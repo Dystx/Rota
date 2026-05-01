@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading } from "@repo/ui";
+import { ArchiveLayout, TripCard } from "@repo/ui";
 
 const regions = [
   "Porto",
@@ -12,30 +12,30 @@ const regions = [
   "Aveiro"
 ];
 
+function slugify(text: string) {
+  return text.toLowerCase().replace(/\s+/g, "-");
+}
+
 export default function PortugalPage() {
   return (
-    <PageShell>
-      <SectionHeading
-        eyebrow="Portugal launch market"
-        title="Start narrow, then expand country by country"
-        description="The roadmap calls for a curated Portugal-first place base with region logic, local notes, and quality controls."
-      />
-
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <ArchiveLayout
+      testid="portugal-header"
+      header={{
+        eyebrow: "Portugal launch market",
+        title: "Start narrow, then expand country by country",
+        description: "The roadmap calls for a curated Portugal-first place base with region logic, local notes, and quality controls."
+      }}
+    >
+      <div data-testid="region-grid" className="contents">
         {regions.map((region) => (
-          <Card key={region}>
-            <CardHeader>
-              <CardTitle>{region}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="rota-muted">
-                Seed region for routes, places, seasonal judgment, and local
-                review standards.
-              </p>
-            </CardContent>
-          </Card>
+          <TripCard
+            key={region}
+            testid={`region-card-${slugify(region)}`}
+            title={region}
+            caption="Seed region for routes, places, seasonal judgment, and local review standards."
+          />
         ))}
       </div>
-    </PageShell>
+    </ArchiveLayout>
   );
 }
