@@ -4,3 +4,5 @@ export * from "./components/card";
 export * from "./components/shell";
 export * from "./components/table";
 export * from "./components/map";
+export { TripCard } from "./components/trip-card";
+export type { TripCardProps } from "./components/trip-card";
