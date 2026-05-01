@@ -14,71 +14,80 @@ export default function ReviewerOperationsPage() {
 
   return (
     <PageShell variant="reviewer">
-      <SectionHeading
-        eyebrow="Background operations"
-        title="Worker plan shell"
-        description="Surfaces the next roadmap layer: export jobs, reviewer assignment, and route refresh work that should run outside the request cycle."
-      />
-      <Card>
-        <CardHeader>
-          <CardTitle>Current worker plan</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <p className="rota-muted text-sm">{workerPlan.summary}</p>
-          <div className="grid gap-4 lg:grid-cols-3">
-            {workerPlan.jobs.map((job) => (
-              <div key={job.id} className="grid gap-3 rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                <div className="flex flex-wrap gap-2">
-                  <Badge tone="soft">{job.type.replace(/_/g, " ")}</Badge>
-                  <Badge tone="soft">{job.status}</Badge>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[var(--color-foreground)]">{job.title}</p>
-                  <p className="rota-muted mt-2 text-sm">{job.summary}</p>
-                </div>
-                <div className="grid gap-2 text-sm">
-                  <p className="text-[var(--color-foreground)]">Owner: {job.owner}</p>
-                  <p className="text-[var(--color-foreground)]">Next step: {job.nextStep}</p>
-                  {job.blockingReason ? <p className="rota-muted">Blocked: {job.blockingReason}</p> : null}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+      <div data-testid="reviewer-operations-header">
+        <SectionHeading
+          eyebrow="Background operations"
+          title="Worker plan shell"
+          description="Surfaces the next roadmap layer: export jobs, reviewer assignment, and route refresh work that should run outside the request cycle."
+        />
+      </div>
+
+      <div className="flex flex-col gap-8 md:gap-12">
+        <Card data-testid="worker-plan-card">
           <CardHeader>
-            <CardTitle>Checkout plans</CardTitle>
+            <CardTitle>Current worker plan</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-3">
-            {checkoutPlans.map((plan) => (
-              <div key={plan.tier} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                <div className="flex flex-wrap gap-2">
-                  <Badge tone="soft">{plan.tier.replace(/-/g, " ")}</Badge>
-                  <Badge tone="soft">{plan.priceLabel}</Badge>
+          <CardContent className="grid gap-6">
+            <p className="rota-muted text-lg">{workerPlan.summary}</p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {workerPlan.jobs.map((job) => (
+                <div key={job.id} className="flex flex-col gap-4 rounded-[24px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.5)] p-6 shadow-sm">
+                  <div className="flex flex-wrap gap-2">
+                    <Badge tone="soft">{job.type.replace(/_/g, " ")}</Badge>
+                    <Badge tone="soft">{job.status}</Badge>
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold text-[var(--color-foreground)]">{job.title}</p>
+                    <p className="rota-muted mt-1 text-sm">{job.summary}</p>
+                  </div>
+                  <div className="mt-auto grid gap-2 pt-2 text-sm">
+                    <p className="text-[var(--color-foreground)]">Owner: {job.owner}</p>
+                    <p className="text-[var(--color-foreground)]">Next step: {job.nextStep}</p>
+                    {job.blockingReason ? <p className="text-[var(--color-muted-foreground)]">Blocked: {job.blockingReason}</p> : null}
+                  </div>
                 </div>
-                <p className="rota-muted mt-3 text-sm">{plan.fulfillment}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Email previews</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3">
-            {emailPreviews.map((preview) => (
-              <div key={preview.kind} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                <div className="flex flex-wrap gap-2">
-                  <Badge tone="soft">{preview.kind.replace(/-/g, " ")}</Badge>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <Card data-testid="checkout-plan-card">
+            <CardHeader>
+              <CardTitle>Checkout plans</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 gap-4">
+              {checkoutPlans.map((plan) => (
+                <div key={plan.tier} className="flex flex-col gap-3 rounded-[24px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.5)] p-6 shadow-sm">
+                  <div className="flex flex-wrap gap-2">
+                    <Badge tone="soft">{plan.tier.replace(/-/g, " ")}</Badge>
+                    <Badge tone="soft">{plan.priceLabel}</Badge>
+                  </div>
+                  <p className="rota-muted text-base">{plan.fulfillment}</p>
                 </div>
-                <p className="mt-3 text-sm font-semibold text-[var(--color-foreground)]">{preview.subject}</p>
-                <p className="rota-muted mt-2 text-sm">{preview.previewText}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card data-testid="email-preview-card">
+            <CardHeader>
+              <CardTitle>Email previews</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 gap-4">
+              {emailPreviews.map((preview) => (
+                <div key={preview.kind} className="flex flex-col gap-3 rounded-[24px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.5)] p-6 shadow-sm">
+                  <div className="flex flex-wrap gap-2">
+                    <Badge tone="soft">{preview.kind.replace(/-/g, " ")}</Badge>
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold text-[var(--color-foreground)]">{preview.subject}</p>
+                    <p className="rota-muted mt-1 text-sm">{preview.previewText}</p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </PageShell>
   );
