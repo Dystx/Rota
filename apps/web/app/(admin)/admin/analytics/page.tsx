@@ -57,61 +57,86 @@ export default async function AdminAnalyticsPage() {
 
   return (
     <PageShell variant="admin">
-      <SectionHeading
-        eyebrow="Admin CMS"
-        title="Analytics shell"
-        description="Prepared for product analytics, funnel health, monetization visibility, and country-launch signals."
-      />
-      <div className="grid gap-4 lg:grid-cols-4">
+      <div data-testid="admin-analytics-header" className="mb-12">
+        <SectionHeading
+          eyebrow="Admin CMS"
+          title="Analytics shell"
+          description="Prepared for product analytics, funnel health, monetization visibility, and country-launch signals."
+        />
+      </div>
+
+      <div data-testid="analytics-metrics" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
         {metrics.map((metric) => (
-          <Card key={metric.label}>
-            <CardHeader>
-              <CardTitle>{metric.label}</CardTitle>
+          <Card key={metric.label} className="rota-glass-panel border-none shadow-sm transition-all hover:shadow-md">
+            <CardHeader className="pb-3 border-b border-border/40">
+              <CardTitle className="text-lg font-medium tracking-tight">{metric.label}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-5">
               <StatPill label="Current" value={metric.value} />
             </CardContent>
           </Card>
         ))}
       </div>
+
       {infoMessage ? (
-        <Card>
+        <Card className="mb-8 border-[rgba(180,35,24,0.15)] bg-[rgba(180,35,24,0.03)] shadow-none">
           <CardContent className="pt-6">
-            <p className="rota-muted text-sm">{infoMessage}</p>
+            <p className="text-[#b42318] text-sm font-medium flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#b42318] inline-block"></span>
+              {infoMessage}
+            </p>
           </CardContent>
         </Card>
       ) : null}
-      <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>Core funnel</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3">
-            {funnels.map(([stage, value]) => (
-              <div key={stage} className="flex items-center justify-between rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                <p className="text-sm text-[var(--color-foreground)]">{stage}</p>
-                <StatPill label="Rate" value={value} />
+
+      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] w-full max-w-full min-w-0">
+        <div data-testid="funnel-card" className="w-full min-w-0">
+          <Card className="rota-glass-panel border-none shadow-sm overflow-hidden h-full">
+            <CardHeader className="border-b border-border/40 bg-[var(--color-surface-muted)]/30">
+              <CardTitle className="text-lg font-medium tracking-tight flex items-center gap-2">
+                <span className="rota-dot"></span> Core funnel
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 overflow-x-auto">
+              <div className="grid gap-3 min-w-[300px]">
+                {funnels.map(([stage, value]) => (
+                  <div key={stage} className="flex items-center justify-between rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface)] p-4 shadow-sm transition-colors hover:border-[var(--color-primary)]/30 hover:bg-white">
+                    <p className="text-sm font-medium text-[var(--color-foreground)] tracking-tight">{stage}</p>
+                    <StatPill label="Rate" value={value} />
+                  </div>
+                ))}
               </div>
-            ))}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Partner click leaderboard</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3 text-sm">
-            {topPartners.length ? (
-              topPartners.map((partner) => (
-                <div key={partner.partnerId} className="flex items-center justify-between rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                  <p className="text-sm text-[var(--color-foreground)]">{partner.name}</p>
-                  <StatPill label="Clicks" value={String(partner.clicks)} />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div data-testid="partner-leaderboard" className="w-full min-w-0">
+          <Card className="rota-glass-panel border-none shadow-sm overflow-hidden h-full">
+            <CardHeader className="border-b border-border/40 bg-[var(--color-surface-muted)]/30">
+              <CardTitle className="text-lg font-medium tracking-tight flex items-center gap-2">
+                <span className="rota-dot"></span> Partner click leaderboard
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 overflow-x-auto text-sm">
+              {topPartners.length ? (
+                <div className="grid gap-3 min-w-[300px]">
+                  {topPartners.map((partner) => (
+                    <div key={partner.partnerId} className="flex items-center justify-between rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface)] p-4 shadow-sm transition-colors hover:border-[var(--color-primary)]/30 hover:bg-white">
+                      <p className="text-sm font-medium text-[var(--color-foreground)] tracking-tight">{partner.name}</p>
+                      <StatPill label="Clicks" value={String(partner.clicks)} />
+                    </div>
+                  ))}
                 </div>
-              ))
-            ) : (
-              <p className="rota-muted">Partner click reporting will appear here once travelers start opening booking sources from saved trips.</p>
-            )}
-          </CardContent>
-        </Card>
+              ) : (
+                <div className="p-4 rounded-xl bg-[rgba(48,101,118,0.04)] border border-[rgba(48,101,118,0.1)]">
+                  <p className="text-[var(--color-secondary)] text-sm leading-relaxed font-medium">
+                    Partner click reporting will appear here once travelers start opening booking sources from saved trips.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </PageShell>
   );
