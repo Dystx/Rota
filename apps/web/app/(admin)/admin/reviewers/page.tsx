@@ -32,27 +32,31 @@ export default async function AdminReviewersPage() {
 
   return (
     <PageShell variant="admin">
-      <SectionHeading
-        eyebrow="Admin CMS"
-        title="Reviewer management shell"
-        description="Matches the roadmap's reviewer-management layer: region fit, language coverage, specialties, and assignment readiness."
-      />
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card>
+      <div data-testid="admin-reviewers-header">
+        <SectionHeading
+          eyebrow="Admin CMS"
+          title="Reviewer management shell"
+          description="Matches the roadmap's reviewer-management layer: region fit, language coverage, specialties, and assignment readiness."
+        />
+      </div>
+      
+      <div className="grid gap-6 lg:grid-cols-3 mb-8">
+        <Card className="rota-glass-panel border-0">
           <CardHeader>
             <CardTitle>Reviewer coverage</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
+          <CardContent className="flex flex-wrap gap-4">
             <StatPill label="Active" value={`${rows.filter((row) => row[4] === "Active").length} reviewers`} />
             <StatPill label="Languages" value="PT / EN / ES" />
             <StatPill label="Gap" value="South coast" />
           </CardContent>
         </Card>
-        <Card>
+        
+        <Card className="rota-glass-panel border-0">
           <CardHeader>
             <CardTitle>Assignment tags</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
+          <CardContent className="flex flex-wrap gap-3">
             {[
               "Food-first",
               "Family pacing",
@@ -63,33 +67,40 @@ export default async function AdminReviewersPage() {
             ))}
           </CardContent>
         </Card>
-        <Card>
+        
+        <Card className="rota-glass-panel border-0 bg-[var(--color-surface)]">
           <CardHeader>
             <CardTitle>Review quality goal</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="rota-muted text-sm">Keep visible trust markers credible by matching reviewers to region, language, and route style.</p>
+            <p className="text-[var(--color-muted-foreground)] text-sm leading-relaxed">
+              Keep visible trust markers credible by matching rumia.pt reviewers to region, language, and route style.
+            </p>
           </CardContent>
         </Card>
       </div>
+
       {infoMessage ? (
-        <Card>
+        <Card className="mb-8 border-amber-200 bg-amber-50">
           <CardContent className="pt-6">
-            <p className="rota-muted text-sm">{infoMessage}</p>
+            <p className="text-sm text-amber-800">{infoMessage}</p>
           </CardContent>
         </Card>
       ) : null}
-      <Card>
-        <CardHeader>
-          <CardTitle>Reviewer roster</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            columns={["Reviewer", "Regions", "Languages", "Specialty", "Status"]}
-            rows={rows}
-          />
-        </CardContent>
-      </Card>
+
+      <div data-testid="reviewers-table" className="min-w-0 max-w-full">
+        <Card className="rota-glass-panel border-0 overflow-hidden">
+          <CardHeader>
+            <CardTitle>Reviewer roster</CardTitle>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <DataTable
+              columns={["Reviewer", "Regions", "Languages", "Specialty", "Status"]}
+              rows={rows}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </PageShell>
   );
 }
