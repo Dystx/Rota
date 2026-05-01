@@ -49,70 +49,88 @@ export default async function AdminQualityPage() {
 
   return (
     <PageShell variant="admin">
-      <SectionHeading
-        eyebrow="Admin CMS"
-        title="Quality dashboard shell"
-        description="Surfaces the roadmap's quality-review layer for itinerary health, reviewer trust, and route realism."
-      />
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Quality score</CardTitle>
+      <div data-testid="admin-quality-header" className="mb-12">
+        <SectionHeading
+          eyebrow="Admin CMS"
+          title="Quality dashboard shell"
+          description="Surfaces the roadmap's quality-review layer for itinerary health, reviewer trust, and route realism."
+        />
+      </div>
+
+      <div data-testid="quality-metrics" className="grid gap-6 lg:grid-cols-3 mb-10">
+        <Card className="rota-glass-panel border-none shadow-sm transition-all hover:shadow-md">
+          <CardHeader className="pb-3 border-b border-border/40">
+            <CardTitle className="text-lg font-medium tracking-tight">Quality score</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
+          <CardContent className="pt-5 flex flex-wrap gap-4">
             <StatPill label="Current" value={averageQuality === "—" ? averageQuality : `${averageQuality} / 10`} />
             <StatPill label="Places flagged" value={String(flaggedPlaces.length)} />
             <StatPill label="High confidence" value={String(highConfidencePlaces)} />
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Key checks</CardTitle>
+
+        <Card className="rota-glass-panel border-none shadow-sm transition-all hover:shadow-md">
+          <CardHeader className="pb-3 border-b border-border/40">
+            <CardTitle className="text-lg font-medium tracking-tight">Key checks</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
+          <CardContent className="pt-5 flex flex-wrap gap-2.5">
             {[
               `${places.length} places tracked`,
               `${scoredPlaces.length} scored`,
               `${flaggedPlaces.filter((place) => place.quality === null).length} missing quality`,
               `${flaggedPlaces.filter((place) => place.sourceConfidence !== "High").length} low-confidence`
             ].map((item) => (
-              <Badge key={item} tone="soft">{item}</Badge>
+              <Badge key={item} tone="soft" className="bg-[var(--color-surface-muted)] text-[var(--color-ink-soft)] px-3 py-1 font-medium">{item}</Badge>
             ))}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Current focus</CardTitle>
+
+        <Card className="rota-glass-panel border-none shadow-sm transition-all hover:shadow-md bg-[var(--color-surface)]">
+          <CardHeader className="pb-3 border-b border-border/40">
+            <CardTitle className="text-lg font-medium tracking-tight">Current focus</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="rota-muted text-sm">
-              {flaggedPlaces.length
-                ? "Prioritize lower-confidence or lower-scored places before they influence more generated routes."
-                : "Quality signals look clear so far. Keep expanding the curated place base without lowering confidence standards."}
-            </p>
+          <CardContent className="pt-5 flex flex-col justify-center">
+            <div className="p-4 rounded-xl bg-[rgba(48,101,118,0.04)] border border-[rgba(48,101,118,0.1)]">
+              <p className="text-[var(--color-secondary)] text-sm leading-relaxed font-medium">
+                {flaggedPlaces.length
+                  ? "Prioritize lower-confidence or lower-scored places before they influence more generated routes."
+                  : "Quality signals look clear so far. Keep expanding the curated place base without lowering confidence standards."}
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
+
       {infoMessage ? (
-        <Card>
+        <Card className="mb-8 border-[rgba(180,35,24,0.15)] bg-[rgba(180,35,24,0.03)] shadow-none">
           <CardContent className="pt-6">
-            <p className="rota-muted text-sm">{infoMessage}</p>
+            <p className="text-[#b42318] text-sm font-medium flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#b42318] inline-block"></span>
+              {infoMessage}
+            </p>
           </CardContent>
         </Card>
       ) : null}
-      <Card>
-        <CardHeader>
-          <CardTitle>Place review queue</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2">
-          {checks.map((item) => (
-            <div key={item.title} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-              <p className="text-sm font-semibold text-[var(--color-foreground)]">{item.title}</p>
-              <p className="rota-muted mt-2 text-sm">{item.details}</p>
+
+      <div data-testid="quality-queue" className="w-full max-w-full min-w-0">
+        <Card className="rota-glass-panel border-none shadow-sm overflow-hidden">
+          <CardHeader className="border-b border-border/40 bg-[var(--color-surface-muted)]/30">
+            <CardTitle className="text-lg font-medium tracking-tight flex items-center gap-2">
+              <span className="rota-dot"></span> Place review queue
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 overflow-x-auto">
+            <div className="grid gap-4 md:grid-cols-2">
+              {checks.map((item) => (
+                <div key={item.title} className="rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface)] p-5 shadow-sm transition-colors hover:border-[var(--color-primary)]/30 hover:bg-white">
+                  <p className="text-sm font-medium text-[var(--color-foreground)] tracking-tight">{item.title}</p>
+                  <p className="text-[var(--color-muted-foreground)] mt-1.5 text-sm leading-relaxed">{item.details}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </PageShell>
   );
 }
