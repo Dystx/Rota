@@ -104,7 +104,7 @@ Primary files:
 
 #### 4. Consumer export and polished delivery surfaces
 
-Status: queued after map/audit UI
+Status: completed
 
 Stitch sources:
 
@@ -117,6 +117,8 @@ Routes to implement in this pass:
 Why fourth:
 
 - unlock, export, and delivery logic are already present, but the delivery experience still needs the actual product-grade Stitch treatment
+
+Completed: 2026-05-01 (`e4ef29e`).
 
 Primary files:
 
