@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+:root {
+  --color-background: #f7faf9;
+  --color-surface: rgba(255, 255, 255, 0.86);
+  --color-surface-muted: #ebeeed;
+  --color-foreground: #181c1c;
+  --color-muted-foreground: #566063;
+  --color-border: #dfe3e2;
+  --color-accent: #b3e8fb;
+  --color-secondary: #306576;
+  --color-ink-soft: #2d3131;
+}
+
+@theme inline {
+  --font-body: var(--font-rota-body);
+  --font-display: var(--font-rota-display);
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-foreground: var(--color-foreground);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-border: var(--color-border);
+  --color-accent: var(--color-accent);
+  --color-secondary: var(--color-secondary);
+  --color-ink-soft: var(--color-ink-soft);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at top right, rgba(179, 232, 251, 0.15), transparent 40%),
+      radial-gradient(circle at top left, rgba(48, 101, 118, 0.05), transparent 40%),
+      linear-gradient(180deg, #f7faf9 0%, #f1f4f3 100%);
+    color: var(--color-foreground);
+    font-family: var(--font-rota-body), sans-serif;
+  }
+}
+
+@layer components {
+  .rota-display {
+    font-family: var(--font-rota-display), serif;
+    font-size: clamp(3.2rem, 7vw, 6rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--color-foreground);
+  }
+
+  .rota-heading {
+    font-family: var(--font-rota-display), serif;
+    font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-foreground);
+  }
+
+  .rota-kicker {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+    color: var(--color-muted-foreground);
+  }
+
+  .rota-muted {
+    color: var(--color-muted-foreground);
+    line-height: 1.8;
+  }
+
+  .rota-glass-panel {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5));
+    backdrop-filter: blur(24px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 8px 32px rgba(24, 28, 28, 0.04);
+  }
+
+  .rota-list-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .rota-dot {
+    height: 0.55rem;
+    width: 0.55rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--color-secondary);
+  }
+
+  .rota-stack-list {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+    padding-left: 1rem;
+    color: var(--color-muted-foreground);
+    line-height: 1.65;
+  }
+
+  .rota-input-placeholder {
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.78);
+    padding: 1rem 1.1rem;
+    color: var(--color-muted-foreground);
+  }
+
+  .rota-stop-card {
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.78);
+    padding: 1rem;
+    color: var(--color-foreground);
+  }
+
+  .rota-form-field {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .rota-form-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-muted-foreground);
+  }
+
+  .rota-form-hint {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--color-muted-foreground);
+  }
+
+  .rota-form-input {
+    width: 100%;
+    border-radius: 18px;
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.84);
+    padding: 0.9rem 1rem;
+    color: var(--color-foreground);
+    font: inherit;
+  }
+
+  .rota-form-input:focus {
+    outline: 2px solid rgba(179, 232, 251, 0.85);
+    outline-offset: 2px;
+  }
+
+  .rota-form-textarea {
+    min-height: 10rem;
+    resize: vertical;
+  }
+
+  .rota-form-error {
+    margin: 0;
+    font-size: 0.84rem;
+    color: #b42318;
+  }
+
+  .rota-check-card {
+    display: flex;
+    align-items: center;
+    border-radius: 18px;
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.78);
+    padding: 0.9rem 1rem;
+    color: var(--color-foreground);
+    cursor: pointer;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .rota-check-card:hover {
+    border-color: rgba(48, 101, 118, 0.38);
+    transform: translateY(-1px);
+  }
+
+  .rota-check-card--active {
+    border-color: rgba(48, 101, 118, 0.58);
+    background: rgba(179, 232, 251, 0.34);
+  }
+
+  .rota-json-preview {
+    margin: 0;
+    overflow: auto;
+    border-radius: 20px;
+    background: rgba(24, 28, 28, 0.94);
+    padding: 1rem;
+    color: #d9e4e7;
+    font-size: 0.86rem;
+    line-height: 1.6;
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "extends": "../../packages/typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@repo/emails": ["../../packages/emails/src/index.ts"],
+      "@repo/emails/*": ["../../packages/emails/src/*"],
+      "@repo/payments": ["../../packages/payments/src/index.ts"],
+      "@repo/payments/*": ["../../packages/payments/src/*"],
+      "@repo/types": ["../../packages/types/src/index.ts"],
+      "@repo/types/*": ["../../packages/types/src/*"]
+    },
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts"]
+}

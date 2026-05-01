@@ -1,0 +1,20 @@
+{
+  "name": "@repo/workers",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@repo/emails": "workspace:*",
+    "@repo/payments": "workspace:*",
+    "@repo/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}
