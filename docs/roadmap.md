@@ -180,7 +180,7 @@ Primary files:
 
 #### 7. Admin CMS and archive-style control surfaces
 
-Status: queued after reviewer workspace
+Status: completed
 
 Stitch sources:
 
@@ -200,6 +200,8 @@ Routes to implement in this pass:
 Why seventh:
 
 - the admin data layer is already in place for the core CMS entities, so the remaining work is to turn the shells into a coherent, real product UI rather than placeholders
+
+Completed: 2026-05-01 (Slice 7 admin verification passed across `/admin/places`, `/admin/countries`, `/admin/regions`, `/admin/partners`, `/admin/reviewers`, `/admin/quality`, and `/admin/analytics`; public/no-auth reachability preserved for `/admin/places` and `/admin/analytics`).
 
 Primary files:
 
