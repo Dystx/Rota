@@ -150,7 +150,7 @@ Primary files:
 
 #### 6. Reviewer workspace real UI pass
 
-Status: queued after consumer surfaces
+Status: completed
 
 Stitch sources:
 
@@ -167,6 +167,8 @@ Routes to implement in this pass:
 Why sixth:
 
 - reviewer functionality already exists and should now be expressed with the real operational UI from Stitch once the consumer journey is visually stable
+
+Completed: 2026-05-01 (`bf415da`, `fab3c54`, `2e348b6`, `803d810`, `a2499d1`).
 
 Primary files:
 
