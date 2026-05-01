@@ -126,7 +126,7 @@ Primary files:
 
 #### 5. Consumer archive and saved-trip browsing
 
-Status: queued after polished delivery
+Status: completed
 
 Stitch sources:
 
@@ -140,6 +140,8 @@ Routes to implement in this pass:
 Why fifth:
 
 - once the main planning and delivery flow looks correct, the archive/browsing surfaces can inherit the same editorial language for saved and destination-focused discovery
+
+Completed: 2026-05-01 (`859c81b`, `baa17c8`).
 
 Primary files:
 
