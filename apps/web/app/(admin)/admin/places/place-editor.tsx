@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, DataTable } from "@repo/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, DataTable } from "@repo/ui";
 import type { Place } from "@repo/types";
 
 type PlaceRow = Place & { quality: number | null };
@@ -64,11 +64,11 @@ export function PlaceEditor() {
   const rows = useMemo(
     () =>
       places.map((place) => [
-        place.name,
-        place.region,
-        place.category,
-        place.quality?.toString() ?? "Pending",
-        place.sourceConfidence,
+        <div key={`${place.id}-name`} className="font-medium text-[var(--color-foreground)]">{place.name}</div>,
+        <Badge key={`${place.id}-region`} tone="soft">{place.region}</Badge>,
+        <span key={`${place.id}-cat`} className="text-[var(--color-muted-foreground)]">{place.category}</span>,
+        <span key={`${place.id}-qual`}>{place.quality?.toString() ?? "Pending"}</span>,
+        <span key={`${place.id}-conf`}>{place.sourceConfidence}</span>,
         <Button key={`${place.id}-edit`} type="button" variant="ghost" onClick={() => startEdit(place)}>
           Edit
         </Button>
@@ -209,53 +209,91 @@ export function PlaceEditor() {
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-      <Card>
-        <CardHeader>
-          <CardTitle>Places table</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          {isLoading ? <p className="rota-muted text-sm">Loading places…</p> : null}
-          <DataTable columns={["Place", "Region", "Category", "Quality", "Source confidence", "Action"]} rows={rows} />
-          <p className="rota-muted text-sm">{message}</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>{editingId ? "Edit place" : "New place"}</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <FormField label="Place name">
-            <input className="rota-form-input" value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} />
-          </FormField>
-          <FormField label="Region">
-            <input className="rota-form-input" value={draft.region} onChange={(event) => setDraft((current) => ({ ...current, region: event.target.value }))} />
-          </FormField>
-          <FormField label="Category">
-            <input className="rota-form-input" value={draft.category} onChange={(event) => setDraft((current) => ({ ...current, category: event.target.value }))} />
-          </FormField>
-          <div className="grid gap-4 md:grid-cols-2">
-            <FormField label="Quality score">
-              <input className="rota-form-input" value={draft.quality} onChange={(event) => setDraft((current) => ({ ...current, quality: event.target.value }))} />
+    <div className="grid items-start gap-8 xl:grid-cols-[1.15fr_0.85fr]">
+      <div className="grid gap-6 min-w-0">
+        <Card className="overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
+          <CardHeader>
+            <CardTitle>Places index</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-6 min-w-0">
+            <div data-testid="places-table" className="min-w-0 overflow-x-auto">
+              {isLoading ? <p className="text-sm text-[var(--color-muted-foreground)]">Loading places…</p> : null}
+              <DataTable columns={["Place", "Region", "Category", "Quality", "Source confidence", "Action"]} rows={rows} />
+            </div>
+            <p className="text-sm text-[var(--color-muted-foreground)]">{message}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="sticky top-32">
+        <Card data-testid="place-form" className="overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
+          <CardHeader>
+            <CardTitle>{editingId ? "Edit place" : "New place"}</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-5">
+            <FormField label="Place name">
+              <input
+                className="w-full rounded-[18px] border border-[var(--color-border)] bg-[rgba(255,255,255,0.84)] px-4 py-3.5 text-[var(--color-foreground)] transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                value={draft.name}
+                onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
+                placeholder="e.g. Miradouro da Vitória"
+              />
             </FormField>
-            <FormField label="Source confidence">
-              <input className="rota-form-input" value={draft.sourceConfidence} onChange={(event) => setDraft((current) => ({ ...current, sourceConfidence: event.target.value }))} />
+            <FormField label="Region">
+              <input
+                className="w-full rounded-[18px] border border-[var(--color-border)] bg-[rgba(255,255,255,0.84)] px-4 py-3.5 text-[var(--color-foreground)] transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                value={draft.region}
+                onChange={(event) => setDraft((current) => ({ ...current, region: event.target.value }))}
+                placeholder="e.g. Porto"
+              />
             </FormField>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Button type="button" onClick={savePlace} disabled={isSaving}>{isSaving ? "Saving…" : editingId ? "Save place" : "Add place"}</Button>
-            <Button type="button" variant="ghost" onClick={resetForm}>Clear</Button>
-          </div>
-        </CardContent>
-      </Card>
+            <FormField label="Category">
+              <input
+                className="w-full rounded-[18px] border border-[var(--color-border)] bg-[rgba(255,255,255,0.84)] px-4 py-3.5 text-[var(--color-foreground)] transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                value={draft.category}
+                onChange={(event) => setDraft((current) => ({ ...current, category: event.target.value }))}
+                placeholder="e.g. Viewpoint"
+              />
+            </FormField>
+            <div className="grid gap-5 md:grid-cols-2">
+              <FormField label="Quality score">
+                <input
+                  className="w-full rounded-[18px] border border-[var(--color-border)] bg-[rgba(255,255,255,0.84)] px-4 py-3.5 text-[var(--color-foreground)] transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                  value={draft.quality}
+                  onChange={(event) => setDraft((current) => ({ ...current, quality: event.target.value }))}
+                  placeholder="0.0 - 10.0"
+                />
+              </FormField>
+              <FormField label="Source confidence">
+                <input
+                  className="w-full rounded-[18px] border border-[var(--color-border)] bg-[rgba(255,255,255,0.84)] px-4 py-3.5 text-[var(--color-foreground)] transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                  value={draft.sourceConfidence}
+                  onChange={(event) => setDraft((current) => ({ ...current, sourceConfidence: event.target.value }))}
+                  placeholder="e.g. High"
+                />
+              </FormField>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Button data-testid="place-save-button" type="button" onClick={savePlace} disabled={isSaving}>
+                {isSaving ? "Saving…" : editingId ? "Save place" : "Add place"}
+              </Button>
+              <Button type="button" variant="ghost" onClick={resetForm}>
+                Clear
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
 
 function FormField({ children, label }: { children: React.ReactNode; label: string }) {
   return (
-    <label className="rota-form-field">
-      <span className="rota-form-label">{label}</span>
+    <label className="grid gap-2">
+      <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--color-muted-foreground)]">
+        {label}
+      </span>
       {children}
     </label>
   );
