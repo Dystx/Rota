@@ -1,4 +1,4 @@
-import { getRegionById, isPersistenceConfigError, listRegions } from "@repo/db";
+import { isPersistenceConfigError, listRegions } from "@repo/db";
 import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading, StatPill } from "@repo/ui";
 
 export default async function AdminRegionsPage() {
@@ -33,12 +33,14 @@ export default async function AdminRegionsPage() {
 
   return (
     <PageShell variant="admin">
-      <SectionHeading
-        eyebrow="Admin CMS"
-        title="Region management shell"
-        description="Tracks local summaries, launch regions, best-fit tags, and seasonality notes for country-by-country rollout."
-      />
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div id="admin-regions-header" className="admin-regions-header" data-testid="admin-regions-header">
+        <SectionHeading
+          eyebrow="Admin CMS"
+          title="Region management shell"
+          description="Tracks local summaries, launch regions, best-fit tags, and seasonality notes for country-by-country rollout."
+        />
+      </div>
+      <div id="regions-summary" className="regions-summary grid gap-4 lg:grid-cols-3" data-testid="regions-summary">
         <Card>
           <CardHeader>
             <CardTitle>Active launch shape</CardTitle>
@@ -80,17 +82,19 @@ export default async function AdminRegionsPage() {
           </CardContent>
         </Card>
       ) : null}
-      <Card>
-        <CardHeader>
-          <CardTitle>Region controls</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            columns={["Region", "Country", "Best for", "Seasonality", "Launch status"]}
-            rows={rows}
-          />
-        </CardContent>
-      </Card>
+      <div id="regions-table" className="regions-table min-w-0 max-w-full" data-testid="regions-table">
+        <Card className="min-w-0 max-w-full">
+          <CardHeader>
+            <CardTitle>Region controls</CardTitle>
+          </CardHeader>
+          <CardContent className="overflow-x-auto overflow-y-hidden">
+            <DataTable
+              columns={["Region", "Country", "Best for", "Seasonality", "Launch status"]}
+              rows={rows}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </PageShell>
   );
 }
