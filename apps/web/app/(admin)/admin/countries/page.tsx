@@ -1,5 +1,5 @@
 import { isPersistenceConfigError, listRegions } from "@repo/db";
-import { Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading } from "@repo/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading } from "@repo/ui";
 
 function titleCase(value: string) {
   return value
@@ -42,7 +42,7 @@ export default async function AdminCountriesPage() {
     }, new Map()).values()
   );
 
-  const rows =
+  const rawRows =
     countries.length > 0
       ? countries.map((country) => [country.name, country.status, country.name === "Portugal" ? "EUR" : "Pending", country.languages])
       : [
@@ -51,25 +51,76 @@ export default async function AdminCountriesPage() {
           ["Italy", "Planned", "EUR", "EN / IT"]
         ];
 
+  const rows = rawRows.map((row, idx) => [
+    <div key={`col0-${idx}`} className="flex items-center gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface-muted)] font-medium text-[var(--color-foreground)]">
+        {String(row[0]).charAt(0)}
+      </div>
+      <span className="font-medium tracking-tight text-[var(--color-foreground)]">{row[0]}</span>
+    </div>,
+    <Badge key={`col1-${idx}`} tone={row[1] === "Active MVP" ? "default" : "soft"}>
+      {row[1] as string}
+    </Badge>,
+    <span key={`col2-${idx}`} className="font-mono text-sm tracking-wider text-[var(--color-muted-foreground)]">
+      {row[2]}
+    </span>,
+    <span key={`col3-${idx}`} className="text-[var(--color-muted-foreground)]">
+      {row[3]}
+    </span>
+  ]);
+
   return (
     <PageShell variant="admin">
-      <SectionHeading
-        eyebrow="Country configuration"
-        title="Launch-country controls shell"
-        description="Holds transport assumptions, seasonality rules, prompt packs, and reviewer requirements."
-      />
-      <Card>
-        <CardHeader>
-          <CardTitle>Country rollout</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {infoMessage ? <p className="rota-muted mb-4 text-sm">{infoMessage}</p> : null}
-          <DataTable
-            columns={["Country", "Status", "Default currency", "Languages"]}
-            rows={rows}
+      <div className="mx-auto max-w-5xl min-w-0 space-y-16">
+        <div data-testid="admin-countries-header" className="relative">
+          <div className="absolute -left-12 -top-12 -z-10 h-64 w-64 rounded-full bg-[var(--color-accent)]/20 blur-[100px]" />
+          <SectionHeading
+            eyebrow="System Configuration"
+            title="Geographic Rollout"
+            description="Manage operational regions, feature flags, and localization settings for rumia.pt deployments."
+            className="border-b border-[var(--color-border)] pb-8"
           />
-        </CardContent>
-      </Card>
+        </div>
+
+        <div className="grid min-w-0 gap-8">
+          {infoMessage ? (
+            <Card className="border-amber-500/20 bg-amber-50/50 backdrop-blur-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4 text-amber-900">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/20">
+                    <span className="text-sm font-bold text-amber-700">!</span>
+                  </div>
+                  <p className="text-sm font-medium leading-relaxed">{infoMessage}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : null}
+
+          <div data-testid="countries-table" className="group relative min-w-0">
+            <div className="absolute -inset-2 -z-10 rounded-[32px] bg-gradient-to-b from-[var(--color-surface-muted)] to-transparent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
+            <Card className="min-w-0 overflow-hidden border-0 shadow-[0_8px_40px_rgba(24,28,28,0.06)] ring-1 ring-[var(--color-border)]/50">
+              <CardHeader className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]/30 px-6 py-6 sm:px-8">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl tracking-tight text-[var(--color-foreground)]">
+                      Active Territories
+                    </CardTitle>
+                    <p className="mt-1 text-sm leading-relaxed text-[var(--color-muted-foreground)]">
+                      Overview of currently supported markets and their operational status.
+                    </p>
+                  </div>
+                  <Badge tone="default" className="self-start sm:self-auto">{rawRows.length} Markets</Badge>
+                </div>
+              </CardHeader>
+              <div className="overflow-x-auto p-0 sm:p-2 sm:pb-0">
+                <div className="min-w-[600px] sm:min-w-0">
+                  <DataTable columns={["Territory", "Deployment Status", "Currency", "Locales"]} rows={rows} />
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
     </PageShell>
   );
 }
