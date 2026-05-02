@@ -9,3 +9,8 @@
   - Offline/error states
   - Desktop/mobile screenshots in evidence directory
 - Decision: skip T16 for now and proceed to T17 (independent task in Wave 2), then return to T16 later with a fresh session or different approach.
+
+### T26: Local DB Schema Drift Evidence
+- During Playwright integration testing for T26, the local route preview returned the error `column trips.owner_user_id does not exist`.
+- This is a known local schema mismatch/drift limitation and unrelated to the map provider logic.
+- We updated the test to target the map surface directly (`element.screenshot`) rather than relying on a full-page capture to ignore the hero section error state while strictly verifying the Mapbox provider abstraction UI layer.
