@@ -40,6 +40,7 @@ export function RouteMap({
 
   return (
     <div
+      data-testid="schematic-map-fallback"
       className={cn(
         "relative flex h-[600px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[linear-gradient(180deg,rgba(177,232,251,0.25),rgba(247,250,249,0.96))] shadow-[0_24px_60px_rgba(7,17,19,0.06)]",
         className
