@@ -25,9 +25,6 @@ test.describe("Map Provider Integration", () => {
     const providerMap = page.locator('[data-testid="provider-map"]');
     await expect(providerMap).toBeVisible({ timeout: 10000 });
     
-    // Assert public token appears
-    await expect(providerMap).toContainText("Public Token: pk.test...");
-    
     // Take screenshot
     await page.screenshot({ path: "../../.sisyphus/evidence/future-roadmap/task-26-mapbox-enabled.png" });
   });

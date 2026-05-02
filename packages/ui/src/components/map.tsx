@@ -125,6 +125,17 @@ export function RouteMap({
         </div>
       )}
 
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
+        <div className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/90 px-4 py-2 text-xs font-medium shadow-sm backdrop-blur-md text-[var(--color-muted-foreground)]">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          Schematic route map shown while interactive map is unavailable
+        </div>
+      </div>
+
       <div className="relative z-10 h-full w-full pointer-events-none">
         {children}
       </div>

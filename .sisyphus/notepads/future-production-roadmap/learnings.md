@@ -153,3 +153,7 @@ network. Pattern lives in `packages/analytics/src/index.test.ts` (block
 - The map abstraction requires safe checking of `NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN`.
 - To avoid Next.js hydration issues when deciding between a fallback component and a lazily-loaded provider component, use a `useClient` state check inside an effect combined with initial SSR rendering of the fallback.
 - For Playwright testing without modifying environment variables, we implemented a safe backdoor using `typeof window !== 'undefined' && window.location.search.includes('forceMapboxProvider=1')` which only affects the client and cleanly enables deterministic provider screenshots.
+
+### T26: Mapbox Token Security Hardening
+- Implemented strict prefix checking for public tokens (`pk.`) to ensure `MAPBOX_SECRET_KEY` or other `sk.*` prefixes are never accidentally exposed via the client bundle.
+- Improved the Playwright token override (`forceMapboxProvider=1`) to explicitly gate against production by validating `process.env.NODE_ENV !== "production"`.

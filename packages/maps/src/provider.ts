@@ -1,21 +1,33 @@
 /**
  * Resolves whether the Mapbox provider is enabled for client use.
- * Does not throw on missing unrelated config.
  */
 export function isMapProviderEnabled(): boolean {
-  if (typeof window !== "undefined" && window.location.search.includes("forceMapboxProvider=1")) {
-    return true;
-  }
-  return Boolean(process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN?.trim());
+  return getMapProviderToken() !== null;
 }
 
 /**
  * Retrieves the public map token.
- * Returns null if absent.
+ * Returns null if absent, or if the token appears to be a secret key (must start with pk.).
  */
 export function getMapProviderToken(): string | null {
-  if (typeof window !== "undefined" && window.location.search.includes("forceMapboxProvider=1")) {
+  if (
+    typeof window !== "undefined" && 
+    window.location.search.includes("forceMapboxProvider=1") &&
+    process.env.NODE_ENV !== "production"
+  ) {
     return "pk.test.force_enabled_token_for_playwright";
   }
-  return process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN?.trim() || null;
+
+  const token = process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN?.trim();
+  
+  if (!token) {
+    return null;
+  }
+
+  // Reject secret tokens (sk...) or anything not starting with pk.
+  if (!token.startsWith("pk.")) {
+    return null;
+  }
+
+  return token;
 }
