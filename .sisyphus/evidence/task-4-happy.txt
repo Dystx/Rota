@@ -1,0 +1,16 @@
+
+> @repo/maps@0.0.0 test /Users/cheng/rota/packages/maps
+> vitest run --config vitest.config.ts -- geocoding
+
+
+ RUN  v3.2.4 /Users/cheng/rota/packages/maps
+
+ ✓ src/provider.test.ts (5 tests) 1ms
+ ✓ src/geocoding.test.ts (5 tests) 3ms
+ ✓ src/chapter-mapping.test.ts (4 tests) 1ms
+
+ Test Files  3 passed (3)
+      Tests  14 passed (14)
+   Start at  02:19:39
+   Duration  155ms (transform 48ms, setup 0ms, collect 63ms, tests 5ms, environment 0ms, prepare 92ms)
+
