@@ -23,3 +23,5 @@ Because this repo did not already ship next-intl, I added a minimal local server
 P02: `useReducedMotion` must stay SSR-safe by checking `typeof window !== "undefined"` before `matchMedia`, and the test suite passed with four cases covering false/true/change-event/SSR.
 * Itinerary stop coords can stay backwards compatible by adding optional lng/lat/geocode metadata and enforcing pairwise presence with superRefine.
 * Vitest coverage for schema changes should include both positive parse cases and compile-time type checks for derived helper types.
+* Task 16 analytics telemetry followed the existing `AnalyticsEventName` / `AnalyticsEventPropertyMap` / `AnyAnalyticsEvent` pattern exactly; add the six cinematic events in `packages/analytics/src/index.ts` and cover them with `tryCapture(createFakeAnalyticsProvider(), event)` tests.
+* `pnpm -F @repo/analytics test` and `pnpm -F @repo/analytics typecheck` both passed after adding the cinematic event types and tests.
