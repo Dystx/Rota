@@ -7,6 +7,7 @@
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit -p tsconfig.json",
+    "check:mapbox-budget": "node scripts/check-mapbox-budget.mjs",
     "test": "vitest run --config ../../vitest.config.ts apps/web/app/api/trips/route.test.ts && pnpm test:e2e && pnpm test:visual && pnpm test:a11y",
     "test:e2e": "playwright test --config playwright.config.ts --grep @smoke",
     "test:visual": "playwright test --config playwright.config.ts --grep @visual",

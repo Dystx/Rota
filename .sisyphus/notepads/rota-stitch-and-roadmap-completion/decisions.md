@@ -21,3 +21,7 @@
 - Confirmed `/admin/places` and `/admin/analytics` stayed on their exact pathnames with HTTP 200 and no redirect/auth errors.
 - Updated only the Stitch implementation order block in `docs/roadmap.md` to mark Slice 7 complete.
 * Added `StopWithCoords` as an intersection helper over the inferred stop type so runtime schema and compile-time narrowing stay aligned.
+## [2026-05-05] Mapbox budget gate contract
+- Budget source is `apps/web/.budget.json` with `{ "mapboxGlGzipKb": 850 }`.
+- The CI gate exits `0` for OK, `1` for budget overage, and `2` when the build manifest is missing.
+- Evidence is captured with temp-root fixtures so the gate can be tested without a real Next build.
