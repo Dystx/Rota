@@ -14,3 +14,4 @@ export { KenBurnsImage } from "./components/ken-burns-image";
 export { FilmGrain } from "./components/film-grain";
 export * from "./components/chapter-heading";
 export * from "./components/reveal-section";
+export * from "./components/chapter-nav";

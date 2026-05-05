@@ -6,7 +6,7 @@ export function useReducedMotion(): boolean {
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
       return;
     }
 

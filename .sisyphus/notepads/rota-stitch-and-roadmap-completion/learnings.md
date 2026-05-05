@@ -29,3 +29,6 @@ P02: `useReducedMotion` must stay SSR-safe by checking `typeof window !== "undef
 * `node:test` is enough for fixture coverage here; the missing-manifest case is best asserted by omitting the file entirely and expecting exit code 2.
 
 - T02: @repo/ai typecheck keeps rootDir at package src, so enrichment loads @repo/maps dynamically and tests inject a maps client to avoid cross-package source imports and real network calls.
+
+- Task 17: `ChapterNav` should stay SSR-safe by guarding `window.matchMedia` in `useReducedMotion`; jsdom tests may need a local `matchMedia` stub when exercising reduced-motion-aware components.
+- Task 17: `aria-current="step"` works well for chapter dots, and keyboard navigation should be tested by dispatching key events on the specific active button via `data-chapter-id`.
