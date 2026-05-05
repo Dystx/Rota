@@ -39,6 +39,7 @@ export interface MapChapter {
 
 export interface ProviderMapHandle {
   flyTo: (options: { chapter: MapChapter }) => void;
+  jumpTo?: (chapter: MapChapter) => void;
 }
 
 export interface ProviderMapProps extends React.HTMLAttributes<HTMLDivElement> {

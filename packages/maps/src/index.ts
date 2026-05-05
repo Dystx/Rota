@@ -1,5 +1,6 @@
 export * from "./provider";
 export * from "./components/provider-map";
+export * from "./components/cinematic-map";
 export * from "./geocoding";
 
 export async function prewarm(): Promise<void> {

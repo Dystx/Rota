@@ -11,6 +11,15 @@ type Day = {
   stops: Stop[];
 };
 
+export type ChapterCameraTarget = {
+  id: string;
+  center: [number, number];
+  zoom: number;
+  pitch?: number;
+  bearing?: number;
+  duration?: number;
+};
+
 type Chapter = {
   chapterIndex: number;
   stopName: string;
@@ -94,7 +103,18 @@ export function stopsToChapters(days: Day[]): Chapter[] {
   return chapters;
 }
 
-export function cameraForChapter(chapter: Chapter, prev?: Chapter): CameraTarget {
+export function cameraForChapter(chapter: ChapterCameraTarget): ChapterCameraTarget;
+export function cameraForChapter(chapter: Chapter, prev?: Chapter): CameraTarget;
+export function cameraForChapter(chapter: Chapter | ChapterCameraTarget, prev?: Chapter): CameraTarget | ChapterCameraTarget {
+  if ("center" in chapter) {
+    return {
+      ...chapter,
+      pitch: chapter.pitch ?? CHAPTER_CAMERA_DEFAULTS.pitch,
+      bearing: chapter.bearing ?? CHAPTER_CAMERA_DEFAULTS.bearing,
+      duration: chapter.duration ?? CHAPTER_CAMERA_DEFAULTS.duration,
+    };
+  }
+
   const center: [number, number] | undefined =
     chapter.lng !== undefined && chapter.lat !== undefined ? [chapter.lng, chapter.lat] : undefined;
 
