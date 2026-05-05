@@ -1,1 +1,7 @@
-{ "mapboxGlGzipKb": 850 }
+{
+  "mapboxGlGzipKb": 850,
+  "gates": [
+    { "name": "motion-gate", "command": "pnpm qa:motion-gate", "expect": "exit 0" },
+    { "name": "ui-bundle-route-trip-detail", "route": "/trip/[tripId]", "maxRouteJsKbGz": 850 }
+  ]
+}
