@@ -1,0 +1,4 @@
+
+> @repo/ui@0.0.0 build /Users/cheng/rota/packages/ui
+> tsc --noEmit
+
