@@ -1,0 +1,16 @@
+=== task-P03 motion gate enforcement evidence ===
+Date: 2026-05-05T01:26:43Z
+
+--- Step 1: clean codebase ---
+[motion-gate] OK scanned 107 file(s), no violations
+exit=0
+
+--- Step 2: inject fixture violation ---
+Fixture: import { motion } from 'motion/react'
+[motion-gate] FAIL 1 violation(s) across 108 file(s):
+  /Users/cheng/rota/packages/ui/src/__motion_gate_fixture__.tsx:1: import { motion } from 'motion/react' is forbidden — use { m } from 'motion/react-m'
+exit=1
+
+--- Step 3: remove fixture ---
+[motion-gate] OK scanned 107 file(s), no violations
+exit=0
