@@ -1,0 +1,10 @@
+pnpm -F @repo/maps test -- chapter-mapping
+
+> @repo/maps@0.0.0 test /Users/cheng/rota/packages/maps
+> vitest run --config vitest.config.ts -- chapter-mapping
+
+✓ src/chapter-mapping.test.ts (4 tests) 1ms
+  - interpolateCamera wraps bearing across 360 degrees: passed
+
+Test Files  3 passed (3)
+Tests       14 passed (14)
