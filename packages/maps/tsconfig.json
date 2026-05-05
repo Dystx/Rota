@@ -8,6 +8,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
+      "@repo/ui": ["../ui/src/index.ts"],
       "@/*": ["./src/*"]
     }
   },

@@ -15,6 +15,7 @@ import {
   TravelTimeChip
 } from "@repo/ui";
 import { buildPartnerClickHref, selectRelevantPartners } from "@/lib/partner-enrichment";
+import { PrewarmLink } from "./map-components";
 
 export default async function TripMapPage({
   params,
@@ -142,7 +143,7 @@ export default async function TripMapPage({
               const isActive = routeDay.dayIndex === activeDay?.dayIndex || (!activeDay && routeDay.dayIndex === 1);
 
               return (
-                <Link
+                <PrewarmLink
                   key={routeDay.dayIndex}
                   href={`/trip/${tripId}/map?day=${routeDay.dayIndex}`}
                   className={[
@@ -153,7 +154,7 @@ export default async function TripMapPage({
                   ].join(" ")}
                 >
                   {routeDay.label}
-                </Link>
+                </PrewarmLink>
               );
             }
           )}

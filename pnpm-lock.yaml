@@ -197,6 +197,9 @@ importers:
 
   packages/maps:
     dependencies:
+      '@repo/ui':
+        specifier: workspace:*
+        version: link:../ui
       mapbox-gl:
         specifier: ^3
         version: 3.23.1
@@ -213,6 +216,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      jsdom:
+        specifier: ^25
+        version: 25.0.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3

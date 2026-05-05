@@ -7,6 +7,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@repo/ui": "workspace:*",
     "mapbox-gl": "^3"
   },
   "peerDependencies": {
@@ -16,6 +17,7 @@
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "jsdom": "^25",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },

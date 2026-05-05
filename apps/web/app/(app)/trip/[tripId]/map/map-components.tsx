@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { isMapProviderEnabled } from "@repo/maps";
+import Link from "next/link";
+import { isMapProviderEnabled, prewarm } from "@repo/maps";
 import { RouteMap as SchematicMap } from "@repo/ui";
 
 const ProviderMap = dynamic(() => import("@repo/maps").then(mod => ({ default: mod.ProviderMap })), { ssr: false });
@@ -25,6 +26,14 @@ export function RouteMap(props: React.ComponentProps<typeof SchematicMap>) {
   }
 
   return <SchematicMap {...props} />;
+}
+
+export function PrewarmLink(props: React.ComponentProps<typeof Link>) {
+  const handlePrewarm = (): void => {
+    void prewarm();
+  };
+
+  return <Link {...props} onFocus={handlePrewarm} onMouseEnter={handlePrewarm} />;
 }
 
 export const MapPanel = dynamic(() => import("@repo/ui").then(mod => ({ default: mod.MapPanel })), { ssr: false });
