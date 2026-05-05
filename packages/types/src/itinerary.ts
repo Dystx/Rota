@@ -14,7 +14,22 @@ export const TripStopSchema = z.object({
   endTime: z.string(),
   reason: z.string(),
   localTip: z.string(),
-  warning: z.string().optional()
+  warning: z.string().optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  lat: z.number().min(-90).max(90).optional(),
+  geocodeConfidence: z.number().min(0).max(1).optional(),
+  geocodeSource: z.enum(["mapbox", "manual"]).nullable().optional()
+}).superRefine((value, context) => {
+  const hasLng = value.lng !== undefined;
+  const hasLat = value.lat !== undefined;
+
+  if (hasLng !== hasLat) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [hasLng ? "lat" : "lng"],
+      message: "Provide both lng and lat together."
+    });
+  }
 });
 
 export const TripDaySchema = z.object({
@@ -37,6 +52,8 @@ export const ItinerarySchema = z.object({
 });
 
 export type TripQuestion = z.infer<typeof TripQuestionSchema>;
-export type TripStop = z.infer<typeof TripStopSchema>;
+export type Stop = z.infer<typeof TripStopSchema>;
+export type TripStop = Stop;
+export type StopWithCoords = Stop & { lng: number; lat: number };
 export type TripDay = z.infer<typeof TripDaySchema>;
 export type Itinerary = z.infer<typeof ItinerarySchema>;

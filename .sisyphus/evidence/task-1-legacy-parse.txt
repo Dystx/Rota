@@ -1,0 +1,12 @@
+> @repo/types@0.0.0 test /Users/cheng/rota/packages/types
+> vitest run --config vitest.config.ts
+
+
+ RUN  v2.1.9 /Users/cheng/rota/packages/types
+
+ ✓ src/itinerary.test.ts (7 tests) 2ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  02:17:42
+   Duration  185ms (transform 19ms, setup 0ms, collect 19ms, tests 2ms, environment 0ms, prepare 46ms)
