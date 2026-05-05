@@ -1,0 +1,1 @@
+KenBurnsImage: uses primitive <img> when useReducedMotion() is true. FilmGrain: returns null when useReducedMotion() is true.
