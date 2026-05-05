@@ -12,11 +12,17 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "jsdom": "^25",
+    "vitest": "^2",
     "typescript": "^5.9.3"
   },
   "scripts": {
+    "build": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"
   }
 }
