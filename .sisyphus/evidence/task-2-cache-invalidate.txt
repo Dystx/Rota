@@ -1,0 +1,2 @@
+Evidence: pnpm -F @repo/ai test -- enrich passed; cache miss case mutates TripBrief.pace and asserts geocodeBatch called twice.
+Test: packages/ai/src/enrich.test.ts keeps geocoding mocked, so no real network calls.

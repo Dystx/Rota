@@ -27,3 +27,5 @@ P02: `useReducedMotion` must stay SSR-safe by checking `typeof window !== "undef
 * `pnpm -F @repo/analytics test` and `pnpm -F @repo/analytics typecheck` both passed after adding the cinematic event types and tests.
 * Mapbox budget gating can stay isolated to `apps/web` by reading `.next/build-manifest.json`, walking chunk references recursively, and gzip-measuring only files whose contents contain `mapboxgl`.
 * `node:test` is enough for fixture coverage here; the missing-manifest case is best asserted by omitting the file entirely and expecting exit code 2.
+
+- T02: @repo/ai typecheck keeps rootDir at package src, so enrichment loads @repo/maps dynamically and tests inject a maps client to avoid cross-package source imports and real network calls.

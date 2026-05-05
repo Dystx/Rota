@@ -1,0 +1,2 @@
+Evidence: pnpm -F @repo/ai test -- enrich passed; cache hit case asserts second enrich with same TripBrief calls geocodeBatch once total.
+Test: packages/ai/src/enrich.test.ts uses mocked mapsClient.geocodeBatch and __resetItineraryCache beforeEach.

@@ -4,6 +4,7 @@ import {
   type TripBrief,
   type TripQuestion
 } from "@repo/types";
+import { enrichItineraryWithCoords } from "./enrich";
 
 export interface ItineraryGenerator {
   generate(tripBrief: TripBrief): Promise<Itinerary>;
@@ -143,6 +144,7 @@ class DeterministicItineraryGenerator implements ItineraryGenerator {
 
 const generator = new DeterministicItineraryGenerator();
 
-export async function generateItineraryFromBrief(tripBrief: TripBrief) {
-  return generator.generate(tripBrief);
+export async function generateItineraryFromBrief(tripBrief: TripBrief): Promise<Itinerary> {
+  const itinerary = await generator.generate(tripBrief);
+  return enrichItineraryWithCoords(itinerary, tripBrief);
 }
