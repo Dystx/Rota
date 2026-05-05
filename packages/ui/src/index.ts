@@ -8,3 +8,5 @@ export { TripCard } from "./components/trip-card";
 export type { TripCardProps } from "./components/trip-card";
 export { ArchiveLayout } from "./components/archive-layout";
 export type { ArchiveLayoutProps } from "./components/archive-layout";
+export * from "./components/chapter-heading";
+export * from "./components/reveal-section";
