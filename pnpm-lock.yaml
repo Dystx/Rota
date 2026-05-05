@@ -131,6 +131,12 @@ importers:
 
   packages/ai:
     dependencies:
+      '@repo/analytics':
+        specifier: workspace:*
+        version: link:../analytics
+      '@repo/maps':
+        specifier: workspace:*
+        version: link:../maps
       '@repo/types':
         specifier: workspace:*
         version: link:../types

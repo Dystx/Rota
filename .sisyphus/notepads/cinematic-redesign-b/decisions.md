@@ -12,3 +12,7 @@
 ## [2026-05-05] T05 implementation notes
 - Camera helpers remain pure and package-local.
 - Cross-region flights use longer duration and wider curve once Haversine distance exceeds 200km.
+
+
+## T03 geocoding analytics identity
+- Geocode completion analytics uses a stable briefCacheKey-derived trip id because TripBrief has no persisted id at enrichment time.

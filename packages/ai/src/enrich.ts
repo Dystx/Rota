@@ -1,5 +1,12 @@
 import { createHash } from "node:crypto";
 
+import {
+  createNoopAnalyticsProvider,
+  resolveDefaultAnalyticsProvider,
+  tryCapture,
+  type AnalyticsProvider
+} from "@repo/analytics";
+import { geocodeBatch, offsetDuplicateCoords, type GeocodeInput, type GeocodeResult } from "@repo/maps";
 import type { Itinerary, TripBrief } from "@repo/types";
 
 const MAX_CACHE_ENTRIES = 200;
@@ -22,17 +29,14 @@ type BriefProjection = {
   rawBrief: TripBrief["rawBrief"];
 };
 
-type GeocodeInput = {
-  placeName: string;
-  regionBias?: string[];
-  countries?: string[];
-};
-
-type GeocodeResult = { lng: number; lat: number; confidence: number; matchedPlace: string } | null;
-
 type EnrichmentMapsClient = {
   geocodeBatch: (inputs: GeocodeInput[], opts: { token: string; fetch?: typeof fetch }) => Promise<GeocodeResult[]>;
   offsetDuplicateCoords: (stops: { lng: number; lat: number; stopIndex: number }[]) => { lng: number; lat: number }[];
+};
+
+type EnrichmentOptions = {
+  mapsClient?: EnrichmentMapsClient;
+  analytics?: AnalyticsProvider;
 };
 
 type CachedGeocodeResults = GeocodeResult[];
@@ -40,7 +44,7 @@ type CachedGeocodeResults = GeocodeResult[];
 const itineraryCache = new Map<string, CachedGeocodeResults>();
 
 function getMapboxToken(): string | undefined {
-  return process.env.MAPBOX_PUBLIC_TOKEN ?? process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? process.env.MAPBOX_TOKEN;
+  return process.env.MAPBOX_SECRET_KEY ?? process.env.MAPBOX_PUBLIC_TOKEN ?? process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? process.env.MAPBOX_TOKEN;
 }
 
 function sortedStrings(values: readonly string[]): string[] {
@@ -53,23 +57,54 @@ function isEnrichmentMapsClient(value: unknown): value is EnrichmentMapsClient {
   return typeof candidate.geocodeBatch === "function" && typeof candidate.offsetDuplicateCoords === "function";
 }
 
-async function loadMapsClient(): Promise<EnrichmentMapsClient | undefined> {
-  const mapsModulePath = "@repo/maps";
-  const sourceModulePath = "../../maps/src/" + "geocoding";
+function loadMapsClient(): EnrichmentMapsClient | undefined {
+  const module = { geocodeBatch, offsetDuplicateCoords };
+  return isEnrichmentMapsClient(module) ? module : undefined;
+}
+
+function getAnalyticsProvider(analytics?: AnalyticsProvider): AnalyticsProvider {
+  if (analytics) return analytics;
 
   try {
-    const module = await import(mapsModulePath);
-    if (isEnrichmentMapsClient(module)) return module;
+    return resolveDefaultAnalyticsProvider();
   } catch {
-    // Continue to workspace source fallback below.
+    return createNoopAnalyticsProvider();
   }
+}
 
-  try {
-    const module = await import(sourceModulePath);
-    return isEnrichmentMapsClient(module) ? module : undefined;
-  } catch {
-    return undefined;
-  }
+function getAnalyticsTripId(brief: TripBrief): string {
+  return briefCacheKey(brief).slice(0, 16);
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Geocoding failed";
+}
+
+function logGeocodingFailure(error: unknown): void {
+  console.error("Failed to geocode itinerary stops.", error);
+}
+
+async function captureGeocodeCompleted(params: {
+  analytics: AnalyticsProvider;
+  brief: TripBrief;
+  stopCount: number;
+  geocodedCount: number;
+  lowConfidenceCount: number;
+  durationMs: number;
+  error?: string;
+}): Promise<void> {
+  await tryCapture(params.analytics, {
+    name: "cinematic_geocode_completed",
+    distinctId: `trip:${getAnalyticsTripId(params.brief)}`,
+    properties: {
+      tripId: getAnalyticsTripId(params.brief),
+      stopCount: params.stopCount,
+      geocodedCount: params.geocodedCount,
+      lowConfidenceCount: params.lowConfidenceCount,
+      durationMs: params.durationMs,
+      ...(params.error ? { error: params.error } : {})
+    }
+  });
 }
 
 export function briefCacheKey(brief: TripBrief): string {
@@ -121,12 +156,15 @@ function setCachedResults(cacheKey: string, results: CachedGeocodeResults): void
 export async function enrichItineraryWithCoords(
   itinerary: Itinerary,
   brief: TripBrief,
-  mapsClient?: EnrichmentMapsClient,
+  optionsOrMapsClient?: EnrichmentOptions | EnrichmentMapsClient,
 ): Promise<Itinerary> {
   const stops = itinerary.days.flatMap((day) => day.stops);
   if (!stops.length) return itinerary;
 
-  const client = mapsClient ?? await loadMapsClient();
+  const options = isEnrichmentMapsClient(optionsOrMapsClient) ? { mapsClient: optionsOrMapsClient } : optionsOrMapsClient;
+  const analytics = getAnalyticsProvider(options?.analytics);
+  const startedAt = Date.now();
+  const client = options?.mapsClient ?? loadMapsClient();
   if (!client) return itinerary;
 
   const cacheKey = briefCacheKey(brief);
@@ -140,13 +178,25 @@ export async function enrichItineraryWithCoords(
       const fetchedResults = await client.geocodeBatch(
         stops.map((stop) => ({
           placeName: stop.placeName,
-          regionBias: [stop.region]
+          regionBias: brief.regions,
+          countries: ["pt", "es"]
         })),
         { token }
       );
       geocodeResults = fetchedResults;
       setCachedResults(cacheKey, fetchedResults);
-    } catch {
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      logGeocodingFailure(error);
+      await captureGeocodeCompleted({
+        analytics,
+        brief,
+        stopCount: stops.length,
+        geocodedCount: 0,
+        lowConfidenceCount: stops.length,
+        durationMs: Date.now() - startedAt,
+        error: errorMessage
+      });
       return itinerary;
     }
   }
@@ -155,28 +205,45 @@ export async function enrichItineraryWithCoords(
 
   const readyResults = geocodeResults;
 
-  const coordCandidates = readyResults.flatMap((result, stopIndex) => {
-    if (!result) return [];
-    return [{ lng: result.lng, lat: result.lat, stopIndex }];
+  let geocodedCount = 0;
+
+  itinerary.days.forEach((day) => {
+    const dayStopIndexes = day.stops.map((stop) => stops.indexOf(stop));
+    const coordCandidates = dayStopIndexes.flatMap((stopIndex) => {
+      const result = readyResults[stopIndex];
+      if (!result) return [];
+      return [{ lng: result.lng, lat: result.lat, stopIndex }];
+    });
+    const adjustedCoords = client.offsetDuplicateCoords(coordCandidates);
+    let adjustedIndex = 0;
+
+    for (const stopIndex of dayStopIndexes) {
+      const result = readyResults[stopIndex];
+      if (!result) continue;
+
+      const adjusted = adjustedCoords[adjustedIndex];
+      adjustedIndex += 1;
+
+      if (!adjusted) continue;
+
+      const stop = stops[stopIndex];
+      if (!stop) continue;
+
+      stop.lng = adjusted.lng;
+      stop.lat = adjusted.lat;
+      stop.geocodeConfidence = result.confidence;
+      stop.geocodeSource = "mapbox";
+      geocodedCount += 1;
+    }
   });
-  const adjustedCoords = client.offsetDuplicateCoords(coordCandidates);
-  let adjustedIndex = 0;
 
-  readyResults.forEach((result, stopIndex) => {
-    if (!result) return;
-
-    const adjusted = adjustedCoords[adjustedIndex];
-    adjustedIndex += 1;
-
-    if (!adjusted) return;
-
-    const stop = stops[stopIndex];
-    if (!stop) return;
-
-    stop.lng = adjusted.lng;
-    stop.lat = adjusted.lat;
-    stop.geocodeConfidence = result.confidence;
-    stop.geocodeSource = "mapbox";
+  await captureGeocodeCompleted({
+    analytics,
+    brief,
+    stopCount: stops.length,
+    geocodedCount,
+    lowConfidenceCount: readyResults.filter((result) => !result).length,
+    durationMs: Date.now() - startedAt
   });
 
   return itinerary;
