@@ -1,8 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-// @ts-ignore - handled by motion/react-m alias
-import { m, useScroll, useTransform } from 'motion/react-m';
+import { m, useScroll, useTransform } from 'motion/react';
 import { KenBurnsImage } from '@repo/ui/components/ken-burns-image';
 import { FilmGrain } from '@repo/ui/components/film-grain';
 import { useReducedMotion } from '@repo/ui/hooks/use-reduced-motion';
@@ -34,8 +33,6 @@ export function CinematicHero({
   const y = useTransform(scrollYProgress, [0, 0.6], ['0%', '-50%']);
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
-  const bgImage = coverImageUrl || '/placeholder-trip.jpg';
-
   const metaText = [
     region,
     durationDays ? `${durationDays} days` : undefined,
@@ -53,20 +50,26 @@ export function CinematicHero({
       )}
     >
       <div className="absolute inset-0 z-0">
-        <div className="hidden md:block w-full h-full">
-          <KenBurnsImage
-            src={bgImage}
-            alt={title}
-            className="w-full h-full object-cover object-center"
-            durationMs={20000}
-            pan="bl-tr"
-          />
-        </div>
-        <img
-          src={bgImage}
-          alt={title}
-          className="block md:hidden w-full h-full object-cover object-center"
-        />
+        {coverImageUrl ? (
+          <>
+            <div className="hidden md:block w-full h-full">
+              <KenBurnsImage
+                src={coverImageUrl}
+                alt={title}
+                className="w-full h-full object-cover object-center"
+                durationMs={20000}
+                pan="bl-tr"
+              />
+            </div>
+            <img
+              src={coverImageUrl}
+              alt={title}
+              className="block md:hidden w-full h-full object-cover object-center"
+            />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-iberian-shadow)] via-[var(--color-atlantic)] to-[var(--color-iberian-azulejo)] opacity-60 mix-blend-multiply" />
+        )}
         
         <div 
           className="absolute inset-0"
