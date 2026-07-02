@@ -1,24 +1,26 @@
 # Rumia — Roadmap
 
-> **Two specs, two axes.** This file bridges them.
+> **Three specs, three axes.** This file bridges them.
 >
-> - **Long-term product vision** → [`docs/spec.md`](./spec.md) (v2.0 Tiered Service Model — 3 tiers, 8 phases).
-> - **Refined 2026 immediate focus** → [`docs/spec-refined-2026.md`](./spec-refined-2026.md) (Tier 1 + Tier 2 only; Tier 3 + Mobile deferred; Awwwards-grade design).
+> - **v4.0 (current authoritative)** → [`docs/spec-v4.md`](./spec-v4.md) — 4-tier ascension model (Tier 1 Core / Tier 2 Curation / Tier 3 Concierge / Tier 4 Marketplace).
+> - **v2.0 long-term vision** → [`docs/spec.md`](./spec.md) — 3-tier Tiered Service Model (preserved for historical reference).
+> - **Refined 2026 scope** → [`docs/spec-refined-2026.md`](./spec-refined-2026.md) — visual identity (olive/ochre) + UI/UX details; Tier 3 + Mobile deferred.
 > - **Operational launch-readiness** → §3 below. Drives *how* we ship.
 >
-> Section 2 maps current state to the refined 5-phase engineering plan.
+> Section 2 maps current state to the v4 5-phase engineering plan.
 
 ---
 
 ## 1. What Rumia Is
 
-Three-tier travel concierge platform for Portugal-first, AI-powered itinerary planning:
+Four-tier travel concierge platform for Portugal-first, AI-powered itinerary planning:
 
-- **Tier 1 (Core)**: structured brief → RAG-generated day-by-day itinerary with maps, routing, opening-hour validation. Free; monetized via exports + affiliate bookings.
-- **Tier 2 (Hybrid Specialist)**: human reviewer + asynchronous chat lifeline for on-trip adjustments. Premium upsell.
-- **Tier 3 (Presencial Guide)**: licensed local guide marketplace. **Deferred** per refined scope.
+- **Tier 1 (Core AI Wrapper)**: structured brief → RAG-generated day-by-day itinerary with maps, routing, opening-hour validation. Free; monetized via exports + affiliate bookings.
+- **Tier 2 (Specialist Curation)**: human specialist audit + async chat. One-time flat fee per booking.
+- **Tier 3 (Full Remote Support)**: 24/7 concierge lifeline during the active trip. AI pre-triage (parking, hours, transit) → specialist rota (taste, nuance, urgent transactional). Daily rate subscription.
+- **Tier 4 (On-Site Real Guide)**: RNAAT-licensed physical guide dispatch. Premium flat-day fee.
 
-The immediate focus is Tier 1 + Tier 2 only. See [`docs/spec-refined-2026.md`](./spec-refined-2026.md) for the scope decision rationale and reactivation triggers.
+The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (per `docs/spec-v4.md`). Tier 4 is gated on RNAAT compliance + ops partner (see spec §3).
 
 ---
 
@@ -220,8 +222,12 @@ Reactivation triggers documented in `docs/spec-refined-2026.md` §5.
 
 ## 6. References
 
-- **`docs/spec.md`** — v2.0 Master Product Specification & Architecture Blueprint (long-term vision, 3 tiers, 8 phases).
-- **`docs/spec-refined-2026.md`** — refined immediate scope (Tier 1+2 only, Awwwards design, updated tech stack, 5 active phases + 2 deferred).
+- **`docs/spec-v4.md`** — v4.0 Master Product Specification (4-tier ascension model; current authoritative spec).
+- **`docs/spec.md`** — v2.0 Master Product Specification (3-tier long-term vision; historical).
+- **`docs/spec-refined-2026.md`** — Refined 2026 Scope (Tier 1+2-only immediate focus + Awwwards-grade design paradigm).
+- **`docs/prototype.html`** — Single-file React SPA prototype (canonical visual identity + route map).
+- **`docs/prototype-routes.md`** — Prototype routes mapped to current Next.js routes + migration plan.
+- **`docs/design-tokens-olive-ochre.css`** — v4 `@theme` translation of the prototype (reference; additive to existing `packages/ui/src/styles.css`).
 - **`docs/architecture.md`** — current architecture overview.
 - **`docs/adr/001-auth-rls-strategy.md`** — RLS strategy.
 - **`docs/adr/002-deterministic-contracts.md`** — provider-stubbing pattern.
