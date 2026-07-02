@@ -1,9 +1,18 @@
 import Link from "next/link";
+import { Metadata } from "next";
 import { isPersistenceConfigError, listTripDrafts } from "@repo/db";
 import { buildEmailPreview } from "@repo/emails";
 import { getCheckoutPlan } from "@repo/payments";
 import { ArchiveLayout, Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
+
+export const metadata: Metadata = {
+  title: "My Account",
+  robots: {
+    index: false,
+    follow: false
+  }
+};
 
 function prettify(value: string) {
   return value.replace(/-/g, " ");
@@ -36,9 +45,9 @@ export default async function AccountPage() {
     <ArchiveLayout
       testid="account-header"
       header={{
-        eyebrow: "Saved trips",
-        title: "Saved draft routes",
-        description: "This page now reads persisted trip records and is the first revisit surface after trip creation."
+        eyebrow: "Client Portal",
+        title: "Your Itineraries",
+        description: "Access your drafted routes, unlock final itineraries, and request human review."
       }}
     >
       {infoMessage ? (
@@ -87,7 +96,7 @@ export default async function AccountPage() {
                     {tripCommerceState.canUnlock && (
                       <form action={`/api/trips/${trip.id}/unlock`} method="post" className="inline-flex">
                         <Button type="submit" variant="ghost">
-                          Unlock trip
+                          Checkout to unlock
                         </Button>
                       </form>
                     )}
@@ -104,7 +113,7 @@ export default async function AccountPage() {
         ) : (
           <Card className="bg-white/70">
             <CardContent className="pt-6">
-              <p className="rota-muted">Saved and paid itinerary cards will appear here once a real draft trip has been persisted.</p>
+              <p className="rota-muted">Your saved drafts and unlocked itineraries will appear here once you create your first trip.</p>
             </CardContent>
           </Card>
         )}
@@ -112,10 +121,10 @@ export default async function AccountPage() {
 
       <Card data-testid="account-stats" className="flex flex-col bg-white/70">
         <CardHeader>
-          <CardTitle>Next account features</CardTitle>
+          <CardTitle>Deliverables & Upgrades</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-1 flex-col gap-4">
-          <p className="rota-muted text-sm leading-relaxed">Markdown export is live for unlocked trips. PDF, calendar, and share-link history can attach here later.</p>
+          <p className="rota-muted text-sm leading-relaxed">Upgrade your drafts to unlock full daily routing, export features, and optional human concierge review.</p>
           <div className="grid gap-3 xl:grid-cols-2">
             <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
               <p className="rota-kicker">Unlock plan</p>
@@ -123,7 +132,7 @@ export default async function AccountPage() {
               <p className="rota-muted mt-2 text-xs">{unlockPlan.fulfillment}</p>
             </div>
             <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-              <p className="rota-kicker">Delivery preview</p>
+              <p className="rota-kicker">Concierge review</p>
               <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{exportEmailPreview.subject}</p>
               <p className="rota-muted mt-2 text-xs">{reviewPlan.priceLabel} review stays optional after unlock.</p>
             </div>

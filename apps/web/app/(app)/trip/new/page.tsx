@@ -1,14 +1,23 @@
+import { Metadata } from "next";
 import { PageShell, Card, CardContent, CardHeader, StatPill } from "@repo/ui";
 import { TripBriefForm } from "./trip-brief-form";
+
+export const metadata: Metadata = {
+  title: "Trip Details Confirmation",
+  description: "Review or manually enter the structured details of your Portugal trip before we craft your itinerary.",
+  alternates: {
+    canonical: "/trip/new"
+  }
+};
 
 export default function NewTripPage() {
   return (
     <PageShell variant="app">
       <div className="mx-auto max-w-3xl text-center mb-12">
-        <StatPill label="Local concierge" value="Lisbon & Porto" />
-        <h1 className="rota-display mt-6 mb-4">Polish your plan</h1>
+        <StatPill label="Advanced details" value="Manual confirmation" />
+        <h1 className="rota-display mt-6 mb-4">Confirm your brief</h1>
         <p className="rota-muted text-xl max-w-2xl mx-auto">
-          Tell us how you like to travel. We’ll audit your preferences, align them with local realities, and craft a paced, realistic Portugal itinerary.
+          Review and manually adjust the specifics of your trip. We use these structured details to craft a paced, realistic Portugal itinerary.
         </p>
       </div>
 

@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { isMapProviderEnabled, prewarm } from "@repo/maps";
+import { isMapProviderEnabled } from "@repo/maps";
+import { prewarm } from "@repo/maps/prewarm";
 import { RouteMap as SchematicMap } from "@repo/ui";
 
 const ProviderMap = dynamic(() => import("@repo/maps").then(mod => ({ default: mod.ProviderMap })), { ssr: false });
@@ -22,7 +23,11 @@ export function RouteMap(props: React.ComponentProps<typeof SchematicMap>) {
   }
 
   if (useProvider) {
-    return <ProviderMap {...props} />;
+    const { onLoad, ...rest } = props;
+    return <ProviderMap {...rest} onLoad={() => {
+      const loadEvent = {} as Parameters<NonNullable<typeof onLoad>>[0];
+      onLoad?.(loadEvent);
+    }} />;
   }
 
   return <SchematicMap {...props} />;

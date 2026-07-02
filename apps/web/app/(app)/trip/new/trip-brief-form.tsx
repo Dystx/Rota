@@ -146,6 +146,7 @@ export function TripBriefForm() {
       });
 
       const payload = (await response.json()) as {
+        error?: { message?: string };
         message?: string;
         tripId?: string;
         errors?: Record<string, string[]>;
@@ -166,7 +167,7 @@ export function TripBriefForm() {
           setErrors(nextErrors);
         }
 
-        setSubmitMessage(payload.message ?? "Could not save the trip brief yet.");
+        setSubmitMessage(payload.error?.message ?? payload.message ?? "Could not save the trip brief yet.");
         return;
       }
 
@@ -377,7 +378,7 @@ export function TripBriefForm() {
                   ? `${normalizeErrors(errors)} field${normalizeErrors(errors) > 1 ? "s" : ""} need attention.`
                   : submitMessage || "Ready for audit."}
               </p>
-              <Button type="button" disabled={isSubmitting} className="min-w-[160px]" onClick={() => void handleSubmit()}>
+              <Button type="submit" disabled={isSubmitting} className="min-w-[160px]">
                 {isSubmitting ? "Auditing..." : "Audit & Polish Plan"}
               </Button>
             </div>
@@ -390,7 +391,7 @@ export function TripBriefForm() {
           <CardHeader className="pb-4">
             <CardTitle className="text-white">Payload Ready</CardTitle>
             <p className="text-white/60 text-sm">
-              This structured brief has been validated against the Rota schema.
+              This structured brief has been validated against our plan schema.
             </p>
           </CardHeader>
           <CardContent>
@@ -413,10 +414,11 @@ function SelectField({
   options: readonly string[];
   onChange: (value: string) => void;
 }) {
+  const id = `select-${label.toLowerCase().replace(/\s+/g, "-")}`;
   return (
     <div className="rota-form-field">
-      <label className="rota-form-label">{label}</label>
-      <select className="rota-form-input" value={value} onChange={(event) => onChange(event.target.value)}>
+      <label htmlFor={id} className="rota-form-label">{label}</label>
+      <select id={id} className="rota-form-input" value={value} onChange={(event) => onChange(event.target.value)}>
         {options.map((option) => (
           <option key={option} value={option}>
             {prettify(option)}

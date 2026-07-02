@@ -166,7 +166,21 @@ export function PlaceEditor() {
       const payload = (await response.json()) as {
         message?: string;
         place?: PlaceRow;
+        error?: {
+          message: string;
+          details?: Record<string, string[]>;
+        };
       };
+
+      if (!response.ok) {
+        let errMsg = payload.error?.message || payload.message || "Failed to save.";
+        if (payload.error?.details) {
+          const detailStr = Object.entries(payload.error.details).map(([k, v]) => `${k}: ${v.join(", ")}`).join("; ");
+          errMsg += " " + detailStr;
+        }
+        setMessage(errMsg);
+        return;
+      }
 
       if (response.ok && payload.place) {
         setPlaces((current) => {
@@ -182,27 +196,8 @@ export function PlaceEditor() {
         return;
       }
 
-      setPlaces((current) => {
-        if (!editingId) {
-          return [nextPlace, ...current];
-        }
-
-        return current.map((place) => (place.id === editingId ? nextPlace : place));
-      });
-
-      setMessage(payload.message ?? (editingId ? `${nextPlace.name} updated in the local admin editor.` : `${nextPlace.name} added to the local admin editor.`));
-      resetForm();
-    } catch {
-      setPlaces((current) => {
-        if (!editingId) {
-          return [nextPlace, ...current];
-        }
-
-        return current.map((place) => (place.id === editingId ? nextPlace : place));
-      });
-
-      setMessage(editingId ? `${nextPlace.name} updated in the local admin editor.` : `${nextPlace.name} added to the local admin editor.`);
-      resetForm();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Failed to save.");
     } finally {
       setIsSaving(false);
     }

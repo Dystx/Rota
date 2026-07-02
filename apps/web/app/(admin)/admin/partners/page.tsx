@@ -1,12 +1,16 @@
 import { isPersistenceConfigError, listPartners } from "@repo/db";
 import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading } from "@repo/ui";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 export default async function AdminPartnersPage() {
+  const auth = await getAdminPageAuthContext();
   let partners = [] as Awaited<ReturnType<typeof listPartners>>;
   let infoMessage = "";
 
   try {
-    partners = await listPartners();
+    if (isAdminPageAuthContext(auth)) {
+      partners = await listPartners(100, { client: auth.client });
+    }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted partners here."
@@ -37,6 +41,7 @@ export default async function AdminPartnersPage() {
           eyebrow="Admin Directory"
           title="Curated Partners"
           description="Prepared for affiliate sources, booking links, and partner quality controls without turning rumia.pt into a marketplace."
+          h1
         />
       </div>
 

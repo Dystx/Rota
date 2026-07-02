@@ -1,12 +1,16 @@
 import { isPersistenceConfigError, listPlaces } from "@repo/db";
 import { Badge, Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading, StatPill } from "@repo/ui";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 export default async function AdminQualityPage() {
+  const auth = await getAdminPageAuthContext();
   let places = [] as Awaited<ReturnType<typeof listPlaces>>;
   let infoMessage = "";
 
   try {
-    places = await listPlaces();
+    if (isAdminPageAuthContext(auth)) {
+      places = await listPlaces(100, { client: auth.client });
+    }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted quality signals here."
@@ -54,6 +58,7 @@ export default async function AdminQualityPage() {
           eyebrow="Admin CMS"
           title="Quality dashboard shell"
           description="Surfaces the roadmap's quality-review layer for itinerary health, reviewer trust, and route realism."
+          h1
         />
       </div>
 

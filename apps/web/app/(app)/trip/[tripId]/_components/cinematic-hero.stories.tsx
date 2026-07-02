@@ -1,6 +1,19 @@
-// @ts-ignore - storybook types missing in app
-import type { Meta, StoryObj } from '@storybook/react';
 import { CinematicHero } from './cinematic-hero';
+
+type Meta<TComponent> = {
+  title: string;
+  component: TComponent;
+  parameters?: Record<string, unknown>;
+};
+
+type StoryArgs<TMeta> = TMeta extends { component: (props: infer Props) => unknown }
+  ? Partial<Props>
+  : Record<string, never>;
+
+type StoryObj<TMeta> = {
+  args?: StoryArgs<TMeta>;
+  parameters?: Record<string, unknown>;
+};
 
 const meta = {
   title: 'Trip/CinematicHero',

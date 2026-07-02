@@ -1,23 +1,34 @@
-import { isPersistenceConfigError, listBookingClicks } from "@repo/db";
+import { getAdminAnalyticsMetricCounts, isPersistenceConfigError, listBookingClicks, type AdminAnalyticsMetricCounts } from "@repo/db";
 import { Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading, StatPill } from "@repo/ui";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 function prettify(value: string) {
   return value.replace(/-/g, " ");
 }
 
-const funnels: Array<[string, string]> = [
-  ["Landing → brief", "61%"],
-  ["Brief → saved trip", "46%"],
-  ["Saved trip → unlock", "18%"],
-  ["Unlock → export", "72%"]
-];
+const emptyAnalyticsCounts: AdminAnalyticsMetricCounts = {
+  checkoutCompletions: 0,
+  partnerClicksLast7Days: 0,
+  partnerClicksTotal: 0,
+  reviewCompletions: 0,
+  reviewQueueSize: 0,
+  tripsLast7Days: 0,
+  tripsTotal: 0
+};
 
 export default async function AdminAnalyticsPage() {
+  const auth = await getAdminPageAuthContext();
+  let analyticsCounts = emptyAnalyticsCounts;
   let bookingClicks = [] as Awaited<ReturnType<typeof listBookingClicks>>;
   let infoMessage = "";
 
   try {
-    bookingClicks = await listBookingClicks();
+    if (isAdminPageAuthContext(auth)) {
+      [analyticsCounts, bookingClicks] = await Promise.all([
+        getAdminAnalyticsMetricCounts({ client: auth.client }),
+        listBookingClicks(200, { client: auth.client })
+      ]);
+    }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted analytics here."
@@ -26,9 +37,7 @@ export default async function AdminAnalyticsPage() {
         : "Could not load analytics yet.";
   }
 
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const recentClicks = bookingClicks.filter((click) => new Date(click.createdAt).getTime() >= sevenDaysAgo);
-  const sourceCounts = recentClicks.reduce<Record<string, number>>((counts, click) => {
+  const sourceCounts = bookingClicks.reduce<Record<string, number>>((counts, click) => {
     counts[click.source] = (counts[click.source] ?? 0) + 1;
 
     return counts;
@@ -49,16 +58,25 @@ export default async function AdminAnalyticsPage() {
     .slice(0, 4);
   const topSource = Object.entries(sourceCounts).sort((left, right) => right[1] - left[1])[0]?.[0] ?? "none";
   const metrics = [
-    { label: "Partner clicks", value: String(bookingClicks.length) },
-    { label: "7-day clicks", value: String(recentClicks.length) },
-    { label: "Partners clicked", value: String(Object.keys(partnerCounts).length) },
-    { label: "Top source", value: prettify(topSource) }
+    { label: "Trips", value: String(analyticsCounts.tripsTotal), detail: `${analyticsCounts.tripsLast7Days} last 7d` },
+    { label: "Checkout completions", value: String(analyticsCounts.checkoutCompletions), detail: "Paid trips" },
+    { label: "Partner clicks", value: String(analyticsCounts.partnerClicksTotal), detail: `${analyticsCounts.partnerClicksLast7Days} last 7d` },
+    { label: "Review queue", value: String(analyticsCounts.reviewQueueSize), detail: `${analyticsCounts.reviewCompletions} completed` }
+  ];
+  const operationalMetrics: Array<[string, string]> = [
+    ["Trips created", `${analyticsCounts.tripsTotal} total / ${analyticsCounts.tripsLast7Days} last 7d`],
+    ["Checkout starts", "Not tracked yet"],
+    ["Checkout completions", `${analyticsCounts.checkoutCompletions} paid trips`],
+    ["Partner click source", prettify(topSource)],
+    ["Review queue", `${analyticsCounts.reviewQueueSize} assigned/submitted`],
+    ["Review completions", `${analyticsCounts.reviewCompletions} completed`]
   ];
 
   return (
     <PageShell variant="admin">
       <div data-testid="admin-analytics-header" className="mb-12">
         <SectionHeading
+          h1
           eyebrow="Admin CMS"
           title="Analytics shell"
           description="Prepared for product analytics, funnel health, monetization visibility, and country-launch signals."
@@ -73,6 +91,7 @@ export default async function AdminAnalyticsPage() {
             </CardHeader>
             <CardContent className="pt-5">
               <StatPill label="Current" value={metric.value} />
+              <p className="mt-3 text-xs font-medium text-muted-foreground">{metric.detail}</p>
             </CardContent>
           </Card>
         ))}
@@ -90,22 +109,25 @@ export default async function AdminAnalyticsPage() {
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] w-full max-w-full min-w-0">
-        <div data-testid="funnel-card" className="w-full min-w-0">
+        <div data-testid="analytics-snapshot" className="w-full min-w-0">
           <Card className="rota-glass-panel border-none shadow-sm overflow-hidden h-full">
             <CardHeader className="border-b border-border/40 bg-[var(--color-surface-muted)]/30">
               <CardTitle className="text-lg font-medium tracking-tight flex items-center gap-2">
-                <span className="rota-dot"></span> Core funnel
+                <span className="rota-dot"></span> Operational snapshot
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 overflow-x-auto">
               <div className="grid gap-3 min-w-[300px]">
-                {funnels.map(([stage, value]) => (
-                  <div key={stage} className="flex items-center justify-between rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface)] p-4 shadow-sm transition-colors hover:border-[var(--color-primary)]/30 hover:bg-white">
-                    <p className="text-sm font-medium text-[var(--color-foreground)] tracking-tight">{stage}</p>
-                    <StatPill label="Rate" value={value} />
+                {operationalMetrics.map(([label, value]) => (
+                  <div key={label} className="flex items-center justify-between gap-4 rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface)] p-4 shadow-sm transition-colors hover:border-[var(--color-primary)]/30 hover:bg-white">
+                    <p className="text-sm font-medium text-[var(--color-foreground)] tracking-tight">{label}</p>
+                    <StatPill label="Metric" value={value} />
                   </div>
                 ))}
               </div>
+              <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+                Checkout starts are not persisted today; completions are derived from paid trips without reading the service-role-only webhook ledger.
+              </p>
             </CardContent>
           </Card>
         </div>

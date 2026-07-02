@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { generateItineraryFromBrief } from "@repo/ai";
-import { getTripDraftById, isPersistenceConfigError } from "@repo/db";
+import { createAuthenticatedUserDataClient, getReviewerIdForUser, getTripDraftById, getTrustedAppRoleFromClaims, getUserRoleProfile, isPersistenceConfigError, reviewerHasTripAssignment } from "@repo/db";
 import { buildRouteValidation } from "@repo/routing";
 import {
   type MapRouteWarning,
@@ -10,14 +10,18 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
+  ErrorState,
   MapPanel,
   PageShell,
   RouteMap,
   SectionHeading,
   StatPill,
+  StatusPill,
   TravelTimeChip
 } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export default async function ReviewerTripPage({
   params,
@@ -34,20 +38,40 @@ export default async function ReviewerTripPage({
   let itinerary = null;
   let routeValidation = null;
   let infoMessage = "";
+  let errorMessage = "";
+  let isAuthorizedReviewer = false;
 
   try {
-    trip = await getTripDraftById(tripId);
+    const supabase = await createServerSupabaseClient();
+    const { data, error } = await supabase.auth.getClaims();
+
+    if (error || !data?.claims?.sub) {
+      infoMessage = "Sign in with a reviewer account to open this reviewer trip workspace.";
+    } else {
+      const client = createAuthenticatedUserDataClient(supabase);
+      const claimsRole = getTrustedAppRoleFromClaims(data.claims);
+      const profile = claimsRole === "none" ? await getUserRoleProfile(data.claims.sub, { client }) : null;
+      const role = claimsRole === "none" ? profile?.appRole ?? "none" : claimsRole;
+      const reviewerId = role === "reviewer" ? await getReviewerIdForUser(data.claims.sub, { client }) : null;
+
+      if (role !== "reviewer" || !reviewerId) {
+        infoMessage = "This reviewer workspace is only available to linked reviewer accounts.";
+      } else if (!(await reviewerHasTripAssignment(tripId, reviewerId, { client }))) {
+        infoMessage = "This trip is not assigned to your reviewer account.";
+      } else {
+        isAuthorizedReviewer = true;
+        trip = await getTripDraftById(tripId, { client });
+      }
+    }
 
     if (trip) {
       itinerary = await generateItineraryFromBrief(trip.brief);
       routeValidation = buildRouteValidation(itinerary);
     }
   } catch (error) {
-    infoMessage = isPersistenceConfigError(error)
+    errorMessage = isPersistenceConfigError(error)
       ? "Supabase environment variables are not configured yet, so this workspace cannot load the saved route draft."
-      : error instanceof Error
-        ? error.message
-        : "Could not load the reviewer trip yet.";
+      : "Could not load the reviewer trip workspace. Please try again later.";
   }
 
   const activeDay = routeValidation?.days.find((routeDay) => routeDay.dayIndex === selectedDayIndex) ?? routeValidation?.days[0];
@@ -85,38 +109,46 @@ export default async function ReviewerTripPage({
       <div data-testid="reviewer-trip-header">
         <SectionHeading
           eyebrow={`Review trip ${tripId}`}
-          title={trip ? `${trip.title} reviewer route` : "Expert reviewer workspace"}
-          description="Built around route edits, local notes, substitutions, pacing alerts, and reviewer change summaries." 
+          title={trip ? `${trip.title} reviewer route` : "Reviewer trip workspace"}
+          description="Review the route, leave local notes, apply substitutions, monitor pacing alerts, and complete the reviewer summary."
+          h1
         />
       </div>
       {review === "queued" ? (
-        <Card>
+        <Card className="mt-6 border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="pt-6">
             <p className="rota-muted text-sm">This trip is now marked as in review.</p>
           </CardContent>
         </Card>
       ) : null}
       {review === "completed" ? (
-        <Card>
+        <Card className="mt-6 border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="pt-6">
             <p className="rota-muted text-sm">Reviewer completion saved. The trip now carries reviewed trust markers.</p>
           </CardContent>
         </Card>
       ) : null}
       {review === "locked" ? (
-        <Card>
+        <Card className="mt-6 border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="pt-6">
             <p className="rota-muted text-sm">This trip must be unlocked before it can move through human review.</p>
           </CardContent>
         </Card>
       ) : null}
-      {infoMessage ? (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="rota-muted text-sm">{infoMessage}</p>
+      {errorMessage ? (
+        <Card className="mt-6 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
+          <CardContent className="p-0">
+            <ErrorState variant="table" title="Cannot load trip workspace" message={errorMessage} />
+          </CardContent>
+        </Card>
+      ) : infoMessage ? (
+        <Card className="mt-6 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
+          <CardContent className="p-0">
+            <EmptyState variant="table" title="Reviewer access required" description={infoMessage} />
           </CardContent>
         </Card>
       ) : null}
+      {!isAuthorizedReviewer ? null : (
       <div className="grid gap-8 xl:grid-cols-[0.9fr_1.1fr]">
         <div className="grid gap-6">
           <Card className="overflow-hidden border-black/5 bg-white/60 shadow-sm">
@@ -166,7 +198,7 @@ export default async function ReviewerTripPage({
                       />
                     </label>
                     <div>
-                      <Button type="submit" className="w-full sm:w-auto">Mark as reviewed</Button>
+                      <Button type="submit" data-testid="review-complete-submit" className="w-full sm:w-auto">Mark as reviewed</Button>
                     </div>
                   </div>
                 </form>
@@ -304,6 +336,7 @@ export default async function ReviewerTripPage({
           </div>
         </div>
       </div>
+      )}
     </PageShell>
   );
 }

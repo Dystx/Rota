@@ -1,5 +1,6 @@
 import { isPersistenceConfigError, listRegions } from "@repo/db";
 import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading } from "@repo/ui";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 function titleCase(value: string) {
   return value
@@ -10,11 +11,14 @@ function titleCase(value: string) {
 }
 
 export default async function AdminCountriesPage() {
+  const auth = await getAdminPageAuthContext();
   let regions = [] as Awaited<ReturnType<typeof listRegions>>;
   let infoMessage = "";
 
   try {
-    regions = await listRegions();
+    if (isAdminPageAuthContext(auth)) {
+      regions = await listRegions(100, { client: auth.client });
+    }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted country rollout signals here."
@@ -78,6 +82,7 @@ export default async function AdminCountriesPage() {
             eyebrow="System Configuration"
             title="Geographic Rollout"
             description="Manage operational regions, feature flags, and localization settings for rumia.pt deployments."
+            h1
             className="border-b border-[var(--color-border)] pb-8"
           />
         </div>

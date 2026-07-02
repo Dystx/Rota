@@ -1,8 +1,17 @@
 import Link from "next/link";
+import { Metadata } from "next";
 import { buildEmailPreview } from "@repo/emails";
 import { getCheckoutPlan } from "@repo/payments";
-import { Button, Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading, PricingCard, TestimonialCard, FeatureGrid, FeatureGridItem } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
+
+export const metadata: Metadata = {
+  title: "Human Review Trust Layer",
+  description: "Add a premium human review layer to your AI-generated route for local notes, pace adjustments, and rain plans.",
+  alternates: {
+    canonical: "/human-review"
+  }
+};
 
 export default function HumanReviewPage() {
   const reviewedTripState = getTripCommerceState({ isPaid: true, hasHumanReview: true });
@@ -13,43 +22,58 @@ export default function HumanReviewPage() {
     <PageShell>
       <SectionHeading
         eyebrow="Trust layer"
-        title="Human review is a premium layer, not the main interface"
-        description="The roadmap treats review as a differentiator that edits routes and adds local notes after generation."
+        title="Expert polish for your itinerary"
+        description="Elevate your generated route with a premium human review. Our local Portugal specialists adjust pacing, swap restaurants, and add exclusive rain plans."
+        h1={true}
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Visible review markers</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3">
-          {reviewedTripState.markers.map((note) => (
-            <div key={note} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-              <p className="text-sm text-[var(--color-foreground)]">{note}</p>
-            </div>
-          ))}
-          <ul className="rota-stack-list">
-            <li>Restaurant changed after human review</li>
-            <li>This day was adjusted for better pacing</li>
-            <li>Rain plan added by reviewer</li>
-          </ul>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-              <p className="rota-kicker">Human review add-on</p>
-              <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{reviewPlan.priceLabel}</p>
-              <p className="rota-muted mt-2 text-sm">{reviewPlan.fulfillment}</p>
-            </div>
-            <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-              <p className="rota-kicker">Delivery email</p>
-              <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{reviewEmail.subject}</p>
-              <p className="rota-muted mt-2 text-sm">{reviewEmail.previewText}</p>
-            </div>
-          </div>
-          <div>
-            <Button asChild>
-              <Link href="/pricing">See unlock tiers</Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+
+      <div className="mb-20">
+        <FeatureGrid>
+          <FeatureGridItem title="Route & Pacing Validation">
+            We ensure your driving times are realistic and your daily schedule allows you to breathe. We fix overly ambitious AI routes before you hit the road.
+          </FeatureGridItem>
+          <FeatureGridItem title="Restaurant Curation">
+            We swap generic recommendations for hard-to-find local favorites, hidden gems, and confirm their opening hours for your travel dates.
+          </FeatureGridItem>
+          <FeatureGridItem title="Rain Plans & Contingencies">
+            We add backup plans for outdoor activities, ensuring your trip stays on track regardless of unexpected weather changes.
+          </FeatureGridItem>
+        </FeatureGrid>
+      </div>
+
+      <div className="grid gap-12 lg:grid-cols-2">
+        <div className="space-y-8">
+          <TestimonialCard author="Sofia Almeida" role="Lead Portugal Specialist">
+            We don't just check the map—we visualize your entire day. If a restaurant is closed on Mondays or a coastal drive faces afternoon fog, we adjust the itinerary before you even arrive.
+          </TestimonialCard>
+          
+          <Card className="bg-[var(--color-cream)]">
+            <CardHeader>
+              <CardTitle>Delivery Email Preview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-base font-semibold text-[var(--color-foreground)]">{reviewEmail.subject}</div>
+              <div className="mt-2 text-sm leading-relaxed text-[var(--color-muted-foreground)]">{reviewEmail.previewText}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <PricingCard
+            title="Human Review Add-on"
+            description="Available exclusively after unlocking your base trip."
+            price={reviewPlan.priceLabel}
+            fulfillment={reviewPlan.fulfillment}
+            features={reviewedTripState.markers}
+            highlighted={true}
+            action={
+              <Button asChild className="w-full" variant="primary">
+                <Link href="/pricing">See unlock tiers</Link>
+              </Button>
+            }
+          />
+        </div>
+      </div>
     </PageShell>
   );
 }

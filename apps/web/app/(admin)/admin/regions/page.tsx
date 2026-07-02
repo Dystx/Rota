@@ -1,12 +1,16 @@
 import { isPersistenceConfigError, listRegions } from "@repo/db";
 import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading, StatPill } from "@repo/ui";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 export default async function AdminRegionsPage() {
+  const auth = await getAdminPageAuthContext();
   let regions = [] as Awaited<ReturnType<typeof listRegions>>;
   let infoMessage = "";
 
   try {
-    regions = await listRegions();
+    if (isAdminPageAuthContext(auth)) {
+      regions = await listRegions(100, { client: auth.client });
+    }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted regions here."
@@ -38,6 +42,7 @@ export default async function AdminRegionsPage() {
           eyebrow="Admin CMS"
           title="Region management shell"
           description="Tracks local summaries, launch regions, best-fit tags, and seasonality notes for country-by-country rollout."
+          h1
         />
       </div>
       <div id="regions-summary" className="regions-summary grid gap-4 lg:grid-cols-3" data-testid="regions-summary">

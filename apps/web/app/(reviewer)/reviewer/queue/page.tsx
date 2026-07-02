@@ -1,159 +1,160 @@
 import Link from "next/link";
-import { getLatestAssignmentForTrip, isPersistenceConfigError, listTripDrafts } from "@repo/db";
-import { Badge, Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading } from "@repo/ui";
+import { Metadata } from "next";
+import { filterActiveReviewerAssignments, isPersistenceConfigError, listReviewerAssignments, getTripDraftById } from "@repo/db";
+import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatusPill } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
+import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
+
+export const metadata: Metadata = {
+  title: "Reviewer Queue",
+  robots: {
+    index: false,
+    follow: false
+  }
+};
 
 function prettify(value: string) {
   return value.replace(/-/g, " ");
 }
 
 export default async function ReviewerQueuePage() {
-  let trips = [] as Awaited<ReturnType<typeof listTripDrafts>>;
-  let infoMessage = "";
+  let authContext: Awaited<ReturnType<typeof getReviewerPageAuthContext>> = null;
+  let activeTrips = [] as Array<{
+    id: string;
+    title: string;
+    region: string;
+    reviewerName: string;
+    accessLabel: string;
+    exportLabel: string;
+    reviewLabel: string;
+    queueLabel: string;
+  }>;
+  let errorMessage = "";
+  let notSignedIn = false;
 
   try {
-    trips = await listTripDrafts();
+    authContext = await getReviewerPageAuthContext();
+    if (!authContext) {
+      notSignedIn = true;
+    } else {
+      const { client, reviewerId } = authContext;
+      const assignments = await listReviewerAssignments(100, reviewerId, { client });
+      const activeAssignments = filterActiveReviewerAssignments(assignments);
+
+      activeTrips = (await Promise.all(
+        activeAssignments.map(async (assignment) => {
+          const trip = await getTripDraftById(assignment.tripId, { client });
+          if (!trip) return null;
+
+          const tripCommerceState = getTripCommerceState({
+            hasHumanReview: trip.hasHumanReview,
+            isPaid: trip.isPaid
+          });
+
+          return {
+            id: trip.id.toString(),
+            title: trip.title,
+            region: prettify(trip.brief.regions[0] ?? "portugal"),
+            reviewerName: assignment.reviewerName ?? "Assigned",
+            accessLabel: tripCommerceState.accessLabel,
+            exportLabel: tripCommerceState.exportLabel,
+            reviewLabel: tripCommerceState.reviewLabel,
+            queueLabel: assignment.status === "submitted" ? "Submitted" : "Needs review"
+          };
+        })
+      )).filter(Boolean) as typeof activeTrips;
+    }
   } catch (error) {
-    infoMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load real paid and review-ready trips here."
-      : error instanceof Error
-        ? error.message
-        : "Could not load reviewer queue.";
+    errorMessage = isPersistenceConfigError(error)
+      ? "Configure Supabase environment variables to load real assigned trips here."
+      : "Could not load reviewer queue. Please try again later.";
   }
 
-  const processedTrips =
-    trips.length > 0
-      ? await Promise.all(
-          trips.map(async (trip) => {
-            const tripCommerceState = getTripCommerceState({
-              hasHumanReview: trip.hasHumanReview,
-              isPaid: trip.isPaid
-            });
-            const latestAssignment = await getLatestAssignmentForTrip(trip.id).catch(() => null);
-
-            return {
-              id: trip.id.toString(),
-              title: trip.title,
-              region: prettify(trip.brief.regions[0] ?? "portugal"),
-              reviewerName: latestAssignment?.reviewerName ?? "Unassigned",
-              accessLabel: tripCommerceState.accessLabel,
-              exportLabel: tripCommerceState.exportLabel,
-              reviewLabel: tripCommerceState.reviewLabel,
-              queueLabel: tripCommerceState.queueLabel
-            };
-          })
-        )
-      : [
-          {
-            id: "1",
-            title: "Porto & Douro / 5 days",
-            region: "North",
-            reviewerName: "Inês Almeida",
-            accessLabel: "Unlocked paid trip",
-            exportLabel: "PDF + calendar export ready",
-            reviewLabel: "Ready for human review",
-            queueLabel: "Needs review"
-          },
-          {
-            id: "2",
-            title: "Lisbon calm family route",
-            region: "Lisbon",
-            reviewerName: "Tomás Costa",
-            accessLabel: "Unlocked paid trip",
-            exportLabel: "PDF + calendar export ready",
-            reviewLabel: "Local expert reviewed",
-            queueLabel: "Completed"
-          },
-          {
-            id: "3",
-            title: "Algarve coastal week",
-            region: "South",
-            reviewerName: "Unassigned",
-            accessLabel: "Free preview only",
-            exportLabel: "PDF + calendar export locked",
-            reviewLabel: "Human review available after unlock",
-            queueLabel: "Waiting for unlock"
-          }
-        ];
+  const processedTrips = activeTrips;
 
   return (
     <PageShell variant="reviewer">
       <div data-testid="reviewer-queue-header">
         <SectionHeading
+          h1
           eyebrow="Reviewer dashboard"
-          title="Review queue shell"
-          description="Matches the roadmap: assigned trips, due soon, and local quality review."
+          title="Review queue"
+          description="Manage your assigned trips, priorities, and pending quality reviews."
         />
       </div>
       <div className="flex flex-wrap gap-4 mt-6">
         <a
           href="/reviewer/operations"
-          className="inline-flex items-center rounded-full border border-black/5 bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white min-h-[44px]"
+          className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white min-h-[44px]"
         >
           Open worker plan
         </a>
         <a
           href="/reviewer/profile"
-          className="inline-flex items-center rounded-full border border-black/5 bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white min-h-[44px]"
+          className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white min-h-[44px]"
         >
           Reviewer profile
         </a>
         <a
           href="/reviewer/history"
-          className="inline-flex items-center rounded-full border border-black/5 bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white min-h-[44px]"
+          className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white min-h-[44px]"
         >
           Review history
         </a>
       </div>
-      {infoMessage ? (
-        <Card className="mt-8 overflow-hidden border-black/5 bg-white/60 shadow-sm">
-          <CardContent className="px-8 py-6">
-            <p className="rota-muted leading-relaxed">{infoMessage}</p>
+
+      {errorMessage ? (
+        <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
+          <CardContent className="p-0">
+            <ErrorState variant="table" title="Cannot load queue" message={errorMessage} />
+          </CardContent>
+        </Card>
+      ) : notSignedIn ? (
+        <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
+          <CardContent className="p-0">
+            <EmptyState variant="table" title="Sign in required" description="Sign in with a linked reviewer account to load your active queue." />
+          </CardContent>
+        </Card>
+      ) : processedTrips.length === 0 ? (
+        <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
+          <CardContent className="p-0">
+            <EmptyState 
+              variant="table" 
+              title="Your queue is empty" 
+              description="There are no active trips assigned to you at the moment. Check back later or review your history." 
+              icon={
+                <div className="h-12 w-12 rounded-full bg-[var(--color-surface-muted)] flex items-center justify-center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-muted-foreground)]">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                </div>
+              }
+            />
           </CardContent>
         </Card>
       ) : null}
-      <Card className="mt-8 overflow-hidden border-black/5 bg-white/60 shadow-sm">
+
+      {!errorMessage && !notSignedIn && processedTrips.length > 0 && (
+        <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
         <CardHeader className="px-4 md:px-8 pt-6 md:pt-8 pb-4">
           <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl">Assigned trips</CardTitle>
         </CardHeader>
         <CardContent className="px-4 md:px-8 pb-6 md:pb-8">
           <div data-testid="queue-list" className="w-full">
             {/* Desktop Table */}
-            <div className="hidden md:block overflow-x-auto rounded-[24px] border border-[var(--color-border)]">
-              <table className="w-full border-collapse text-left text-sm whitespace-nowrap">
-                <thead className="bg-[var(--color-surface-muted)] text-[var(--color-muted-foreground)]">
-                  <tr>
-                    {["Trip", "Region", "Reviewer", "Unlock", "Export", "Review", "Queue state"].map((col) => (
-                      <th key={col} className="px-4 py-3 font-medium uppercase tracking-[0.12em]">
-                        {col}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {processedTrips.map((trip) => (
-                    <tr key={trip.id} data-testid={`queue-item-${trip.id}`} className="border-t border-[var(--color-border)] group hover:bg-[rgba(247,250,249,0.5)] transition-colors">
-                      <td className="px-4 py-4 text-[var(--color-foreground)]">
-                        <Link href={`/reviewer/trips/${trip.id}`} className="font-medium text-[var(--color-foreground)] underline-offset-4 hover:underline block min-h-[44px] content-center relative z-10">
-                          {trip.title}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-4 text-[var(--color-foreground)]">{trip.region}</td>
-                      <td className="px-4 py-4 text-[var(--color-foreground)]">{trip.reviewerName}</td>
-                      <td className="px-4 py-4 text-[var(--color-foreground)]">
-                        <Badge tone="soft">{trip.accessLabel}</Badge>
-                      </td>
-                      <td className="px-4 py-4 text-[var(--color-foreground)]">
-                        <Badge tone="soft">{trip.exportLabel}</Badge>
-                      </td>
-                      <td className="px-4 py-4 text-[var(--color-foreground)]">
-                        <Badge tone="soft">{trip.reviewLabel}</Badge>
-                      </td>
-                      <td className="px-4 py-4 text-[var(--color-foreground)]">{trip.queueLabel}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="hidden md:block">
+              <DataTable 
+                columns={[
+                  { key: "title", header: "Trip", cell: (row) => <Link href={`/reviewer/trips/${row.id}`} className="font-medium text-[var(--color-foreground)] underline-offset-4 hover:underline block min-h-[44px] content-center relative z-10">{row.title}</Link> },
+                  { key: "region", header: "Region", cell: (row) => row.region },
+                  { key: "reviewerName", header: "Reviewer", cell: (row) => row.reviewerName },
+                  { key: "access", header: "Unlock", cell: (row) => <Badge tone="soft">{row.accessLabel}</Badge> },
+                  { key: "export", header: "Export", cell: (row) => <Badge tone="soft">{row.exportLabel}</Badge> },
+                  { key: "review", header: "Review", cell: (row) => <Badge tone="soft">{row.reviewLabel}</Badge> },
+                  { key: "queueLabel", header: "Queue state", cell: (row) => <StatusPill tone={row.queueLabel === "Submitted" ? "success" : "warning"} label={row.queueLabel} /> }
+                ]}
+                data={processedTrips}
+              />
             </div>
 
             {/* Mobile Cards */}
@@ -174,15 +175,16 @@ export default async function ReviewerQueuePage() {
                     <Badge tone="soft">{trip.reviewLabel}</Badge>
                   </div>
                   <div className="w-full h-px bg-[var(--color-border)]" />
-                  <span className="text-sm font-medium uppercase tracking-[0.12em] text-[var(--color-muted-foreground)] relative z-20">
-                    {trip.queueLabel}
-                  </span>
+                  <div className="relative z-20 self-start">
+                    <StatusPill tone={trip.queueLabel === "Submitted" ? "success" : "warning"} label={trip.queueLabel} />
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </CardContent>
       </Card>
+      )}
     </PageShell>
   );
 }

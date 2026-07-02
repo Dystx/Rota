@@ -1,33 +1,53 @@
-import { Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading } from "@repo/ui";
+import { Metadata } from "next";
+import { PageShell, SectionHeading, FeatureGrid, FeatureGridItem } from "@repo/ui";
+
+export const metadata: Metadata = {
+  title: "How It Works | Portugal Travel Concierge",
+  description: "Learn how rumia.pt transforms your trip prompt into a validated, cinematic Portugal itinerary.",
+  alternates: {
+    canonical: "/how-it-works"
+  }
+};
 
 const flow = [
-  "User writes a trip brief.",
-  "Rota normalizes the brief and detects missing information.",
-  "Structured question cards appear only when needed.",
-  "A route is generated, explained, validated, and optionally sent for human review.",
-  "Background worker jobs prepare exports, reviewer assignment, and route refresh tasks."
+  {
+    title: "1. Prompt & Capture",
+    description: "Tell us about your ideal Portugal trip in plain English. We handle the complexity of translating your vision into a structured travel framework."
+  },
+  {
+    title: "2. Schema-Aligned Brief",
+    description: "Your prompt is normalized into a structured brief. If any critical travel details are missing—like dates or travel pace—we'll ask focused follow-up questions."
+  },
+  {
+    title: "3. Cinematic Route Preview",
+    description: "Experience a rich, cinematic preview of your generated route. Explore daily pacing, region summaries, and core logistics before committing."
+  },
+  {
+    title: "4. Unlock & Human Review",
+    description: "Unlock the full itinerary with a single payment. Opt for an expert human review to get personalized local adjustments and insider recommendations."
+  },
+  {
+    title: "5. Export & Travel",
+    description: "Return to your account at any time to access your finalized route. Export to map providers or PDF and enjoy a seamless travel experience."
+  }
 ];
 
 export default function HowItWorksPage() {
   return (
     <PageShell>
       <SectionHeading
-        eyebrow="Interaction model"
-        title="A planning system with a clear sequence"
-        description="The UI shell mirrors the roadmap's no-chat flow so later backend work has obvious homes."
+        eyebrow="The Journey"
+        title="From idea to itinerary in five steps"
+        description="A deliberate progression that takes the friction out of planning while maintaining high standards for local travel."
+        h1={true}
       />
-      <div className="grid gap-4 lg:grid-cols-5">
-        {flow.map((step, index) => (
-          <Card key={step}>
-            <CardHeader>
-              <CardTitle>{`0${index + 1}`}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="rota-muted">{step}</p>
-            </CardContent>
-          </Card>
+      <FeatureGrid>
+        {flow.map((step) => (
+          <FeatureGridItem key={step.title} title={step.title}>
+            {step.description}
+          </FeatureGridItem>
         ))}
-      </div>
+      </FeatureGrid>
     </PageShell>
   );
 }

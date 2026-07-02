@@ -1,10 +1,26 @@
 import Link from "next/link";
 import { generateItineraryFromBrief } from "@repo/ai";
 import { getTripDraftById, isPersistenceConfigError } from "@repo/db";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading, TripCard } from "@repo/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CinematicGuide,
+  CTASection,
+  GuideChapter,
+  GuideProgress,
+  PageShell,
+  RevealSection,
+  SectionHeading,
+  TripCard
+} from "@repo/ui";
 import { buildEmailPreview } from "@repo/emails";
 import { buildTripSharePath, listTripExportOptions } from "@/lib/trip-export";
 import { getTripCommerceState } from "@/lib/trip-commerce";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 function getFormatFromHref(href: string) {
   if (href.includes("view=print")) return "print";
@@ -20,6 +36,7 @@ function renderPrintView(title: string, tripId: string, itinerary: Awaited<Retur
         eyebrow={`Trip ${tripId}`}
         title={`${title} print view`}
         description="A simplified export layout for browser print and PDF save flows."
+        h1
       />
       <div className="grid gap-4">
         <Card>
@@ -74,6 +91,9 @@ export default async function TripExportPage({
   let itinerary = null;
   let infoMessage = "";
 
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   try {
     trip = await getTripDraftById(tripId);
 
@@ -82,10 +102,22 @@ export default async function TripExportPage({
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
-      ? "Supabase environment variables are not configured yet, so export files are unavailable."
+      ? "Saved trip data is not available right now. Export files will return when the trip reloads."
       : error instanceof Error
-        ? error.message
+        ? "Could not load trip exports yet."
         : "Could not load trip exports yet.";
+  }
+
+  if (trip && trip.ownerUserId && (!user || user.id !== trip.ownerUserId)) {
+    return (
+      <PageShell variant="app">
+        <div className="text-center py-16 md:py-32">
+          <h1 className="text-5xl">Trip not found</h1>
+          <p>This trip does not exist or you do not have permission to view it.</p>
+          <Button asChild><Link href="/account">Back to account</Link></Button>
+        </div>
+      </PageShell>
+    );
   }
 
   if (view === "print") {
@@ -99,94 +131,170 @@ export default async function TripExportPage({
   });
   const emailPreview = buildEmailPreview(trip?.hasHumanReview ? "review-complete" : "export-ready", trip?.title ?? "Trip export");
 
+  const chapters = [
+    { id: "overview", label: "Overview" },
+    { id: "formats", label: "Formats" },
+    { id: "delivery", label: "Delivery" },
+    { id: "access", label: "Access" },
+    { id: "next-step", label: "Continue" }
+  ];
+
+  const heroTitle = trip ? `${trip.title} exports` : "Trip export center";
+  const heroDescription = "PDF, print, calendar, and share actions live here, ready when the trip is unlocked.";
+
   return (
     <PageShell variant="app">
-      <SectionHeading
-        eyebrow={`Trip ${tripId}`}
-        title={trip ? `${trip.title} exports` : "Trip export center"}
-        description="The roadmap export layer groups PDF, print, calendar, and share actions in one place after unlock."
-      />
-      {infoMessage ? (
-        <Card data-testid="info-message">
-          <CardContent className="pt-6">
-            <p className="rota-muted text-sm">{infoMessage}</p>
-          </CardContent>
-        </Card>
-      ) : null}
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] items-start">
-        <div className="grid gap-4" data-testid="export-options">
-          {listTripExportOptions(tripId).map((option) => (
-            <TripCard
-              key={option.label}
-              title={option.label}
-              caption={option.description}
-              href={option.href}
-              testid={`export-option-${getFormatFromHref(option.href)}`}
-            />
-          ))}
-        </div>
-        <div className="grid gap-4">
-          <Card data-testid="share-card">
-            <CardHeader>
-              <CardTitle>Share and delivery</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                <p className="rota-kicker">Share path</p>
-                <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{buildTripSharePath(tripId)}</p>
-                <p className="rota-muted mt-2 text-sm">Share links stay tied to the saved trip route for now.</p>
-              </div>
-              <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                <p className="rota-kicker">Delivery email</p>
-                <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{emailPreview.subject}</p>
-                <p className="rota-muted mt-2 text-sm">{emailPreview.previewText}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card data-testid="access-card">
-            <CardHeader>
-              <CardTitle>Export access</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="flex flex-wrap gap-2">
-                <Badge tone="soft">{tripCommerceState.accessLabel}</Badge>
-                <Badge tone="soft">{tripCommerceState.exportLabel}</Badge>
-                <Badge tone="soft">{tripCommerceState.reviewLabel}</Badge>
-              </div>
-              <p className="rota-muted text-sm leading-relaxed">
-                {tripCommerceState.canExport
-                  ? "This trip is unlocked, so PDF, calendar, markdown, and print exports are available."
-                  : "Unlock the trip first. Export files remain gated until payment is confirmed."}
+      <CinematicGuide>
+        <GuideProgress chapters={chapters} />
+
+        <GuideChapter id="overview" className="py-12 md:py-24">
+          <div className="mx-auto max-w-[860px] grid gap-8" data-testid="trip-export-header">
+            <RevealSection>
+              <p className="rota-kicker text-[var(--color-atlantic)]">Export center · Trip {tripId}</p>
+              <h1 className="mt-4 font-[family-name:var(--font-rota-display)] text-5xl tracking-tight text-[var(--color-foreground)] lg:text-6xl">
+                {heroTitle}
+              </h1>
+              <p className="rota-muted mt-6 max-w-3xl text-xl leading-relaxed">{heroDescription}</p>
+            </RevealSection>
+
+            {infoMessage ? (
+              <RevealSection delayMs={120}>
+                <Card data-testid="info-message">
+                  <CardContent className="pt-6">
+                    <p className="rota-muted text-sm">{infoMessage}</p>
+                  </CardContent>
+                </Card>
+              </RevealSection>
+            ) : null}
+          </div>
+        </GuideChapter>
+
+        <GuideChapter id="formats" className="py-12 md:py-24">
+          <div className="mx-auto max-w-[1100px] grid gap-8">
+            <RevealSection>
+              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl text-[var(--color-foreground)]">Choose a format</h2>
+              <p className="rota-muted mt-4 max-w-2xl text-lg leading-relaxed">
+                Each format mirrors the same audited route. PDF, calendar, and markdown are gated until unlock; print is always safe to use.
               </p>
-              <div className="flex flex-wrap gap-3 w-full">
-                <Button asChild className="flex-1 min-h-[44px]">
-                  <Link href={`/trip/${tripId}`}>Back to trip</Link>
-                </Button>
-                <Button asChild variant="ghost" className="flex-1 min-h-[44px]">
-                  <Link href={`/trip/${tripId}/map`}>Open route map</Link>
-                </Button>
+            </RevealSection>
+            <RevealSection delayMs={120}>
+              <div className="grid gap-4 md:grid-cols-2" data-testid="export-options">
+                {listTripExportOptions(tripId).map((option) => (
+                  <TripCard
+                    key={option.label}
+                    title={option.label}
+                    caption={option.description}
+                    href={option.href}
+                    testid={`export-option-${getFormatFromHref(option.href)}`}
+                  />
+                ))}
               </div>
-            </CardContent>
-          </Card>
-          <Card data-testid="included-list">
-            <CardHeader>
-              <CardTitle>Included in the PDF itinerary</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              {[
-                "Cover and trip summary",
-                "Route overview and validation warnings",
-                "Day-by-day itinerary with stop timing",
-                "Local tips and reviewer trust markers"
-              ].map((item) => (
-                <div key={item} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4 text-sm text-[var(--color-foreground)]">
-                  {item}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            </RevealSection>
+          </div>
+        </GuideChapter>
+
+        <GuideChapter id="delivery" className="py-12 md:py-24">
+          <div className="mx-auto max-w-[860px] grid gap-8">
+            <RevealSection>
+              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl text-[var(--color-foreground)]">Share &amp; delivery</h2>
+              <p className="rota-muted mt-4 max-w-2xl text-lg leading-relaxed">
+                Where the trip lives once it leaves the planner.
+              </p>
+            </RevealSection>
+            <RevealSection delayMs={120}>
+              <Card data-testid="share-card">
+                <CardHeader>
+                  <CardTitle>Share and delivery</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-3">
+                  <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
+                    <p className="rota-kicker">Share path</p>
+                    <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{buildTripSharePath(tripId)}</p>
+                    <p className="rota-muted mt-2 text-sm">Share links stay tied to the saved trip route.</p>
+                  </div>
+                  <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
+                    <p className="rota-kicker">Delivery email</p>
+                    <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{emailPreview.subject}</p>
+                    <p className="rota-muted mt-2 text-sm">{emailPreview.previewText}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </RevealSection>
+            <RevealSection delayMs={200}>
+              <Card data-testid="included-list">
+                <CardHeader>
+                  <CardTitle>Included in the PDF itinerary</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-3">
+                  {[
+                    "Cover and trip summary",
+                    "Route overview and validation notes",
+                    "Day-by-day itinerary with stop timing",
+                    "Local tips and reviewer trust markers"
+                  ].map((item) => (
+                    <div key={item} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4 text-sm text-[var(--color-foreground)]">
+                      {item}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </RevealSection>
+          </div>
+        </GuideChapter>
+
+        <GuideChapter id="access" className="py-12 md:py-24 bg-[var(--color-ink)] text-[var(--color-paper)]">
+          <div className="mx-auto max-w-[860px] grid gap-8">
+            <RevealSection>
+              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl">Export access</h2>
+              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--color-cream)]">
+                {tripCommerceState.canExport
+                  ? "This trip is unlocked. PDF, calendar, markdown, and print exports are ready."
+                  : "Unlock the trip to release PDF, calendar, and markdown exports. Print stays available either way."}
+              </p>
+            </RevealSection>
+            <RevealSection delayMs={120}>
+              <Card data-testid="access-card" className="bg-white/5 border-white/10 text-white">
+                <CardContent className="grid gap-4 pt-6">
+                  <div className="flex flex-wrap gap-2">
+                    <Badge tone="soft" className="bg-white/15 border-white/10 text-white">{tripCommerceState.accessLabel}</Badge>
+                    <Badge tone="soft" className="bg-white/15 border-white/10 text-white">{tripCommerceState.exportLabel}</Badge>
+                    <Badge tone="soft" className="bg-white/15 border-white/10 text-white">{tripCommerceState.reviewLabel}</Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-3 w-full">
+                    {tripCommerceState.canUnlock ? (
+                      <form action={`/api/trips/${tripId}/unlock`} method="post" className="flex-1">
+                        <Button type="submit" className="w-full min-h-[44px] bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90">
+                          Checkout to unlock exports
+                        </Button>
+                      </form>
+                    ) : null}
+                    <Button asChild variant="ghost" className="flex-1 min-h-[44px] border border-[var(--color-paper)] text-[var(--color-paper)] hover:bg-white/10">
+                      <Link href={`/trip/${tripId}/map`}>Open route map</Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </RevealSection>
+          </div>
+        </GuideChapter>
+
+        <GuideChapter id="next-step" className="p-0">
+          <CTASection>
+            <h2 className="font-[family-name:var(--font-rota-display)] text-4xl md:text-5xl">Send the trip onward</h2>
+            <p className="text-xl text-[var(--color-cream)] max-w-2xl">
+              Print directly, return to the guided trip, or unlock the full export bundle.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mt-4">
+              <Button asChild className="bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90 text-lg px-8 py-3 h-auto min-h-[44px]">
+                <Link href={`/trip/${tripId}`}>Back to trip</Link>
+              </Button>
+              <Button asChild variant="ghost" className="border border-[var(--color-paper)] text-[var(--color-paper)] hover:bg-white/10 text-lg px-8 py-3 h-auto min-h-[44px]">
+                <Link href={`/trip/${tripId}/export?view=print`}>Print-friendly view</Link>
+              </Button>
+            </div>
+          </CTASection>
+        </GuideChapter>
+      </CinematicGuide>
     </PageShell>
   );
 }

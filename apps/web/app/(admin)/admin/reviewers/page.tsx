@@ -1,12 +1,16 @@
 import { isPersistenceConfigError, listReviewers } from "@repo/db";
 import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading, StatPill } from "@repo/ui";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 export default async function AdminReviewersPage() {
+  const auth = await getAdminPageAuthContext();
   let reviewers = [] as Awaited<ReturnType<typeof listReviewers>>;
   let infoMessage = "";
 
   try {
-    reviewers = await listReviewers();
+    if (isAdminPageAuthContext(auth)) {
+      reviewers = await listReviewers(100, { client: auth.client });
+    }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted reviewers here."
@@ -37,6 +41,7 @@ export default async function AdminReviewersPage() {
           eyebrow="Admin CMS"
           title="Reviewer management shell"
           description="Matches the roadmap's reviewer-management layer: region fit, language coverage, specialties, and assignment readiness."
+          h1
         />
       </div>
       
