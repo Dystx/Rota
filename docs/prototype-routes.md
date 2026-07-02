@@ -95,11 +95,46 @@ The prototype uses **Tailwind CDN** with `tailwind.config = {...}` syntax. The c
 
 ## Migration Plan
 
-1. **Add new prototype-mapped routes as Next.js pages** (5 client-facing, 7 console routes)
+1. **Add new prototype-mapped routes as Next.js pages** (5 client-facing, 7 console routes) ✅ **DONE 2026-07-02**
 2. **Keep `(admin|app|reviewer)` route groups as-is** for now — adds `/console/*` as an alias/redirect layer later if desired
-3. **Apply `docs/design-tokens-olive-ochre.css`** by replacing `packages/ui/src/styles.css` content
+3. **Apply `docs/design-tokens-olive-ochre.css`** by replacing `packages/ui/src/styles.css` content ✅ **DONE additively 2026-07-02**
 4. **Audit `.rota-*` component classes** in `packages/ui/src/styles.css` for hardcoded Cinematic Concierge references; rename or repoint to olive/ochre tokens
 5. **Replace page-level hero sections** in `(marketing)/*` and `(app)/trip/new/page.tsx` with prototype's hero layout (`h-[819px]` cinematic background + glass card overlay)
 6. **Verify** `pnpm typecheck` and `pnpm test` still pass after token swap
 
 Each step is its own commit; smallest-reviewable diff.
+
+---
+
+## Migration Progress (as of 2026-07-02)
+
+| Step | Status | Commit |
+|---|---|---|
+| 1. Add prototype-mapped routes as Next.js pages | ✅ **11/12 routes ported** | `c007883`, `8476954`, `af25df7`, `7bcf504` |
+| 2. Olive/ochre tokens applied to `packages/ui/src/styles.css` | ✅ Done additively | `baf0042`, `081b40f` |
+| 3. Prototype served verbatim at `/prototype.html` | ✅ Done | `061165d` |
+| 4. `.rota-*` audit | ⏳ Pending | — |
+| 5. Replace page-level heroes in `(marketing)/(app)` | ⏳ Pending | — |
+
+### Routes ported
+
+| Prototype route | Next.js path | Commit |
+|---|---|---|
+| `/planner` | `apps/web/app/planner/page.tsx` | `8476954` |
+| `/logistics` | `apps/web/app/logistics/page.tsx` | `af25df7` |
+| `/checkout` | `apps/web/app/checkout/page.tsx` | `c007883` |
+| `/itineraries` | `apps/web/app/itineraries/page.tsx` | `af25df7` |
+| `/vault` | `apps/web/app/vault/page.tsx` | `af25df7` |
+| `/expert-chat` | `apps/web/app/expert-chat/page.tsx` | `af25df7` |
+| `/console/pipeline` | `apps/web/app/console/pipeline/page.tsx` | `7bcf504` |
+| `/console/workspace` | `apps/web/app/console/workspace/page.tsx` | `7bcf504` |
+| `/console/messages` | `apps/web/app/console/messages/page.tsx` | `7bcf504` |
+| `/console/graph` | `apps/web/app/console/graph/page.tsx` | `7bcf504` |
+| `/console/metrics` | `apps/web/app/console/metrics/page.tsx` | `7bcf504` |
+| `/console/config` | `apps/web/app/console/config/page.tsx` | `7bcf504` |
+
+### Routes NOT ported (intentional)
+
+| Prototype route | Reason |
+|---|---|
+| `/` (HomePage) | Conflicts with existing `apps/web/app/(marketing)/page.tsx` (the actual Rota marketing homepage). The prototype's HomePage is a hero-only mockup; the existing marketing page is the real entry point. |
