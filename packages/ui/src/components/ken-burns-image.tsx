@@ -1,10 +1,6 @@
 'use client';
 
-declare module 'motion/react-m' {
-  export const m: any;
-}
-
-import { m } from 'motion/react-m';
+import { m } from 'motion/react';
 import { useReducedMotion } from '../hooks/use-reduced-motion';
 
 export interface KenBurnsImageProps {
@@ -46,7 +42,7 @@ export function KenBurnsImage({
   const { x, y } = getPanValues();
 
   return (
-    <m.img
+      <m.img
       src={src}
       alt={alt}
       className={className}
@@ -61,6 +57,6 @@ export function KenBurnsImage({
         repeat: Infinity,
         repeatType: 'mirror',
       }}
-    />
+      />
   );
 }

@@ -2,8 +2,11 @@
 
 import * as React from "react";
 import { RouteMap as SchematicMap, useReducedMotion } from "@repo/ui";
+import { tryCapture, type AnalyticsProvider } from "@repo/analytics";
 import { CHAPTER_CAMERA_DEFAULTS, CINEMATIC_STYLE, FOG_CONFIG, TERRAIN_CONFIG } from "../cinematic-config";
-import { getMapProviderToken } from "../provider";
+import { getMapProviderToken, getMapStaticImageUrl } from "../provider";
+import { isKillSwitchActive } from "../kill-switch";
+import type { MapboxMap, MapboxMarker } from "./mount-provider";
 
 export interface MapStopMarker {
   id: string;
@@ -39,10 +42,10 @@ export interface MapChapter {
 
 export interface ProviderMapHandle {
   flyTo: (options: { chapter: MapChapter }) => void;
-  jumpTo?: (chapter: MapChapter) => void;
+  jumpTo: (chapter: MapChapter) => void;
 }
 
-export interface ProviderMapProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ProviderMapProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onLoad'> {
   selectedDayId?: string;
   days?: MapDayLayer[];
   warnings?: MapRouteWarning[];
@@ -50,36 +53,8 @@ export interface ProviderMapProps extends React.HTMLAttributes<HTMLDivElement> {
   mode?: "static" | "cinematic";
   onLoad?: () => void;
   tripId?: string;
+  analytics?: AnalyticsProvider;
 }
-
-type LngLat = [number, number];
-
-type BoundsLike = {
-  extend: (lngLat: LngLat) => BoundsLike;
-};
-
-type MapboxMarker = {
-  setLngLat: (lngLat: LngLat) => MapboxMarker;
-  addTo: (map: MapboxMap) => MapboxMarker;
-  remove: () => void;
-};
-
-type MapboxMap = {
-  on: (event: "load", callback: () => void) => void;
-  fitBounds: (bounds: BoundsLike, options?: Record<string, unknown>) => void;
-  flyTo: (options: Record<string, unknown>) => void;
-  setTerrain?: (terrain: typeof TERRAIN_CONFIG) => void;
-  setFog?: (fog: typeof FOG_CONFIG) => void;
-  remove: () => void;
-};
-
-type MapboxModule = {
-  default?: MapboxModule;
-  accessToken: string;
-  Map: new (options: Record<string, unknown>) => MapboxMap;
-  Marker: new (options?: Record<string, unknown>) => MapboxMarker;
-  LngLatBounds: new (southWest: LngLat, northEast: LngLat) => BoundsLike;
-};
 
 type CoordinateStop = MapStopMarker & {
   dayId: string;
@@ -112,7 +87,9 @@ function getCoordinateStops(days: MapDayLayer[]): CoordinateStop[] {
       const coordinate = hasCoordinate(stop) ? stop : fallbackCoordinate(stop);
 
       if (!coordinate) {
-        console.warn(`ProviderMap omitted stop without coordinates: ${stop.label}`);
+        if (process.env.NODE_ENV !== "production") {
+          console["warn"](`ProviderMap omitted stop without coordinates: ${stop.label}`);
+        }
         return;
       }
 
@@ -134,17 +111,35 @@ function toSchematicDays(days: MapDayLayer[]): React.ComponentProps<typeof Schem
   }));
 }
 
-function getStaticImageUrl(token: string, stops: CoordinateStop[]): string {
-  const markerOverlay = stops
+function getStaticImageUrl(stops: CoordinateStop[]): string | null {
+  const first = stops[0];
+  if (!first) return null;
+  const overlay = stops
     .slice(0, 10)
     .map((stop, index) => `pin-s-${index + 1}+111827(${stop.lng},${stop.lat})`)
     .join(",");
-  const overlay = markerOverlay || "auto";
-  return `https://api.mapbox.com/styles/v1/mapbox/standard/static/${overlay}/auto/1200x600?access_token=${encodeURIComponent(token)}`;
+  return getMapStaticImageUrl({ lng: first.lng, lat: first.lat, zoom: 8, overlay });
 }
 
-function normalizeMapboxModule(module: MapboxModule): MapboxModule {
-  return module.default ?? module;
+function resolveChapterCoordinate(chapter: MapChapter, stops: CoordinateStop[]): { lng: number; lat: number } | null {
+  const stop = chapter.stopId ? stops.find((item) => item.id === chapter.stopId) : undefined;
+  const lng = chapter.lng ?? stop?.lng;
+  const lat = chapter.lat ?? stop?.lat;
+
+  return typeof lng === "number" && typeof lat === "number" && Number.isFinite(lng) && Number.isFinite(lat)
+    ? { lng, lat }
+    : null;
+}
+
+function toCameraOptions(chapter: MapChapter, center: { lng: number; lat: number }, duration: number): Record<string, unknown> {
+  return {
+    center: [center.lng, center.lat],
+    zoom: chapter.zoom ?? CHAPTER_CAMERA_DEFAULTS.zoom,
+    pitch: chapter.pitch ?? CHAPTER_CAMERA_DEFAULTS.pitch,
+    bearing: chapter.bearing ?? CHAPTER_CAMERA_DEFAULTS.bearing,
+    duration,
+    curve: CHAPTER_CAMERA_DEFAULTS.curve,
+  };
 }
 
 export const ProviderMap = React.forwardRef<ProviderMapHandle, ProviderMapProps>(function ProviderMap(
@@ -157,6 +152,7 @@ export const ProviderMap = React.forwardRef<ProviderMapHandle, ProviderMapProps>
     mode = "static",
     onLoad,
     tripId,
+    analytics,
     ...props
   },
   ref,
@@ -168,6 +164,19 @@ export const ProviderMap = React.forwardRef<ProviderMapHandle, ProviderMapProps>
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const mapRef = React.useRef<MapboxMap | null>(null);
   const markersRef = React.useRef<MapboxMarker[]>([]);
+  const killSwitchActive = isKillSwitchActive();
+  const killSwitchTelemetryFiredRef = React.useRef(false);
+  const [staticImageFailed, setStaticImageFailed] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!killSwitchActive || killSwitchTelemetryFiredRef.current || !analytics) return;
+    killSwitchTelemetryFiredRef.current = true;
+    void tryCapture(analytics, {
+      name: "cinematic_kill_switch_triggered",
+      distinctId: tripId ? `trip:${tripId}` : "anon-cinematic",
+      properties: { reason: "manual", loadCount: 0, threshold: 0 },
+    });
+  }, [analytics, killSwitchActive, tripId]);
 
   React.useImperativeHandle(
     ref,
@@ -177,119 +186,116 @@ export const ProviderMap = React.forwardRef<ProviderMapHandle, ProviderMapProps>
           return;
         }
 
-        const stop = chapter.stopId ? coordinateStops.find((item) => item.id === chapter.stopId) : undefined;
-        const lng = chapter.lng ?? stop?.lng;
-        const lat = chapter.lat ?? stop?.lat;
+        const center = resolveChapterCoordinate(chapter, coordinateStops);
+        if (!center) return;
 
-        if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
+        mapRef.current?.flyTo(toCameraOptions(chapter, center, chapter.duration ?? CHAPTER_CAMERA_DEFAULTS.duration));
+      },
+      jumpTo(chapter) {
+        const center = resolveChapterCoordinate(chapter, coordinateStops);
+        if (!center) return;
+
+        const options = { ...toCameraOptions(chapter, center, 0), animate: false };
+        const map = mapRef.current;
+        if (map?.jumpTo) {
+          map.jumpTo(options);
           return;
         }
 
-        mapRef.current?.flyTo({
-          center: [lng, lat],
-          zoom: chapter.zoom ?? CHAPTER_CAMERA_DEFAULTS.zoom,
-          pitch: chapter.pitch ?? CHAPTER_CAMERA_DEFAULTS.pitch,
-          bearing: chapter.bearing ?? CHAPTER_CAMERA_DEFAULTS.bearing,
-          duration: chapter.duration ?? CHAPTER_CAMERA_DEFAULTS.duration,
-          curve: CHAPTER_CAMERA_DEFAULTS.curve,
-        });
+        map?.flyTo(options);
       },
     }),
     [coordinateStops, effectiveMode],
   );
 
   React.useEffect(() => {
-    if (!token || coordinateStops.length === 0 || process.env.NEXT_PUBLIC_MAPBOX_KILL_SWITCH === "1") {
+    if (!token || coordinateStops.length === 0 || killSwitchActive) {
       return;
     }
 
     let isMounted = true;
     let mapInstance: MapboxMap | null = null;
+    let activeMarkers: MapboxMarker[] = [];
 
-    async function mountMap(): Promise<void> {
-      if (!token) {
-        return;
-      }
+    async function mount(): Promise<void> {
+      if (!token || !containerRef.current) return;
 
-      const imported = (await import("mapbox-gl")) as unknown as MapboxModule;
-      const mapboxgl = normalizeMapboxModule(imported);
+      const { mountMapbox, prewarmMapbox } = await import("./mount-provider");
 
-      if (!isMounted || !containerRef.current) {
-        return;
-      }
+      if (!isMounted || !containerRef.current) return;
 
-      const firstStop = coordinateStops[0];
+      await prewarmMapbox();
 
-      if (!firstStop) {
-        return;
-      }
+      if (!isMounted || !containerRef.current) return;
 
-      mapboxgl.accessToken = token;
-      mapInstance = new mapboxgl.Map({
+      const result = await mountMapbox({
         container: containerRef.current,
+        token,
+        stops: coordinateStops.map(({ id, label, lng, lat }) => ({ id, label, lng, lat })),
+        mode: effectiveMode,
+        cameraDefaults: CHAPTER_CAMERA_DEFAULTS,
         style: CINEMATIC_STYLE,
-        center: [firstStop.lng, firstStop.lat],
-        zoom: effectiveMode === "cinematic" ? CHAPTER_CAMERA_DEFAULTS.zoom : 8,
-        pitch: effectiveMode === "cinematic" ? CHAPTER_CAMERA_DEFAULTS.pitch : 0,
-        bearing: effectiveMode === "cinematic" ? CHAPTER_CAMERA_DEFAULTS.bearing : 0,
-        interactive: true,
+        terrain: TERRAIN_CONFIG,
+        fog: FOG_CONFIG,
+        onLoad,
       });
+
+      if (!result || !isMounted) {
+        result?.markers.forEach((marker) => marker.remove());
+        result?.map.remove();
+        return;
+      }
+
+      mapInstance = result.map;
+      activeMarkers = result.markers;
       mapRef.current = mapInstance;
-
-      mapInstance.on("load", () => {
-        mapInstance?.setTerrain?.(TERRAIN_CONFIG);
-        mapInstance?.setFog?.(FOG_CONFIG);
-
-        const bounds = new mapboxgl.LngLatBounds(
-          [firstStop.lng, firstStop.lat],
-          [firstStop.lng, firstStop.lat],
-        );
-        coordinateStops.slice(1).forEach((stop) => bounds.extend([stop.lng, stop.lat]));
-
-        if (effectiveMode === "static") {
-          mapInstance?.fitBounds(bounds, { padding: 80, duration: 0, animate: false });
-        }
-
-        onLoad?.();
-      });
-
-      markersRef.current = coordinateStops.map((stop, index) => {
-        const markerElement = document.createElement("button");
-        markerElement.type = "button";
-        markerElement.textContent = String(index + 1);
-        markerElement.setAttribute("aria-label", `Focus ${stop.label}`);
-        markerElement.className = "grid h-8 w-8 place-items-center rounded-full border-2 border-white bg-[#111827] text-xs font-bold text-white shadow-lg";
-        markerElement.addEventListener("click", () => {
-          mapInstance?.flyTo({ center: [stop.lng, stop.lat], zoom: 14, duration: effectiveMode === "static" ? 0 : 900 });
-        });
-
-        return new mapboxgl.Marker({ element: markerElement }).setLngLat([stop.lng, stop.lat]).addTo(mapInstance as MapboxMap);
-      });
+      markersRef.current = activeMarkers;
     }
 
-    void mountMap();
+    void mount();
 
     return () => {
       isMounted = false;
-      markersRef.current.forEach((marker) => marker.remove());
+      activeMarkers.forEach((marker) => marker.remove());
       markersRef.current = [];
       mapInstance?.remove();
       mapRef.current = null;
     };
-  }, [coordinateStops, effectiveMode, onLoad, token]);
+  }, [coordinateStops, effectiveMode, killSwitchActive, onLoad, token]);
 
   if (!token || coordinateStops.length === 0) {
     return <SchematicMap selectedDayId={selectedDayId} days={toSchematicDays(days)} warnings={warnings} className={className} {...props}>{children}</SchematicMap>;
   }
 
-  if (process.env.NEXT_PUBLIC_MAPBOX_KILL_SWITCH === "1") {
+  if (killSwitchActive) {
+    const staticUrl = getStaticImageUrl(coordinateStops);
+    const showImage = staticUrl !== null && !staticImageFailed;
     return (
       <div
         data-testid="static-map-placeholder"
+        data-static-fallback={showImage ? "image" : "schematic"}
         className={`relative flex h-[600px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.96)] shadow-[0_24px_60px_rgba(7,17,19,0.06)] ${className ?? ""}`}
         {...props}
       >
-        <img src={getStaticImageUrl(token, coordinateStops)} alt={`Static map preview for ${tripId ?? "trip"}`} className="absolute inset-0 h-full w-full object-cover" />
+        {showImage ? (
+          <img
+            src={staticUrl}
+            alt={`Static map preview for ${tripId ?? "trip"}`}
+            className="absolute inset-0 h-full w-full object-cover"
+            onError={() => setStaticImageFailed(true)}
+          />
+        ) : (
+          <div
+            data-static-schematic=""
+            aria-label={`Static map preview for ${tripId ?? "trip"}`}
+            role="img"
+            className="absolute inset-0 h-full w-full"
+            style={{
+              background:
+                "radial-gradient(120% 80% at 50% 35%, var(--color-aqua, #cfeae3) 0%, var(--color-cream, #f3ede1) 55%, var(--color-paper, #f7faf9) 100%)",
+            }}
+          />
+        )}
         <div className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full border border-[var(--color-border)] bg-white/90 px-4 py-2 text-xs font-medium text-[var(--color-muted-foreground)] shadow-sm backdrop-blur-md">
           Static map preview shown while live map is disabled
         </div>

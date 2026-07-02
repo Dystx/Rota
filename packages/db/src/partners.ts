@@ -1,5 +1,5 @@
 import { CreatePartnerSchema, PartnerSchema, type CreatePartnerInput, type Partner, type UpdatePartnerInput } from "@repo/types";
-import { createAdminClient } from "./index";
+import { resolveDataClient, type DataClientOptions } from "./clients";
 
 type RawPartnerRow = {
   id: string;
@@ -29,8 +29,8 @@ function parsePartnerRow(row: RawPartnerRow): Partner {
   });
 }
 
-export async function listPartners(limit = 100): Promise<Partner[]> {
-  const { data, error } = await createAdminClient()
+export async function listPartners(limit = 100, options?: DataClientOptions): Promise<Partner[]> {
+  const { data, error } = await resolveDataClient(options)
     .from("partners")
     .select("id,name,type,coverage_regions,status,notes,link,is_affiliate")
     .order("created_at", { ascending: false })
@@ -43,8 +43,8 @@ export async function listPartners(limit = 100): Promise<Partner[]> {
   return ((data as RawPartnerRow[] | null) ?? []).map((row) => parsePartnerRow(row));
 }
 
-export async function getPartnerById(id: string): Promise<Partner | null> {
-  const { data, error } = await createAdminClient()
+export async function getPartnerById(id: string, options?: DataClientOptions): Promise<Partner | null> {
+  const { data, error } = await resolveDataClient(options)
     .from("partners")
     .select("id,name,type,coverage_regions,status,notes,link,is_affiliate")
     .eq("id", id)
@@ -61,11 +61,11 @@ export async function getPartnerById(id: string): Promise<Partner | null> {
   return parsePartnerRow(data as RawPartnerRow);
 }
 
-export async function createPartner(input: CreatePartnerInput): Promise<Partner> {
+export async function createPartner(input: CreatePartnerInput, options?: DataClientOptions): Promise<Partner> {
   const partner = CreatePartnerSchema.parse(input);
   const nextId = partner.id?.trim() || slugifyPartnerId(partner.name);
 
-  const { data, error } = await createAdminClient()
+  const { data, error } = await resolveDataClient(options)
     .from("partners")
     .insert({
       coverage_regions: partner.coverageRegions,
@@ -87,7 +87,7 @@ export async function createPartner(input: CreatePartnerInput): Promise<Partner>
   return parsePartnerRow(data as RawPartnerRow);
 }
 
-export async function updatePartner(id: string, patch: UpdatePartnerInput): Promise<Partner | null> {
+export async function updatePartner(id: string, patch: UpdatePartnerInput, options?: DataClientOptions): Promise<Partner | null> {
   const nextPatch = CreatePartnerSchema.partial().parse(patch);
   const updates: Record<string, string | string[] | boolean> = {};
 
@@ -99,7 +99,7 @@ export async function updatePartner(id: string, patch: UpdatePartnerInput): Prom
   if (nextPatch.link !== undefined) updates.link = nextPatch.link;
   if (nextPatch.isAffiliate !== undefined) updates.is_affiliate = nextPatch.isAffiliate;
 
-  const { data, error } = await createAdminClient()
+  const { data, error } = await resolveDataClient(options)
     .from("partners")
     .update(updates)
     .eq("id", id)

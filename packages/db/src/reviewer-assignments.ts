@@ -1,11 +1,28 @@
 import {
   CreateReviewerAssignmentSchema,
   ReviewerAssignmentSchema,
+  reviewerAssignmentStatuses,
   type CreateReviewerAssignmentInput,
   type ReviewerAssignment,
   type UpdateReviewerAssignmentInput
 } from "@repo/types";
-import { createAdminClient } from "./index";
+import { resolveDataClient, type DataClientOptions } from "./clients";
+
+export const activeReviewerAssignmentStatuses = ["assigned", "submitted"] as const;
+
+export class DuplicateActiveReviewerAssignmentError extends Error {
+  constructor(public readonly existingAssignment: ReviewerAssignment) {
+    super("Trip already has an active reviewer assignment.");
+    this.name = "DuplicateActiveReviewerAssignmentError";
+  }
+}
+
+export class DuplicateActiveReviewerAssignmentDatabaseError extends Error {
+  constructor() {
+    super("Trip already has an active reviewer assignment.");
+    this.name = "DuplicateActiveReviewerAssignmentDatabaseError";
+  }
+}
 
 type RawReviewerAssignmentRow = {
   id: number;
@@ -46,7 +63,26 @@ function toNumericTripId(tripId: string) {
   return Number.isInteger(numericTripId) ? numericTripId : null;
 }
 
-export async function createReviewerAssignment(input: CreateReviewerAssignmentInput): Promise<ReviewerAssignment> {
+function isUniqueActiveReviewerAssignmentError(error: { code?: string; message?: string } | null | undefined): boolean {
+  return (
+    error?.code === "23505" &&
+    (error.message?.includes("reviewer_assignments_one_active_per_trip_idx") ?? false)
+  );
+}
+
+export function isActiveReviewerAssignmentStatus(status: string): boolean {
+  return activeReviewerAssignmentStatuses.includes(status as (typeof activeReviewerAssignmentStatuses)[number]);
+}
+
+export function isSupportedReviewerAssignmentStatus(status: string): boolean {
+  return reviewerAssignmentStatuses.includes(status as (typeof reviewerAssignmentStatuses)[number]);
+}
+
+export function filterActiveReviewerAssignments(assignments: ReviewerAssignment[]): ReviewerAssignment[] {
+  return assignments.filter((assignment) => isActiveReviewerAssignmentStatus(assignment.status));
+}
+
+export async function createReviewerAssignment(input: CreateReviewerAssignmentInput, options?: DataClientOptions): Promise<ReviewerAssignment> {
   const assignment = CreateReviewerAssignmentSchema.parse(input);
   const numericTripId = toNumericTripId(assignment.tripId);
 
@@ -54,7 +90,14 @@ export async function createReviewerAssignment(input: CreateReviewerAssignmentIn
     throw new Error("Trip assignment requires a numeric trip id.");
   }
 
-  const { data, error } = await createAdminClient()
+  const activeAssignments = filterActiveReviewerAssignments(await listAssignmentsForTrip(assignment.tripId, options));
+  const existingAssignment = activeAssignments[0];
+
+  if (existingAssignment) {
+    throw new DuplicateActiveReviewerAssignmentError(existingAssignment);
+  }
+
+  const { data, error } = await resolveDataClient(options)
     .from("reviewer_assignments")
     .insert({
       notes: assignment.notes,
@@ -65,6 +108,10 @@ export async function createReviewerAssignment(input: CreateReviewerAssignmentIn
     .select("id,trip_id,reviewer_id,status,notes,created_at,completed_at,reviewers(name)")
     .single();
 
+  if (isUniqueActiveReviewerAssignmentError(error)) {
+    throw new DuplicateActiveReviewerAssignmentDatabaseError();
+  }
+
   if (error || !data) {
     throw new Error(error?.message ?? "Failed to create reviewer assignment.");
   }
@@ -72,8 +119,8 @@ export async function createReviewerAssignment(input: CreateReviewerAssignmentIn
   return parseAssignmentRow(data as RawReviewerAssignmentRow);
 }
 
-export async function listReviewerAssignments(limit = 100, reviewerId?: string): Promise<ReviewerAssignment[]> {
-  let query = createAdminClient()
+export async function listReviewerAssignments(limit = 100, reviewerId?: string, options?: DataClientOptions): Promise<ReviewerAssignment[]> {
+  let query = resolveDataClient(options)
     .from("reviewer_assignments")
     .select("id,trip_id,reviewer_id,status,notes,created_at,completed_at,reviewers(name)")
     .order("created_at", { ascending: false })
@@ -92,14 +139,14 @@ export async function listReviewerAssignments(limit = 100, reviewerId?: string):
   return ((data as RawReviewerAssignmentRow[] | null) ?? []).map((row) => parseAssignmentRow(row));
 }
 
-export async function listAssignmentsForTrip(tripId: string): Promise<ReviewerAssignment[]> {
+export async function listAssignmentsForTrip(tripId: string, options?: DataClientOptions): Promise<ReviewerAssignment[]> {
   const numericTripId = toNumericTripId(tripId);
 
   if (numericTripId === null) {
     return [];
   }
 
-  const { data, error } = await createAdminClient()
+  const { data, error } = await resolveDataClient(options)
     .from("reviewer_assignments")
     .select("id,trip_id,reviewer_id,status,notes,created_at,completed_at,reviewers(name)")
     .eq("trip_id", numericTripId)
@@ -112,13 +159,61 @@ export async function listAssignmentsForTrip(tripId: string): Promise<ReviewerAs
   return ((data as RawReviewerAssignmentRow[] | null) ?? []).map((row) => parseAssignmentRow(row));
 }
 
-export async function getLatestAssignmentForTrip(tripId: string): Promise<ReviewerAssignment | null> {
-  const assignments = await listAssignmentsForTrip(tripId);
+export async function getReviewerAssignmentById(assignmentId: string, options?: DataClientOptions): Promise<ReviewerAssignment | null> {
+  const numericAssignmentId = Number(assignmentId);
+
+  if (!Number.isInteger(numericAssignmentId)) {
+    return null;
+  }
+
+  const { data, error } = await resolveDataClient(options)
+    .from("reviewer_assignments")
+    .select("id,trip_id,reviewer_id,status,notes,created_at,completed_at,reviewers(name)")
+    .eq("id", numericAssignmentId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  return parseAssignmentRow(data as RawReviewerAssignmentRow);
+}
+
+export async function getLatestAssignmentForTrip(tripId: string, options?: DataClientOptions): Promise<ReviewerAssignment | null> {
+  const assignments = await listAssignmentsForTrip(tripId, options);
 
   return assignments[0] ?? null;
 }
 
-export async function updateReviewerAssignment(assignmentId: string, patch: UpdateReviewerAssignmentInput): Promise<ReviewerAssignment | null> {
+export async function getLatestAssignmentForReviewerTrip(
+  tripId: string,
+  reviewerId: string,
+  options?: DataClientOptions
+): Promise<ReviewerAssignment | null> {
+  const assignments = await listAssignmentsForTrip(tripId, options);
+
+  return assignments.find((assignment) => assignment.reviewerId === reviewerId) ?? null;
+}
+
+export async function reviewerHasTripAssignment(
+  tripId: string,
+  reviewerId: string,
+  options?: DataClientOptions
+): Promise<boolean> {
+  const assignments = await listAssignmentsForTrip(tripId, options);
+
+  return assignments.some((assignment) => assignment.reviewerId === reviewerId);
+}
+
+export async function updateReviewerAssignment(
+  assignmentId: string,
+  patch: UpdateReviewerAssignmentInput,
+  options?: DataClientOptions
+): Promise<ReviewerAssignment | null> {
   const numericAssignmentId = Number(assignmentId);
 
   if (!Number.isInteger(numericAssignmentId)) {
@@ -131,7 +226,7 @@ export async function updateReviewerAssignment(assignmentId: string, patch: Upda
   if (patch.status !== undefined) updates.status = patch.status;
   if (patch.completedAt !== undefined) updates.completed_at = patch.completedAt;
 
-  const { data, error } = await createAdminClient()
+  const { data, error } = await resolveDataClient(options)
     .from("reviewer_assignments")
     .update(updates)
     .eq("id", numericAssignmentId)
@@ -149,16 +244,43 @@ export async function updateReviewerAssignment(assignmentId: string, patch: Upda
   return parseAssignmentRow(data as RawReviewerAssignmentRow);
 }
 
-export async function markLatestAssignmentCompleted(tripId: string, notes?: string): Promise<ReviewerAssignment | null> {
-  const latestAssignment = await getLatestAssignmentForTrip(tripId);
+export async function markLatestAssignmentCompleted(tripId: string, notes?: string, options?: DataClientOptions): Promise<ReviewerAssignment | null> {
+  const latestAssignment = await getLatestAssignmentForTrip(tripId, options);
 
   if (!latestAssignment) {
     return null;
   }
 
-  return updateReviewerAssignment(latestAssignment.id, {
-    completedAt: new Date().toISOString(),
-    notes,
-    status: "completed"
-  });
+  return updateReviewerAssignment(
+    latestAssignment.id,
+    {
+      completedAt: new Date().toISOString(),
+      notes,
+      status: "completed"
+    },
+    options
+  );
+}
+
+export async function markReviewerTripAssignmentCompleted(
+  tripId: string,
+  reviewerId: string,
+  notes?: string,
+  options?: DataClientOptions
+): Promise<ReviewerAssignment | null> {
+  const latestAssignment = await getLatestAssignmentForReviewerTrip(tripId, reviewerId, options);
+
+  if (!latestAssignment) {
+    return null;
+  }
+
+  return updateReviewerAssignment(
+    latestAssignment.id,
+    {
+      completedAt: new Date().toISOString(),
+      notes,
+      status: "completed"
+    },
+    options
+  );
 }

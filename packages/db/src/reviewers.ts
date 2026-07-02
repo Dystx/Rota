@@ -1,5 +1,5 @@
 import { CreateReviewerSchema, ReviewerSchema, type CreateReviewerInput, type Reviewer, type UpdateReviewerInput } from "@repo/types";
-import { createAdminClient } from "./index";
+import { resolveDataClient, type DataClientOptions } from "./clients";
 
 type RawReviewerRow = {
   id: string;
@@ -33,8 +33,8 @@ function parseReviewerRow(row: RawReviewerRow): Reviewer {
   });
 }
 
-export async function listReviewers(limit = 100): Promise<Reviewer[]> {
-  const { data, error } = await createAdminClient()
+export async function listReviewers(limit = 100, options?: DataClientOptions): Promise<Reviewer[]> {
+  const { data, error } = await resolveDataClient(options)
     .from("reviewers")
     .select("id,name,country,regions,languages,specialties,status,rating,bio,response_promise")
     .order("created_at", { ascending: false })
@@ -47,8 +47,8 @@ export async function listReviewers(limit = 100): Promise<Reviewer[]> {
   return ((data as RawReviewerRow[] | null) ?? []).map((row) => parseReviewerRow(row));
 }
 
-export async function getReviewerById(id: string): Promise<Reviewer | null> {
-  const { data, error } = await createAdminClient()
+export async function getReviewerById(id: string, options?: DataClientOptions): Promise<Reviewer | null> {
+  const { data, error } = await resolveDataClient(options)
     .from("reviewers")
     .select("id,name,country,regions,languages,specialties,status,rating,bio,response_promise")
     .eq("id", id)
@@ -65,11 +65,11 @@ export async function getReviewerById(id: string): Promise<Reviewer | null> {
   return parseReviewerRow(data as RawReviewerRow);
 }
 
-export async function createReviewer(input: CreateReviewerInput): Promise<Reviewer> {
+export async function createReviewer(input: CreateReviewerInput, options?: DataClientOptions): Promise<Reviewer> {
   const reviewer = CreateReviewerSchema.parse(input);
   const nextId = reviewer.id?.trim() || slugifyReviewerId(reviewer.name);
 
-  const { data, error } = await createAdminClient()
+  const { data, error } = await resolveDataClient(options)
     .from("reviewers")
     .insert({
       bio: reviewer.bio,
@@ -93,7 +93,7 @@ export async function createReviewer(input: CreateReviewerInput): Promise<Review
   return parseReviewerRow(data as RawReviewerRow);
 }
 
-export async function updateReviewer(id: string, patch: UpdateReviewerInput): Promise<Reviewer | null> {
+export async function updateReviewer(id: string, patch: UpdateReviewerInput, options?: DataClientOptions): Promise<Reviewer | null> {
   const nextPatch = CreateReviewerSchema.partial().parse(patch);
   const updates: Record<string, string | string[] | number | null> = {};
 
@@ -107,7 +107,7 @@ export async function updateReviewer(id: string, patch: UpdateReviewerInput): Pr
   if (nextPatch.bio !== undefined) updates.bio = nextPatch.bio;
   if (nextPatch.responsePromise !== undefined) updates.response_promise = nextPatch.responsePromise;
 
-  const { data, error } = await createAdminClient()
+  const { data, error } = await resolveDataClient(options)
     .from("reviewers")
     .update(updates)
     .eq("id", id)

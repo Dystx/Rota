@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CHAPTER_CAMERA_DEFAULTS } from "./cinematic-config";
-import { cameraForChapter, interpolateCamera, stopsToChapters } from "./chapter-mapping";
+import { cameraForChapter, interpolateCamera, progressToActiveIndex, stopsToChapters } from "./chapter-mapping";
 
 describe("chapter mapping", () => {
   it("stopsToChapters preserves order across multi-day trips", () => {
@@ -9,18 +9,18 @@ describe("chapter mapping", () => {
         {
           dayIndex: 0,
           stops: [
-            { stopName: "Lisbon" },
-            { stopName: "Sintra" },
+            { stopName: "Lisbon", lng: 1, lat: 1 },
+            { stopName: "Sintra", lng: 2, lat: 2 },
           ],
         },
         {
           dayIndex: 1,
           stops: [
-            { stopName: "Porto" },
-            { stopName: "Braga" },
+            { stopName: "Porto", lng: 3, lat: 3 },
+            { stopName: "Braga", lng: 4, lat: 4 },
           ],
         },
-      ]).map((chapter) => chapter.stopName),
+      ]).map((chapter) => chapter.title),
     ).toEqual(["Lisbon", "Sintra", "Porto", "Braga"]);
   });
 
@@ -66,5 +66,13 @@ describe("chapter mapping", () => {
     const to = { zoom: 12, pitch: 40, bearing: 10, lng: -8, lat: 39 };
 
     expect(interpolateCamera(from, to, 0.5).bearing).toBeLessThan(1);
+  });
+
+  it("progressToActiveIndex maps scroll progress to chapter indexes", () => {
+    expect(progressToActiveIndex(0, 5)).toBe(0);
+    expect(progressToActiveIndex(0.5, 5)).toBe(2);
+    expect(progressToActiveIndex(1, 5)).toBe(4);
+    expect(progressToActiveIndex(0.5, 1)).toBe(0);
+    expect(progressToActiveIndex(0.5, 0)).toBe(-1);
   });
 });

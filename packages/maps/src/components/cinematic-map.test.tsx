@@ -25,6 +25,8 @@ vi.mock("./provider-map", async () => {
 
 vi.mock("../provider", () => ({
   getMapProviderToken: vi.fn(() => "pk.test.mapbox"),
+  getMapStaticImageUrl: vi.fn((params: { lng: number; lat: number; zoom: number }) =>
+    `https://api.mapbox.com/styles/v1/mapbox/standard/static/${params.lng},${params.lat},${params.zoom}/1200x600?access_token=pk.test.mapbox`),
 }));
 
 vi.mock("mapbox-gl", () => {

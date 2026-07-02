@@ -92,3 +92,5 @@ export const TripBriefSchema = z
   });
 
 export type TripBrief = z.infer<typeof TripBriefSchema>;
+
+export type TripBriefValidationErrors = z.inferFlattenedErrors<typeof TripBriefSchema>["fieldErrors"];

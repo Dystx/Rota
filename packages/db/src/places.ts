@@ -1,5 +1,5 @@
 import { CreatePlaceSchema, PlaceSchema, type CreatePlaceInput, type Place, type UpdatePlaceInput } from "@repo/types";
-import { createAdminClient } from "./index";
+import { resolveDataClient, type DataClientOptions } from "./clients";
 
 type RawPlaceRow = {
   id: string;
@@ -25,8 +25,8 @@ function parsePlaceRow(row: RawPlaceRow): Place {
   });
 }
 
-export async function listPlaces(limit = 100): Promise<Place[]> {
-  const { data, error } = await createAdminClient()
+export async function listPlaces(limit = 100, options?: DataClientOptions): Promise<Place[]> {
+  const { data, error } = await resolveDataClient(options)
     .from("places")
     .select("id,name,region,category,quality,source_confidence")
     .order("created_at", { ascending: false })
@@ -39,8 +39,8 @@ export async function listPlaces(limit = 100): Promise<Place[]> {
   return ((data as RawPlaceRow[] | null) ?? []).map((row) => parsePlaceRow(row));
 }
 
-export async function getPlaceById(id: string): Promise<Place | null> {
-  const { data, error } = await createAdminClient()
+export async function getPlaceById(id: string, options?: DataClientOptions): Promise<Place | null> {
+  const { data, error } = await resolveDataClient(options)
     .from("places")
     .select("id,name,region,category,quality,source_confidence")
     .eq("id", id)
@@ -57,11 +57,11 @@ export async function getPlaceById(id: string): Promise<Place | null> {
   return parsePlaceRow(data as RawPlaceRow);
 }
 
-export async function createPlace(input: CreatePlaceInput): Promise<Place> {
+export async function createPlace(input: CreatePlaceInput, options?: DataClientOptions): Promise<Place> {
   const place = CreatePlaceSchema.parse(input);
   const nextId = place.id?.trim() || slugifyPlaceId(place.name);
 
-  const { data, error } = await createAdminClient()
+  const { data, error } = await resolveDataClient(options)
     .from("places")
     .insert({
       category: place.category,
@@ -81,7 +81,7 @@ export async function createPlace(input: CreatePlaceInput): Promise<Place> {
   return parsePlaceRow(data as RawPlaceRow);
 }
 
-export async function updatePlace(id: string, patch: UpdatePlaceInput): Promise<Place | null> {
+export async function updatePlace(id: string, patch: UpdatePlaceInput, options?: DataClientOptions): Promise<Place | null> {
   const nextPatch = CreatePlaceSchema.partial().parse(patch);
   const updates: Record<string, string | number | null> = {};
 
@@ -105,7 +105,7 @@ export async function updatePlace(id: string, patch: UpdatePlaceInput): Promise<
     updates.source_confidence = nextPatch.sourceConfidence;
   }
 
-  const { data, error } = await createAdminClient()
+  const { data, error } = await resolveDataClient(options)
     .from("places")
     .update(updates)
     .eq("id", id)

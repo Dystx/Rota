@@ -35,7 +35,7 @@ export function PageShell({
           </nav>
         </div>
       </header>
-      <main className="mx-auto grid max-w-[1400px] gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">{children}</main>
+      <main id="main-content" className="mx-auto grid max-w-[1400px] gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">{children}</main>
     </div>
   );
 }
@@ -44,18 +44,21 @@ export function SectionHeading({
   eyebrow,
   title,
   description,
-  className
+  className,
+  h1
 }: {
   eyebrow: string;
   title: string;
   description: string;
   className?: string;
+  h1?: boolean;
 }) {
+  const TitleTag = h1 ? "h1" : "h2";
   return (
     <div className={cn("grid gap-3", className)}>
       <p className="rota-kicker">{eyebrow}</p>
       <div className="grid gap-3 lg:max-w-4xl">
-        <h2 className="rota-heading">{title}</h2>
+        <TitleTag className="rota-heading">{title}</TitleTag>
         <p className="rota-muted text-lg">{description}</p>
       </div>
     </div>

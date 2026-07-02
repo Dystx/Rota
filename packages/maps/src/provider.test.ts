@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { isMapProviderEnabled, getMapProviderToken } from "./provider";
+import { isMapProviderEnabled, getMapProviderToken, getMapStaticImageUrl } from "./provider";
 
 describe("Map Provider", () => {
   const originalEnvToken = process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN;
@@ -48,5 +48,43 @@ describe("Map Provider", () => {
     
     expect(isMapProviderEnabled()).toBe(false);
     expect(getMapProviderToken()).toBe(null);
+  });
+
+  describe("getMapStaticImageUrl", () => {
+    it("returns null when token is missing", () => {
+      vi.unstubAllGlobals();
+      delete process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN;
+      expect(getMapStaticImageUrl({ lng: -9.1, lat: 38.7, zoom: 8 })).toBe(null);
+    });
+
+    it("returns null when token is a secret key", () => {
+      vi.unstubAllGlobals();
+      process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN = "sk.evil";
+      expect(getMapStaticImageUrl({ lng: -9.1, lat: 38.7, zoom: 8 })).toBe(null);
+    });
+
+    it("returns null when coordinates are not finite", () => {
+      vi.unstubAllGlobals();
+      process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN = "pk.test.123";
+      expect(getMapStaticImageUrl({ lng: NaN, lat: 38.7, zoom: 8 })).toBe(null);
+      expect(getMapStaticImageUrl({ lng: -9.1, lat: Infinity, zoom: 8 })).toBe(null);
+    });
+
+    it("builds a Mapbox static URL with a public token", () => {
+      vi.unstubAllGlobals();
+      process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN = "pk.test.123";
+      const url = getMapStaticImageUrl({ lng: -9.1, lat: 38.7, zoom: 8 });
+      expect(url).toContain("https://api.mapbox.com/styles/v1/mapbox/light-v11/static/");
+      expect(url).toContain("-9.1,38.7,8");
+      expect(url).toContain("1200x600");
+      expect(url).toContain("access_token=pk.test.123");
+    });
+
+    it("includes overlay markers when provided", () => {
+      vi.unstubAllGlobals();
+      process.env.NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN = "pk.test.123";
+      const url = getMapStaticImageUrl({ lng: -9.1, lat: 38.7, zoom: 8, overlay: "pin-s-1+111827(-9.1,38.7)" });
+      expect(url).toContain("pin-s-1+111827(-9.1,38.7)/-9.1,38.7,8");
+    });
   });
 });

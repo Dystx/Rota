@@ -37,6 +37,7 @@ export function ArchiveLayout({
           eyebrow={header.eyebrow || ""}
           title={header.title}
           description={header.description || ""}
+          h1={true}
         />
 
         {filters && filters.length > 0 && (

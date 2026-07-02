@@ -1,4 +1,4 @@
-import { createAdminClient } from "./index";
+import { resolveDataClient, resolvePrivilegedServerDataClient, type DataClientOptions } from "./clients";
 
 type RawBookingClickRow = {
   id: number;
@@ -62,8 +62,8 @@ function parseBookingClick(row: RawBookingClickRow): BookingClick {
   };
 }
 
-export async function createBookingClick(input: CreateBookingClickInput): Promise<BookingClick> {
-  const { data, error } = await createAdminClient()
+export async function createBookingClick(input: CreateBookingClickInput, options?: DataClientOptions): Promise<BookingClick> {
+  const { data, error } = await resolvePrivilegedServerDataClient(options)
     .from("booking_clicks")
     .insert({
       partner_id: input.partnerId,
@@ -83,8 +83,8 @@ export async function createBookingClick(input: CreateBookingClickInput): Promis
   return parseBookingClick(data as RawBookingClickRow);
 }
 
-export async function listBookingClicks(limit = 200): Promise<BookingClick[]> {
-  const { data, error } = await createAdminClient()
+export async function listBookingClicks(limit = 200, options?: DataClientOptions): Promise<BookingClick[]> {
+  const { data, error } = await resolveDataClient(options)
     .from("booking_clicks")
     .select("id,partner_id,trip_id,source,target,referer,user_agent,created_at,partners(name)")
     .order("created_at", { ascending: false })

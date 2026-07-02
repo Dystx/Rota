@@ -18,11 +18,9 @@ describe("geocoding", () => {
     expect(result).toEqual({ lng: -9.1, lat: 38.7, confidence: 0.8, matchedPlace: "Lisboa" });
   });
 
-  it("returns null for low relevance and warns", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+  it("returns null for low relevance", async () => {
     const fetchMock = vi.fn(async () => okResponse({ features: [{ relevance: 0.4, place_name: "Low", geometry: { coordinates: [-9.1, 38.7] } }] }));
     await expect(geocodePlace({ placeName: "Low" }, { token: "pk.test", fetch: fetchMock as typeof fetch })).resolves.toBeNull();
-    expect(warn).toHaveBeenCalledWith("Mapbox geocoding result rejected due to low relevance.");
   });
 
   it("throws a typed error on 401", async () => {

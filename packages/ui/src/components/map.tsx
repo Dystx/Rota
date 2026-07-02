@@ -106,7 +106,7 @@ export function RouteMap({
             <div
               key={w.id}
               className={cn(
-                "flex items-center gap-2.5 rounded-full border px-4 py-2 text-xs font-medium shadow-md backdrop-blur-md transition-all",
+                "flex items-center gap-2.5 rounded-full border px-4 py-2 min-h-[44px] text-xs font-medium shadow-md backdrop-blur-md transition-all",
                 w.severity === "high"
                   ? "border-[#f5c2c7]/60 bg-[#f8d7da]/90 text-[#842029]"
                   : w.severity === "medium"
@@ -126,7 +126,7 @@ export function RouteMap({
       )}
 
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
-        <div className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/90 px-4 py-2 text-xs font-medium shadow-sm backdrop-blur-md text-[var(--color-muted-foreground)]">
+        <div className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/90 px-4 py-2 min-h-[44px] text-xs font-medium shadow-sm backdrop-blur-md text-[var(--color-muted-foreground)]">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="16" x2="12" y2="12" />

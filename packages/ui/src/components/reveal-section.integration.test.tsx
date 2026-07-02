@@ -33,7 +33,7 @@ const { motionDivMock } = vi.hoisted(() => ({
   }),
 }));
 
-vi.mock('motion/react-m', () => ({
+vi.mock('motion/react', () => ({
   m: {
     div: motionDivMock,
   },

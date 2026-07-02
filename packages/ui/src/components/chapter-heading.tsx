@@ -31,7 +31,7 @@ export function ChapterHeading({
       )}
     >
       <p className="text-iberian-gold font-medium uppercase tracking-widest text-sm">
-        <span className="opacity-70 mr-2">{formattedIndex}</span>
+        <span className="mr-2">{formattedIndex}</span>
         {eyebrow && <span>{eyebrow}</span>}
       </p>
       

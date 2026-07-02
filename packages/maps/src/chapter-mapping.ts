@@ -1,14 +1,15 @@
 import { CHAPTER_CAMERA_DEFAULTS } from "./cinematic-config";
 
-type Stop = {
-  stopName: string;
+export type ChapterMappableStop = {
+  stopName?: string;
+  placeName?: string;
   lng?: number;
   lat?: number;
 };
 
-type Day = {
+export type ChapterMappableDay = {
   dayIndex: number;
-  stops: Stop[];
+  stops: ChapterMappableStop[];
 };
 
 export type ChapterCameraTarget = {
@@ -18,6 +19,7 @@ export type ChapterCameraTarget = {
   pitch?: number;
   bearing?: number;
   duration?: number;
+  title?: string;
 };
 
 type Chapter = {
@@ -85,18 +87,24 @@ function normalizeBearing(bearing: number): number {
   return normalized < 0 ? normalized + 360 : normalized;
 }
 
-export function stopsToChapters(days: Day[]): Chapter[] {
-  const chapters: Chapter[] = [];
+export function stopsToChapters(days: readonly ChapterMappableDay[]): ChapterCameraTarget[] {
+  const chapters: ChapterCameraTarget[] = [];
 
   for (const day of days) {
+    let stopIndex = 0;
     for (const stop of day.stops) {
-      chapters.push({
-        chapterIndex: chapters.length,
-        stopName: stop.stopName,
-        lng: stop.lng,
-        lat: stop.lat,
-        dayIndex: day.dayIndex,
-      });
+      if (stop.lng !== undefined && stop.lat !== undefined) {
+        chapters.push({
+          id: `day-${day.dayIndex}-stop-${stopIndex}`,
+          center: [stop.lng, stop.lat],
+          zoom: CHAPTER_CAMERA_DEFAULTS.zoom,
+          title: stop.stopName || stop.placeName || 'Unknown Stop',
+          pitch: CHAPTER_CAMERA_DEFAULTS.pitch,
+          bearing: CHAPTER_CAMERA_DEFAULTS.bearing,
+          duration: CHAPTER_CAMERA_DEFAULTS.duration,
+        });
+      }
+      stopIndex++;
     }
   }
 
@@ -160,4 +168,12 @@ export function interpolateCamera(from: CameraState, to: CameraState, progress: 
     lng: from.lng + (to.lng - from.lng) * clampedProgress,
     lat: from.lat + (to.lat - from.lat) * clampedProgress,
   };
+}
+
+export function progressToActiveIndex(progress: number, count: number): number {
+  if (count <= 0) return -1;
+  if (count === 1) return 0;
+
+  const clampedProgress = Math.min(1, Math.max(0, progress));
+  return Math.min(count - 1, Math.floor(clampedProgress * count));
 }

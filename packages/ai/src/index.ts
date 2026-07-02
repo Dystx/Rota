@@ -6,6 +6,8 @@ import {
 } from "@repo/types";
 import { enrichItineraryWithCoords } from "./enrich";
 
+export * from "./prompt-normalization";
+
 export interface ItineraryGenerator {
   generate(tripBrief: TripBrief): Promise<Itinerary>;
 }

@@ -1,5 +1,4 @@
 type MapboxGeocodeFeature = {
-  relevance?: number;
   place_name?: string;
   properties?: {
     name?: string;
@@ -59,21 +58,20 @@ async function readJsonResponse(response: Response): Promise<unknown> {
 }
 
 function parseFeature(feature: MapboxGeocodeFeature): GeocodeResult {
-  const relevance = feature.relevance ?? 0;
-  if (relevance < 0.6) {
-    console.warn("Mapbox geocoding result rejected due to low relevance.");
+  const coordinates = feature.geometry?.coordinates;
+  if (!coordinates || coordinates.length !== 2) {
     return null;
   }
 
-  const coordinates = feature.geometry?.coordinates;
-  if (!coordinates || coordinates.length < 2) {
+  const relevance = "relevance" in feature ? (feature as { relevance?: unknown }).relevance : undefined;
+  if (typeof relevance === "number" && relevance < 0.6) {
     return null;
   }
 
   return {
     lng: coordinates[0],
     lat: coordinates[1],
-    confidence: relevance,
+    confidence: typeof relevance === "number" ? relevance : 1,
     matchedPlace: feature.place_name ?? feature.properties?.name ?? "",
   };
 }

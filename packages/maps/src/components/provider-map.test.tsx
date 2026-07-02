@@ -143,6 +143,28 @@ describe("ProviderMap", () => {
 
     expect(container.querySelector("[data-testid='static-map-placeholder']")).toBeTruthy();
     expect(container.querySelector("img[alt='Static map preview for trip-1']")).toBeTruthy();
+    expect(container.querySelector("[data-testid='static-map-placeholder']")?.getAttribute("data-static-fallback")).toBe("image");
+    expect(mapConstructor).not.toHaveBeenCalled();
+  });
+
+  it("falls back to schematic when the static image errors", () => {
+    process.env.NEXT_PUBLIC_MAPBOX_KILL_SWITCH = "1";
+
+    act(() => {
+      root.render(<ProviderMap days={daysWithCoordinates} mode="static" tripId="trip-1" />);
+    });
+
+    const img = container.querySelector("img[alt='Static map preview for trip-1']") as HTMLImageElement | null;
+    expect(img).toBeTruthy();
+
+    act(() => {
+      img?.dispatchEvent(new Event("error", { bubbles: true }));
+    });
+
+    expect(container.querySelector("img[alt='Static map preview for trip-1']")).toBeNull();
+    expect(container.querySelector("[data-static-schematic]")).toBeTruthy();
+    const placeholder = container.querySelector("[data-testid='static-map-placeholder']");
+    expect(placeholder?.getAttribute("data-static-fallback")).toBe("schematic");
     expect(mapConstructor).not.toHaveBeenCalled();
   });
 

@@ -1,9 +1,9 @@
 'use client';
 
 import { type ReactNode, type ReactElement } from 'react';
-import { m } from 'motion/react-m';
+
+import { m } from 'motion/react';
 import { useReducedMotion } from '../hooks/use-reduced-motion';
-import { cn } from '../lib/cn';
 
 export interface RevealSectionProps {
   children: ReactNode;

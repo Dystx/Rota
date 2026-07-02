@@ -3,7 +3,7 @@
 import * as React from "react";
 import { tryCapture, type AnalyticsProvider } from "@repo/analytics";
 import { cameraForChapter, type ChapterCameraTarget } from "../chapter-mapping";
-import { getMapProviderToken } from "../provider";
+import { getMapStaticImageUrl } from "../provider";
 import { ProviderMap, type MapDayLayer, type ProviderMapHandle } from "./provider-map";
 
 type ChapterChangeSource = "scroll" | "click" | "keyboard" | "deep-link";
@@ -31,12 +31,11 @@ function viewportBucket(): ViewportBucket {
   return "desktop";
 }
 
-function staticImageUrl(chapters: ChapterCameraTarget[]): string {
-  const token = getMapProviderToken();
+function staticImageUrl(chapters: ChapterCameraTarget[]): string | null {
   const first = chapters.find(hasCoords);
   const [lng, lat] = first?.center ?? [-9.1393, 38.7223];
   const zoom = first?.zoom ?? 8;
-  return `https://api.mapbox.com/styles/v1/mapbox/standard/static/${lng},${lat},${zoom}/1200x600?access_token=${encodeURIComponent(token ?? "")}`;
+  return getMapStaticImageUrl({ lng, lat, zoom });
 }
 
 function daysFromChapters(chapters: ChapterCameraTarget[]): MapDayLayer[] {
@@ -79,6 +78,7 @@ export function CinematicMap({
   analytics,
   onTilesLoaded,
 }: CinematicMapProps): React.ReactElement {
+  const [staticImageFailed, setStaticImageFailed] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(false);
   const sentinelRef = React.useRef<HTMLDivElement | null>(null);
   const mapRef = React.useRef<ProviderMapHandle | null>(null);
@@ -149,14 +149,38 @@ export function CinematicMap({
   }, [activeChapterId, chapters, isVisible, reducedMotion]);
 
   if (!isVisible) {
+    const url = staticImageUrl(chapters);
+    const showSchematic = url === null || staticImageFailed;
     return (
-      <div ref={sentinelRef} className={className}>
-        <img src={staticImageUrl(chapters)} data-static-placeholder="" loading="lazy" alt={`Static map preview for ${tripId}`} />
+      <div ref={sentinelRef} className={className} data-static-fallback={showSchematic ? "schematic" : "image"}>
+        {showSchematic ? (
+          <div
+            data-static-placeholder=""
+            data-static-schematic=""
+            role="img"
+            aria-label={`Static map preview for ${tripId}`}
+            className="h-[600px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)]"
+            style={{
+              background:
+                "radial-gradient(120% 80% at 50% 35%, var(--color-aqua, #cfeae3) 0%, var(--color-cream, #f3ede1) 55%, var(--color-paper, #f7faf9) 100%)",
+            }}
+            suppressHydrationWarning
+          />
+        ) : (
+          <img
+            src={url}
+            data-static-placeholder=""
+            loading="lazy"
+            alt={`Static map preview for ${tripId}`}
+            onError={() => setStaticImageFailed(true)}
+            suppressHydrationWarning
+          />
+        )}
       </div>
     );
   }
 
-  return <ProviderMap ref={mapRef} days={daysFromChapters(chapters)} mode="cinematic" tripId={tripId} className={className} />;
+  return <ProviderMap ref={mapRef} days={daysFromChapters(chapters)} mode="cinematic" tripId={tripId} analytics={analytics} className={className} />;
 }
 
 export type { ChapterCameraTarget };

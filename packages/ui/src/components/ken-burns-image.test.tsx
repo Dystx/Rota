@@ -9,7 +9,7 @@ vi.mock('../hooks/use-reduced-motion', () => ({
   useReducedMotion: vi.fn(),
 }));
 
-vi.mock('motion/react-m', () => ({
+vi.mock('motion/react', () => ({
   m: {
     img: ({ src, alt, className, 'data-testid': testId }: any) => (
       <img src={src} alt={alt} className={className} data-testid={testId || 'motion-img'} />
