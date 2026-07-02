@@ -1,8 +1,26 @@
 import { createBookingClick } from "@repo/db";
+import {
+  resolveDefaultAnalyticsProvider,
+  safeTargetHost,
+  tryCapture,
+  type AnalyticsProvider
+} from "@repo/analytics";
+import { validationError } from "@/lib/auth/api";
 
 const allowedProtocols = new Set(["http:", "https:"]);
 
-export async function GET(request: Request) {
+type PartnerClickDependencies = {
+  analytics?: AnalyticsProvider;
+  createClick?: typeof createBookingClick;
+};
+
+export async function handlePartnerClickRequest(
+  request: Request,
+  dependencies: PartnerClickDependencies = {}
+) {
+  const createClick = dependencies.createClick ?? createBookingClick;
+  const analytics = dependencies.analytics ?? resolveDefaultAnalyticsProvider();
+
   const { searchParams } = new URL(request.url);
   const target = searchParams.get("target");
   const partnerId = searchParams.get("partnerId");
@@ -10,7 +28,7 @@ export async function GET(request: Request) {
   const source = searchParams.get("source");
 
   if (!target || !partnerId || !tripId || !source) {
-    return Response.json({ message: "Missing partner click parameters." }, { status: 400 });
+    return validationError("Missing partner click parameters.");
   }
 
   let destination: URL;
@@ -18,15 +36,15 @@ export async function GET(request: Request) {
   try {
     destination = new URL(target);
   } catch {
-    return Response.json({ message: "Invalid partner link." }, { status: 400 });
+    return validationError("Invalid partner link.");
   }
 
   if (!allowedProtocols.has(destination.protocol)) {
-    return Response.json({ message: "Unsupported partner link protocol." }, { status: 400 });
+    return validationError("Unsupported partner link protocol.");
   }
 
   try {
-    await createBookingClick({
+    await createClick({
       partnerId,
       referer: request.headers.get("referer"),
       source,
@@ -34,9 +52,24 @@ export async function GET(request: Request) {
       tripId,
       userAgent: request.headers.get("user-agent")
     });
-  } catch (error) {
-    console.error("Failed to persist partner click", error);
+  } catch {
+    // Preserve redirect behavior when best-effort click persistence is unavailable.
   }
 
+  await tryCapture(analytics, {
+    name: "partner_clicked",
+    distinctId: `trip:${tripId}`,
+    properties: {
+      partner_id: partnerId,
+      trip_id: tripId,
+      source,
+      target_host: safeTargetHost(destination.toString())
+    }
+  });
+
   return Response.redirect(destination, 307);
+}
+
+export async function GET(request: Request) {
+  return handlePartnerClickRequest(request);
 }

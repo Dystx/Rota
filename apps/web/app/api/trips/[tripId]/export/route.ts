@@ -8,25 +8,32 @@ import {
   buildTripPdfExport,
   buildTripPdfFilename
 } from "@/lib/trip-export";
+import { internalError, isApiResponse, notFoundError, requireApiRole, validationError, forbiddenError } from "@/lib/auth/api";
 
 export async function GET(request: Request, { params }: { params: Promise<{ tripId: string }> }) {
+  const auth = await requireApiRole(["traveler"]);
+
+  if (isApiResponse(auth)) {
+    return auth;
+  }
+
   const { tripId } = await params;
   const { searchParams } = new URL(request.url);
   const format = searchParams.get("format") ?? "markdown";
 
   if (!["markdown", "pdf", "calendar"].includes(format)) {
-    return Response.json({ message: "Supported export formats are markdown, pdf, and calendar." }, { status: 400 });
+    return validationError("Supported export formats are markdown, pdf, and calendar.");
   }
 
   try {
-    const trip = await getTripDraftById(tripId);
+    const trip = await getTripDraftById(tripId, { client: auth.client });
 
     if (!trip) {
-      return Response.json({ message: "Trip not found." }, { status: 404 });
+      return notFoundError("Trip not found.");
     }
 
     if (!trip.isPaid) {
-      return Response.json({ message: "Unlock the trip before exporting it." }, { status: 403 });
+      return forbiddenError("Unlock the trip before exporting it.");
     }
 
     const itinerary = await generateItineraryFromBrief(trip.brief);
@@ -62,15 +69,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ trip
       }
     });
   } catch (error) {
-    return Response.json(
-      {
-        message: isPersistenceConfigError(error)
-          ? "Supabase environment variables are not configured yet, so exports are unavailable."
-          : error instanceof Error
-            ? error.message
-            : "Could not export this trip."
-      },
-      { status: isPersistenceConfigError(error) ? 503 : 500 }
+    return internalError(
+      isPersistenceConfigError(error) ? "Supabase environment variables are not configured yet, so exports are unavailable." : "Could not export this trip.",
+      isPersistenceConfigError(error) ? 503 : 500
     );
   }
 }

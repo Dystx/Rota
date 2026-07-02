@@ -20,6 +20,7 @@ const IGNORE_DIRS = ['node_modules', '.next', 'dist', 'build', '.turbo'];
 
 // Allowed named imports from 'motion/react'
 const ALLOWED_REACT_NAMES = new Set([
+  'm',
   'LazyMotion',
   'domAnimation',
   'domMax',
@@ -87,6 +88,14 @@ function checkFile(filePath, content) {
     if (source === 'framer-motion') {
       violations.push(
         `${filePath}:${lineNo}: 'framer-motion' is forbidden — use 'motion/react' + 'motion/react-m'`
+      );
+      i = endLine;
+      continue;
+    }
+
+    if (/^@motionone(\/.*)?$/.test(source)) {
+      violations.push(
+        `${filePath}:${lineNo}: '@motionone/*' is forbidden — use 'motion/react' + 'motion/react-m'`
       );
       i = endLine;
       continue;

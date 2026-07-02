@@ -1,35 +1,48 @@
-import { createPartner, listPartners } from "@repo/db";
+import { createPartner, listPartners , writeAuditTrail } from "@repo/db";
 import { CreatePartnerSchema } from "@repo/types";
+import { internalError, isApiResponse, requireApiRole, validationError } from "@/lib/auth/api";
 
 export async function GET() {
+  const auth = await requireApiRole(["admin"]);
+
+  if (isApiResponse(auth)) {
+    return auth;
+  }
+
   try {
-    const partners = await listPartners();
+    const partners = await listPartners(100, { client: auth.client });
 
     return Response.json({ partners });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to load partners.";
-    const status = message.startsWith("Missing required environment variable") ? 503 : 500;
-
-    return Response.json({ message }, { status });
+    return internalError(message.startsWith("Missing required environment variable") ? "Persistence is not configured." : "Failed to load partners.", message.startsWith("Missing required environment variable") ? 503 : 500);
   }
 }
 
 export async function POST(request: Request) {
+  const auth = await requireApiRole(["admin"]);
+
+  if (isApiResponse(auth)) {
+    return auth;
+  }
+
   const body = await request.json();
   const parsed = CreatePartnerSchema.safeParse(body);
 
   if (!parsed.success) {
-    return Response.json(
-      {
-        errors: parsed.error.flatten().fieldErrors,
-        message: "Partner validation failed."
-      },
-      { status: 400 }
-    );
+    return validationError("Partner validation failed.", parsed.error.flatten().fieldErrors);
   }
 
   try {
-    const partner = await createPartner(parsed.data);
+    const partner = await createPartner(parsed.data, { client: auth.client });
+    
+    await writeAuditTrail({
+      actorUserId: auth.userId,
+      action: "create",
+      entityType: "partners",
+      entityId: partner.id,
+      after: partner
+    }, { client: auth.client });
 
     return Response.json(
       {
@@ -40,8 +53,6 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to create partner.";
-    const status = message.startsWith("Missing required environment variable") ? 503 : 500;
-
-    return Response.json({ message }, { status });
+    return internalError(message.startsWith("Missing required environment variable") ? "Persistence is not configured." : "Failed to create partner.", message.startsWith("Missing required environment variable") ? 503 : 500);
   }
 }

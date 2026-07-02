@@ -8,13 +8,16 @@
   },
   "dependencies": {
     "@repo/emails": "workspace:*",
+    "@repo/monitoring": "workspace:*",
     "@repo/payments": "workspace:*",
     "@repo/types": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "scripts": {
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   }
 }

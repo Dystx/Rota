@@ -12,7 +12,7 @@
     "test:e2e": "playwright test --config playwright.config.ts --grep @smoke",
     "test:visual": "playwright test --config playwright.config.ts --grep @visual",
     "test:a11y": "playwright test --config playwright.config.ts --grep @a11y",
-    "test:perf": "pnpm build",
+    "test:perf": "playwright test --config playwright.config.ts --grep @perf",
     "test:typecheck": "tsc --noEmit -p playwright/tsconfig.json"
   },
   "dependencies": {
@@ -22,6 +22,7 @@
     "@repo/db": "workspace:*",
     "@repo/emails": "workspace:*",
     "@repo/maps": "workspace:*",
+    "@repo/monitoring": "workspace:*",
     "@repo/payments": "workspace:*",
     "@repo/routing": "workspace:*",
     "@repo/types": "workspace:*",
@@ -29,6 +30,7 @@
     "@repo/workers": "workspace:*",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.105.1",
+    "motion": "^12.38.0",
     "next": "^16.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

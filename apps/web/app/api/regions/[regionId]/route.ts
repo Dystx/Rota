@@ -1,52 +1,66 @@
-import { getRegionById, updateRegion } from "@repo/db";
+import { getRegionById, updateRegion , writeAuditTrail } from "@repo/db";
 import { UpdateRegionSchema } from "@repo/types";
+import { internalError, isApiResponse, notFoundError, requireApiRole, validationError } from "@/lib/auth/api";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ regionId: string }> }) {
+  const auth = await requireApiRole(["admin"]);
+
+  if (isApiResponse(auth)) {
+    return auth;
+  }
+
   const { regionId } = await params;
 
   try {
-    const region = await getRegionById(regionId);
+    const region = await getRegionById(regionId, { client: auth.client });
 
     if (!region) {
-      return Response.json({ message: "Region not found." }, { status: 404 });
+      return notFoundError("Region not found.");
     }
 
     return Response.json({ region });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to load region.";
-    const status = message.startsWith("Missing required environment variable") ? 503 : 500;
-
-    return Response.json({ message }, { status });
+    return internalError(message.startsWith("Missing required environment variable") ? "Persistence is not configured." : "Failed to load region.", message.startsWith("Missing required environment variable") ? 503 : 500);
   }
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ regionId: string }> }) {
+  const auth = await requireApiRole(["admin"]);
+
+  if (isApiResponse(auth)) {
+    return auth;
+  }
+
   const { regionId } = await params;
   const body = await request.json();
   const parsed = UpdateRegionSchema.safeParse(body);
 
   if (!parsed.success) {
-    return Response.json(
-      {
-        errors: parsed.error.flatten().fieldErrors,
-        message: "Region update validation failed."
-      },
-      { status: 400 }
-    );
+    return validationError("Region update validation failed.", parsed.error.flatten().fieldErrors);
   }
 
   try {
-    const region = await updateRegion(regionId, parsed.data);
+    const region = await updateRegion(regionId, parsed.data, { client: auth.client });
+    
+    if (region) {
+      await writeAuditTrail({
+        actorUserId: auth.userId,
+        action: "update",
+        entityType: "regions",
+        entityId: region.id,
+        before: null,
+        after: region
+      }, { client: auth.client });
+    }
 
     if (!region) {
-      return Response.json({ message: "Region not found." }, { status: 404 });
+      return notFoundError("Region not found.");
     }
 
     return Response.json({ message: "Region updated.", region });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update region.";
-    const status = message.startsWith("Missing required environment variable") ? 503 : 500;
-
-    return Response.json({ message }, { status });
+    return internalError(message.startsWith("Missing required environment variable") ? "Persistence is not configured." : "Failed to update region.", message.startsWith("Missing required environment variable") ? 503 : 500);
   }
 }

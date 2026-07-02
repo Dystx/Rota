@@ -1,4 +1,13 @@
-import { isPersistenceConfigError, markTripAsPaid } from "@repo/db";
+import { createFakeCheckoutProvider, createStripeCheckoutProvider, type CheckoutProvider } from "@repo/payments";
+import { getTripDraftById, isPersistenceConfigError } from "@repo/db";
+import { createServerStripeSecretConfig } from "@repo/config/server";
+import { forbiddenError, internalError, isApiResponse, requireApiRole, type AuthorizedApiContext } from "@/lib/auth/api";
+
+type UnlockCheckoutDependencies = {
+  checkoutProvider?: CheckoutProvider;
+  getTrip?: typeof getTripDraftById;
+  requireTraveler?: () => Promise<AuthorizedApiContext | Response>;
+};
 
 function buildRedirectUrl(request: Request, tripId: string, unlock: string) {
   const currentUrl = new URL(request.url);
@@ -30,17 +39,70 @@ function buildRedirectUrl(request: Request, tripId: string, unlock: string) {
   return fallbackUrl;
 }
 
-export async function POST(request: Request, { params }: { params: Promise<{ tripId: string }> }) {
-  const { tripId } = await params;
+function buildCheckoutReturnUrl(request: Request, tripId: string, unlock: string): string {
+  return buildRedirectUrl(request, tripId, unlock).toString();
+}
+
+function resolveCheckoutProvider(): CheckoutProvider {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
+
+  if (!stripeSecretKey || stripeSecretKey.startsWith("sk_test_fake")) {
+    return createFakeCheckoutProvider();
+  }
+
+  return createStripeCheckoutProvider({
+    secretKey: createServerStripeSecretConfig().secretKey
+  });
+}
+
+export async function handleUnlockCheckoutRequest(
+  request: Request,
+  tripId: string,
+  dependencies: UnlockCheckoutDependencies = {}
+): Promise<Response> {
+  const requireTraveler = dependencies.requireTraveler ?? (() => requireApiRole(["traveler"]));
+  const getTrip = dependencies.getTrip ?? getTripDraftById;
+  const checkoutProvider = dependencies.checkoutProvider ?? resolveCheckoutProvider();
+  const auth = await requireTraveler();
+
+  if (isApiResponse(auth)) {
+    return auth;
+  }
 
   try {
-    const trip = await markTripAsPaid(tripId);
+    const trip = await getTrip(tripId, { client: auth.client });
 
-    return Response.redirect(buildRedirectUrl(request, tripId, trip ? "success" : "not-found"), 303);
+    if (!trip) {
+      return Response.redirect(buildRedirectUrl(request, tripId, "not-found"), 303);
+    }
+
+    if (trip.ownerUserId && trip.ownerUserId !== auth.userId) {
+      return forbiddenError("Trip does not belong to this traveler.");
+    }
+
+    if (trip.isPaid) {
+      return Response.redirect(buildRedirectUrl(request, tripId, "already-unlocked"), 303);
+    }
+
+    const checkoutSession = await checkoutProvider.createSession({
+      cancelUrl: buildCheckoutReturnUrl(request, tripId, "cancelled"),
+      purchaseKind: "unlock",
+      successUrl: buildCheckoutReturnUrl(request, tripId, "checkout-started"),
+      tripId,
+      userId: auth.userId
+    });
+
+    return Response.redirect(checkoutSession.url, 303);
   } catch (error) {
-    return Response.redirect(
-      buildRedirectUrl(request, tripId, isPersistenceConfigError(error) ? "unavailable" : "error"),
-      303
-    );
+    if (isPersistenceConfigError(error)) {
+      return Response.redirect(buildRedirectUrl(request, tripId, "unavailable"), 303);
+    }
+
+    return internalError("Checkout session could not be created.", 502);
   }
+}
+
+export async function POST(request: Request, { params }: { params: Promise<{ tripId: string }> }) {
+  const { tripId } = await params;
+  return handleUnlockCheckoutRequest(request, tripId);
 }

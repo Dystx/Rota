@@ -1,3 +1,5 @@
+// Operator playbook: at 40k Mapbox loads/month, prepare to flip the kill switch
+// (`MAPBOX_KILL_SWITCH=1`). At 75k, flip immediately to stop billing exposure.
 import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
