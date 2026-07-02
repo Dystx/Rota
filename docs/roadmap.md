@@ -1,11 +1,12 @@
 # Rumia — Roadmap
 
-> **Two roadmaps, two axes.** This file bridges them.
+> **Two specs, two axes.** This file bridges them.
 >
-> - **Product roadmap** → [`docs/spec.md`](./spec.md) (v2.0 Tiered Service Model). Drives *what* we build.
-> - **Operational roadmap** → §3 below. Drives *how* we ship — the launch-readiness phases that unblock production deployment.
+> - **Long-term product vision** → [`docs/spec.md`](./spec.md) (v2.0 Tiered Service Model — 3 tiers, 8 phases).
+> - **Refined 2026 immediate focus** → [`docs/spec-refined-2026.md`](./spec-refined-2026.md) (Tier 1 + Tier 2 only; Tier 3 + Mobile deferred; Awwwards-grade design).
+> - **Operational launch-readiness** → §3 below. Drives *how* we ship.
 >
-> Section 2 maps current state to spec phases.
+> Section 2 maps current state to the refined 5-phase engineering plan.
 
 ---
 
@@ -13,105 +14,99 @@
 
 Three-tier travel concierge platform for Portugal-first, AI-powered itinerary planning:
 
-- **Level 1 (Core)**: structured brief → RAG-generated day-by-day itinerary with maps, routing, opening-hour validation.
-- **Level 2 (Hybrid)**: human specialist review + asynchronous chat lifeline for on-trip adjustments.
-- **Level 3 (Presencial)**: vetted marketplace of licensed local guides (RNAAT-compliant for Portugal).
+- **Tier 1 (Core)**: structured brief → RAG-generated day-by-day itinerary with maps, routing, opening-hour validation. Free; monetized via exports + affiliate bookings.
+- **Tier 2 (Hybrid Specialist)**: human reviewer + asynchronous chat lifeline for on-trip adjustments. Premium upsell.
+- **Tier 3 (Presencial Guide)**: licensed local guide marketplace. **Deferred** per refined scope.
 
-See [`docs/spec.md`](./spec.md) for the full v2.0 spec — executive summary, tier architecture, tech stack, AI pipeline, database schema, and 8-phase product roadmap.
+The immediate focus is Tier 1 + Tier 2 only. See [`docs/spec-refined-2026.md`](./spec-refined-2026.md) for the scope decision rationale and reactivation triggers.
 
 ---
 
-## 2. Current State vs Spec Phases (last verified 2026-07-02)
+## 2. Current State vs Refined 2026 Phases (last verified 2026-07-02)
 
-### Spec Phase 1 — Foundation (Infrastructure, Auth, Core Schemas, Monorepo Setup)
+### Phase 1 — Foundations & Architecture Setup
 
-| Spec requirement | Status |
+| Requirement | Status |
 |---|---|
 | Monorepo (`pnpm` + `turbo`) with apps + packages layout | ✅ **Done** — 12 packages + 2 runnable apps |
-| Core Schemas: `trip_briefs`, `trips` | ✅ **Done** — migration `202604291900` |
-| Knowledge graph seed: `places` | ✅ **Done** — migration `202604292240` (no PostGIS/pgvector yet) |
-| Identity: `user_profiles` + `reviewer_auth_links` | ✅ **Done** — migration `202605011600` |
-| RLS policies on public tables | 🟡 **Local-only** — migration `202605011700` written; **NOT confirmed applied to hosted** |
-| Audit trail: `admin_audit_trail` | ✅ **Done** — migration `20260504010324` (local only) |
-| CI workflow | ✅ **Done** — `.github/workflows/ci.yml` |
-| Quality baseline | ✅ **Done** — `pnpm typecheck` 13/13, unit tests 228/228 |
+| PostgreSQL + PostGIS + pgvector extensions | ❌ **Not started** |
+| Tailwind v4 design tokens (matches `packages/ui/src/styles.css`) | ✅ **Done** — token system in `packages/ui` |
+| Cinematic Concierge aesthetic via design tokens | ✅ **Done** — paper/cream/ink/atlantic/aqua tokens; reduced-motion media query |
 
-### Spec Phase 2 — Portugal MVP (Knowledge Graph, PostGIS/Vector, Basic AI Itineraries)
+### Phase 2 — Knowledge Graph Seeding (Portugal Module)
 
-| Spec requirement | Status |
+| Requirement | Status |
 |---|---|
-| `countries` / `cities` geographic entities | ❌ **Not started** (current code uses `country_slug` text + `regions` table as a stand-in) |
-| `restaurants` separate from `places` | ❌ **Not started** |
-| PostGIS extension + spatial columns | ❌ **Not started** |
-| pgvector extension + embedding columns | ❌ **Not started** |
-| Knowledge graph seed (Portugal-first place list with embeddings) | 🟡 **Partial** — `places` table seeded; no embeddings yet |
-| Basic AI itineraries (packages/ai deterministic pipeline) | ✅ **Done** — 5-step pipeline wired in `packages/ai/src/index.ts` (normalize → retrieve → spatial → validate → render) |
+| `places` table seeded for Lisbon, Sintra, Porto, Algarve | 🟡 **Partial** — `places` table exists; coverage unverified |
+| Text descriptions → pgvector embeddings | ❌ **Not started** — no embeddings yet |
+| Mapbox custom minimalist skin | ✅ **Done** — `packages/maps` cinematic-map controller with reduced-motion |
+| Spatial columns (PostGIS geometry) | ❌ **Not started** |
 
-### Spec Phase 3 — AI Planning Engine
+### Phase 3 — Invisible AI Engine (Tier 1 Activation)
 
-| Spec requirement | Status |
+| Requirement | Status |
 |---|---|
-| Trip Brief Normalization Engine (Step 1) | ✅ **Done** — `packages/ai/src/prompt-normalization.test.ts` |
-| Invisible AI UI controls (Make it more relaxed / Replace this stop) | 🟡 **Partial** — UI primitives exist; semantic re-search after stop replacement not yet wired |
-| Custom layout engine | ✅ **Done** — `packages/ui` cinematic primitives (ChapterHeading, RevealSection, ChapterNav) |
+| Trip Brief parser (Vercel AI SDK) | 🟡 **Partial** — `packages/ai/src/prompt-normalization.test.ts` exists; needs SDK wiring |
+| Smart Question Cards pipeline | 🟡 **Partial** — `packages/ui/src/components/prompt-composer.tsx` exists |
+| Geometric optimization (travel-time + opening-hour validation) | ✅ **Done** — `packages/routing` + `packages/ai` step 4 |
+| Invisible UI controls (`Reduce driving`, `Make it more relaxed`) | 🟡 **Partial** — primitives exist; semantic re-search on stop replacement not yet wired |
 
-### Spec Phase 4 — Premium Monetization
+### Phase 4 — Workspace & Checkout Infrastructure
 
-| Spec requirement | Status |
+| Requirement | Status |
 |---|---|
-| Stripe infrastructure | ❌ **Not started** — `@repo/payments` exists with deterministic checkout-plan contracts; live Stripe deferred |
-| PDF Export Engine | 🟡 **Partial** — `/trip/[tripId]/export` page exists; needs final Stripe-gated unlock flow |
-| Calendar Export Engine | 🟡 **Partial** — same; surface exists, unlock logic pending |
-| Affiliate booking (booking_clicks table + Stripe-led attribution) | 🟡 **Partial** — `booking_clicks` table exists; affiliate attribution pending |
+| Asymmetric timeline canvas + inline controls | ✅ **Done** — `apps/web/app/(app)/trip/[tripId]/page.tsx` + cinematic-hero + chapter-nav |
+| Stripe payment flows | ❌ **Not started** — `@repo/payments` has deterministic contracts; live Stripe deferred |
+| PDF + Calendar Export Engines | 🟡 **Partial** — `/trip/[tripId]/export` page exists; unlock gating pending |
+| Premium exports + affiliate bookings | 🟡 **Partial** — `booking_clicks` table exists; attribution flow pending |
 
-### Spec Phase 5 — Level 2 Hybrid System
+### Phase 5 — Specialist Collaboration Hub (Tier 2 Activation)
 
-| Spec requirement | Status |
+| Requirement | Status |
 |---|---|
 | Reviewer roster + assignments | ✅ **Done** — `reviewers`, `reviewer_assignments` tables; `/reviewer/*` routes |
-| Asynchronous Triage Chat System | ❌ **Not started** — `chat_threads` / `chat_messages` tables don't exist yet |
-| Specialist dashboard with calculated route timelines | 🟡 **Partial** — `/reviewer/trips/[tripId]` route map exists; needs explicit route timeline display per verification §7 SLA |
+| Reviewer dashboard with error-checking alert panel | 🟡 **Partial** — `/reviewer/trips/[tripId]` exists; needs explicit route-timeline display per spec §7 SLA |
+| Asynchronous chat infrastructure | ❌ **Not started** — `chat_threads`/`chat_messages` tables don't exist |
+| AI triage pre-routing | ❌ **Not started** |
 
-### Spec Phase 6 — Level 3 Marketplace
+### Future Backlog — DEFERRED (per refined scope)
 
-| Spec requirement | Status |
-|---|---|
-| `guide_profiles` + `guide_bookings` tables | ❌ **Not started** |
-| Guide onboarding + verification | ❌ **Not started** |
-| Dynamic dispatch | ❌ **Not started** |
-| RNAAT regulatory auditing | ❌ **Not started** (blocker per spec §7) |
+| Phase | Description | Reactivation trigger |
+|---|---|---|
+| Phase 6 — Mobile | Expo + React Native companion; offline geolocation sync | Tier 1+2 retention shows repeat-trip behavior |
+| Phase 7 — Tier 3 Marketplace | Physical guide matching; RNAAT compliance; dispatch | Tier 1+2 monetization > break-even + RNAAT review + ops partner |
 
-### Spec Phase 7 — Mobile Experience
+### Tech stack alignment
 
-| Spec requirement | Status |
-|---|---|
-| React Native companion app | ❌ **Not started** — `apps/mobile/` directory exists but no `package.json` |
-| Offline synchronizer | ❌ **Not started** |
+| Stack item | Spec | Current |
+|---|---|---|
+| Next.js 16 + RSC | required | ✅ in use (Next 16.2.4 per dev.log) |
+| Vercel AI SDK | required | ❌ not wired — `packages/ai` uses direct OpenAI integration |
+| Zustand | required | ❌ not in use — no transient state store |
+| Tailwind v4 | required | 🟡 unspecified version; existing CSS-token system in place |
+| Bun | optional runtime | ❌ not in use — pnpm/Node |
+| Upstash QStash + Redis | queue/cache | ❌ not in use — `apps/workers` is bounded-local |
+| PostGIS | required | ❌ not enabled |
+| pgvector | required | ❌ not enabled |
 
-### Spec Phase 8 — International Expansion
+### Pre-existing tech debt (carried, recently fixed)
 
-| Spec requirement | Status |
-|---|---|
-| Modular porting to Spain, Italy, France, Greece, Japan | ❌ **Not started** |
-
-### Pre-existing tech debt
-
-- `packages/db/src/index.ts` had `isPersistenceConfigError` shadow re-export (canonical in `clients.ts:54`); **removed** (commit `7a4f555`).
-- 11 placeholder copy items in admin/reviewer `EmptyState` titles + `"Active MVP"` status label; **replaced** (commit `7a4f555`).
-- 6 admin pages had `error.message` fall-through in catch blocks; **replaced** with generic fallbacks (commit `3cb58a1`).
-- Vitest include pattern excluded `*.test.tsx`; **fixed** (commit `253da10`). 22 React component test files now runnable.
-- `.sisyphus/`, `.omk/`, `.kimi/`, `.playwright-mcp/` untracked tool state; **removed from repo** (commits `bc1aa48`, `339ffb9`).
-- 9 scratch debug scripts (`apps/web/check-*.cjs`) + `apps/web/playwright-report/`; **deleted** (commit `253da10`).
+- `packages/db/src/index.ts` had `isPersistenceConfigError` shadow re-export; **removed** (`7a4f555`).
+- 11 placeholder copy items in admin/reviewer `EmptyState` + `"Active MVP"` status label; **replaced** (`7a4f555`).
+- 6 admin pages had `error.message` fall-through in catch blocks; **replaced** with generic fallbacks (`3cb58a1`).
+- Vitest include pattern excluded `*.test.tsx`; **fixed** (`253da10`).
+- `.sisyphus/`, `.omk/`, `.kimi/`, `.playwright-mcp/` untracked tool state; **removed** (`bc1aa48`, `339ffb9`).
+- 9 scratch debug scripts + `apps/web/playwright-report/`; **deleted** (`253da10`).
 
 ---
 
 ## 3. Operational Roadmap — Launch-Readiness Phases
 
-These are the phases that unblock production deployment. They run alongside the spec phases above; many spec phases have local-only implementations and need the operational work below to ship.
+These phases unblock production deployment. They run alongside the refined 5-phase engineering plan; many refined-phase items have local-only implementations that need operational work below to ship.
 
 ### Phase 0 — Audit + Housekeeping ✅ Complete (2026-07-02)
 
-Repo cleanup, copy fixes, db shadow removal, vitest `*.test.tsx` discovery, project-content tracking. See git log commits `e49a624` … `e7e7f23`.
+Repo cleanup, copy fixes, db shadow removal, vitest `*.test.tsx` discovery, project-content tracking. See commits `e49a624` … `e7e7f23`.
 
 ### Phase 1 — Pre-existing Tech Debt ✅ Complete (2026-07-02)
 
@@ -135,95 +130,115 @@ Goal: bring hosted Supabase to parity with local; eliminates the spec's Phase 1 
 
 **Exit criteria**: every line in `docs/ops/launch.md` §1 checked; outsider test user cannot read another user's trip.
 
-> **Decision needed before Phase 2 starts**: refresh `docs/adr/001-auth-rls-strategy.md` against current hosting provider behaviour.
+### Phase 3 — Hosted Worker Runner (decision made: Upstash QStash)
 
-### Phase 3 — Hosted Worker Runner
+Goal: move `apps/workers` from bounded local to Upstash QStash (decision documented in `docs/spec-refined-2026.md` §6).
 
-Goal: move `apps/workers` from bounded local to a hosted cron/queue runner (Inngest vs. Upstash QStash — decision needed).
+| # | Task |
+|---|---|
+| 3.1 | Add Upstash QStash SDK to `apps/workers` |
+| 3.2 | Replace bounded-local entrypoint with QStash handler |
+| 3.3 | Wire PDF/Calendar export jobs to QStash |
+| 3.4 | Add Upstash Redis caching for place lookups |
 
 ### Phase 4 — Live Provider Integrations
 
 Replace deterministic stubs with live providers at the package boundary:
 - `@repo/payments` → live Stripe + webhooks
 - `@repo/emails` → live Resend
-- `@repo/ai` → live OpenAI/Claude (replace deterministic fallback)
+- `@repo/ai` → live **Vercel AI SDK** (replace direct OpenAI integration per refined spec §3)
 - `@repo/maps` → live Mapbox GL (replace stub)
 
-### Phase 5 — Spec-Phase 2 Gaps (Portugal MVP Backfill)
-
-Until Phase 2 (operational) lands on hosted, we can't fully ship spec Phase 2. Backfill items:
+### Phase 5 — Spec-Phase 1 Backfill (Foundations)
 
 | # | Task | Spec Phase |
 |---|---|---|
-| 5.1 | Add `countries` + `cities` tables (replace text `country_slug` + `regions` shape) | Spec 2 |
-| 5.2 | Add `restaurants` table (separate from `places`) | Spec 2 |
-| 5.3 | Enable PostGIS extension + add spatial columns | Spec 2 |
-| 5.4 | Enable pgvector extension + add embedding columns | Spec 2 |
-| 5.5 | Seed Portugal place list with embeddings | Spec 2 |
+| 5.1 | Enable PostGIS extension on hosted | Refined 1 |
+| 5.2 | Enable pgvector extension on hosted | Refined 1 |
+| 5.3 | Add `embedding` column to `places` + add spatial column | Refined 2 |
+| 5.4 | Confirm Tailwind v4 dependency (currently unspecified) | Refined 1 |
 
-### Phase 6 — Spec-Phase 5 Gaps (Level 2 Hybrid System)
-
-| # | Task | Spec Phase |
-|---|---|---|
-| 6.1 | Add `chat_threads` + `chat_messages` tables | Spec 5 |
-| 6.2 | Asynchronous triage chat system (4-hour SLA, AI pre-triage) | Spec 5 |
-| 6.3 | Specialist dashboard route timeline display (per spec §7 SLA) | Spec 5 |
-
-### Phase 7 — Spec-Phase 6 Gaps (Level 3 Marketplace)
+### Phase 6 — Spec-Phase 2 Backfill (Knowledge Graph — Portugal Module)
 
 | # | Task | Spec Phase |
 |---|---|---|
-| 7.1 | **RNAAT regulatory audit** (Portugal-specific; spec §7 blocker) | Spec 6 |
-| 7.2 | Add `guide_profiles` + `guide_bookings` tables | Spec 6 |
-| 7.3 | Guide onboarding + verification flow | Spec 6 |
-| 7.4 | Dynamic dispatch | Spec 6 |
+| 6.1 | Seed Lisbon, Sintra, Porto, Algarve place lists | Refined 2 |
+| 6.2 | Generate text descriptions → pgvector embeddings | Refined 2 |
+| 6.3 | Apply Mapbox minimalist skin geometries (audit existing `packages/maps`) | Refined 2 |
 
-### Phase 8 — Spec-Phase 4 Backfill + Post-Launch
+### Phase 7 — Spec-Phase 3 Backfill (Invisible AI Engine — Tier 1)
 
 | # | Task | Spec Phase |
 |---|---|---|
-| 8.1 | Live Stripe checkout + webhook → `payment_webhook_events` ledger | Spec 4 |
-| 8.2 | PDF / Calendar Export Engines gated by Stripe | Spec 4 |
-| 8.3 | Affiliate booking attribution | Spec 4 |
-| 8.4 | Spec Phase 7 (Mobile): React Native companion + offline sync | Spec 7 |
-| 8.5 | Spec Phase 8 (International): modular porting to Spain, Italy, France, Greece, Japan | Spec 8 |
+| 7.1 | Wire Vercel AI SDK into `packages/ai` (replace direct OpenAI integration) | Refined 3 |
+| 7.2 | Introduce Zustand store for transient map/UI state | Refined 3 |
+| 7.3 | Wire `Replace this stop` to drop the node + re-run semantic search | Refined 3 |
+
+### Phase 8 — Spec-Phase 4 Backfill (Workspace + Checkout)
+
+| # | Task | Spec Phase |
+|---|---|---|
+| 8.1 | Asymmetric timeline canvas + inline controls (per Awwwards paradigm) | Refined 4 |
+| 8.2 | Live Stripe checkout + webhook → `payment_webhook_events` ledger | Refined 4 |
+| 8.3 | PDF + Calendar Export Engines gated by Stripe unlock | Refined 4 |
+| 8.4 | Affiliate booking attribution flow | Refined 4 |
+
+### Phase 9 — Spec-Phase 5 Backfill (Specialist Hub — Tier 2)
+
+| # | Task | Spec Phase |
+|---|---|---|
+| 9.1 | Add `chat_threads` + `chat_messages` tables | Refined 5 |
+| 9.2 | Asynchronous chat infrastructure (Supabase replication) | Refined 5 |
+| 9.3 | Reviewer dashboard route-timeline display (per spec §7 SLA) | Refined 5 |
+| 9.4 | AI triage pre-routing | Refined 5 |
 
 ---
 
-## 4. Risk Register
+## 4. Future Backlog (DEFERRED — not in active roadmap)
+
+- **Mobile companion** (Phase 6 in refined spec) — Expo + React Native + offline geolocation sync.
+- **Tier 3 in-person guide marketplace** (Phase 7 in refined spec) — RNAAT compliance + physical guide dispatch.
+- **International expansion** (Phase 8 in v2.0 spec) — Spain, Italy, France, Greece, Japan.
+
+Reactivation triggers documented in `docs/spec-refined-2026.md` §5.
+
+---
+
+## 5. Risk Register
 
 | Risk | Severity | Mitigation |
 |---|---|---|
-| Phase 2 schema application breaks hosted data | High | PITR backup before each migration (per `docs/ops/backup-restore.md`); apply oldest → newest; verify `get_advisors(security)` after each |
+| Phase 2 schema application breaks hosted data | High | PITR backup before each migration; oldest → newest; verify `get_advisors(security)` after each |
 | Phase 2.8 service-role key rotation invalidates in-flight requests | High | Coordinate with Vercel deployment window |
-| Phase 3 worker runner choice locks into a vendor | Medium | Prefer Inngest's local-emulator story; document in `docs/adr/002-worker-runner.md` |
+| Phase 3 Upstash QStash lock-in | Low-Medium | QStash has portable HTTP-cron semantics; Upstash Redis cache is replaceable with Vercel KV |
 | Phase 4 provider integrations introduce latency | Medium | Provider calls wrapped in `@repo/*`; UI shows deterministic-fallback during long polls |
-| Phase 7.1 RNAAT compliance status unknown | High | Block Level 3 launch until audit complete |
-| Phase 7 mobile companion requires iOS/Android app store deployment | High | Apple/Google review processes block rapid iteration |
-| E2E blocked by missing Supabase env in this workspace | Low | `npx supabase start` resolves |
+| Phase 5–7 spec-backfill drift from refined scope | Medium | Per-phase ADRs gate scope expansions; quarterly review against `docs/spec-refined-2026.md` |
+| Bun runtime compatibility gaps with pnpm/Turbo | Medium | Bun is optional runtime; Node path stays primary |
+| E2E blocked by missing Supabase env | Low | `npx supabase start` resolves |
 
 ---
 
-## 5. References
+## 6. References
 
-- **`docs/spec.md`** — Rumia v2.0 Master Product Specification & Architecture Blueprint (canonical product reference).
+- **`docs/spec.md`** — v2.0 Master Product Specification & Architecture Blueprint (long-term vision, 3 tiers, 8 phases).
+- **`docs/spec-refined-2026.md`** — refined immediate scope (Tier 1+2 only, Awwwards design, updated tech stack, 5 active phases + 2 deferred).
 - **`docs/architecture.md`** — current architecture overview.
-- **`docs/adr/001-auth-rls-strategy.md`** — RLS strategy, may need refresh after Phase 2.
-- **`docs/adr/002-deterministic-contracts.md`** — provider-stubbing pattern rationale.
-- **`docs/ops/launch.md`** — pre-launch gate (Phase 2), launch sequence (Phase 3 deployment), smoke test, rollback plan.
-- **`docs/ops/backup-restore.md`** — PITR / disaster recovery referenced by Phase 2 risk register.
+- **`docs/adr/001-auth-rls-strategy.md`** — RLS strategy.
+- **`docs/adr/002-deterministic-contracts.md`** — provider-stubbing pattern.
+- **`docs/ops/launch.md`** — pre-launch gate (Phase 2).
+- **`docs/ops/backup-restore.md`** — PITR / disaster recovery.
 - **`docs/ops/incidents.md`** — incident response runbook.
-- **`docs/ops/deploy-rollback.md`** — deployment + rollback procedure.
+- **`docs/ops/deploy-rollback.md`** — deployment + rollback.
 - **`docs/error-monitoring.md`** — error monitoring approach.
-- **`README.md`** — quick start, architecture map, env setup.
 - **`docs/audit/phase-0-cinematic-redesign.md`** — Phase 0 audit evidence.
+- **`README.md`** — quick start.
 
 ---
 
-## 6. Open Questions (need user call)
+## 7. Open Questions (need user call)
 
-1. **Worker runner choice** (Phase 3): Inngest vs. Upstash QStash.
-2. **RNAAT regulatory status** (Phase 7.1): has Portugal legal review been commissioned for Level 3 marketplace?
-3. **`apps/mobile/` scope**: in scope, or scaffold-abandoned?
-4. **ADR refresh before Phase 2**: refresh `docs/adr/001-auth-rls-strategy.md`?
-5. **ADR for spec gap backfill** (Phase 5–7): should each spec-vs-current gap item get its own ADR, or one umbrella "spec-to-implementation reconciliation" ADR?
+1. **Phase 2 Supabase credentials** — confirm access pattern: local-only dry-run first, then staged apply, then hosted?
+2. **`apps/mobile/` scope** — definitively deferred per refined spec, or scaffold-abandoned?
+3. **Tier 3 reactivation metrics** — PM-owned; what's the break-even threshold for Tier 1+2?
+4. **Tailwind version audit** — current package.json has no Tailwind pin; verify v3 vs v4 baseline.
+5. **Vercel AI SDK migration timing** — wire in Phase 4 (live providers) or earlier in Phase 7 (Tier 1)?
