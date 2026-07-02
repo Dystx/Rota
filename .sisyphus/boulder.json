@@ -1,12 +1,35 @@
 {
-  "active_plan": "/Users/cheng/rota/.sisyphus/plans/rota-stitch-and-roadmap-completion.md",
-  "started_at": "2026-05-01T01:25:36.126Z",
+  "active_plan": "/Users/cheng/rota/.sisyphus/plans/full-app-framer-redesign.md",
+  "started_at": "2026-05-05T16:38:53.559Z",
   "session_ids": [
-    "ses_21edbd918ffeeE5wrBtSothmzv"
+    "ses_216f89239ffeZhZadkb6BOnLYX",
+    "ses_206fbd6d2ffe7mQGGq42nUFCae",
+    "ses_206fbc6dfffepmmmFzFLx0cB3i",
+    "ses_206fbc6d8ffeDPWAFi3Wzt88R3",
+    "ses_206fbc6d5ffecmtsp4G7JeywG6",
+    "ses_206fbc6d1ffeeS1fduHGb7PryG",
+    "ses_206fb46bbffeQUhQUPVqgl4su6"
   ],
   "session_origins": {
-    "ses_21edbd918ffeeE5wrBtSothmzv": "direct"
+    "ses_216f89239ffeZhZadkb6BOnLYX": "direct",
+    "ses_206fbd6d2ffe7mQGGq42nUFCae": "appended",
+    "ses_206fbc6dfffepmmmFzFLx0cB3i": "appended",
+    "ses_206fbc6d8ffeDPWAFi3Wzt88R3": "appended",
+    "ses_206fbc6d5ffecmtsp4G7JeywG6": "appended",
+    "ses_206fbc6d1ffeeS1fduHGb7PryG": "appended",
+    "ses_206fb46bbffeQUhQUPVqgl4su6": "appended"
   },
-  "plan_name": "rota-stitch-and-roadmap-completion",
-  "agent": "atlas"
+  "plan_name": "full-app-framer-redesign",
+  "agent": "atlas",
+  "task_sessions": {
+    "final-wave:f1": {
+      "task_key": "final-wave:f1",
+      "task_label": "F1",
+      "task_title": "**Plan Compliance Audit** — `oracle`",
+      "session_id": "ses_206edede2ffeCrKcWI8Ppg5O8u",
+      "agent": "Sisyphus-Junior",
+      "category": "visual-engineering",
+      "updated_at": "2026-05-06T04:07:26.980Z"
+    }
+  }
 }

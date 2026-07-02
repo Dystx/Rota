@@ -140,3 +140,104 @@ Verification: 28/28 vitest pass (analytics 15, trips 8, partner-clicks 5); `pnpm
 ### T26: Mapbox Provider Map Integration
 - Decided to create `@repo/maps` as a package that exclusively handles Mapbox configuration checks and exposes a provider facade.
 - Rather than directly depending on `mapbox-gl` (which adds heavy bundle size), we created a visually similar fallback facade (`ProviderMap`) that documents where the real mapbox library would load, while maintaining map UX layout and rendering warnings over the map surface.
+
+## 2026-05-02T02:53:51Z — Task: T27 Worker and Background Job Pipeline
+- Chose `bounded-node-cron-compatible-local-runner` for `apps/workers`: one-shot Node execution that can be invoked locally or by Vercel Cron, drains due jobs, and stops. This avoids adding an external queue provider before launch.
+- Kept production secrets out of the worker package by requiring provider injection; tests use `createFakeEmailProvider()` or a fail-once wrapper and never construct Resend, Stripe, PostHog, or Supabase service-role clients.
+- Modeled abandoned checkout cleanup as local deterministic state mutation instead of a DB migration/service-role job in T27; future DB-backed cleanup can reuse the same status/idempotency contract once T28/T41 add health and observability.
+
+## 2026-05-02T03:08:00Z — Task: T28 Provider Failure Fallbacks and Config Health Checks
+- Located the health module in `packages/config/src/health.ts` and exposed it through both the index re-export and a `./health` subpath, so apps can import `@repo/config/health` without pulling in `./server` env validators or zod parsing.
+- Defined the status taxonomy as `configured | missing | degraded` plus a separate `requirement: required-for-action | optional` field, instead of collapsing optional providers into "ok" or forcing them to "missing", so optional providers (Mapbox, PostHog) do not appear as failures while still surfacing in the report.
+- Treated `worker-queue` as a derived health entry that depends on Supabase + Resend rather than a real broker probe, matching T27's `bounded-node-cron-compatible-local-runner` execution target. No Redis/SQS/BullMQ probing was added.
+- Replicated the Mapbox `pk.*`-only shape rule from `packages/maps/src/provider.ts` (degrade on `sk.*`) and added the same shape rule to Stripe publishable keys (`pk_…` only; degrade on `sk_…`) to catch the most common publishable/secret key mixup.
+- Hints carry only env var names and shape rules, never values; an `assertNoSecretLeak` regex set checks `sk_(live|test)_…`, `whsec_…`, `pk_(live|test)_…`, `sb_secret_…`, JWT `eyJ…`, `Bearer …`, and `sk.…`/`pk.…` token shapes, used in tests and in the CLI emitter before stdout write.
+- Skipped the Mapbox-fallback Playwright screenshot evidence because the trip map page currently fails on unrelated DB drift (`column trips.owner_user_id does not exist`) which would dominate the screenshot. Used `apps/web/app/(app)/trip/[tripId]/map/map-components.tsx` source (which routes to `SchematicMap` when `isMapProviderEnabled()` is false) plus the all-missing health report as the documented fallback evidence instead.
+
+
+## 2026-05-02T04:25:00Z — Task: T29 Reviewer Assigned Access
+- Kept T29 scoped to access control: no assignment selection/concurrency changes from T30. Review completion now verifies the authenticated reviewer has a trip assignment and completes that reviewer's own assignment, not a generic latest trip assignment.
+- No Supabase migration was added because existing T10 RLS foundation already uses reviewer auth links plus assignments; this task tightened app/page/API boundaries with authenticated SSR/RLS clients.
+
+## 2026-05-02T14:30:00+00:00 — Task: T32 Admin Route/API Guards
+- Added a shared `getAdminPageAuthContext()` helper under `apps/web/lib/auth/admin.ts` and cached it per server render, keeping page-level authorization role/session based without introducing service-role access.
+- Chose an admin layout-level guard for `/admin/**` plus authenticated-client page reads, so UI structure stays unchanged while anonymous users redirect and wrong-role users see a small 403 state.
+- Refactored only the representative places API into injectable handlers for tests; the other CMS APIs already use the same `requireApiRole(["admin"])` and request-client pattern, so broad route rewrites were unnecessary.
+- No Supabase migration was added because T32 tightened app-layer route/API enforcement and reused the existing T10/T12 RLS/client split foundation.
+
+
+## 2026-05-02T14:45:00+00:00 — Task: T30 Reviewer Assignment Logic
+- Chose app-level duplicate-active prevention for this task instead of a Supabase migration, keeping the diff focused while documenting the remaining true-concurrency race until a DB partial unique index is added.
+- Kept assignment statuses unchanged (`assigned`, `submitted`, `completed`, `returned`) but changed schemas from free strings to the supported enum so queue and API behavior cannot drift into `in_review` or other trip-status names.
+- Reused T29/T32 auth boundaries: admin-only assignment creation still uses `requireApiRole(["admin"])`, reviewer reads remain self-scoped, and reviewer pages now resolve the current reviewer through trusted auth context rather than a fixed persona id.
+
+
+## 2026-05-02T14:55:00+00:00 — Task: T30 Concurrency Fix
+- Added `reviewer_assignments_one_active_per_trip_idx` as a partial unique index on `trip_id` for `status in ('assigned', 'submitted')`, enforcing the exclusive active-reviewer model at the database layer.
+- Kept the app-level duplicate precheck as a UX optimization but made the database index authoritative for truly concurrent requests.
+- Chose fail-closed migration behavior if pre-existing duplicate active rows exist, because silently choosing a winner would risk hiding assignment integrity problems.
+- [Task 31] Reviewer Workspace Functional Hardening
+  - Enforced usage of `getReviewerPageAuthContext()` in `queue`, `operations`, and `history` pages.
+  - Decided to display specific unauthorized UI cards for unauthenticated or non-reviewer users rather than redirecting, as it aligns better with the current "reviewer shell" visual patterns where auth boundaries might not be enforced at the routing level yet.
+  - The queue now correctly relies on `listReviewerAssignments` and filters by active assignments. It correctly queries `getTripDraftById` directly per active assignment.
+
+
+## 2026-05-04T01:13:53+00:00 — Task: T34 Admin Analytics Real-Data Pipeline
+- Replaced the hardcoded analytics funnel with count-based operational metrics instead of fabricating conversion rates from incomplete events.
+- Chose focused `packages/db/src/analytics.ts` count helpers using the authenticated admin client, preserving RLS and avoiding service-role access from the page.
+- Documented missing status/payment indexes as follow-ups in evidence rather than adding migrations or materialized views outside T34's strict scope.
+
+## Task 35 — Protected Route E2E Suite (2026-05-04)
+
+- DECISION: Split coverage between Playwright (real middleware, anonymous + cross-role denial) and Vitest (positive role matrix against `requireRouteAccess`). Reason: mock storage-state cookies fail real Supabase JWT validation, so Playwright cannot prove persona-positive access without standing up a live Supabase session. Vitest against the gating function gives deterministic, fast, no-Docker proof of the full 4×4 matrix.
+- DECISION: Tagged Playwright spec `@smoke @protected-routes` so it runs under `pnpm test:e2e` (which hardcodes `--grep @smoke`) and can be filtered via `--grep @protected-routes` for targeted runs.
+- DECISION: Did NOT add a separate curl/HTTP harness for API checks. The Vitest tests exercise `requireRouteAccess` directly (the same function middleware calls), and the Playwright suite hits the real running server's API endpoints with `request.get()`. Both code paths are exercised; an extra curl harness would be redundant.
+- DECISION: Accept both `307` and `403` for cross-role page assertions in Playwright (`expectPageBlocked`). Reason: under mock storage-state, middleware treats personas as anonymous (→307), but if storage-state ever becomes valid the same call should produce 403. The assertion remains correct in both regimes.
+
+## 2026-05-04 — Task: Real Supabase Playwright Auth Fixtures
+- Replaced mock cookie/localStorage Playwright auth state with real Supabase-issued sessions provisioned in Playwright `globalSetup` (apps/web/playwright/global-setup.ts), so middleware `refreshSupabaseSession` → `getClaims()` → `requireRouteAccess` accepts the personas without changing any route code.
+- Encoded persona role on `app_metadata.role` only (admin, reviewer, traveler), matching `packages/db/src/roles.ts` and `apps/web/lib/auth/routes.ts`; never used `user_metadata` / `raw_user_meta_data` because that field is user-editable and would break the trusted role contract.
+- Captured cookies via `@supabase/ssr` `createServerClient` against an in-memory `Map` cookie jar during `signInWithPassword`, instead of launching a browser, so storage-state generation is deterministic, hermetic, and ~hundreds of ms per persona.
+- Kept fixture function signatures unchanged (`createAdminStorageState()`, `createReviewerStorageState()`, `createTravelerStorageState()`) and changed only their return type from a mocked `BrowserContextOptions["storageState"]` object to an absolute path string pointing at `apps/web/playwright/.auth/<persona>.json` — Playwright accepts both forms, so existing specs were not touched.
+- Cached storage states under `apps/web/playwright/.auth/` and added that directory to `.gitignore`; secrets stay in env (`E2E_TEST_USER_PASSWORD`) and never in source or evidence.
+- Failed fast on missing env (`SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `E2E_TEST_USER_PASSWORD`); rejected silent fallback to mock cookies because that hides auth regressions.
+- Made persona provisioning idempotent: `auth.admin.createUser` first, fall back to paginated `listUsers` lookup + `updateUserById` to reconcile `app_metadata.role` and password when the user already exists, so re-running `globalSetup` is safe across CI and local runs.
+- Documented `E2E_TEST_USER_PASSWORD` (and optional `E2E_SUPABASE_URL` override) in root `.env.example` rather than creating a per-app env example, matching existing repo convention.
+
+## 2026-05-04T05:20:00Z — Task: T40 Supabase Advisors, EXPLAIN Plans, and Load Baseline
+- Chose not to apply hosted Supabase migrations during T40 because the hosted database is missing multiple dependent migrations; directly applying policy/index/RPC changes without a migration reconciliation owner could broaden or break access controls.
+- Classified `/admin/analytics` as the admin analytics hot route for load evidence because this repo does not expose a dedicated admin analytics API route; the page calls `getAdminAnalyticsMetricCounts()` and `listBookingClicks()`.
+- Treated T40 evidence as a launch-readiness rejection despite no critical/high security advisor findings, because unresolved schema drift and performance advisor findings prevent representative happy-path EXPLAIN/load approval.
+
+## T41 — Error Monitoring foundation (2026-05-04)
+
+- Decision: ship a typed monitoring abstraction in `packages/monitoring`
+  modeled after `@repo/analytics`. No new external SaaS dependency.
+  Production default = noop provider; `resolveDefaultMonitoringProvider()`
+  is the single function to update when a real provider is wired.
+- Decision: events carry only typed enums + sanitized routes + numerics.
+  Raw error messages, request bodies, emails, tokens, and Supabase keys are
+  structurally excluded and additionally stripped at runtime by
+  `redactMonitoringDetails` (forbidden-key set + value-shape regex).
+- Decision: `tryCapture` is fail-open. A monitoring outage cannot break a
+  request or worker job. Mirrors the analytics pattern.
+- Decision: replaced the `console.error("TRIP CREATION ERROR:", error)`
+  in `apps/web/app/api/trips/route.ts` with a sanitized `tryCapture`
+  call. The raw error object is no longer logged through `console.error`
+  in this route.
+- Decision: worker dead-letter capture fires exactly once after retry
+  exhaustion, not on each retry. Retry-scheduled attempts stay in
+  `state.attempts` for local debugging only.
+- Decision: alert criteria documented in `docs/error-monitoring.md`.
+  Actual dashboard alert configuration is deferred to the follow-up task
+  that wires the SaaS provider; T41 brief explicitly allows documentation
+  of criteria as the deliverable.
+
+### SEO and Metadata (Task 42)
+- **Metadata Template**: Decided to use `%s | rumia.pt` as the title template in the root layout to ensure consistent branding while allowing unique page titles.
+- **Index Protection**: Applied both `robots.txt` disallows and `noindex` metadata to private routes (`/admin`, `/reviewer`, `/account`, `/trip/[tripId]`) to minimize the risk of sensitive content leaking to search engines.
+- **Sitemap Inclusion**: Only public marketing pages and the "Plan Trip" entry point are included in the sitemap. Trip Detail pages are excluded as they are considered user-specific/private drafts.
+- **Branding**: Replaced user-facing "Rota" references with "rumia.pt" in marketing copy and metadata to align with the launch brand.
+
+## 2026-05-05T00:00:00Z — Task: Playwright a11y keyboard navigation fix
+- Kept the behavioral test centered on direct keyboard activation of the submit button rather than exhaustive tab traversal, because the latter was sensitive to form complexity and viewport differences.

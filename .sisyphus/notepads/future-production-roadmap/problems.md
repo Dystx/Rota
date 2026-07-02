@@ -33,3 +33,26 @@
 ## 2026-05-01T17:00:00+00:00 Task: T10 RLS Policies
 - Unresolved production gate: apply the T10 migration to local/staging, run `supabase/policy-tests/task-10-rls-policy-matrix.sql`, and rerun Supabase security/performance advisors once CLI/Docker or another execution target is available.
 - Unresolved production gate: T12 still needs to stop request-path reads/writes from relying on service-role/admin helpers except for approved server/webhook/job paths.
+
+## 2026-05-04T05:20:00Z — Task: T40 Supabase Advisors, EXPLAIN Plans, and Load Baseline
+- Unresolved production gate: hosted Supabase schema is missing `owner_user_id`, `reviewer_auth_links`, `create_trip_draft`, RLS policies, non-primary hot-path indexes, `payment_webhook_events`, and `admin_audit_trail`; reconcile migration history before launch.
+- Unresolved production gate: Supabase Auth leaked password protection is disabled and must be enabled in the dashboard before production acceptance.
+- Unresolved production gate: T40 could not produce happy-path hosted load evidence for trip creation, reviewer queue, admin analytics, or booking click recording without risking writes against a drifted schema; rerun after migration reconciliation with seeded roles/sessions.
+
+## T41 — Error Monitoring foundation (2026-05-04)
+
+- Problem encountered: the existing `apps/web/app/api/trips/route.ts`
+  catch block used `console.error("TRIP CREATION ERROR:", error)` which
+  serializes the entire error object — exactly the leak this task targets.
+  Fix: replaced with sanitized `tryCapture` call carrying only
+  `route, method, status, errorCode, errorKind`.
+- Problem encountered: worker `WorkerRuntime` is shared by multiple tests;
+  adding a required `monitor` field would have broken existing fixtures.
+  Fix: made `monitor` optional and gated the capture on `if (runtime.monitor)`.
+- Problem encountered: `apps/web` `pnpm test` script chains vitest with
+  Playwright suites; running it surfaces unrelated pre-existing Playwright
+  failures. Workaround for verification: invoke vitest directly with
+  `pnpm --dir apps/web exec vitest run --config ../../vitest.config.ts
+  apps/web/app/api/trips/route.test.ts`.
+- No problems with redaction tests — all forbidden keys and secret value
+  patterns are stripped on first try.
