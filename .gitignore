@@ -29,6 +29,12 @@ apps/web/playwright/.auth/
 # --- Stale root Playwright output dir (active runner writes to apps/web/playwright/test-results/) ---
 test-results/
 
+# --- Playwright HTML reporter output (ephemeral; regenerated per run) ---
+apps/web/playwright-report/
+
+# --- One-off debug scripts (numbered check-warning*.cjs variants) ---
+apps/web/check-*.cjs
+
 # --- Playwright MCP browser-session scratch ---
 .playwright-mcp/
 
