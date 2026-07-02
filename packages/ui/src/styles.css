@@ -187,6 +187,38 @@
 
   --cinematic-overlay-hero: linear-gradient(180deg, oklch(0.18 0.02 250 / 0) 0%, oklch(0.18 0.02 250 / 0.85) 100%);
   --cinematic-overlay-vignette: radial-gradient(ellipse at center, transparent 40%, oklch(0.18 0.02 250 / 0.55) 100%);
+
+  /* ----------------------------------------------------------------------
+   * OLIVE + OCHRE PALETTE — Tailwind utility generation
+   * Source: docs/prototype.html, docs/design-tokens-olive-ochre.css
+   * Additive to Cinematic Concierge above.
+   * ---------------------------------------------------------------------- */
+  --color-primary: var(--color-primary);
+  --color-primary-container: var(--color-primary-container);
+  --color-olive-light: var(--color-olive-light);
+  --color-olive-dark: var(--color-olive-dark);
+  --color-ochre-light: var(--color-ochre-light);
+  --color-ochre-dark: var(--color-ochre-dark);
+  --color-linen-dark: var(--color-linen-dark);
+  --color-background-olive: var(--color-background-olive);
+  --color-on-primary: var(--color-on-primary);
+  --color-on-surface-olive: var(--color-on-surface-olive);
+  --color-on-surface-olive-variant: var(--color-on-surface-olive-variant);
+  --color-glass-light: var(--color-glass-light);
+  --color-glass-dark: var(--color-glass-dark);
+
+  --font-body-md: var(--font-body-md);
+  --font-label-ui: var(--font-label-ui);
+  --font-display: var(--font-display);
+  --font-display-mobile: var(--font-display-mobile);
+  --font-headline-sm: var(--font-headline-sm);
+  --font-headline-lg: var(--font-headline-lg);
+  --font-mono-micro: var(--font-mono-micro);
+  --font-mono-technical: var(--font-mono-technical);
+
+  --radius-olive-default: var(--radius-olive-default);
+  --radius-olive-lg: var(--radius-olive-lg);
+  --radius-olive-xl: var(--radius-olive-xl);
 }
 
 @layer base {
