@@ -1,1 +1,0 @@
-[mapbox-budget] OK 1KB ≤ 10KB

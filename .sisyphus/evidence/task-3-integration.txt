@@ -1,8 +1,0 @@
-T03 geocoding integration evidence
-
-- packages/ai/src/enrich.ts imports geocodeBatch and offsetDuplicateCoords from @repo/maps.
-- enrichItineraryWithCoords sends every stop to geocodeBatch with placeName, regionBias from brief.regions, and countries [pt, es].
-- Successful results attach lng, lat, geocodeConfidence, and geocodeSource=mapbox.
-- offsetDuplicateCoords is applied once per itinerary day.
-- cinematic_geocode_completed analytics is emitted with stopCount, geocodedCount, lowConfidenceCount, and durationMs.
-- Verification: pnpm -F @repo/ai test passed; pnpm -F @repo/ai typecheck passed.

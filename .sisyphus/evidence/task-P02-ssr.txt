@@ -1,7 +1,0 @@
-Command: pnpm -F @repo/ui test -- use-reduced-motion
-
-Result: PASS
-
-Relevant output:
-✓ src/hooks/use-reduced-motion.test.ts (4 tests) 62ms
-Includes SSR coverage for useReducedMotion()

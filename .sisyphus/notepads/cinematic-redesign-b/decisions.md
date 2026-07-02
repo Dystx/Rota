@@ -1,2 +1,0 @@
-- Kept `packages/ui/src/components/reveal-section.tsx` unchanged and added only adoption coverage plus a story.
-- Used a self-contained story title of `reveal-section` so the exported story maps cleanly to the requested `reveal-section--adoption-grid` identifier.

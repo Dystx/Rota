@@ -1,3 +1,0 @@
-- RevealSection adoption tests can verify motion config by mocking `motion/react-m` and inspecting the `m.div` call args directly.
-- Reduced-motion behavior should be exercised through `window.matchMedia` so the `useReducedMotion` hook stays in play.
-- A plain CSF-style story file is sufficient for `packages/ui` even without a local Storybook package in the repo.

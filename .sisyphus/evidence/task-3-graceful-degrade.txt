@@ -1,8 +1,0 @@
-T03 graceful degrade evidence
-
-- geocodeBatch errors are caught in enrichItineraryWithCoords.
-- Failure path logs console.error("Failed to geocode itinerary stops.", error).
-- Failure path returns the original itinerary without coordinates.
-- Failure path emits cinematic_geocode_completed with error, geocodedCount=0, and lowConfidenceCount=stopCount.
-- Test coverage: enrich.test.ts includes thrown geocoder case asserting no coords, logged error, and error analytics.
-- Verification: pnpm -F @repo/ai test passed; pnpm -F @repo/ai typecheck passed.
