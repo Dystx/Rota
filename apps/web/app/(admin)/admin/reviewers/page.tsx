@@ -39,8 +39,8 @@ export default async function AdminReviewersPage() {
       <div data-testid="admin-reviewers-header">
         <SectionHeading
           eyebrow="Admin CMS"
-          title="Reviewer management shell"
-          description="Matches the roadmap's reviewer-management layer: region fit, language coverage, specialties, and assignment readiness."
+          title="Reviewer roster"
+          description="Region fit, language coverage, specialties, and assignment readiness."
           h1
         />
       </div>

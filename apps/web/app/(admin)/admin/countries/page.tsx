@@ -33,7 +33,7 @@ export default async function AdminCountriesPage() {
       const existing = map.get(key);
       const active = (existing?.active ?? 0) + (region.launchStatus === "Active" ? 1 : 0);
       const statuses = [existing?.status, region.launchStatus].filter(Boolean);
-      const status = statuses.includes("Active") ? "Active MVP" : statuses.includes("Planned") ? "Planned" : "Research";
+      const status = statuses.includes("Active") ? "Active" : statuses.includes("Planned") ? "Planned" : "Research";
 
       map.set(key, {
         active,
@@ -50,7 +50,7 @@ export default async function AdminCountriesPage() {
     countries.length > 0
       ? countries.map((country) => [country.name, country.status, country.name === "Portugal" ? "EUR" : "Pending", country.languages])
       : [
-          ["Portugal", "Active MVP", "EUR", "EN / PT"],
+          ["Portugal", "Active", "EUR", "EN / PT"],
           ["Spain", "Pilot later", "EUR", "EN / ES"],
           ["Italy", "Planned", "EUR", "EN / IT"]
         ];
@@ -62,7 +62,7 @@ export default async function AdminCountriesPage() {
       </div>
       <span className="font-medium tracking-tight text-[var(--color-foreground)]">{row[0]}</span>
     </div>,
-    <Badge key={`col1-${idx}`} tone={row[1] === "Active MVP" ? "default" : "soft"}>
+    <Badge key={`col1-${idx}`} tone={row[1] === "Active" ? "default" : "soft"}>
       {row[1] as string}
     </Badge>,
     <span key={`col2-${idx}`} className="font-mono text-sm tracking-wider text-[var(--color-muted-foreground)]">

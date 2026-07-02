@@ -40,7 +40,7 @@ export default async function AdminRegionsPage() {
       <div id="admin-regions-header" className="admin-regions-header" data-testid="admin-regions-header">
         <SectionHeading
           eyebrow="Admin CMS"
-          title="Region management shell"
+          title="Regional curation"
           description="Tracks local summaries, launch regions, best-fit tags, and seasonality notes for country-by-country rollout."
           h1
         />

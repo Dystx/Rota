@@ -287,7 +287,7 @@ export default async function ReviewerTripPage({
                   <div className="grid gap-4">
                     <p className="rota-kicker">Reviewer focus</p>
                     <h3 className="font-[family-name:var(--font-rota-display)] text-3xl text-[var(--color-foreground)]">
-                      {activeDay ? `${activeDay.label} edit layer` : "Map editor shell"}
+                      {activeDay ? `${activeDay.label} edit layer` : "Map editor"}
                     </h3>
                     <p className="rota-muted leading-relaxed">
                       {activeItineraryDay?.transportAssumption ??

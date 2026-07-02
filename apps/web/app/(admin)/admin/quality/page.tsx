@@ -56,8 +56,8 @@ export default async function AdminQualityPage() {
       <div data-testid="admin-quality-header" className="mb-12">
         <SectionHeading
           eyebrow="Admin CMS"
-          title="Quality dashboard shell"
-          description="Surfaces the roadmap's quality-review layer for itinerary health, reviewer trust, and route realism."
+          title="Quality signals"
+          description="Reviews itinerary health, reviewer trust, and route realism across the curated place base."
           h1
         />
       </div>

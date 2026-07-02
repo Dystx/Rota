@@ -78,7 +78,7 @@ export default async function AdminAnalyticsPage() {
         <SectionHeading
           h1
           eyebrow="Admin CMS"
-          title="Analytics shell"
+          title="Analytics"
           description="Prepared for product analytics, funnel health, monetization visibility, and country-launch signals."
         />
       </div>

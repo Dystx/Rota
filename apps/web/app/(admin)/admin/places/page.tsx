@@ -8,7 +8,7 @@ export default function AdminPlacesPage() {
         <SectionHeading
           h1
           eyebrow="Admin CMS"
-          title="Places database shell"
+          title="Places"
           description="Prepared for curation, quality scoring, source confidence, and Portugal-first place management."
         />
       </div>

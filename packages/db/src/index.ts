@@ -112,10 +112,6 @@ function selectTripsQuery(options?: DataClientOptions) {
   );
 }
 
-export function isPersistenceConfigError(error: unknown) {
-  return error instanceof Error && error.message.startsWith("Missing required environment variable");
-}
-
 type RawCreateTripDraftRpcRow = {
   trip_id: number;
   trip_brief_id: number;
