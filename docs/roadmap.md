@@ -26,15 +26,13 @@ Rota is a guided-trip platform focused on Portugal (rumia.pt). It turns a natura
 - **2 runnable apps**: `apps/web` (Next.js 16 App Router, 3 surfaces), `apps/workers` (bounded local job runner).
 - **1 mobile scaffold**: `apps/mobile/` exists but no `package.json` — not buildable yet.
 - **10 Supabase migrations committed** (Apr 29 – May 4, 2026) covering briefs, trips, places, regions, partners, booking clicks, user roles, RLS policies, payment webhooks, admin audit trail.
-- **UI rollout complete (local)**: 24-task `rota-stitch-and-roadmap-completion` plan shipped slices 3–7 with F1–F4 verdicts `APPROVE` (2026-05-01).
-- **Cinematic redesign in flight**: `full-app-framer-redesign` plan — T1–T33 tasks implemented across motion foundation, design tokens, surface redesigns, runtime fixes. **F1–F4 final verification wave still unchecked.**
+- **Cinematic redesign shipped** (commits `342d2a2` … `94228d8`): motion package foundation, expanded design tokens, redesigned admin/traveler/marketing/reviewer surfaces, Mapbox GL v3 integration, geocoding seam, AI itinerary enrichment, full API route surface, Playwright fixtures, motion-gate + mapbox-budget scripts.
 - **Housekeeping**: `chore(repo): cleanup untracked runtime artifacts, dedupe evidence, tighten gitignore` (commit `e49a624`) on 2026-07-02.
+- **Quality baseline**: `pnpm typecheck` 13/13 tasks clean, `pnpm lint` 5/5 scripts clean, `pnpm test` 92/92 unit tests pass, `pnpm build` 2/2 tasks successful.
 
 ### What's in flight
 
-- **109 working-tree modifications** (consumer + admin + marketing surfaces). Uncommitted; need review and committing before any further code work.
-- **422 untracked files** (mostly `.sisyphus/` runtime artifacts pre-`.gitignore` extension; ~11 evidence PNGs now tracked after cleanup commit).
-- **Active plan `full-app-framer-redesign`**: paused after T1–T33 implementation; F1–F4 unchecked.
+- **E2E blocked by environment**: `apps/web/playwright/global-setup.ts` requires a reachable Supabase project (`tujrfgtfxphhqpujkeix.supabase.co`); DNS lookup fails in this environment. Run `npx supabase start && npx supabase db reset` per `README.md` to enable e2e, visual, a11y, perf suites.
 
 ### What's blocking production
 
@@ -48,8 +46,6 @@ Rota is a guided-trip platform focused on Portugal (rumia.pt). It turns a natura
 
 ### Pre-existing tech debt (carried, not yet fixed)
 
-- `@repo/monitoring` has typecheck errors (acknowledged in `docs/architecture.md`).
-- `@repo/db` has assertion failures (acknowledged in `docs/architecture.md`).
 - `packages/db/src/index.ts` re-exports `./clients` (line ~6) **and** defines a local `isPersistenceConfigError` shadow (~line 115). Functionally fine (local wins) but is duplicate logic.
 - `apps/web/app/(reviewer)/reviewer/history/page.tsx` and `profile/page.tsx` fall through to `error.message` on unknown errors — would leak schema-cache strings if drift hits those pages.
 - Vitest include pattern excludes `*.test.tsx` under `apps/web/app/`, so React server-component page tests aren't discoverable.
@@ -60,19 +56,33 @@ Rota is a guided-trip platform focused on Portugal (rumia.pt). It turns a natura
 
 Phases are ordered by dependency. **Phase 0–1 are immediate.** **Phase 2 unblocks production.** Phase 3–4 are post-blocker. Phase 5 is post-launch.
 
-### Phase 0 — Audit + Housekeeping *(immediate)*
+### Phase 0 — Audit + Housekeeping *(in progress)*
 
-Goal: clean working tree, baseline verified, final verification wave of active plan completed.
+Goal: clean working tree, baseline verified, post-ship audit captured.
 
 | # | Task | Done | Evidence |
 |---|---|---|---|
 | 0.1 | Repo cleanup (untracked runtime artifacts, dedupe evidence, tighten `.gitignore`) | ✅ 2026-07-02 | commit `e49a624` |
-| 0.2 | Resolve 109 working-tree modifications (commit, revert, or stage into the active plan's wave) | ⏳ | — |
-| 0.3 | Run `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm --filter web build` to baseline current state | ⏳ | — |
-| 0.4 | Execute F1–F4 final wave of `full-app-framer-redesign` plan (Plan Compliance, Code Quality, Manual QA, Scope Fidelity) | ⏳ | `.sisyphus/evidence/full-app-framer-redesign/F1-F4` |
-| 0.5 | Update `.sisyphus/boulder.json` and notepads to reflect Phase 0 outcome | ⏳ | — |
+| 0.2 | Resolve working-tree modifications (cinematic redesign implementation) | ✅ 2026-07-02 | commits `49b87f9` … `94228d8` (5 commits, 162 files, +13.5K/-2.1K lines) |
+| 0.3 | Run `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` to baseline current state | ✅ 2026-07-02 | Phase 0.3 results above |
+| 0.4 | Audit the 5-commit cinematic-redesign wave against `DESIGN.md`, `AGENTS.md`, and project goals (token compliance, motion/reduced-motion, no purple-gradient SaaS, scope fidelity vs recent commits) | ⏳ | This section, below |
+| 0.5 | Document audit findings + any residual pre-existing concerns | ⏳ | This section, below |
 
-**Exit criteria**: working tree has zero uncommitted edits; `pnpm typecheck` is clean (modulo documented pre-existing errors); F1–F4 produce APPROVE verdicts; boulder points to the next live plan.
+**Exit criteria**: working tree has zero uncommitted edits; `pnpm typecheck` / `pnpm lint` / `pnpm test` / `pnpm build` all clean; Phase 0.4 audit produces no new findings or has documented remediation tasks.
+
+### Phase 0.4 — Cinematic Redesign Audit *(scope)*
+
+Audit the 5-commit wave against `DESIGN.md` (Cinematic Concierge) and `AGENTS.md` (token discipline, scope discipline):
+
+- **Token compliance**: `var(--paper)`, `var(--cream)`, `var(--ink)`, `var(--atlantic)`, `var(--aqua)` — used everywhere colors appear; no arbitrary page-level hex.
+- **Typography compliance**: Noto Serif for headlines, Inter for body/labels — no third font sneaking in.
+- **Motion discipline**: `motion` package only (no `framer-motion`, no `@motionone/*`, no GSAP/Lenis/Scrollama); reduced-motion honored everywhere a transform/parallax is used.
+- **Anti-pattern sweep**: no scroll-jacked forms/tables; no purple-gradient SaaS styling on reviewer/admin surfaces.
+- **Scope fidelity**: 5-commit wave matches `docs/architecture.md` package boundaries; no incidental rewrites; no major upgrades to Next/React/Tailwind/Supabase/Playwright.
+
+### Phase 0.5 — Document Findings *(scope)*
+
+For any Phase 0.4 finding that doesn't fit Phase 1 or later, decide: ship as-is (with rationale) or add a remediation task to Phase 1.
 
 ---
 
@@ -82,12 +92,10 @@ Goal: clean the slate so Phase 2 isn't fighting untracked breakage.
 
 | # | Task | Owner scope | Success |
 |---|---|---|---|
-| 1.1 | Fix `@repo/monitoring` typecheck errors | `@repo/monitoring` | `pnpm --filter @repo/monitoring typecheck` clean |
-| 1.2 | Fix `@repo/db` assertion failures in `clients.test.ts`, `index.test.ts` | `@repo/db` | `pnpm --filter @repo/db test` clean |
-| 1.3 | Remove `isPersistenceConfigError` shadow in `packages/db/src/index.ts`; keep the canonical re-export | `packages/db` | Single definition; tests still pass |
-| 1.4 | Replace `error.message` fall-through in `/reviewer/history` and `/reviewer/profile` with a generic user-safe fallback | `apps/web/app/(reviewer)` | Error boundary returns tokenized message; no schema-cache leakage |
-| 1.5 | Fix Vitest include pattern to discover `*.test.tsx` under `apps/web/app/` | `vitest.config.ts` | New page-level tests run in CI |
-| 1.6 | Audit & document residual pre-existing concerns in `.sisyphus/notepads/visual-engineering/issues.md` | session | Documented |
+| 1.1 | Remove `isPersistenceConfigError` shadow in `packages/db/src/index.ts`; keep the canonical re-export | `packages/db` | Single definition; tests still pass |
+| 1.2 | Replace `error.message` fall-through in `/reviewer/history` and `/reviewer/profile` with a generic user-safe fallback | `apps/web/app/(reviewer)` | Error boundary returns tokenized message; no schema-cache leakage |
+| 1.3 | Fix Vitest include pattern to discover `*.test.tsx` under `apps/web/app/` | `vitest.config.ts` | New page-level tests run in CI |
+| 1.4 | Audit & document any remaining pre-existing concerns from the 5-commit wave's audit | session | Documented |
 
 **Exit criteria**: `pnpm typecheck` and `pnpm test` clean across the workspace; no `error.message` fall-through to user UI; new page tests runnable.
 
@@ -153,12 +161,11 @@ Goal: features that don't gate the launch but matter for retention / analytics.
 
 | # | Task | Source |
 |---|---|---|
-| 5.1 | Real-time reviewer chat (websocket or polling) | deferred in `docs/roadmap.md` |
-| 5.2 | Analytics dashboard with Recharts | deferred in `docs/roadmap.md` |
-| 5.3 | Automated PDF storage and long-term export history | deferred in `docs/roadmap.md` |
-| 5.4 | Partner booking click tracking and attribution logic | deferred in `docs/roadmap.md` |
+| 5.1 | Real-time reviewer chat (websocket or polling) | deferred in original roadmap |
+| 5.2 | Analytics dashboard with Recharts | deferred in original roadmap |
+| 5.3 | Automated PDF storage and long-term export history | deferred in original roadmap |
+| 5.4 | Partner booking click tracking and attribution logic | deferred in original roadmap |
 | 5.5 | Mobile app: give `apps/mobile/` a real `package.json` (currently empty) | new scope |
-| 5.6 | Cleanup of completed/historical `.sisyphus/plans/*` to an `archive/` subdir | housekeeping |
 
 ---
 
@@ -166,33 +173,31 @@ Goal: features that don't gate the launch but matter for retention / analytics.
 
 | Risk | Severity | Mitigation |
 |---|---|---|
-| Phase 0.4 (F1–F4) reveals Must-NOT-Have violations in active plan | High | Re-open `full-app-framer-redesign` plan, scope new remediation tasks, do not mark complete |
+| Phase 0.4 audit reveals anti-pattern violations in the 5-commit wave | Medium | Add remediation tasks to Phase 1 |
 | Phase 1 work touches shared types and ripples to apps | Medium | Land in dedicated branches, run full workspace `pnpm typecheck` after each merge |
 | Phase 2 schema application breaks hosted data | High | Take a PITR backup before each migration (see `docs/ops/backup-restore.md`); apply in order from oldest to newest; verify `get_advisors(security)` after each |
 | Phase 2.8 service-role key rotation invalidates in-flight requests | High | Coordinate with Vercel deployment window; do not rotate during peak |
 | Phase 3 worker runner choice locks us into a vendor | Medium | Prefer Inngest's local-emulator story; document the decision in `docs/adr/002-worker-runner.md` |
 | Phase 4 provider integrations introduce latency | Medium | Provider calls wrapped in `@repo/*` packages; UI shows deterministic-fallback states during long polls |
-| Working-tree mods (109 files) hide a regression Phase 1 will need to debug | Medium | Land mods first (Phase 0.2) before any other code work |
+| E2E blocked by missing Supabase env in this workspace | Low | `npx supabase start` resolves; document in onboarding |
 
 ---
 
-## 5. Active Plans & References
+## 5. References
 
-- **`.sisyphus/plans/full-app-framer-redesign.md`** — current active plan. T1–T33 implemented; F1–F4 pending. Pick up at Phase 0.4.
-- **`.sisyphus/plans/rota-stitch-and-roadmap-completion.md`** — completed 2026-05-01 with all F1–F4 APPROVE. Retained as historical record.
-- **`.sisyphus/plans/future-production-roadmap.md`** — predecessor to this roadmap. Has its own FINAL_SUMMARY (113 evidence files). Useful as historical context for the Phase 2 launch checklist.
-- **`.sisyphus/plans/cinematic-redesign-{a,b}.md`** — superseded iterations; retained as historical record.
+- **`README.md`** — quick start, architecture map, env setup.
+- **`DESIGN.md`** — Cinematic Concierge aesthetic spec; referenced by every UI task.
+- **`docs/architecture.md`** — current architecture overview.
+- **`docs/adr/001-auth-rls-strategy.md`** — RLS strategy, may need refresh after Phase 2.
 - **`docs/ops/launch.md`** — pre-launch gate (Phase 2), launch sequence (Phase 3 deployment), smoke test (Phase 2 verification), rollback plan.
 - **`docs/ops/backup-restore.md`** — PITR / disaster recovery procedures referenced by Phase 2 risk register.
-- **`docs/adr/001-auth-rls-strategy.md`** — RLS strategy, may need refresh after Phase 2.
-- **`docs/architecture.md`** — current architecture overview.
-- **`DESIGN.md`** — Cinematic Concierge aesthetic spec; referenced by every UI task.
+- **`docs/error-monitoring.md`** — error monitoring approach.
+- **`AGENTS.md`** — agent operating rules.
 
 ---
 
 ## 6. Open Questions (need user call)
 
 1. **Worker runner choice** (Phase 3.1): Inngest vs. Upstash QStash — pick before Phase 3 starts.
-2. **`apps/mobile/` scope** (Phase 5.5): is the mobile app in scope, or was the scaffold accidental? No `package.json` suggests it was abandoned.
+2. **`apps/mobile/` scope** (Phase 5.5): is the mobile app in scope, or was the scaffold abandoned? No `package.json` suggests it was never built.
 3. **ADR refresh** (Phase 2 prerequisite): should `docs/adr/001-auth-rls-strategy.md` be updated before Phase 2 migrations apply, or is "good enough" the right answer?
-4. **Boulder plan continuation** (Phase 0.5): after Phase 0 completes, what's the next live plan? Resume `full-app-framer-redesign`, or pivot to a new "production-launch" plan derived from this roadmap?

@@ -20,7 +20,10 @@ apps/web/playwright/.auth/
 *.log
 *.pid
 
-# --- Repo-root ad-hoc screenshots (regenerated each run; canonical lives under .sisyphus/evidence/) ---
+# --- sisyphus-agent workflow state (plans, notepads, evidence, boulder.json) ---
+.sisyphus/
+
+# --- Repo-root ad-hoc screenshots (regenerated each run) ---
 /*.png
 
 # --- Stale root Playwright output dir (active runner writes to apps/web/playwright/test-results/) ---
