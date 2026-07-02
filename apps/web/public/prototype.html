@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rumia - Single Page App</title>
+    
+    <!-- Scripts for React, React DOM, Babel, History, React Router -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/history@5/umd/history.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#ffddb5",
+                        "on-secondary-fixed": "#2a1800",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#e0f6e7",
+                        "on-primary-fixed": "#0c1f16",
+                        "tertiary-fixed-dim": "#c8c6c2",
+                        "glass-dark": "rgba(43, 62, 52, 0.85)",
+                        "primary-container": "#2b3e34",
+                        "surface-tint": "#4f6358",
+                        "on-secondary-container": "#784d00",
+                        "ochre-dark": "#CE933F",
+                        "on-tertiary-fixed": "#1c1c1a",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#0c1f16",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#d7eedf",
+                        "secondary-fixed-dim": "#f9bb68",
+                        "background": "#e8fff0",
+                        "on-primary-container": "#94a99c",
+                        "on-surface-variant": "#424844",
+                        "on-tertiary-container": "#a5a3a0",
+                        "surface-dim": "#c9dfd1",
+                        "surface-bright": "#e8fff0",
+                        "error": "#ba1a1a",
+                        "surface": "#e8fff0",
+                        "primary-fixed": "#d2e8d9",
+                        "inverse-surface": "#22342b",
+                        "secondary": "#825505",
+                        "linen-dark": "#EFECE6",
+                        "primary": "#16281f",
+                        "glass-light": "rgba(255, 255, 255, 0.65)",
+                        "primary-fixed-dim": "#b6ccbe",
+                        "grid-pattern": "rgba(43, 62, 52, 0.1)",
+                        "surface-container-highest": "#d2e8d9",
+                        "on-error": "#ffffff",
+                        "olive-light": "#3C5447",
+                        "outline": "#737874",
+                        "surface-container": "#ddf3e5",
+                        "outline-variant": "#c2c8c2",
+                        "on-background": "#0c1f16",
+                        "tertiary-container": "#3a3a37",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#242422",
+                        "surface-variant": "#d2e8d9",
+                        "on-tertiary-fixed-variant": "#474744",
+                        "on-secondary-fixed-variant": "#643f00",
+                        "tertiary-fixed": "#e5e2de",
+                        "on-primary-fixed-variant": "#384b41",
+                        "olive-dark": "#1D2A23",
+                        "inverse-primary": "#b6ccbe",
+                        "surface-container-low": "#e3f9ea",
+                        "ochre-light": "#EAB875",
+                        "secondary-container": "#ffc16d"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "section-gap": "24px",
+                        "base": "4px",
+                        "container-padding-lg": "32px",
+                        "header-height": "64px",
+                        "card-padding": "20px",
+                        "gutter": "16px",
+                        "container-padding-sm": "24px"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "mono-micro": ["JetBrains Mono"],
+                        "label-ui": ["Inter"],
+                        "headline-sm": ["Playfair Display"],
+                        "display-mobile": ["Playfair Display"],
+                        "display": ["Playfair Display"],
+                        "mono-technical": ["JetBrains Mono"],
+                        "headline-lg": ["Playfair Display"]
+                    },
+                    fontSize: {
+                        "body-md": ["14px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "mono-micro": ["10px", { "lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "label-ui": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-mobile": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "mono-technical": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "40px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Shared Components ---
+
+        const TopNav = () => {
+            return (
+                <nav className="fixed top-0 w-full z-50 bg-glass-light/65 backdrop-blur-md border-b border-white/20 shadow-sm transition-all duration-300">
+                    <div className="flex justify-between items-center h-header-height px-container-padding-lg max-w-7xl mx-auto">
+                        <Link to="/" className="font-headline-lg text-headline-lg italic text-primary">Rumia</Link>
+                        <ul className="hidden md:flex items-center gap-8">
+                            <li><Link to="/itineraries" className="font-label-ui text-label-ui text-on-surface-variant hover:text-ochre-light transition-colors duration-200">Itineraries</Link></li>
+                            <li><Link to="/expert-chat" className="font-label-ui text-label-ui text-on-surface-variant hover:text-ochre-light transition-colors duration-200">Expert Chat</Link></li>
+                            <li><Link to="/vault" className="font-label-ui text-label-ui text-on-surface-variant hover:text-ochre-light transition-colors duration-200">Vault</Link></li>
+                            <li><Link to="/console" className="font-label-ui text-label-ui text-on-surface-variant hover:text-ochre-light transition-colors duration-200">Console</Link></li>
+                        </ul>
+                        <div className="flex items-center gap-6">
+                            <Link to="/planner" className="hidden md:block bg-olive-light text-on-primary font-label-ui text-label-ui px-6 py-2 rounded-full hover:bg-olive-dark transition-colors duration-200 shadow-sm">Plan a Trip</Link>
+                            <button className="w-8 h-8 rounded-full overflow-hidden border border-white/20 shadow-sm">
+                                <img alt="Traveler profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJnCG5lbmqYcEas2Nf4z5hZZPtjVXDRq2TGeX3XdS4r7JVq4OGrFc0rdoTDxgd0_-MXbB4YPoDQGFjWbrRxYGdAgBQKu6_PeaXiwP6ZEx3gBpaqg-Dq7X86ueESI1-bNfV3znqVQyVKMm4FeLnC5BdGm9U1YH_9xnm1nJzp95YcKIclkYAqs6-lFU5bCBsbu10S71THbosiO6wWD4r4a4Fl0LhpERaj1ORLotenFT3_2dyOL8qp8D4BUWyVxfNVchZ9FakGOE-9f4x"/>
+                            </button>
+                        </div>
+                    </div>
+                </nav>
+            );
+        };
+
+        const ConsoleNav = () => {
+            return (
+                <nav className="hidden md:flex flex-col h-full py-section-gap px-gutter z-50 fixed left-0 top-0 w-64 bg-olive-dark shadow-2xl backdrop-blur-xl">
+                    <div className="mb-8 px-3">
+                        <Link to="/" className="font-headline-sm text-headline-sm text-ochre-light block">Rumia Console</Link>
+                        <p className="font-mono-micro text-mono-micro text-linen-dark opacity-70 mt-1 uppercase">Management Portal</p>
+                    </div>
+                    <ul className="flex-1 space-y-2">
+                        <li><Link to="/console/pipeline" className="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark rounded-lg font-body-md text-body-md"><span className="material-symbols-outlined">assignment_turned_in</span> Pipeline</Link></li>
+                        <li><Link to="/console/workspace" className="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark rounded-lg font-body-md text-body-md"><span className="material-symbols-outlined">edit_note</span> Revision Workspace</Link></li>
+                        <li><Link to="/console/messages" className="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark rounded-lg font-body-md text-body-md"><span className="material-symbols-outlined">chat_bubble</span> Messaging Hub</Link></li>
+                        <li><Link to="/console/graph" className="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark rounded-lg font-body-md text-body-md"><span className="material-symbols-outlined">account_tree</span> Knowledge Graph</Link></li>
+                        <li><Link to="/console/metrics" className="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark rounded-lg font-body-md text-body-md"><span className="material-symbols-outlined">analytics</span> Metrics</Link></li>
+                        <li><Link to="/console/config" className="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark rounded-lg font-body-md text-body-md"><span className="material-symbols-outlined">settings</span> System Config</Link></li>
+                    </ul>
+                </nav>
+            );
+        };
+
+
+        // --- Screens ---
+
+        const HomePage = () => (
+            <div className="min-h-screen pt-header-height flex flex-col">
+                <TopNav />
+                <main className="flex-1">
+                    <section className="relative h-[819px] min-h-[600px] w-full flex flex-col justify-center items-center overflow-hidden">
+                        <div className="absolute inset-0 w-full h-full">
+                            <div className="w-full h-full bg-cover bg-center filter brightness-[0.85] contrast-125 saturate-110" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCX3bKR-Xr7E_XjZsIHsO8GXIycFbn1UViEGxIXcvq3q5URIvlKF1tHXI8Q6I2K_aOmqDtA0I9xgu3nukH3AKzEV0E_ZVN-jTVndO-ZmUgFTgQ6Qja0ApRYSCmHU7_rtk4zuAXTpszEFhJntzw9Hc1PU-yQqKvq_VB1tCp5kV0RyNrRw34OBeBnei4hZhWWHXgKziQfaoH-stdy5vUUyvroiRc1Xl46gkiOU5z3CByCu7z7MeZue5KAtydhEggtzf5NL-NDqysiKt-S')"}}></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90"></div>
+                        </div>
+                        <div className="relative z-10 w-full max-w-4xl mx-auto px-container-padding-lg text-center flex flex-col items-center">
+                            <h1 className="font-display text-display text-on-secondary mb-section-gap tracking-tight drop-shadow-2xl">
+                                Discover <span className="italic text-ochre-light">Intentionally.</span>
+                            </h1>
+                            <div className="w-full max-w-3xl bg-glass-light backdrop-blur-[24px] border border-white/40 rounded-xl p-card-padding shadow-2xl flex flex-col items-center">
+                                <Link to="/planner" className="bg-olive-light text-on-primary font-label-ui text-label-ui px-8 py-3 rounded-full hover:bg-olive-dark transition-all duration-200 shadow-md flex items-center gap-2 group">
+                                    Begin Journey <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                </Link>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        );
+
+        const PlannerPage = () => (
+            <div className="bg-primary text-linen-dark antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+                <div className="absolute inset-0 w-full h-full bg-cover bg-center opacity-30 z-[-2]" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCzEwXnJYAipE08VL-hr3P3BYwSrlRjIyjL5sfDtwjoYxB-y51wLp6hsVIk22sgoW6QB09oiy8LenVzi9fTviHSQPR1PvB4UJcUD7zLlT2dC84BS2mwp7ZWu9hplWAo6uCdWwgcDmG3b1FKZ75W8jvqk3YzMBi1EbdIcFAWaXa-RzYOroGe3HPMGsu6CenzluL-SW3IKpNrNvPy9Zl_vljATmBkhPcvvMW-EPyyGy4T036LDJBwqzcFio_a0dcyQ8e12fjvVRPBzsyz')"}}></div>
+                <header className="fixed top-0 w-full z-50 p-container-padding-lg flex justify-between items-center">
+                    <Link to="/" className="font-headline-sm text-headline-sm italic text-ochre-light">Rumia</Link>
+                    <Link to="/" className="text-linen-dark opacity-70 hover:opacity-100 transition-opacity"><span className="material-symbols-outlined text-2xl">close</span></Link>
+                </header>
+                <main className="flex-grow flex items-center justify-center px-container-padding-sm md:px-[48px] z-10 py-header-height">
+                    <div className="max-w-4xl w-full text-center">
+                        <div className="bg-glass-dark backdrop-blur-xl border border-white/10 rounded-2xl p-container-padding-lg md:p-[64px] shadow-2xl relative">
+                            <h1 className="font-headline-lg text-headline-lg md:font-display md:text-display text-linen-dark leading-tight relative z-10 mb-8">
+                                AI Intent Engine
+                            </h1>
+                            <Link to="/logistics" className="bg-ochre-light text-primary font-label-ui text-label-ui px-8 py-4 rounded-lg shadow-sm hover:shadow-lg inline-flex items-center gap-2">
+                                Synthesize Itinerary <span className="material-symbols-outlined">arrow_forward</span>
+                            </Link>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        );
+
+        const LogisticsPage = () => (
+            <div className="bg-background min-h-screen text-on-background relative overflow-hidden flex flex-col justify-center items-center p-container-padding-sm md:p-container-padding-lg">
+                <main className="relative z-10 w-full max-w-2xl mx-auto">
+                    <div className="bg-glass-light rounded-xl p-8 md:p-12 shadow-2xl flex flex-col gap-8 border border-white/20">
+                        <header className="text-center">
+                            <h1 className="font-headline-lg text-headline-lg text-primary mb-2">Will you rent a car?</h1>
+                        </header>
+                        <div className="flex justify-between items-center mt-4 pt-6 border-t border-olive-dark/10">
+                            <Link to="/planner" className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
+                                <span className="material-symbols-outlined text-sm">arrow_back</span> Back
+                            </Link>
+                            <Link to="/checkout" className="bg-olive-dark text-on-primary font-label-ui text-label-ui px-6 py-3 rounded-lg hover:bg-primary transition-colors flex items-center gap-2">
+                                Continue <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                            </Link>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        );
+
+        const CheckoutPage = () => (
+             <div className="min-h-screen flex flex-col font-body-md text-body-md text-on-surface">
+                <header className="fixed top-0 w-full bg-glass-light/65 backdrop-blur-md border-b border-white/20 shadow-sm z-50 flex justify-between items-center h-header-height px-container-padding-lg transition-all">
+                    <Link to="/" className="font-headline-lg text-headline-lg italic text-primary">Rumia</Link>
+                    <Link to="/itineraries" className="text-on-surface-variant hover:text-ochre-light"><span className="material-symbols-outlined">close</span></Link>
+                </header>
+                <main className="flex-grow pt-32 pb-24 px-container-padding-sm max-w-7xl mx-auto w-full flex flex-col justify-center items-center">
+                    <div className="text-center mb-16 max-w-2xl mx-auto">
+                        <h1 className="font-display-mobile md:font-display text-display-mobile md:text-display text-primary mb-6">Elevate Your Itinerary</h1>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-section-gap w-full max-w-5xl">
+                        <div className="bg-glass-light rounded-xl p-8 border border-white/40 shadow-sm">
+                            <h2 className="font-headline-lg text-headline-lg text-primary mb-4">Core AI Synthesis</h2>
+                            <Link to="/itineraries" className="block text-center w-full py-4 px-6 rounded-lg border border-outline text-primary font-label-ui hover:bg-surface-variant">Continue with Core AI</Link>
+                        </div>
+                        <div className="bg-olive-dark text-linen-dark rounded-xl p-8 shadow-lg border border-ochre-light">
+                            <h2 className="font-headline-lg text-headline-lg text-linen-dark mb-4">Hybrid Specialist Review</h2>
+                            <Link to="/expert-chat" className="block text-center w-full py-4 px-6 rounded-lg bg-ochre-dark text-on-primary font-label-ui hover:bg-ochre-light">Upgrade & Finalize</Link>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        );
+
+        const ItinerariesPage = () => (
+             <div className="min-h-screen flex flex-col font-body-md">
+                <TopNav />
+                <main className="flex-grow pt-[88px] px-container-padding-sm max-w-7xl mx-auto w-full">
+                    <h1 className="font-headline-lg text-headline-lg text-primary mb-8">Itineraries</h1>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+                         <div className="bg-glass-light backdrop-blur-md rounded-xl border border-white/20 shadow-sm p-4">
+                            <h3 className="font-headline-sm text-primary mb-2">Kyoto Autumn Retreat</h3>
+                            <p className="text-sm text-on-surface-variant mb-4">7 Days</p>
+                            <Link to="/vault" className="text-ochre-dark font-label-ui hover:underline">View in Vault</Link>
+                         </div>
+                    </div>
+                </main>
+            </div>
+        );
+
+        const VaultPage = () => (
+             <div className="min-h-screen flex flex-col font-body-md">
+                <TopNav />
+                <main className="flex-grow pt-[88px] px-container-padding-sm max-w-7xl mx-auto w-full">
+                    <h1 className="font-headline-lg text-headline-lg text-primary mb-8">Saved Vault</h1>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+                        <div className="bg-glass-light p-4 rounded-xl border border-white/20 shadow-sm">
+                            <h2 className="font-headline-sm text-primary">Portugal Escape</h2>
+                            <p className="text-sm">7 DAYS</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        );
+
+        const ExpertChatPage = () => (
+             <div className="h-screen flex flex-col font-body-md">
+                <TopNav />
+                <main className="flex-1 flex pt-header-height overflow-hidden max-w-[1600px] mx-auto w-full">
+                    <section className="flex-1 flex flex-col bg-surface relative p-4">
+                        <div className="h-16 flex items-center border-b border-olive-light/10 mb-4">
+                            <h2 className="font-headline-sm text-primary">Chat with Ana (Kyoto Specialist)</h2>
+                        </div>
+                        <div className="flex-1 overflow-y-auto bg-white/50 rounded-xl p-4 shadow-sm border border-olive-light/10">
+                            <p className="text-on-surface-variant">Chat messages go here...</p>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        );
+
+        // --- Console Pages ---
+
+        const ConsolePipeline = () => (
+             <div className="flex min-h-screen bg-background">
+                <ConsoleNav />
+                <main className="flex-1 md:ml-64 p-container-padding-lg">
+                    <h2 className="font-headline-lg text-headline-lg text-primary mb-4">Operations Pipeline</h2>
+                    <div className="bg-glass-light p-4 rounded-xl border border-white/20">Pipeline Board</div>
+                </main>
+            </div>
+        );
+
+        const ConsoleWorkspace = () => (
+             <div className="flex min-h-screen bg-background">
+                <ConsoleNav />
+                <main className="flex-1 md:ml-64 p-container-padding-lg">
+                    <h2 className="font-headline-lg text-headline-lg text-primary mb-4">Revision Workspace</h2>
+                    <div className="bg-glass-light p-4 rounded-xl border border-white/20">Editor Interface</div>
+                </main>
+            </div>
+        );
+
+        const ConsoleMessages = () => (
+             <div className="flex min-h-screen bg-background">
+                <ConsoleNav />
+                <main className="flex-1 md:ml-64 p-container-padding-lg">
+                    <h2 className="font-headline-lg text-headline-lg text-primary mb-4">Messaging Hub</h2>
+                    <div className="bg-glass-light p-4 rounded-xl border border-white/20">Messages Interface</div>
+                </main>
+            </div>
+        );
+
+        const ConsoleGraph = () => (
+             <div className="flex min-h-screen bg-black text-white">
+                <nav className="hidden md:flex flex-col h-full py-section-gap px-gutter z-50 fixed left-0 top-0 w-64 bg-olive-dark shadow-2xl">
+                     <div className="mb-8 px-3">
+                        <Link to="/" className="font-headline-sm text-headline-sm text-ochre-light block">Rumia Console</Link>
+                    </div>
+                    <ul className="flex-1 space-y-2">
+                        <li><Link to="/console/graph" className="text-ochre-light p-3 flex items-center gap-3">Knowledge Graph</Link></li>
+                        <li><Link to="/console/metrics" className="text-white p-3 flex items-center gap-3">Metrics</Link></li>
+                    </ul>
+                </nav>
+                <main className="flex-1 md:ml-64 p-container-padding-lg">
+                    <h2 className="font-headline-lg text-headline-lg text-white mb-4">Knowledge Graph</h2>
+                    <div className="bg-white/10 p-4 rounded-xl">Graph Interface</div>
+                </main>
+            </div>
+        );
+
+        const ConsoleMetrics = () => (
+             <div className="flex min-h-screen bg-background">
+                <ConsoleNav />
+                <main className="flex-1 md:ml-64 p-container-padding-lg">
+                    <h2 className="font-headline-lg text-headline-lg text-primary mb-4">Metrics Dashboard</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-glass-light p-4 rounded-xl border border-white/20">Metric 1</div>
+                        <div className="bg-glass-light p-4 rounded-xl border border-white/20">Metric 2</div>
+                        <div className="bg-glass-light p-4 rounded-xl border border-white/20">Metric 3</div>
+                    </div>
+                </main>
+            </div>
+        );
+
+        const ConsoleConfig = () => (
+             <div className="flex min-h-screen bg-background">
+                <ConsoleNav />
+                <main className="flex-1 md:ml-64 p-container-padding-lg">
+                    <h2 className="font-headline-lg text-headline-lg text-primary mb-4">System Config</h2>
+                    <div className="bg-glass-light p-4 rounded-xl border border-white/20">Settings Interface</div>
+                </main>
+            </div>
+        );
+
+
+        // --- App Component ---
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <Routes>
+                        {/* Client facing routes */}
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/planner" element={<PlannerPage />} />
+                        <Route path="/logistics" element={<LogisticsPage />} />
+                        <Route path="/checkout" element={<CheckoutPage />} />
+                        <Route path="/itineraries" element={<ItinerariesPage />} />
+                        <Route path="/vault" element={<VaultPage />} />
+                        <Route path="/expert-chat" element={<ExpertChatPage />} />
+
+                        {/* Admin / Console routes */}
+                        <Route path="/console" element={<ConsolePipeline />} />
+                        <Route path="/console/pipeline" element={<ConsolePipeline />} />
+                        <Route path="/console/workspace" element={<ConsoleWorkspace />} />
+                        <Route path="/console/messages" element={<ConsoleMessages />} />
+                        <Route path="/console/graph" element={<ConsoleGraph />} />
+                        <Route path="/console/metrics" element={<ConsoleMetrics />} />
+                        <Route path="/console/config" element={<ConsoleConfig />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
