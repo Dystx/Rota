@@ -1,94 +1,81 @@
-# Rota
+# Rota (Rumia.pt)
 
-Portugal-first travel planning platform scaffold.
+Portugal-first travel planning platform.
 
-## What this repo includes
+## Architecture
 
-- `apps/web`: Next.js App Router web shell with marketing, consumer, reviewer, and admin surfaces.
-- `packages/ui`: shared UI primitives and Stitch-aligned design tokens.
-- `packages/typescript-config`: shared TypeScript config.
-- `docs/design/stitch-design-reference.md`: implementation-facing summary of the current Stitch direction.
-- `docs/architecture.md`: scaffold architecture notes plus dependency research updates.
-- placeholders for the roadmap packages and future Supabase/scripts work.
+This project is a monorepo managed by `pnpm` and `Turborepo`.
 
-## Principles carried into the scaffold
+- `apps/web`: Next.js App Router application (Consumer, Reviewer, Admin surfaces).
+- `apps/workers`: Bounded local runner for background export and delivery jobs.
+- `packages/ui`: Shared design tokens and React components (aligned with Stitch).
+- `packages/config`: Centralized, typed environment configuration.
+- `packages/db`: Supabase client and CRUD helpers.
+- `packages/types`: Shared Zod schemas and TypeScript definitions.
+- `packages/ai`: Deterministic itinerary generation engine.
+- `packages/routing`: Travel-time validation and map layer logic.
+- `packages/payments`: Deterministic checkout plan contracts.
+- `packages/emails`: Deterministic transactional email templates.
+- `packages/maps`: Map provider abstractions.
+- `packages/analytics`: Privacy-safe event instrumentation.
+- `packages/monitoring`: Error capture and route-health foundation.
 
-- No generic AI chat UI.
-- Web/PWA first.
-- Portugal-first content model.
-- Consumer, reviewer, and admin route groups from day one.
-- Shared UI tokens derived from the current Stitch project, while avoiding over-polished lock-in.
+## Quick Start
 
-## Quick start
+### Prerequisites
+- Node.js >= 24.0.0
+- pnpm >= 10.0.0
 
+### Installation
 ```bash
 pnpm install
+```
+
+### Development
+```bash
 pnpm dev
 ```
 
-## Supabase setup
-
-The trip create/read/unlock/review/export flows expect these variables in `.env.local`:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
+### Verification
+```bash
+pnpm typecheck  # Run TypeScript checks across all packages
+pnpm lint       # Run linting
+pnpm test       # Run unit tests
 ```
 
-For local Supabase:
+### End-to-End & Specialized Tests
+These commands require `apps/web` to be running or use Playwright's webServer config.
+```bash
+pnpm test:e2e     # Smoke tests (@smoke)
+pnpm test:visual  # Visual regression tests (@visual)
+pnpm test:a11y    # Accessibility audits (@a11y)
+```
 
+## Environment Setup
+
+Copy the root `.env.example` to `apps/web/.env.local` and fill in your Supabase credentials.
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key (Server only!)
+```
+
+**Security Warning**: `SUPABASE_SERVICE_ROLE_KEY` bypasses all RLS policies. It must never be exposed to the client or committed to version control.
+
+## Supabase Development
+
+For local development with the Supabase CLI:
 ```bash
 npx supabase start
 npx supabase db reset
 ```
 
-Then copy the local keys from the CLI output into `.env.local` and restart the app.
+## Production Readiness Status
 
-If Docker is not installed or not running, local Supabase will not start.
+The platform currently operates on **Deterministic Contracts** for local development and testing. This means:
+1. The UI and logic are implemented using stable schemas.
+2. External providers (OpenAI, Stripe, Resend, Mapbox) are currently stubbed or bounded in their respective `@repo/*` packages to allow for decoupled development.
+3. **Current Blocker**: The hosted Supabase environment has significant schema drift. Production deployment is blocked until `owner_user_id` columns, RLS policies, and missing schema elements are reconciled.
 
-## Admin places API
 
-The first admin place-management API now exists:
-
-- `GET /api/places`
-- `POST /api/places`
-- `GET /api/places/[placeId]`
-- `PATCH /api/places/[placeId]`
-
-These routes use the shared place schema and Supabase-backed db helpers when env is configured. The admin editor still falls back to local-only changes if the API is unavailable.
-
-## Initial route surfaces
-
-- `/` landing page
-- `/portugal`
-- `/how-it-works`
-- `/pricing`
-- `/human-review`
-- `/trip/new`
-- `/trip/[tripId]`
-- `/trip/[tripId]/map`
-- `/trip/[tripId]/export`
-- `/account`
-- `/reviewer/queue`
-- `/reviewer/profile`
-- `/reviewer/history`
-- `/reviewer/trips/[tripId]`
-- `/admin/places`
-- `/admin/countries`
-- `/admin/regions`
-- `/admin/partners`
-- `/admin/reviewers`
-- `/admin/quality`
-- `/admin/analytics`
-
-## Dependency direction
-
-The roadmap already covers the core stack. After package research, the current stance is:
-
-- add now: `zod`
-- add soon: `date-fns`, `tailwind-merge`, `clsx`, `class-variance-authority`
-- add with shadcn/ui: `lucide-react`, Radix-based primitives, `react-day-picker`, `@tanstack/react-table`, `cmdk`
-- add later only when needed: `motion`, `sonner`, `@tanstack/react-query`, `next-themes`, `recharts`
-
-The next roadmap milestone in code is the structured trip brief, so the first new dependency should be `zod`.

@@ -15,7 +15,8 @@
     "test:visual": "pnpm --dir apps/web test:visual",
     "test:a11y": "pnpm --dir apps/web test:a11y",
     "test:perf": "pnpm --dir apps/web test:perf",
-    "qa:motion-gate": "node apps/web/scripts/check-motion-imports.mjs"
+    "qa:motion-gate": "node apps/web/scripts/check-motion-imports.mjs",
+    "qa:mapbox-budget": "node apps/web/scripts/check-mapbox-budget.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",

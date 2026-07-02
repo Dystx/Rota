@@ -1,6 +1,6 @@
 # Supabase
 
-This folder now holds the first migration for trip brief persistence.
+This folder holds the local Supabase configuration and migrations for Rota persistence, role/profile mapping, and traveler ownership prerequisites.
 
 ## Local workflow
 
@@ -13,12 +13,12 @@ npx supabase start
 npx supabase db reset
 ```
 
-Then copy the CLI output into `.env.local`:
+Then copy the CLI output into `.env.local`. This file is ignored by git because the service key is server-only secret material:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<publishable key>
-SUPABASE_SERVICE_ROLE_KEY=<secret key>
+SUPABASE_SERVICE_ROLE_KEY=<server-only service_role/secret key>
 ```
 
 Useful local endpoints:
@@ -29,7 +29,31 @@ Useful local endpoints:
 
 ## Hosted workflow
 
-If you already have a Supabase project, apply the migrations in this folder to that project and set the same three variables in `.env.local` using your hosted project values.
+If you already have a Supabase project, apply the migrations in this folder to that project and set the same three variables in `.env.local` using your hosted project values. Prefer a current `sb_secret_...` key for backend code when available; never expose it through `NEXT_PUBLIC_*`, client components, browser headers, docs, or committed files.
+
+If a hosted service-role or secret key was exposed, rotate it before production from **Supabase Dashboard → Project Settings → API Keys**. Create a replacement secret key, update backend/runtime secret stores, verify the app boots, then delete the exposed key. Record only timestamps/key labels in evidence, never the key value.
+
+## Trusted roles and local personas
+
+Application roles are trusted only when read from `auth.users.raw_app_meta_data.role` through validated claims or from server-owned public tables:
+
+- `public.user_profiles.app_role`: `traveler`, `reviewer`, `admin`, or `none`
+- `public.reviewer_auth_links`: maps an auth user to a reviewer row such as local test reviewer `ines-almeida`
+- `public.trip_briefs.owner_user_id` and `public.trips.owner_user_id`: traveler ownership prerequisites for future RLS policies
+
+Do not authorize from `auth.users.raw_user_meta_data`, client-provided `user_metadata`, form fields, cookies, or localStorage. User metadata is acceptable for display-only profile details, but not for role decisions.
+
+For deterministic local testing, run the local persona script after `npx supabase db reset` and after exporting local-only throwaway passwords:
+
+```bash
+export ROTA_TRAVELER_PASSWORD='local-only-password'
+export ROTA_REVIEWER_PASSWORD='local-only-password'
+export ROTA_ADMIN_PASSWORD='local-only-password'
+export ROTA_OUTSIDER_PASSWORD='local-only-password'
+node scripts/seed-local-personas.mjs
+```
+
+The script creates or updates `traveler@example.com`, `reviewer@example.com`, `admin@example.com`, and `outsider@example.com`, writes trusted app metadata roles, upserts `public.user_profiles`, and links the reviewer persona to `public.reviewers.id = 'ines-almeida'`. No real credentials, provider keys, JWTs, or `.env.local` values should be committed or copied into evidence.
 
 ## Current blocker on this machine
 
