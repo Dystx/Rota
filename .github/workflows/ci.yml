@@ -1,0 +1,173 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  install-lint-typecheck-build-test:
+    name: build typecheck test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
+
+      - name: Unit and smoke tests
+        run: pnpm test
+
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Playwright smoke tests
+        run: pnpm --dir apps/web test:e2e
+
+      - name: Upload Playwright reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          if-no-files-found: ignore
+          path: |
+            apps/web/playwright-report
+            apps/web/playwright/test-results
+            apps/web/playwright-report/results.json
+
+      - name: Upload visual and a11y artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-quality-artifacts
+          if-no-files-found: ignore
+          path: |
+            apps/web/playwright/tests/visual.spec.ts-snapshots
+            apps/web/playwright/tests/accessibility.spec.ts-snapshots
+            apps/web/lighthouse-report
+            apps/web/.lighthouseci
+
+  supabase:
+    name: supabase
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start local Supabase
+        run: supabase start
+
+      - name: Reset local Supabase database
+        run: supabase db reset
+
+      - name: Discover Supabase db commands
+        run: |
+          mkdir -p .github/artifacts/supabase
+          supabase db --help | tee .github/artifacts/supabase/db-help.txt
+
+      - name: Run local Supabase advisor/lint check
+        run: |
+          mkdir -p .github/artifacts/supabase
+          if supabase db lint --help >/dev/null 2>&1; then
+            supabase db lint --local > .github/artifacts/supabase/db-lint-local.txt 2>&1
+            status=$?
+            if [ "$status" -eq 0 ]; then
+              echo "supabase db lint --local passed" | tee .github/artifacts/supabase/db-lint-status.txt
+            else
+              {
+                echo "supabase db lint --local exited nonzero (${status})."
+                echo "This job fails on real lint findings after preserving output."
+              } | tee .github/artifacts/supabase/db-lint-status.txt
+              exit "$status"
+            fi
+          elif supabase db advisors --help >/dev/null 2>&1; then
+            supabase db advisors > .github/artifacts/supabase/db-advisors.txt 2>&1
+            status=$?
+            if [ "$status" -eq 0 ]; then
+              echo "supabase db advisors passed" | tee .github/artifacts/supabase/db-advisors-status.txt
+            else
+              {
+                echo "supabase db advisors exited nonzero (${status})."
+                echo "This job fails on real advisor findings after preserving output."
+              } | tee .github/artifacts/supabase/db-advisors-status.txt
+              exit "$status"
+            fi
+          else
+            {
+              echo "No supported Supabase db lint/advisors command was found."
+              echo "This is nonblocking and recorded as a local environment limitation."
+            } | tee .github/artifacts/supabase/db-advisors-status.txt
+          fi
+
+      - name: Upload Supabase artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-artifacts
+          if-no-files-found: ignore
+          path: |
+            .github/artifacts/supabase
+            supabase/.temp
