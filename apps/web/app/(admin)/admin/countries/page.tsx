@@ -22,9 +22,7 @@ export default async function AdminCountriesPage() {
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted country rollout signals here."
-      : error instanceof Error
-        ? error.message
-        : "Could not load country rollout data yet.";
+      : "Could not load country rollout data yet.";
   }
 
   const countries = Array.from(

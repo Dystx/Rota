@@ -14,9 +14,7 @@ export default async function AdminReviewersPage() {
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted reviewers here."
-      : error instanceof Error
-        ? error.message
-        : "Could not load admin reviewers.";
+      : "Could not load admin reviewers.";
   }
 
   const rows =

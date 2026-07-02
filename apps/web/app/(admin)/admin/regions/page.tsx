@@ -14,9 +14,7 @@ export default async function AdminRegionsPage() {
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted regions here."
-      : error instanceof Error
-        ? error.message
-        : "Could not load admin regions.";
+      : "Could not load admin regions.";
   }
 
   const rows =

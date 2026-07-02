@@ -14,9 +14,7 @@ export default async function AdminPartnersPage() {
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted partners here."
-      : error instanceof Error
-        ? error.message
-        : "Could not load partner records.";
+      : "Could not load partner records.";
   }
 
   const rows =

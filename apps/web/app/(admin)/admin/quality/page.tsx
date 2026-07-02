@@ -14,9 +14,7 @@ export default async function AdminQualityPage() {
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted quality signals here."
-      : error instanceof Error
-        ? error.message
-        : "Could not load quality data yet.";
+      : "Could not load quality data yet.";
   }
 
   const scoredPlaces = places.filter((place) => place.quality !== null && place.quality !== undefined);

@@ -32,9 +32,7 @@ export default async function AdminAnalyticsPage() {
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load persisted analytics here."
-      : error instanceof Error
-        ? error.message
-        : "Could not load analytics yet.";
+      : "Could not load analytics yet.";
   }
 
   const sourceCounts = bookingClicks.reduce<Record<string, number>>((counts, click) => {
