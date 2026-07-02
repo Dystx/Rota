@@ -3,6 +3,7 @@
 **Status**: Additive to [`docs/spec.md`](./spec.md) (v2.0 Tiered Service Model — the long-term product vision).
 **Effective**: 2026-07-02 onward.
 **Scope decision**: Tiers 1 + 2 are the immediate focus; Tier 3 (in-person guide marketplace) and Mobile are deferred to the future backlog.
+**Visual identity**: Olive + Ochre + Cream + Sage palette from the prototype (see §6).
 
 ---
 
@@ -141,6 +142,73 @@ Mobile (Phase 6) reactivation requires:
 
 - [`docs/spec.md`](./spec.md) — v2.0 long-term product vision (3 tiers, 8 phases, 12-table schema)
 - [`docs/roadmap.md`](./roadmap.md) — operational roadmap (Phase 0–8), aligned with this refined scope
-- [`docs/audit/phase-0-cinematic-redesign.md`](./audit/phase-0-cinematic-redesign.md) — Phase 0 audit evidence
-- `packages/ui/src/styles.css` — design token source of truth
-- `DESIGN.md` (was oh-my-kimi-generated; now removed — Cinematic Concierge aesthetic preserved via tokens)
+- [`docs/prototype.html`](./prototype.html) — single-file React SPA prototype (the source for the new visual identity + route map)
+- [`docs/prototype-routes.md`](./prototype-routes.md) — prototype routes mapped to current Next.js routes + migration plan
+- [`docs/design-tokens-olive-ochre.css`](./design-tokens-olive-ochre.css) — proposed replacement for `packages/ui/src/styles.css` (REFERENCE; not yet applied)
+- [`docs/audit/phase-0-cinematic-redesign.md`](./audit/phase-0-cinematic-redesign.md) — Phase 0 audit evidence (Cinematic Concierge tokens)
+- `packages/ui/src/styles.css` — active design token source of truth (Cinematic Concierge palette — pending replacement)
+
+---
+
+## 6. Visual Identity: Olive + Ochre + Cream + Sage
+
+The visual identity is anchored by the prototype at [`docs/prototype.html`](./prototype.html). Distinct from the earlier Cinematic Concierge tokens (paper / cream / ink / atlantic / aqua), the prototype uses an editorial Iberian palette:
+
+### 6.1 Primary palette
+
+```
+--color-primary:           #16281f   deep green-black
+--color-primary-container: #2b3e34   forest
+--color-olive-light:       #3c5447   mid olive
+--color-olive-dark:        #1d2a23   deep olive
+--color-ochre-light:       #eab875   warm tan (brand accent)
+--color-ochre-dark:        #ce933f   burnt ochre (brand accent deep)
+--color-linen-dark:        #efece6   cream linen (foreground on dark)
+--color-background:        #e8fff0   pale sage
+```
+
+### 6.2 Typography
+
+```
+display:        Playfair Display (serif) — headlines, hero
+headline:       Playfair Display (serif) — section headings
+body:           Inter (sans-serif) — body, UI labels
+mono:           JetBrains Mono (monospace) — technical micro-labels (mono-micro 10px)
+```
+
+Type scale (carried over from prototype): `display 72px`, `display-mobile 48px`, `headline-lg 30px`, `headline-sm 18px`, `body-md 14px`, `label-ui 12px`, `mono-micro 10px`.
+
+### 6.3 Glass surfaces (defining characteristic)
+
+The prototype's hero pattern is a `h-[819px]` cinematic background with a glass-morphism CTA card overlay:
+
+```
+.glass-panel {
+  background: rgba(255, 255, 255, 0.65);    /* glass-light */
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+.glass-panel-dark {
+  background: rgba(43, 62, 52, 0.85);       /* glass-dark */
+  backdrop-filter: blur(24px);
+}
+```
+
+### 6.4 Motion (carry-over)
+
+The Cinematic Concierge motion system is retained:
+
+```
+--motion-duration-fast:   200ms
+--motion-duration-base:   400ms
+--motion-duration-slow:   800ms
+--motion-easing-cinematic: cubic-bezier(0.2, 0, 0, 1)
+@media (prefers-reduced-motion: reduce) { /* all durations -> 0ms */ }
+```
+
+### 6.5 Migration status
+
+- **Reference doc**: [`docs/design-tokens-olive-ochre.css`](./design-tokens-olive-ochre.css) — full v4 `@theme` block, ready to swap into `packages/ui/src/styles.css`.
+- **Active stylesheet**: `packages/ui/src/styles.css` still holds Cinematic Concierge tokens (paper/cream/ink/atlantic/aqua) — pending replacement.
+- **Open question**: which palette wins? Cinematic Concierge (current 5-commit wave) vs Olive + Ochre (prototype). See `docs/roadmap.md` §7 Open Questions.

@@ -1,0 +1,322 @@
+/* Rumia Olive & Ochre Design Tokens — extracted from prototype
+ *
+ * Source: docs/prototype.html (single-file React SPA prototype, 2026-07)
+ * Status: REFERENCE ONLY. Not applied. The active stylesheet is
+ *         packages/ui/src/styles.css (Cinematic Concierge tokens).
+ *         This file documents the proposed replacement.
+ *
+ * Apply via:
+ *   - Move these tokens into packages/ui/src/styles.css
+ *   - Replace Cinematic Concierge palette (paper/cream/ink/atlantic/aqua)
+ *     with olive/ochre/cream/sage
+ *   - Update .rota-* component classes to reference new tokens
+ *   - Audit app/web/app/(marketing|app|admin|reviewer) pages for
+ *     hardcoded color references
+ *
+ * Tailwind v4 conversion:
+ *   The prototype uses Tailwind CDN with `tailwind.config = {...}` syntax.
+ *   Tailwind v4 (already pinned in apps/web + packages/ui at v4.2.4)
+ *   uses `@theme` directive in CSS. Translation:
+ *     tailwind.config.theme.extend.colors["ochre-dark"] = "#CE933F"
+ *       -> @theme { --color-ochre-dark: #CE933F; }
+ *   The class `bg-ochre-dark` then resolves to var(--color-ochre-dark).
+ */
+
+:root {
+  /* --- Primary palette (extracted from prototype tailwind.config) --- */
+  --color-primary: #16281f;                   /* Deep green-black */
+  --color-primary-container: #2b3e34;         /* Forest */
+  --color-primary-fixed: #d2e8d9;             /* Pale sage */
+  --color-primary-fixed-dim: #b6ccbe;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #94a99c;
+  --color-on-primary-fixed: #0c1f16;
+  --color-on-primary-fixed-variant: #384b41;
+  --color-inverse-primary: #b6ccbe;
+
+  /* --- Secondary palette (warm) --- */
+  --color-secondary: #825505;                 /* Burnt umber */
+  --color-secondary-container: #ffc16d;
+  --color-secondary-fixed: #ffddb5;
+  --color-secondary-fixed-dim: #f9bb68;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #784d00;
+  --color-on-secondary-fixed: #2a1800;
+  --color-on-secondary-fixed-variant: #643f00;
+
+  /* --- Tertiary palette (neutral) --- */
+  --color-tertiary: #242422;
+  --color-tertiary-container: #3a3a37;
+  --color-tertiary-fixed: #e5e2de;
+  --color-tertiary-fixed-dim: #c8c6c2;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #a5a3a0;
+  --color-on-tertiary-fixed: #1c1c1a;
+  --color-on-tertiary-fixed-variant: #474744;
+
+  /* --- Brand accent palette (the famous olive + ochre) --- */
+  --color-olive-light: #3c5447;              /* Mid olive */
+  --color-olive-dark: #1d2a23;               /* Deep olive */
+  --color-ochre-light: #eab875;              /* Warm tan */
+  --color-ochre-dark: #ce933f;               /* Burnt ochre */
+  --color-linen-dark: #efece6;               /* Cream linen */
+
+  /* --- Surface palette --- */
+  --color-background: #e8fff0;                /* Pale sage */
+  --color-surface: #e8fff0;
+  --color-surface-dim: #c9dfd1;
+  --color-surface-bright: #e8fff0;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #e3f9ea;
+  --color-surface-container: #ddf3e5;
+  --color-surface-container-high: #d7eedf;
+  --color-surface-container-highest: #d2e8d9;
+  --color-surface-variant: #d2e8d9;
+  --color-surface-tint: #4f6358;
+  --color-on-surface: #0c1f16;
+  --color-on-surface-variant: #424844;
+  --color-on-background: #0c1f16;
+  --color-inverse-surface: #22342b;
+  --color-inverse-on-surface: #e0f6e7;
+
+  /* --- Outline / borders --- */
+  --color-outline: #737874;
+  --color-outline-variant: #c2c8c2;
+  --color-grid-pattern: rgba(43, 62, 52, 0.1);
+
+  /* --- Glass / translucency --- */
+  --color-glass-light: rgba(255, 255, 255, 0.65);
+  --color-glass-dark: rgba(43, 62, 52, 0.85);
+
+  /* --- Status colors --- */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  /* --- Border radius (prototype scale) --- */
+  --radius-default: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* --- Spacing (prototype scale, 4px base) --- */
+  --spacing-base: 4px;
+  --spacing-gutter: 16px;
+  --spacing-card-padding: 20px;
+  --spacing-section-gap: 24px;
+  --spacing-header-height: 64px;
+  --spacing-container-padding-sm: 24px;
+  --spacing-container-padding-lg: 32px;
+
+  /* --- Typography (prototype scale) --- */
+  --font-body-md: "Inter", system-ui, sans-serif;
+  --font-label-ui: "Inter", system-ui, sans-serif;
+  --font-display: "Playfair Display", "Times New Roman", serif;
+  --font-display-mobile: "Playfair Display", "Times New Roman", serif;
+  --font-headline-sm: "Playfair Display", "Times New Roman", serif;
+  --font-headline-lg: "Playfair Display", "Times New Roman", serif;
+  --font-mono-micro: "JetBrains Mono", monospace;
+  --font-mono-technical: "JetBrains Mono", monospace;
+
+  /* --- Type scale --- */
+  --font-size-mono-micro: 10px;
+  --font-size-label-ui: 12px;
+  --font-size-body-md: 14px;
+  --font-size-mono-technical: 12px;
+  --font-size-headline-sm: 18px;
+  --font-size-headline-lg: 30px;
+  --font-size-display-mobile: 48px;
+  --font-size-display: 72px;
+
+  /* --- Motion (carry-over from Cinematic Concierge) --- */
+  --motion-duration-fast: 200ms;
+  --motion-duration-base: 400ms;
+  --motion-duration-slow: 800ms;
+  --motion-easing-cinematic: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-fast: 0ms;
+    --motion-duration-base: 0ms;
+    --motion-duration-slow: 0ms;
+  }
+}
+
+@media print {
+  * {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ----------------------------------------------------------------------
+ * Tailwind v4 @theme block — paste into packages/ui/src/styles.css after
+ * the :root declarations when applying. Each --color-* becomes a Tailwind
+ * utility (bg-olive-light, text-ochre-dark, border-olive-light, etc).
+ *
+ * --font-* utilities:
+ *   font-body-md, font-label-ui, font-display, font-display-mobile,
+ *   font-headline-sm, font-headline-lg, font-mono-micro, font-mono-technical
+ * ---------------------------------------------------------------------- */
+
+@theme inline {
+  /* Colors */
+  --color-primary: var(--color-primary);
+  --color-primary-container: var(--color-primary-container);
+  --color-primary-fixed: var(--color-primary-fixed);
+  --color-primary-fixed-dim: var(--color-primary-fixed-dim);
+  --color-on-primary: var(--color-on-primary);
+  --color-on-primary-container: var(--color-on-primary-container);
+  --color-on-primary-fixed: var(--color-on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--color-on-primary-fixed-variant);
+  --color-inverse-primary: var(--color-inverse-primary);
+
+  --color-secondary: var(--color-secondary);
+  --color-secondary-container: var(--color-secondary-container);
+  --color-secondary-fixed: var(--color-secondary-fixed);
+  --color-secondary-fixed-dim: var(--color-secondary-fixed-dim);
+  --color-on-secondary: var(--color-on-secondary);
+  --color-on-secondary-container: var(--color-on-secondary-container);
+  --color-on-secondary-fixed: var(--color-on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--color-on-secondary-fixed-variant);
+
+  --color-tertiary: var(--color-tertiary);
+  --color-tertiary-container: var(--color-tertiary-container);
+  --color-tertiary-fixed: var(--color-tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--color-tertiary-fixed-dim);
+  --color-on-tertiary: var(--color-on-tertiary);
+  --color-on-tertiary-container: var(--color-on-tertiary-container);
+  --color-on-tertiary-fixed: var(--color-on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--color-on-tertiary-fixed-variant);
+
+  --color-olive-light: var(--color-olive-light);
+  --color-olive-dark: var(--color-olive-dark);
+  --color-ochre-light: var(--color-ochre-light);
+  --color-ochre-dark: var(--color-ochre-dark);
+  --color-linen-dark: var(--color-linen-dark);
+
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-dim: var(--color-surface-dim);
+  --color-surface-bright: var(--color-surface-bright);
+  --color-surface-container-lowest: var(--color-surface-container-lowest);
+  --color-surface-container-low: var(--color-surface-container-low);
+  --color-surface-container: var(--color-surface-container);
+  --color-surface-container-high: var(--color-surface-container-high);
+  --color-surface-container-highest: var(--color-surface-container-highest);
+  --color-surface-variant: var(--color-surface-variant);
+  --color-surface-tint: var(--color-surface-tint);
+  --color-on-surface: var(--color-on-surface);
+  --color-on-surface-variant: var(--color-on-surface-variant);
+  --color-on-background: var(--color-on-background);
+  --color-inverse-surface: var(--color-inverse-surface);
+  --color-inverse-on-surface: var(--color-inverse-on-surface);
+
+  --color-outline: var(--color-outline);
+  --color-outline-variant: var(--color-outline-variant);
+  --color-grid-pattern: var(--color-grid-pattern);
+
+  --color-glass-light: var(--color-glass-light);
+  --color-glass-dark: var(--color-glass-dark);
+
+  --color-error: var(--color-error);
+  --color-error-container: var(--color-error-container);
+  --color-on-error: var(--color-on-error);
+  --color-on-error-container: var(--color-on-error-container);
+
+  /* Radii */
+  --radius: var(--radius-default);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* Spacing */
+  --spacing-base: var(--spacing-base);
+  --spacing-gutter: var(--spacing-gutter);
+  --spacing-card-padding: var(--spacing-card-padding);
+  --spacing-section-gap: var(--spacing-section-gap);
+  --spacing-header-height: var(--spacing-header-height);
+  --spacing-container-padding-sm: var(--spacing-container-padding-sm);
+  --spacing-container-padding-lg: var(--spacing-container-padding-lg);
+
+  /* Fonts */
+  --font-body-md: var(--font-body-md);
+  --font-label-ui: var(--font-label-ui);
+  --font-display: var(--font-display);
+  --font-display-mobile: var(--font-display-mobile);
+  --font-headline-sm: var(--font-headline-sm);
+  --font-headline-lg: var(--font-headline-lg);
+  --font-mono-micro: var(--font-mono-micro);
+  --font-mono-technical: var(--font-mono-technical);
+}
+
+/* ----------------------------------------------------------------------
+ * Body baseline (replace Cinematic Concierge radial gradients)
+ * ---------------------------------------------------------------------- */
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    font-family: var(--font-body-md), system-ui, sans-serif;
+  }
+}
+
+/* ----------------------------------------------------------------------
+ * Brand-specific component classes (matching prototype usage)
+ * ---------------------------------------------------------------------- */
+@layer components {
+  .glass-panel {
+    background: var(--color-glass-light);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+
+  .glass-panel-dark {
+    background: var(--color-glass-dark);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .nav-link {
+    font-family: var(--font-label-ui);
+    font-size: var(--font-size-label-ui);
+    color: var(--color-on-surface-variant);
+    transition: color 200ms ease;
+  }
+
+  .nav-link:hover {
+    color: var(--color-ochre-light);
+  }
+
+  .btn-primary {
+    background: var(--color-olive-light);
+    color: var(--color-on-primary);
+    font-family: var(--font-label-ui);
+    font-size: var(--font-size-label-ui);
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--radius-full);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: background 200ms ease;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-olive-dark);
+  }
+
+  .btn-ochre {
+    background: var(--color-ochre-light);
+    color: var(--color-primary);
+    font-family: var(--font-label-ui);
+    font-size: var(--font-size-label-ui);
+    padding: 1rem 2rem;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 12px rgba(206, 147, 63, 0.2);
+  }
+
+  .btn-ochre:hover {
+    box-shadow: 0 8px 24px rgba(206, 147, 63, 0.3);
+  }
+}
