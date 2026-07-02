@@ -254,7 +254,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
 
 ## TODOs
 
-- [ ] 1. Slice 3 Reverify on Clean :3010 Runtime
+- [x] 1. Slice 3 Reverify on Clean :3010 Runtime
 
   **What to do**:
   - Run the Standard QA Preamble to kill stale `:3008` / `:3010` and stale Playwright MCP locks.
@@ -322,10 +322,10 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
       1. browser_navigate("http://localhost:3010/trip/3/map") — wait for network idle.
       2. browser_snapshot — assert at least one link exists with href containing `/trip/3/map?day=1` and visible text matching /Day\s*1/.
       3. browser_evaluate("() => Array.from(document.querySelectorAll('a[href*=\"/trip/3/map?day=\"]')).map(a => a.textContent?.trim())") — assert array length ≥ 2.
-      4. browser_take_screenshot(filename=".sisyphus/evidence/task-1-map-desktop-d1-1440.png", fullPage=true).
+      4. browser_take_screenshot(filename=".sisyphus/evidence/future-roadmap/task-5-trip-3-map-desktop-1440.png", fullPage=true).
     Expected Result: Page loads HTTP 200; ≥2 day-switch links present; D1 link visible; screenshot saved.
     Failure Indicators: HTTP non-200, zero day links found, "RouteStopPointSchema" appearing in console, screenshot missing.
-    Evidence: .sisyphus/evidence/task-1-map-desktop-d1-1440.png
+    Evidence: .sisyphus/evidence/future-roadmap/task-5-trip-3-map-desktop-1440.png
 
   Scenario: Day-link switching D1→D2 preserves state
     Tool: Playwright
@@ -345,10 +345,10 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
     Steps:
       1. browser_navigate("http://localhost:3010/trip/3/map").
       2. browser_snapshot — assert no horizontal-scroll overflow (computed scrollWidth ≤ clientWidth + 1px).
-      3. browser_take_screenshot(filename=".sisyphus/evidence/task-1-map-mobile-d1-375.png", fullPage=true).
+      3. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/trip-3-map-375.png", fullPage=true).
     Expected Result: Page renders without horizontal overflow; screenshot saved at 375px width.
     Failure Indicators: Horizontal scrollbar present, layout broken, content cut off.
-    Evidence: .sisyphus/evidence/task-1-map-mobile-d1-375.png
+    Evidence: .sisyphus/evidence/final-qa/trip-3-map-375.png
 
   Scenario: Partner CTA uses GET redirect + persists click
     Tool: Playwright + Bash (curl)
@@ -373,9 +373,9 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   ```
 
   **Evidence to Capture**:
-  - [ ] `.sisyphus/evidence/task-1-map-desktop-d1-1440.png`
+  - [ ] `.sisyphus/evidence/future-roadmap/task-5-trip-3-map-desktop-1440.png`
   - [ ] `.sisyphus/evidence/task-1-map-desktop-d2-1440.png`
-  - [ ] `.sisyphus/evidence/task-1-map-mobile-d1-375.png`
+  - [ ] `.sisyphus/evidence/final-qa/trip-3-map-375.png`
   - [ ] `.sisyphus/evidence/task-1-partner-cta-redirect.txt`
   - [ ] `.sisyphus/evidence/task-1-runtime-log.txt`
   - [ ] `.sisyphus/evidence/task-1-analytics-pre.txt` + `task-1-analytics-post.txt` (diff empty)
@@ -385,7 +385,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `packages/routing/src/<file>` (only on fix path)
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 2. Slice 4 Kickoff — Stitch Pull + Trip-Card Primitive Extraction
+- [x] 2. Slice 4 Kickoff — Stitch Pull + Trip-Card Primitive Extraction
 
   **What to do**:
   - Re-pull live Stitch screen JSON via `stitch_get_screen("aa02ed35f5e04ac6a84090981af31168")` and save to `.sisyphus/evidence/task-2-stitch-export-screen.json`. Capture composition: header, two-column grid (export options left / share + access right), included-in-PDF tile list.
@@ -494,7 +494,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `packages/ui/src/components/trip-card.tsx`, `packages/ui/src/index.ts`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 3. Slice 4 Redesign — `/trip/[tripId]/export`
+- [x] 3. Slice 4 Redesign — `/trip/[tripId]/export`
 
   **What to do**:
   - Re-pull `stitch_get_screen("aa02ed35f5e04ac6a84090981af31168")`; save to `.sisyphus/evidence/task-3-stitch-export-screen.json`.
@@ -700,7 +700,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/app/(app)/trip/[tripId]/export/page.tsx` only (verified by `git diff --name-only`).
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 4. Slice 4 Verification + Roadmap Status Update
+- [x] 4. Slice 4 Verification + Roadmap Status Update
 
   **What to do**:
   - Run Standard QA Preamble.
@@ -787,7 +787,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `docs/roadmap.md`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 5. Slice 5 Kickoff — Stitch Pull + Archive-Layout Primitive Extraction + Auth Fixture Prep
+- [x] 5. Slice 5 Kickoff — Stitch Pull + Archive-Layout Primitive Extraction + Auth Fixture Prep
 
   **What to do**:
   - Re-pull live Stitch screen JSON via `stitch_get_screen("3e9c2db666c04499a47e1083872e92ed")` and save to `.sisyphus/evidence/task-5-stitch-archive-screen.json`. Capture composition: header, card grid, filter chips, tile list.
@@ -862,7 +862,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `packages/ui/src/components/archive-layout.tsx`, `packages/ui/src/index.ts`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 6. Slice 5 Sub-page — `/account`
+- [x] 6. Slice 5 Sub-page — `/account`
 
   **What to do**:
   - Re-pull Stitch screen JSON; save to `.sisyphus/evidence/task-6-stitch-account-screen.json`.
@@ -998,7 +998,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/app/(app)/account/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 7. Slice 5 Sub-page — `/portugal`
+- [x] 7. Slice 5 Sub-page — `/portugal`
 
   **What to do**:
   - Re-pull Stitch screen JSON; save to `.sisyphus/evidence/task-7-stitch-portugal-screen.json`.
@@ -1115,7 +1115,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/app/(marketing)/portugal/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 8. Slice 5 Verification + Roadmap Status Update
+- [x] 8. Slice 5 Verification + Roadmap Status Update
 
   **What to do**:
   - Run Standard QA Preamble.
@@ -1197,7 +1197,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `docs/roadmap.md`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 9. Slice 6 Kickoff — Stitch Pull + Reviewer Auth Fixture + Shared Table Primitive
+- [x] 9. Slice 6 Kickoff — Stitch Pull + Reviewer Auth Fixture + Shared Table Primitive
 
   **What to do**:
   - Re-pull live Stitch screen JSON via `stitch_get_screen("d004025471a64b3e99f2d89f7aa81fc1")` and save to `.sisyphus/evidence/task-9-stitch-reviewer-screen.json`.
@@ -1271,7 +1271,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `packages/ui/src/components/data-table-shell.tsx` (if extracted), `packages/ui/src/index.ts` (if changed), `apps/web/playwright/fixtures/reviewer-auth.ts`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 10. Slice 6 Sub-page — `/reviewer/queue`
+- [x] 10. Slice 6 Sub-page — `/reviewer/queue`
 
   **What to do**:
   - Re-pull Stitch screen JSON; save to `.sisyphus/evidence/task-10-stitch-queue-screen.json`.
@@ -1364,7 +1364,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/app/(reviewer)/reviewer/queue/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 11. Slice 6 Sub-page — `/reviewer/trips/[tripId]`
+- [x] 11. Slice 6 Sub-page — `/reviewer/trips/[tripId]`
 
   **What to do**:
   - Re-pull Stitch screen JSON; save to `.sisyphus/evidence/task-11-stitch-reviewer-trip-screen.json`.
@@ -1462,7 +1462,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/app/(reviewer)/reviewer/trips/[tripId]/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 12. Slice 6 Sub-page — `/reviewer/history`
+- [x] 12. Slice 6 Sub-page — `/reviewer/history`
 
   **What to do**:
   - Re-pull Stitch screen JSON; save to `.sisyphus/evidence/task-12-stitch-history-screen.json`.
@@ -1550,7 +1550,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/app/(reviewer)/reviewer/history/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 13. Slice 6 Sub-page — `/reviewer/profile`
+- [x] 13. Slice 6 Sub-page — `/reviewer/profile`
 
   **What to do**:
   - Re-pull Stitch screen JSON; save to `.sisyphus/evidence/task-13-stitch-profile-screen.json`.
@@ -1636,7 +1636,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/app/(reviewer)/reviewer/profile/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 14. Slice 6 Sub-page — `/reviewer/operations`
+- [x] 14. Slice 6 Sub-page — `/reviewer/operations`
 
   **What to do**:
   - Re-pull Stitch screen JSON; save to `.sisyphus/evidence/task-14-stitch-operations-screen.json`.
@@ -1725,7 +1725,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/app/(reviewer)/reviewer/operations/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 15. Slice 6 Verification + Roadmap Status Update
+- [x] 15. Slice 6 Verification + Roadmap Status Update
 
   **What to do**:
   - Run Standard QA Preamble.
@@ -1772,9 +1772,9 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
       3. browser_evaluate("() => location.pathname") — assert matches /^\/reviewer\/trips\/\d+$/.
       4. browser_navigate("http://localhost:3010/reviewer/queue").
       5. browser_evaluate("() => location.pathname") — assert "/reviewer/queue".
-      6. browser_take_screenshot(filename=".sisyphus/evidence/task-15-nav-loop.png").
+      6. browser_take_screenshot(filename=".sisyphus/evidence/task-15-queue-desktop-1440.png").
     Expected Result: Both transitions succeed.
-    Evidence: .sisyphus/evidence/task-15-nav-loop.png
+    Evidence: .sisyphus/evidence/task-15-queue-desktop-1440.png
 
   Scenario: Roadmap update committed
     Tool: Bash
@@ -1788,7 +1788,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   ```
 
   **Evidence to Capture**:
-  - [ ] `.sisyphus/evidence/task-15-nav-loop.png`
+  - [ ] `.sisyphus/evidence/task-15-queue-desktop-1440.png`
   - [ ] `.sisyphus/evidence/task-15-roadmap-commit.txt`
 
   **Commit**: YES
@@ -1796,7 +1796,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `docs/roadmap.md`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 16. Slice 7 Kickoff — Stitch Snapshot + Admin Auth Fixture + Admin Pattern Inventory
+- [x] 16. Slice 7 Kickoff — Stitch Snapshot + Admin Auth Fixture + Admin Pattern Inventory
 
   **What to do**:
   - Re-pull the relevant Stitch screens for admin alignment and save a combined note to `.sisyphus/evidence/task-16-stitch-admin-screens.md` referencing the archive/reviewer compositions already in use plus any admin-target screens from the project.
@@ -1874,7 +1874,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/playwright/fixtures/admin-auth.ts`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 17. Slice 7 Sub-page — `/admin/places`
+- [x] 17. Slice 7 Sub-page — `/admin/places`
 
   **What to do**:
   - Redesign `apps/web/app/(admin)/admin/places/page.tsx` and `apps/web/app/(admin)/admin/places/place-editor.tsx` to match Stitch/admin composition while preserving all current behavior.
@@ -1973,7 +1973,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   - Files: `apps/web/app/(admin)/admin/places/page.tsx`, `apps/web/app/(admin)/admin/places/place-editor.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 18. Slice 7 Sub-page — `/admin/countries`
+- [x] 18. Slice 7 Sub-page — `/admin/countries`
 
   **What to do**:
   - Redesign `apps/web/app/(admin)/admin/countries/page.tsx`.
@@ -2026,9 +2026,9 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
     Steps:
       1. browser_navigate("http://localhost:3010/admin/countries").
       2. Assert `data-testid="admin-countries-header"` present.
-      3. browser_take_screenshot(filename=".sisyphus/evidence/task-18-countries-desktop-1440.png", fullPage=true).
+      3. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-countries-1440.png", fullPage=true).
     Expected Result: Page renders and table visible.
-    Evidence: .sisyphus/evidence/task-18-countries-desktop-1440.png
+    Evidence: .sisyphus/evidence/final-qa/admin-countries-1440.png
 
   Scenario: Countries page renders on mobile
     Tool: Playwright
@@ -2036,22 +2036,22 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
       1. browser_resize(375, 812).
       2. browser_navigate("http://localhost:3010/admin/countries").
       3. browser_evaluate("() => document.documentElement.scrollWidth <= window.innerWidth + 1") — assert true.
-      4. browser_take_screenshot(filename=".sisyphus/evidence/task-18-countries-mobile-375.png", fullPage=true).
+      4. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-countries-375.png", fullPage=true).
     Expected Result: No horizontal overflow.
-    Evidence: .sisyphus/evidence/task-18-countries-mobile-375.png
+    Evidence: .sisyphus/evidence/final-qa/admin-countries-375.png
   ```
 
   **Evidence to Capture**:
   - [ ] `.sisyphus/evidence/task-18-analytics-pre.txt` + `task-18-analytics-post.txt`
-  - [ ] `.sisyphus/evidence/task-18-countries-desktop-1440.png`
-  - [ ] `.sisyphus/evidence/task-18-countries-mobile-375.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-countries-1440.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-countries-375.png`
 
   **Commit**: YES
   - Message: `feat(admin): redesign /admin/countries`
   - Files: `apps/web/app/(admin)/admin/countries/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 19. Slice 7 Sub-page — `/admin/regions`
+- [x] 19. Slice 7 Sub-page — `/admin/regions`
 
   **What to do**:
   - Redesign `apps/web/app/(admin)/admin/regions/page.tsx`.
@@ -2101,9 +2101,9 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
     Steps:
       1. browser_navigate("http://localhost:3010/admin/regions").
       2. Assert `data-testid="admin-regions-header"` present.
-      3. browser_take_screenshot(filename=".sisyphus/evidence/task-19-regions-desktop-1440.png", fullPage=true).
+      3. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-regions-1440.png", fullPage=true).
     Expected Result: Page renders.
-    Evidence: .sisyphus/evidence/task-19-regions-desktop-1440.png
+    Evidence: .sisyphus/evidence/final-qa/admin-regions-1440.png
 
   Scenario: Regions page renders on mobile
     Tool: Playwright
@@ -2111,22 +2111,22 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
       1. browser_resize(375, 812).
       2. browser_navigate("http://localhost:3010/admin/regions").
       3. browser_evaluate("() => document.documentElement.scrollWidth <= window.innerWidth + 1") — assert true.
-      4. browser_take_screenshot(filename=".sisyphus/evidence/task-19-regions-mobile-375.png", fullPage=true).
+      4. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-regions-375.png", fullPage=true).
     Expected Result: No horizontal overflow.
-    Evidence: .sisyphus/evidence/task-19-regions-mobile-375.png
+    Evidence: .sisyphus/evidence/final-qa/admin-regions-375.png
   ```
 
   **Evidence to Capture**:
   - [ ] `.sisyphus/evidence/task-19-analytics-pre.txt` + `task-19-analytics-post.txt`
-  - [ ] `.sisyphus/evidence/task-19-regions-desktop-1440.png`
-  - [ ] `.sisyphus/evidence/task-19-regions-mobile-375.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-regions-1440.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-regions-375.png`
 
   **Commit**: YES
   - Message: `feat(admin): redesign /admin/regions`
   - Files: `apps/web/app/(admin)/admin/regions/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 20. Slice 7 Sub-page — `/admin/partners`
+- [x] 20. Slice 7 Sub-page — `/admin/partners`
 
   **What to do**:
   - Redesign `apps/web/app/(admin)/admin/partners/page.tsx`.
@@ -2185,22 +2185,22 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
       1. browser_resize(375, 812).
       2. browser_navigate("http://localhost:3010/admin/partners").
       3. browser_evaluate("() => document.documentElement.scrollWidth <= window.innerWidth + 1") — assert true.
-      4. browser_take_screenshot(filename=".sisyphus/evidence/task-20-partners-mobile-375.png", fullPage=true).
+      4. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-partners-375.png", fullPage=true).
     Expected Result: No horizontal overflow.
-    Evidence: .sisyphus/evidence/task-20-partners-mobile-375.png
+    Evidence: .sisyphus/evidence/final-qa/admin-partners-375.png
   ```
 
   **Evidence to Capture**:
   - [ ] `.sisyphus/evidence/task-20-analytics-pre.txt` + `task-20-analytics-post.txt`
   - [ ] `.sisyphus/evidence/task-20-partners-desktop-1440.png`
-  - [ ] `.sisyphus/evidence/task-20-partners-mobile-375.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-partners-375.png`
 
   **Commit**: YES
   - Message: `feat(admin): redesign /admin/partners`
   - Files: `apps/web/app/(admin)/admin/partners/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 21. Slice 7 Sub-page — `/admin/reviewers`
+- [x] 21. Slice 7 Sub-page — `/admin/reviewers`
 
   **What to do**:
   - Redesign `apps/web/app/(admin)/admin/reviewers/page.tsx`.
@@ -2249,9 +2249,9 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
     Steps:
       1. browser_navigate("http://localhost:3010/admin/reviewers").
       2. Assert `data-testid="admin-reviewers-header"` present.
-      3. browser_take_screenshot(filename=".sisyphus/evidence/task-21-reviewers-desktop-1440.png", fullPage=true).
+      3. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-reviewers-1440.png", fullPage=true).
     Expected Result: Page renders.
-    Evidence: .sisyphus/evidence/task-21-reviewers-desktop-1440.png
+    Evidence: .sisyphus/evidence/final-qa/admin-reviewers-1440.png
 
   Scenario: Reviewers page renders on mobile
     Tool: Playwright
@@ -2259,22 +2259,22 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
       1. browser_resize(375, 812).
       2. browser_navigate("http://localhost:3010/admin/reviewers").
       3. browser_evaluate("() => document.documentElement.scrollWidth <= window.innerWidth + 1") — assert true.
-      4. browser_take_screenshot(filename=".sisyphus/evidence/task-21-reviewers-mobile-375.png", fullPage=true).
+      4. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-reviewers-375.png", fullPage=true).
     Expected Result: No horizontal overflow.
-    Evidence: .sisyphus/evidence/task-21-reviewers-mobile-375.png
+    Evidence: .sisyphus/evidence/final-qa/admin-reviewers-375.png
   ```
 
   **Evidence to Capture**:
   - [ ] `.sisyphus/evidence/task-21-analytics-pre.txt` + `task-21-analytics-post.txt`
-  - [ ] `.sisyphus/evidence/task-21-reviewers-desktop-1440.png`
-  - [ ] `.sisyphus/evidence/task-21-reviewers-mobile-375.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-reviewers-1440.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-reviewers-375.png`
 
   **Commit**: YES
   - Message: `feat(admin): redesign /admin/reviewers`
   - Files: `apps/web/app/(admin)/admin/reviewers/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 22. Slice 7 Sub-page — `/admin/quality`
+- [x] 22. Slice 7 Sub-page — `/admin/quality`
 
   **What to do**:
   - Redesign `apps/web/app/(admin)/admin/quality/page.tsx`.
@@ -2323,9 +2323,9 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
     Steps:
       1. browser_navigate("http://localhost:3010/admin/quality").
       2. Assert `data-testid="admin-quality-header"` present.
-      3. browser_take_screenshot(filename=".sisyphus/evidence/task-22-quality-desktop-1440.png", fullPage=true).
+      3. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-quality-1440.png", fullPage=true).
     Expected Result: Page renders.
-    Evidence: .sisyphus/evidence/task-22-quality-desktop-1440.png
+    Evidence: .sisyphus/evidence/final-qa/admin-quality-1440.png
 
   Scenario: Quality page renders on mobile
     Tool: Playwright
@@ -2333,22 +2333,22 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
       1. browser_resize(375, 812).
       2. browser_navigate("http://localhost:3010/admin/quality").
       3. browser_evaluate("() => document.documentElement.scrollWidth <= window.innerWidth + 1") — assert true.
-      4. browser_take_screenshot(filename=".sisyphus/evidence/task-22-quality-mobile-375.png", fullPage=true).
+      4. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-quality-375.png", fullPage=true).
     Expected Result: No horizontal overflow.
-    Evidence: .sisyphus/evidence/task-22-quality-mobile-375.png
+    Evidence: .sisyphus/evidence/final-qa/admin-quality-375.png
   ```
 
   **Evidence to Capture**:
   - [ ] `.sisyphus/evidence/task-22-analytics-pre.txt` + `task-22-analytics-post.txt`
-  - [ ] `.sisyphus/evidence/task-22-quality-desktop-1440.png`
-  - [ ] `.sisyphus/evidence/task-22-quality-mobile-375.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-quality-1440.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-quality-375.png`
 
   **Commit**: YES
   - Message: `feat(admin): redesign /admin/quality`
   - Files: `apps/web/app/(admin)/admin/quality/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 23. Slice 7 Sub-page — `/admin/analytics`
+- [x] 23. Slice 7 Sub-page — `/admin/analytics`
 
   **What to do**:
   - Redesign `apps/web/app/(admin)/admin/analytics/page.tsx`.
@@ -2397,9 +2397,9 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
     Steps:
       1. browser_navigate("http://localhost:3010/admin/analytics").
       2. Assert `data-testid="admin-analytics-header"` present.
-      3. browser_take_screenshot(filename=".sisyphus/evidence/task-23-analytics-desktop-1440.png", fullPage=true).
+      3. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-analytics-1440.png", fullPage=true).
     Expected Result: Page renders.
-    Evidence: .sisyphus/evidence/task-23-analytics-desktop-1440.png
+    Evidence: .sisyphus/evidence/final-qa/admin-analytics-1440.png
 
   Scenario: Analytics page renders on mobile
     Tool: Playwright
@@ -2407,22 +2407,22 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
       1. browser_resize(375, 812).
       2. browser_navigate("http://localhost:3010/admin/analytics").
       3. browser_evaluate("() => document.documentElement.scrollWidth <= window.innerWidth + 1") — assert true.
-      4. browser_take_screenshot(filename=".sisyphus/evidence/task-23-analytics-mobile-375.png", fullPage=true).
+      4. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-analytics-375.png", fullPage=true).
     Expected Result: No horizontal overflow.
-    Evidence: .sisyphus/evidence/task-23-analytics-mobile-375.png
+    Evidence: .sisyphus/evidence/final-qa/admin-analytics-375.png
   ```
 
   **Evidence to Capture**:
   - [ ] `.sisyphus/evidence/task-23-analytics-pre.txt` + `task-23-analytics-post.txt`
-  - [ ] `.sisyphus/evidence/task-23-analytics-desktop-1440.png`
-  - [ ] `.sisyphus/evidence/task-23-analytics-mobile-375.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-analytics-1440.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-analytics-375.png`
 
   **Commit**: YES
   - Message: `feat(admin): redesign /admin/analytics`
   - Files: `apps/web/app/(admin)/admin/analytics/page.tsx`
   - Pre-commit: `cd /Users/cheng/rota && pnpm exec tsc --noEmit && pnpm build`
 
-- [ ] 24. Slice 7 Verification + Roadmap Status Update
+- [x] 24. Slice 7 Verification + Roadmap Status Update
 
   **What to do**:
   - Run Standard QA Preamble.
@@ -2461,9 +2461,9 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
       2. Assert `location.pathname === "/admin/places"`.
       3. browser_navigate("http://localhost:3010/admin/analytics").
       4. Assert `location.pathname === "/admin/analytics"`.
-      5. browser_take_screenshot(filename=".sisyphus/evidence/task-24-admin-reachability.png").
+      5. browser_take_screenshot(filename=".sisyphus/evidence/final-qa/admin-analytics-1440.png").
     Expected Result: Both pages reachable; no redirect loop or 500.
-    Evidence: .sisyphus/evidence/task-24-admin-reachability.png
+    Evidence: .sisyphus/evidence/final-qa/admin-analytics-1440.png
 
   Scenario: Roadmap update committed
     Tool: Bash
@@ -2477,7 +2477,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   ```
 
   **Evidence to Capture**:
-  - [ ] `.sisyphus/evidence/task-24-admin-reachability.png`
+  - [ ] `.sisyphus/evidence/final-qa/admin-analytics-1440.png`
   - [ ] `.sisyphus/evidence/task-24-roadmap-commit.txt`
 
   **Commit**: YES
@@ -2493,7 +2493,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
 
 > 4 review agents run in PARALLEL. ALL must APPROVE. Then U1 user-okay gate.
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
 
   Read this plan end-to-end. For each "Must Have" item: verify implementation exists by reading the named file, running the named curl, or running the named command. For each "Must NOT Have" guardrail: search the codebase for forbidden patterns and reject with `file:line` if found. Verify every evidence file declared in T1–T24 exists under `.sisyphus/evidence/`. Compare deliverables list against actual files in repo.
 
@@ -2508,7 +2508,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   **Blocked By**: T24 (S7 Verification).
   **Parallel With**: F2, F3, F4.
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
 
   Run full quality gate. Review every changed file across T1–T24 for code-quality issues and AI-slop patterns.
 
@@ -2534,7 +2534,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   **Blocked By**: T24.
   **Parallel With**: F1, F3, F4.
 
-- [ ] F3. **Real Manual QA** — `unspecified-high` + `playwright` skill
+- [x] F3. **Real Manual QA** — `unspecified-high` + `playwright` skill
 
   Start from clean state via Standard QA Preamble. Execute EVERY QA scenario from EVERY task T1–T24 — follow exact steps, capture fresh evidence to `.sisyphus/evidence/final-qa/task-{N}-{scenario-slug}-{viewport}.{ext}`. Test cross-task integration:
   - Trip overview → export → back to overview (Slice 2 + 4).
@@ -2554,7 +2554,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   **Blocked By**: T24.
   **Parallel With**: F1, F2, F4.
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
 
   For each task T1–T24: read the task's "What to do" + "Must NOT do" sections, then read the actual diff from git. Verify 1:1 — everything in the spec was built, nothing beyond the spec was built.
 
@@ -2572,7 +2572,7 @@ Wave 15: U1 — User Okay Gate (literal APPROVED token)                  [1 task
   **Blocked By**: T24.
   **Parallel With**: F1, F2, F3.
 
-- [ ] U1. **User Okay Gate (literal token)**
+- [x] U1. **User Okay Gate (literal token)**
 
   After F1–F4 all return APPROVE, the executor MUST:
   1. Auto-generate `.sisyphus/evidence/FINAL_SUMMARY.md` containing:

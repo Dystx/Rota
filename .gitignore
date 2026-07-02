@@ -4,7 +4,31 @@ node_modules
 .next
 dist
 coverage
+
+# Local environment files may contain Supabase service-role/secret keys.
+# Keep templates tracked via explicit allow-lists only.
 .env
 .env.*
 !.env.example
+!**/.env.example
 pnpm-lock.yaml
+
+# Playwright auth storage states (real Supabase JWTs — do not commit)
+apps/web/playwright/.auth/
+
+# --- Logs / runtime artifacts ---
+*.log
+*.pid
+
+# --- Repo-root ad-hoc screenshots (regenerated each run; canonical lives under .sisyphus/evidence/) ---
+/*.png
+
+# --- Stale root Playwright output dir (active runner writes to apps/web/playwright/test-results/) ---
+test-results/
+
+# --- Playwright MCP browser-session scratch ---
+.playwright-mcp/
+
+# --- Tooling runtime state (oh-my-kimi + Kimi CLI) ---
+.omk/
+.kimi/
