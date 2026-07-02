@@ -219,6 +219,16 @@
   --radius-olive-default: var(--radius-olive-default);
   --radius-olive-lg: var(--radius-olive-lg);
   --radius-olive-xl: var(--radius-olive-xl);
+
+  /* Font sizes (prototype uses text-display, text-headline-lg, etc.) */
+  --text-mono-micro: 10px;
+  --text-label-ui: 12px;
+  --text-body-md: 14px;
+  --text-mono-technical: 12px;
+  --text-headline-sm: 18px;
+  --text-headline-lg: 30px;
+  --text-display-mobile: 48px;
+  --text-display: 72px;
 }
 
 @layer base {
