@@ -122,6 +122,52 @@
   --color-status-neutral-bg: var(--color-status-neutral-bg);
   --color-status-neutral-border: var(--color-status-neutral-border);
   --color-status-neutral-dot: var(--color-status-neutral-dot);
+
+  /* ----------------------------------------------------------------------
+   * OLIVE + OCHRE PALETTE (Rumia v4 visual identity)
+   * Source: docs/prototype.html (single-file React SPA, 2026-07)
+   * Reference: docs/design-tokens-olive-ochre.css (full @theme block)
+   *
+   * Additive to Cinematic Concierge tokens above. Co-exists so existing
+   * pages still render; new pages opt-in via Tailwind utilities like
+   * `bg-olive-light`, `text-ochre-dark`, etc.
+   * ---------------------------------------------------------------------- */
+
+  --color-primary: #16281f;
+  --color-primary-container: #2b3e34;
+  --color-olive-light: #3c5447;
+  --color-olive-dark: #1d2a23;
+  --color-ochre-light: #eab875;
+  --color-ochre-dark: #ce933f;
+  --color-linen-dark: #efece6;
+  --color-background-olive: #e8fff0;
+  --color-on-primary: #ffffff;
+  --color-on-surface-olive: #0c1f16;
+  --color-on-surface-olive-variant: #424844;
+  --color-glass-light: rgba(255, 255, 255, 0.65);
+  --color-glass-dark: rgba(43, 62, 52, 0.85);
+
+  /* Olive + Ochre typography (Playfair Display + Inter + JetBrains Mono) */
+  --font-body-md: "Inter", system-ui, sans-serif;
+  --font-label-ui: "Inter", system-ui, sans-serif;
+  --font-display: "Playfair Display", "Times New Roman", serif;
+  --font-display-mobile: "Playfair Display", "Times New Roman", serif;
+  --font-headline-sm: "Playfair Display", "Times New Roman", serif;
+  --font-headline-lg: "Playfair Display", "Times New Roman", serif;
+  --font-mono-micro: "JetBrains Mono", monospace;
+  --font-mono-technical: "JetBrains Mono", monospace;
+
+  /* Olive + Ochre spacing (4px base; prototype's spacing scale) */
+  --spacing-base: 4px;
+  --spacing-gutter-olive: 16px;
+  --spacing-card-padding: 20px;
+  --spacing-section-gap: 24px;
+  --spacing-header-height: 64px;
+
+  /* Olive + Ochre radii (prototype's scale) */
+  --radius-olive-default: 0.25rem;
+  --radius-olive-lg: 0.5rem;
+  --radius-olive-xl: 0.75rem;
   --color-skeleton: var(--color-skeleton);
   --color-row-hover: var(--color-row-hover);
   --color-surface-translucent: var(--color-surface-translucent);
