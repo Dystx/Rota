@@ -4,6 +4,7 @@ import "@repo/ui/styles.css";
 import "./globals.css";
 import { WebVitalsReporter } from "./web-vitals-reporter";
 import { MotionProvider } from "@repo/ui";
+import { RegisterServiceWorker } from "./_components/register-sw";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -74,6 +75,16 @@ export default function RootLayout({
       className={`light ${inter.variable} ${playfair.variable} ${jetbrains.variable} relative`}
     >
       <head>
+        {/* PWA: manifest + theme color. The manifest is harmless to
+         * always link — the SW itself is feature-flagged via
+         * NEXT_PUBLIC_PWA_ENABLED. */}
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#18181B" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
         {/* Material Symbols Outlined — icon font used by the prototype */}
         <link
           rel="preconnect"
@@ -97,6 +108,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <WebVitalsReporter />
+        <RegisterServiceWorker />
         <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
