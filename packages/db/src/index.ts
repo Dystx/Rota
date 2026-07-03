@@ -328,3 +328,11 @@ export async function listTripDrafts(limit = 12, options?: DataClientOptions): P
       visibility
     }));
 }
+
+export {
+  SpecialistProfileInputSchema,
+  getSpecialistProfileByUserId,
+  upsertSpecialistProfile,
+  type SpecialistProfile,
+  type SpecialistProfileInput
+} from "./specialists";
