@@ -1,77 +1,82 @@
 @import "tailwindcss";
 
+/* ==============================================================================
+ * Rumia v4 design tokens — 100% parity with docs/prototype.html tailwind.config
+ *
+ * Source: docs/prototype.html (single-file React SPA, 2026-07)
+ * Spec:   docs/spec-v4.md §6
+ *
+ * The :root block defines the CSS variables that .rota-* component classes
+ * (kept for the Cinematic Concierge pages) reference. The @theme block
+ * declares the same tokens in Tailwind v4 format so utility classes
+ * (bg-olive-light, text-ochre-dark, font-display, text-display, h-header-height,
+ * p-section-gap, etc.) are auto-generated.
+ *
+ * Tailwind v4 @theme behavior: declarations create BOTH the CSS variable
+ * (in :root) AND the utility classes. No `inline` keyword — the previous
+ * `@theme inline` approach inlined values into utilities but did NOT
+ * create the CSS variables, which broke .rota-* classes that reference
+ * them via var(--color-X). The proper pattern is plain `@theme`.
+ * ============================================================================== */
+
 :root {
-  /* ----------------------------------------------------------------------
-   * Color tokens — re-pointed to the Rumia v4 olive/ochre palette
-   * (docs/spec-v4.md §6, docs/prototype.html). Variable names preserved
-   * for backward compat with the .rota-* component classes and any
-   * page-level Tailwind utilities that reference them.
-   *
-   * Migration source values (Cinematic Concierge) are kept as comments
-   * for reference; the active hex values are now the v4 palette.
-   * ---------------------------------------------------------------------- */
-
-  /* Cinematic Concierge (legacy)             v4 olive/ochre (active) */
-  --color-paper: #e8fff0;  /* was #fdfbf7 */     /* --color-background-olive */
-  --color-cream: #efece6;  /* was #f4efe6 */     /* --color-linen-dark      */
-  --color-ink: #16281f;    /* was #1a1c20 */     /* --color-primary          */
-  --color-ink-soft: #2b3e34; /* was #2d3131 */    /* --color-primary-container */
-  --color-atlantic: #ce933f; /* was #1f3b4d */    /* --color-ochre-dark      */
-  --color-aqua: #eab875;    /* was #7fb2c4 */     /* --color-ochre-light     */
-
+  /* Cinematic Concierge legacy variables — kept so .rota-* component classes
+     (referenced by existing pages) continue to resolve. v4 values now active
+     (re-pointed in commit 66fc9cc) */
+  --color-paper: #e8fff0;             /* --color-background-olive */
+  --color-cream: #efece6;             /* --color-linen-dark */
+  --color-ink: #16281f;               /* --color-primary */
+  --color-ink-soft: #2b3e34;          /* --color-primary-container */
+  --color-atlantic: #ce933f;          /* --color-ochre-dark */
+  --color-aqua: #eab875;              /* --color-ochre-light */
   --color-background: var(--color-paper);
   --color-surface: rgba(255, 255, 255, 0.86);
   --color-surface-muted: var(--color-cream);
   --color-foreground: var(--color-ink);
-  --color-muted-foreground: #4a5a4e;  /* mid-olive; was #5c6266 */
-  --color-border: #d8dcd8;             /* was #e2dfd8 */
+  --color-muted-foreground: #4a5a4e;
+  --color-border: #d8dcd8;
   --color-accent: var(--color-aqua);
   --color-secondary: var(--color-atlantic);
 
+  /* Status colors (kept; used by .rota-* and table components) */
   --color-status-info-fg: var(--color-secondary);
-  --color-status-info-bg: rgba(206, 147, 63, 0.14);    /* ochre-dark @ 14% */
-  --color-status-info-border: rgba(206, 147, 63, 0.4);  /* ochre-dark @ 40% */
+  --color-status-info-bg: rgba(206, 147, 63, 0.14);
+  --color-status-info-border: rgba(206, 147, 63, 0.4);
   --color-status-info-dot: var(--color-accent);
-
   --color-status-success-fg: #2f5b40;
   --color-status-success-bg: rgba(75, 128, 93, 0.12);
   --color-status-success-border: rgba(75, 128, 93, 0.35);
   --color-status-success-dot: #4b805d;
-
   --color-status-warning-fg: #7a4f15;
   --color-status-warning-bg: rgba(193, 138, 55, 0.14);
   --color-status-warning-border: rgba(193, 138, 55, 0.4);
   --color-status-warning-dot: #c18a37;
-
   --color-status-danger-fg: #7a2a2a;
   --color-status-danger-bg: rgba(168, 73, 73, 0.12);
   --color-status-danger-border: rgba(168, 73, 73, 0.4);
   --color-status-danger-dot: #a84949;
-
   --color-status-neutral-fg: var(--color-foreground);
   --color-status-neutral-bg: rgba(255, 255, 255, 0.6);
   --color-status-neutral-border: var(--color-border);
   --color-status-neutral-dot: var(--color-muted-foreground);
-
-  --color-skeleton: rgba(127, 178, 196, 0.18);
-  --color-row-hover: rgba(127, 178, 196, 0.06);
+  --color-skeleton: rgba(206, 147, 63, 0.12);
+  --color-row-hover: rgba(206, 147, 63, 0.04);
   --color-surface-translucent: rgba(255, 255, 255, 0.7);
   --color-surface-translucent-strong: rgba(255, 255, 255, 0.6);
+  --shadow-stat-card: 0 8px 32px rgba(22, 40, 31, 0.04);
 
-  --shadow-stat-card: 0 8px 32px rgba(24, 28, 28, 0.04);
-
-  /* Spacing Rhythm */
+  /* Spacing rhythm */
   --spacing-section: 120px;
   --spacing-gutter: max(5vw, 2rem);
-  
-  /* Radius & Borders */
+
+  /* Radius */
   --radius-soft: 12px;
   --radius-glass: 20px;
   --border-delicate: 1px solid var(--color-border);
-  
+
   /* Shadows */
-  --shadow-glass: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 8px 32px rgba(26, 28, 32, 0.06);
-  --shadow-elevated: 0 12px 48px rgba(31, 59, 77, 0.08);
+  --shadow-glass: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 8px 32px rgba(22, 40, 31, 0.06);
+  --shadow-elevated: 0 12px 48px rgba(22, 40, 31, 0.08);
 
   /* Motion */
   --motion-duration-fast: 200ms;
@@ -95,151 +100,142 @@
   }
 }
 
-@theme inline {
-  --font-body: var(--font-rota-body);
-  --font-display: var(--font-rota-display);
-  --color-paper: var(--color-paper);
-  --color-cream: var(--color-cream);
-  --color-ink: var(--color-ink);
-  --color-atlantic: var(--color-atlantic);
-  --color-aqua: var(--color-aqua);
-  --color-background: var(--color-background);
-  --color-surface: var(--color-surface);
-  --color-surface-muted: var(--color-surface-muted);
-  --color-foreground: var(--color-foreground);
-  --color-muted-foreground: var(--color-muted-foreground);
-  --color-border: var(--color-border);
-  --color-accent: var(--color-accent);
-  --color-secondary: var(--color-secondary);
-  --color-ink-soft: var(--color-ink-soft);
-  --color-status-info-fg: var(--color-status-info-fg);
-  --color-status-info-bg: var(--color-status-info-bg);
-  --color-status-info-border: var(--color-status-info-border);
-  --color-status-info-dot: var(--color-status-info-dot);
-  --color-status-success-fg: var(--color-status-success-fg);
-  --color-status-success-bg: var(--color-status-success-bg);
-  --color-status-success-border: var(--color-status-success-border);
-  --color-status-success-dot: var(--color-status-success-dot);
-  --color-status-warning-fg: var(--color-status-warning-fg);
-  --color-status-warning-bg: var(--color-status-warning-bg);
-  --color-status-warning-border: var(--color-status-warning-border);
-  --color-status-warning-dot: var(--color-status-warning-dot);
-  --color-status-danger-fg: var(--color-status-danger-fg);
-  --color-status-danger-bg: var(--color-status-danger-bg);
-  --color-status-danger-border: var(--color-status-danger-border);
-  --color-status-danger-dot: var(--color-status-danger-dot);
-  --color-status-neutral-fg: var(--color-status-neutral-fg);
-  --color-status-neutral-bg: var(--color-status-neutral-bg);
-  --color-status-neutral-border: var(--color-status-neutral-border);
-  --color-status-neutral-dot: var(--color-status-neutral-dot);
+/* ==============================================================================
+ * Tailwind v4 @theme — direct translation of prototype.html's tailwind.config
+ * Generated utilities (auto-prefixed by category):
+ *   --color-X   -> bg-X, text-X, border-X, outline-X, fill-X, stroke-X, etc.
+ *   --font-X    -> font-X
+ *   --text-X    -> text-X (font-size)
+ *   --spacing-X -> p-X, m-X, w-X, h-X, gap-X, top-X, etc.
+ *   --radius-X  -> rounded-X, rounded-t-X, rounded-b-X, etc.
+ * ============================================================================== */
 
-  /* ----------------------------------------------------------------------
-   * OLIVE + OCHRE PALETTE (Rumia v4 visual identity)
-   * Source: docs/prototype.html (single-file React SPA, 2026-07)
-   * Reference: docs/design-tokens-olive-ochre.css (full @theme block)
-   *
-   * Additive to Cinematic Concierge tokens above. Co-exists so existing
-   * pages still render; new pages opt-in via Tailwind utilities like
-   * `bg-olive-light`, `text-ochre-dark`, etc.
-   * ---------------------------------------------------------------------- */
-
-  --color-primary: #16281f;
-  --color-primary-container: #2b3e34;
-  --color-olive-light: #3c5447;
-  --color-olive-dark: #1d2a23;
-  --color-ochre-light: #eab875;
-  --color-ochre-dark: #ce933f;
-  --color-linen-dark: #efece6;
-  --color-background-olive: #e8fff0;
-  --color-on-primary: #ffffff;
-  --color-on-surface-olive: #0c1f16;
-  --color-on-surface-olive-variant: #424844;
-  --color-glass-light: rgba(255, 255, 255, 0.65);
+@theme {
+  /* ----- COLORS (40+ tokens from prototype tailwind.config.theme.extend.colors) ----- */
+  --color-on-error-container: #93000a;
+  --color-secondary-fixed: #ffddb5;
+  --color-on-secondary-fixed: #2a1800;
+  --color-error-container: #ffdad6;
+  --color-inverse-on-surface: #e0f6e7;
+  --color-on-primary-fixed: #0c1f16;
+  --color-tertiary-fixed-dim: #c8c6c2;
   --color-glass-dark: rgba(43, 62, 52, 0.85);
+  --color-primary-container: #2b3e34;
+  --color-surface-tint: #4f6358;
+  --color-on-secondary-container: #784d00;
+  --color-ochre-dark: #ce933f;
+  --color-on-tertiary-fixed: #1c1c1a;
+  --color-on-secondary: #ffffff;
+  --color-on-surface: #0c1f16;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-tertiary: #ffffff;
+  --color-surface-container-high: #d7eedf;
+  --color-secondary-fixed-dim: #f9bb68;
+  --color-background: #e8fff0;
+  --color-on-primary-container: #94a99c;
+  --color-on-surface-variant: #424844;
+  --color-on-tertiary-container: #a5a3a0;
+  --color-surface-dim: #c9dfd1;
+  --color-surface-bright: #e8fff0;
+  --color-error: #ba1a1a;
+  --color-surface: #e8fff0;
+  --color-primary-fixed: #d2e8d9;
+  --color-inverse-surface: #22342b;
+  --color-secondary: #825505;
+  --color-linen-dark: #efece6;
+  --color-primary: #16281f;
+  --color-glass-light: rgba(255, 255, 255, 0.65);
+  --color-primary-fixed-dim: #b6ccbe;
+  --color-grid-pattern: rgba(43, 62, 52, 0.1);
+  --color-surface-container-highest: #d2e8d9;
+  --color-on-error: #ffffff;
+  --color-olive-light: #3c5447;
+  --color-outline: #737874;
+  --color-surface-container: #ddf3e5;
+  --color-outline-variant: #c2c8c2;
+  --color-on-background: #0c1f16;
+  --color-tertiary-container: #3a3a37;
+  --color-on-primary: #ffffff;
+  --color-tertiary: #242422;
+  --color-surface-variant: #d2e8d9;
+  --color-on-tertiary-fixed-variant: #474744;
+  --color-on-secondary-fixed-variant: #643f00;
+  --color-tertiary-fixed: #e5e2de;
+  --color-on-primary-fixed-variant: #384b41;
+  --color-olive-dark: #1d2a23;
+  --color-inverse-primary: #b6ccbe;
+  --color-surface-container-low: #e3f9ea;
+  --color-ochre-light: #eab875;
+  --color-secondary-container: #ffc16d;
 
-  /* Olive + Ochre typography (Playfair Display + Inter + JetBrains Mono) */
-  --font-body-md: "Inter", system-ui, sans-serif;
-  --font-label-ui: "Inter", system-ui, sans-serif;
-  --font-display: "Playfair Display", "Times New Roman", serif;
-  --font-display-mobile: "Playfair Display", "Times New Roman", serif;
-  --font-headline-sm: "Playfair Display", "Times New Roman", serif;
-  --font-headline-lg: "Playfair Display", "Times New Roman", serif;
-  --font-mono-micro: "JetBrains Mono", monospace;
-  --font-mono-technical: "JetBrains Mono", monospace;
+  /* ----- BORDER RADIUS ----- */
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
 
-  /* Olive + Ochre spacing (4px base; prototype's spacing scale) */
-  --spacing-base: 4px;
-  --spacing-gutter-olive: 16px;
-  --spacing-card-padding: 20px;
+  /* ----- SPACING ----- */
   --spacing-section-gap: 24px;
+  --spacing-base: 4px;
+  --spacing-container-padding-lg: 32px;
   --spacing-header-height: 64px;
+  --spacing-card-padding: 20px;
+  --spacing-gutter: 16px;
+  --spacing-container-padding-sm: 24px;
 
-  /* Olive + Ochre radii (prototype's scale) */
-  --radius-olive-default: 0.25rem;
-  --radius-olive-lg: 0.5rem;
-  --radius-olive-xl: 0.75rem;
-  --color-skeleton: var(--color-skeleton);
-  --color-row-hover: var(--color-row-hover);
-  --color-surface-translucent: var(--color-surface-translucent);
-  --color-surface-translucent-strong: var(--color-surface-translucent-strong);
-  --shadow-stat-card: var(--shadow-stat-card);
-  --color-iberian-terracotta: oklch(0.62 0.13 38);
-  --color-iberian-azulejo: oklch(0.45 0.11 240);
-  --color-iberian-olive: oklch(0.55 0.06 110);
-  --color-iberian-limestone: oklch(0.92 0.01 80);
-  --color-iberian-shadow: oklch(0.18 0.02 250);
-  --color-iberian-gold: oklch(0.78 0.13 75);
-  
-  --spacing-section: var(--spacing-section);
-  --spacing-gutter: var(--spacing-gutter);
-  --radius-soft: var(--radius-soft);
-  --radius-glass: var(--radius-glass);
+  /* ----- FONT FAMILIES ----- */
+  --font-body-md: "Inter", "sans-serif";
+  --font-mono-micro: "JetBrains Mono", "monospace";
+  --font-label-ui: "Inter", "sans-serif";
+  --font-headline-sm: "Playfair Display", "serif";
+  --font-display-mobile: "Playfair Display", "serif";
+  --font-display: "Playfair Display", "serif";
+  --font-mono-technical: "JetBrains Mono", "monospace";
+  --font-headline-lg: "Playfair Display", "serif";
 
-  --cinematic-overlay-hero: linear-gradient(180deg, oklch(0.18 0.02 250 / 0) 0%, oklch(0.18 0.02 250 / 0.85) 100%);
-  --cinematic-overlay-vignette: radial-gradient(ellipse at center, transparent 40%, oklch(0.18 0.02 250 / 0.55) 100%);
-
-  /* ----------------------------------------------------------------------
-   * OLIVE + OCHRE PALETTE — Tailwind utility generation
-   * Source: docs/prototype.html, docs/design-tokens-olive-ochre.css
-   * Additive to Cinematic Concierge above.
-   * ---------------------------------------------------------------------- */
-  --color-primary: var(--color-primary);
-  --color-primary-container: var(--color-primary-container);
-  --color-olive-light: var(--color-olive-light);
-  --color-olive-dark: var(--color-olive-dark);
-  --color-ochre-light: var(--color-ochre-light);
-  --color-ochre-dark: var(--color-ochre-dark);
-  --color-linen-dark: var(--color-linen-dark);
-  --color-background-olive: var(--color-background-olive);
-  --color-on-primary: var(--color-on-primary);
-  --color-on-surface-olive: var(--color-on-surface-olive);
-  --color-on-surface-olive-variant: var(--color-on-surface-olive-variant);
-  --color-glass-light: var(--color-glass-light);
-  --color-glass-dark: var(--color-glass-dark);
-
-  --font-body-md: var(--font-body-md);
-  --font-label-ui: var(--font-label-ui);
-  --font-display: var(--font-display);
-  --font-display-mobile: var(--font-display-mobile);
-  --font-headline-sm: var(--font-headline-sm);
-  --font-headline-lg: var(--font-headline-lg);
-  --font-mono-micro: var(--font-mono-micro);
-  --font-mono-technical: var(--font-mono-technical);
-
-  --radius-olive-default: var(--radius-olive-default);
-  --radius-olive-lg: var(--radius-olive-lg);
-  --radius-olive-xl: var(--radius-olive-xl);
-
-  /* Font sizes (prototype uses text-display, text-headline-lg, etc.) */
-  --text-mono-micro: 10px;
-  --text-label-ui: 12px;
+  /* ----- FONT SIZES (with line-height / letter-spacing / font-weight) ----- */
   --text-body-md: 14px;
-  --text-mono-technical: 12px;
+  --text-body-md--line-height: 1.6;
+  --text-body-md--letter-spacing: 0;
+  --text-body-md--font-weight: 400;
+
+  --text-mono-micro: 10px;
+  --text-mono-micro--line-height: 12px;
+  --text-mono-micro--letter-spacing: 0.1em;
+  --text-mono-micro--font-weight: 700;
+
+  --text-label-ui: 12px;
+  --text-label-ui--line-height: 16px;
+  --text-label-ui--font-weight: 600;
+
   --text-headline-sm: 18px;
-  --text-headline-lg: 30px;
+  --text-headline-sm--line-height: 24px;
+  --text-headline-sm--font-weight: 600;
+
   --text-display-mobile: 48px;
+  --text-display-mobile--line-height: 1.2;
+  --text-display-mobile--font-weight: 700;
+
   --text-display: 72px;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 700;
+
+  --text-mono-technical: 12px;
+  --text-mono-technical--line-height: 16px;
+  --text-mono-technical--font-weight: 500;
+
+  --text-headline-lg: 30px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--font-weight: 700;
 }
+
+/* ==============================================================================
+ * @layer base — body styles match the prototype (no cyan radial gradient).
+ * The prototype's body has classes bg-background text-on-background
+ * font-body-md text-body-md antialiased overflow-x-hidden; we set the
+ * equivalent base values here for SSR consistency.
+ * ============================================================================== */
 
 @layer base {
   * {
@@ -248,22 +244,50 @@
 
   html {
     scroll-behavior: smooth;
+    background-color: #e8fff0;
+    color: #0c1f16;
   }
 
   body {
     margin: 0;
-    background:
-      radial-gradient(circle at top right, rgba(179, 232, 251, 0.15), transparent 40%),
-      radial-gradient(circle at top left, rgba(48, 101, 118, 0.05), transparent 40%),
-      linear-gradient(180deg, #f7faf9 0%, #f1f4f3 100%);
-    color: var(--color-foreground);
-    font-family: var(--font-rota-body), sans-serif;
+    background-color: #e8fff0;
+    color: #0c1f16;
+    font-family: "Inter", "sans-serif", system-ui;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Material Symbols Outlined — set the variation settings globally so
+     every <span class="material-symbols-outlined">icon</span> renders
+     with the correct ligature glyph. */
+  .material-symbols-outlined {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
   }
 }
 
+/* ==============================================================================
+ * @layer components — Cinematic Concierge component classes (preserved).
+ * These use var() references that resolve via the :root block above.
+ * ============================================================================== */
+
 @layer components {
   .rota-display {
-    font-family: var(--font-rota-display), serif;
+    font-family: "Playfair Display", serif;
     font-size: clamp(3.2rem, 7vw, 6rem);
     line-height: 1.05;
     letter-spacing: -0.03em;
@@ -271,7 +295,7 @@
   }
 
   .rota-heading {
-    font-family: var(--font-rota-display), serif;
+    font-family: "Playfair Display", serif;
     font-size: clamp(2.2rem, 4.5vw, 3.8rem);
     line-height: 1.08;
     letter-spacing: -0.02em;
@@ -294,7 +318,7 @@
   .rota-glass-panel {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5));
     backdrop-filter: blur(24px);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 8px 32px rgba(24, 28, 28, 0.04);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 8px 32px rgba(22, 40, 31, 0.04);
   }
 
   .rota-list-row {
@@ -365,7 +389,7 @@
   }
 
   .rota-form-input:focus {
-    outline: 2px solid rgba(179, 232, 251, 0.85);
+    outline: 2px solid rgba(206, 147, 63, 0.5);
     outline-offset: 2px;
   }
 
@@ -389,27 +413,24 @@
     padding: 0.9rem 1rem;
     color: var(--color-foreground);
     cursor: pointer;
-    transition:
-      border-color 160ms ease,
-      background-color 160ms ease,
-      transform 160ms ease;
+    transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
   }
 
   .rota-check-card:hover {
-    border-color: rgba(48, 101, 118, 0.38);
+    border-color: rgba(60, 84, 71, 0.38);
     transform: translateY(-1px);
   }
 
   .rota-check-card--active {
-    border-color: rgba(48, 101, 118, 0.58);
-    background: rgba(179, 232, 251, 0.34);
+    border-color: rgba(60, 84, 71, 0.58);
+    background: rgba(234, 184, 117, 0.18);
   }
 
   .rota-json-preview {
     margin: 0;
     overflow: auto;
     border-radius: 20px;
-    background: rgba(24, 28, 28, 0.94);
+    background: rgba(22, 40, 31, 0.94);
     padding: 1rem;
     color: #d9e4e7;
     font-size: 0.86rem;
