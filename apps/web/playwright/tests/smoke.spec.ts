@@ -6,7 +6,7 @@ test.describe("@smoke public routes", () => {
   test("home page renders on the current project viewport", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("No AI chat.Just a calmer, betterPortugal route.");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Discover");
     await expect(page).toHaveURL("/");
   });
 });

@@ -115,7 +115,8 @@ export default async function TripDetailPage({
         <GuideProgress chapters={chapters} />
 
         <GuideChapter id="overview" className="p-0">
-          <CinematicHero 
+          <div data-testid="trip-overview-header">
+          <CinematicHero
             title={title}
             region={trip ? trip.brief.regions.map(prettify).join(", ") : undefined}
             durationDays={trip?.brief.tripLengthDays}
@@ -134,6 +135,7 @@ export default async function TripDetailPage({
                 </div>
               </div>
             </RevealSection>
+          </div>
           </div>
         </GuideChapter>
 

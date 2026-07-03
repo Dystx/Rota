@@ -107,7 +107,7 @@ export default async function TripMapPage({
         <GuideProgress chapters={chapters} />
 
         <GuideChapter id="overview" className="py-12 md:py-24">
-          <div className="mx-auto max-w-[860px] grid gap-8">
+          <div className="mx-auto max-w-[860px] grid gap-8" data-testid="trip-map-header">
             <RevealSection>
               <p className="rota-kicker text-[var(--color-atlantic)]">Route audit · Trip {tripId}</p>
               <h1 className="mt-4 font-[family-name:var(--font-rota-display)] text-5xl tracking-tight text-[var(--color-foreground)] lg:text-6xl">

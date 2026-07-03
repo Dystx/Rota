@@ -25,8 +25,6 @@
  * fallback — this file only runs when both gates are open.
  */
 
-import { generateObject } from "ai";
-import { createOpenAI } from "@ai-sdk/openai";
 import { z } from "zod";
 import {
   destinationCountries,
@@ -136,6 +134,16 @@ export async function parseTripBriefIntent(
         "Set it in .env.local, or use the deterministic fallback (USE_LLM=false)."
     );
   }
+
+  // Dynamic imports: the Vercel AI SDK v5 has a massive type surface
+  // that hangs `tsc` when statically imported. Loading both the
+  // provider and generateObject lazily keeps the module import cost
+  // near-zero for consumers that never call parseTripBriefIntent()
+  // (i.e. the deterministic fallback path).
+  const [{ generateObject }, { createOpenAI }] = await Promise.all([
+    import("ai"),
+    import("@ai-sdk/openai")
+  ]);
 
   const openai = createOpenAI({ apiKey });
   const modelId = options.model ?? process.env.RUMIA_LLM_MODEL ?? "gpt-4o-mini";
