@@ -336,3 +336,10 @@ export {
   type SpecialistProfile,
   type SpecialistProfileInput
 } from "./specialists";
+
+export {
+  getOrgBySlug,
+  getOrgBranding,
+  type OrgBranding,
+  type PublicOrg
+} from "./organizations";
