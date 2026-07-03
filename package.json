@@ -27,5 +27,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "zod": "3.25.76"
+    }
   }
 }

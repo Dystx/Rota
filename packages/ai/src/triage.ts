@@ -22,6 +22,7 @@
  */
 
 import { z } from "zod";
+import type { JSONSchema7 } from "@ai-sdk/provider";
 
 export const TriageTier = z.enum([
   "informational", // auto-reply OK
@@ -91,7 +92,7 @@ export async function triageMessage(input: TriageInput): Promise<TriageResult> {
     );
   }
 
-  const [{ generateObject }, { createOpenAI }] = await Promise.all([
+  const [{ generateObject, jsonSchema }, { createOpenAI }] = await Promise.all([
     import("ai"),
     import("@ai-sdk/openai")
   ]);
@@ -113,13 +114,15 @@ export async function triageMessage(input: TriageInput): Promise<TriageResult> {
     if (ctx.currentLocalTime) promptLines.push(`Local time: ${ctx.currentLocalTime}`);
   }
 
-  // Same type-cast workaround as the itinerary intent parser —
-  // Vercel AI SDK v5 × Zod-version mismatch. Runtime is correct.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Same `jsonSchema()` adapter as the itinerary intent parser.
+  // Converts the Zod 3.25 schema to JSON Schema via `z.toJSONSchema`
+  // and passes it through the SDK's adapter. The `as JSONSchema7`
+  // narrow is for Zod's OpenAPI-3.1-compatible `exclusiveMaximum`
+  // type (`number | boolean`) vs the SDK's JSONSchema7
+  // (`number`); the runtime shape is correct either way.
   const { object } = await generateObject({
     model: openai(modelId),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    schema: TriageResultSchema as any,
+    schema: jsonSchema(z.toJSONSchema(TriageResultSchema) as JSONSchema7),
     system: SYSTEM_PROMPT,
     prompt: promptLines.join("\n"),
     temperature: 0.1

@@ -26,6 +26,12 @@
  */
 
 import { z } from "zod";
+// Type-only import for the `JSONSchema7` shape the SDK's
+// `jsonSchema()` adapter expects. We pass the Zod 3-flavored JSON
+// Schema through `as JSONSchema7` (narrow, documented, not `as any`).
+// Top-level type imports are stripped at build time, so the import
+// doesn't break the dynamic-import-only policy below.
+import type { JSONSchema7 } from "@ai-sdk/provider";
 import {
   destinationCountries,
   portugalRegions,
@@ -158,7 +164,7 @@ export async function parseTripBriefIntent(
   // provider and generateObject lazily keeps the module import cost
   // near-zero for consumers that never call parseTripBriefIntent()
   // (i.e. the deterministic fallback path).
-  const [{ generateObject }, { createOpenAI }] = await Promise.all([
+  const [{ generateObject, jsonSchema }, { createOpenAI }] = await Promise.all([
     import("ai"),
     import("@ai-sdk/openai")
   ]);
@@ -166,28 +172,22 @@ export async function parseTripBriefIntent(
   const openai = createOpenAI({ apiKey });
   const modelId = options.model ?? process.env.RUMIA_LLM_MODEL ?? "gpt-4o-mini";
 
-  // `as any` is required here: the Vercel AI SDK v5 types
-  // `FlexibleSchema<unknown>` against Zod v4 (`_type`, `_parse`,
-  // `_getType`, etc.). `@repo/types` pins `zod@^3.25.76` whose
-  // ZodObject doesn't expose those class fields, so a structural
-  // assignability check fails. The runtime call is correct — the
-  // SDK walks the schema with standard Zod methods (`safeParse`,
-  // `parse`, `_def`, `_type` via duck-typing) and the
-  // `TripBriefIntentSchema` we pass satisfies that contract.
-  //
-  // The pnpm-lock.yaml shows both `zod@3.25.76` (from @repo/types)
-  // and `zod@4.3.6` (transitive via @ai-sdk/provider-utils) in
-  // node_modules. Pinning the workspace to a single Zod version
-  // would unblock removing this cast. Tracked as a follow-up
-  // (HIGH #9 from the post-Phase 7 code review); not a per-file
-  // fix because it requires a coordinated upgrade across every
-  // package that consumes Zod and every test that constructs a
-  // schema.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Pass the schema through the SDK's `jsonSchema()` adapter.
+  // `z.toJSONSchema()` returns Zod 3's JSON Schema flavor which
+  // allows `exclusiveMaximum: number | boolean` (OpenAPI 3.1
+  // compatibility). The SDK's `jsonSchema()` param is typed as
+  // `JSONSchema7` which only allows `exclusiveMaximum: number`.
+  // The runtime shape is correct in both directions — the boolean
+  // is a JSON Schema discriminator the SDK doesn't read — so the
+  // narrow is safe. Sidesteps the v3↔v4 class-field friction
+  // (Zod 3 ZodObject doesn't expose `_type` / `_parse` /
+  // `_getType`) and lets the SDK use the JSON Schema directly
+  // for structured generation. We re-validate against the
+  // original Zod schema below for the same discriminated-union
+  // error messages as before.
   const { object } = await generateObject({
     model: openai(modelId),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    schema: TripBriefIntentSchema as any,
+    schema: jsonSchema(z.toJSONSchema(TripBriefIntentSchema) as JSONSchema7),
     system: SYSTEM_PROMPT,
     prompt: rawBrief,
     temperature: 0.2
