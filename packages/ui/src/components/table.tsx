@@ -144,7 +144,7 @@ export function DataTable<TRow = unknown>(props: DataTableProps<TRow>) {
 function LegacyDataTable({ columns, rows }: LegacyDataTableProps) {
   return (
     <div className="overflow-hidden rounded-[24px] border border-[var(--color-border)]">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Table — scrollable horizontally">
         <table className="w-full border-collapse text-left text-sm">
           <thead className="bg-[var(--color-surface-muted)] text-[var(--color-muted-foreground)]">
             <tr>
@@ -213,6 +213,9 @@ function RichDataTable<TRow>({
         data-testid="datatable-scroller"
         className={cn("overflow-x-auto", stickyHeader && "overflow-y-auto")}
         style={stickyHeader && maxHeight ? { maxHeight } : undefined}
+        tabIndex={0}
+        role="region"
+        aria-label={ariaLabel ? `${ariaLabel} — scrollable horizontally` : "Data table — scrollable horizontally"}
       >
         <table aria-label={ariaLabel} className="w-full border-collapse text-left">
           {caption ? <caption className="sr-only">{caption}</caption> : null}
