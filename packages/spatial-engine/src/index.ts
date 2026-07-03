@@ -36,6 +36,16 @@ export { mountMapLibreInstance, type MapLibreInstanceOptions } from "./adapters/
 export { AmbientPulseLayer, AMBIENT_PULSE_LAYER_ID, type AmbientPulseLayerOptions } from "./adapters/maplibre/layers/ambient-pulse";
 export { SymbolBadgesLayer, SYMBOL_BADGES_LAYER_ID, type SymbolBadgesLayerOptions } from "./adapters/maplibre/layers/symbol-badges";
 export { RouteLayer, ROUTE_LINE_LAYER_ID, ROUTE_STOPS_LAYER_ID, type RouteLayerOptions } from "./adapters/maplibre/layers/route-layer";
+export {
+  RadialGradientAtmosphereLayer,
+  RADIAL_GRADIENT_ATMOSPHERE_LAYER_ID,
+  type RadialGradientAtmosphereOptions
+} from "./adapters/maplibre/layers/radial-gradient-atmosphere";
+export {
+  StarfieldLayer,
+  STARFIELD_LAYER_ID,
+  type StarfieldOptions
+} from "./adapters/maplibre/layers/starfield";
 
 /**
  * Layer IDs that participate in the click → `onStopClick` forwarding.
@@ -47,7 +57,7 @@ export const CLICKABLE_LAYER_IDS: readonly string[] = [
   ROUTE_STOPS_LAYER_ID
 ] as const;
 
-export { GlobeWorkspace, type GlobeWorkspaceProps } from "./components/globe-workspace";
+export { GlobeWorkspace, DEFAULT_ATMOSPHERE, type GlobeWorkspaceProps } from "./components/globe-workspace";
 export {
   WorkspaceCanvas,
   type WorkspaceCanvasHandle,

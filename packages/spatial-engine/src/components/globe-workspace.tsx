@@ -9,6 +9,7 @@ import { fixtureAllCollections } from "../fixtures/travelers";
 import { CLICKABLE_LAYER_IDS } from "../index";
 import type { ViewportState } from "../core/viewport";
 import type {
+  AtmosphereOptions,
   CameraTarget,
   FogOptions,
   MapStyleEndpoint,
@@ -36,6 +37,30 @@ const DEFAULT_FOG: FogOptions = {
   highColor: "rgb(25, 30, 45)",
   horizonBlend: 0.8,
   fogGroundBlend: 0.5
+};
+
+/**
+ * Default atmosphere — soft radial-gradient halo + ~26k Fibonacci-sphere
+ * stars. Both layers are independent opt-ins (you can pass `{ starfield }`
+ * only, or `{ radialGradient }` only). Pass `atmosphere: undefined` to
+ * skip the layers entirely (the default).
+ *
+ * The colors here mirror `DEFAULT_FOG` so the halo blends into the
+ * MapLibre sky rather than fighting it.
+ */
+export const DEFAULT_ATMOSPHERE: AtmosphereOptions = {
+  radialGradient: {
+    innerColor: "rgb(60, 90, 120)",
+    outerColor: "rgb(5, 8, 15)",
+    intensity: 0.6,
+    radius: 0.7
+  },
+  starfield: {
+    count: 26000,
+    minBrightness: 0.3,
+    maxBrightness: 1.0,
+    seed: 1
+  }
 };
 
 export interface GlobeWorkspaceProps {
@@ -67,6 +92,13 @@ export interface GlobeWorkspaceProps {
    * `FogOptions` to override specific fields.
    */
   fog?: FogOptions;
+  /**
+   * Soft radial-gradient halo + starfield custom WebGL layers. Default:
+   * undefined (no atmosphere layers). Pass `DEFAULT_ATMOSPHERE` to opt
+   * in to the soft default, or a partial `AtmosphereOptions` to mix
+   * and match the radial gradient and starfield independently.
+   */
+  atmosphere?: AtmosphereOptions;
   className?: string;
   testId?: string;
   /**
@@ -105,6 +137,7 @@ export function GlobeWorkspace({
   disableIntro = false,
   terrain,
   fog,
+  atmosphere,
   className,
   testId = "globe-workspace",
   onViewportChange,
@@ -141,7 +174,8 @@ export function GlobeWorkspace({
       initialTarget: resolvedInitialTarget,
       reducedMotion,
       terrain: resolvedTerrain,
-      fog: resolvedFog
+      fog: resolvedFog,
+      atmosphere
     });
     engineRef.current = engine;
     const seeds = fixtureAllCollections();
@@ -248,18 +282,21 @@ export function GlobeWorkspace({
       engine.unmount();
       engineRef.current = null;
     };
-  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, resolvedTerrain, resolvedFog, styleOverride, theme, onViewportChange, onStopClick]);
+  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, resolvedTerrain, resolvedFog, atmosphere, styleOverride, theme, onViewportChange, onStopClick]);
 
   return (
     <div
       ref={containerRef}
       data-testid={testId}
+      role="application"
+      aria-label={`Interactive globe map of ${initialFocus ? "the selected destination" : "Portugal"} — use arrow keys to pan, plus and minus to zoom`}
+      tabIndex={0}
       data-theme={theme}
       data-reduced-motion={reducedMotion ? "true" : "false"}
       data-intro={disableIntro ? "off" : "on"}
       className={
         className ??
-        "relative h-[640px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-sage shadow-[0_24px_60px_rgba(7,17,19,0.06)]"
+        "relative h-[640px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-sage shadow-[0_24px_60px_rgba(7,17,19,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
       }
     >
       {mountError ? (

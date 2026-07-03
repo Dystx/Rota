@@ -2,10 +2,16 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { AmbientPulseLayer } from "./layers/ambient-pulse";
 import { RouteLayer } from "./layers/route-layer";
 import { SymbolBadgesLayer } from "./layers/symbol-badges";
+import {
+  RadialGradientAtmosphereLayer,
+  type RadialGradientAtmosphereOptions
+} from "./layers/radial-gradient-atmosphere";
+import { StarfieldLayer, type StarfieldOptions } from "./layers/starfield";
 import { mountMapLibreInstance } from "./map-instance";
 import { SpatialCameraController } from "../../core/camera-controller";
 import { InMemoryTelemetryService } from "../../core/telemetry-service";
 import type {
+  AtmosphereOptions,
   CameraController,
   CameraTarget,
   SpatialEngine,
@@ -20,6 +26,13 @@ import type {
 interface LayerRegistration {
   layer: SpatialLayer;
   unsubscribe?: () => void;
+}
+
+/** Active custom-layer instances owned by the engine so `unmount` can
+ *  cleanly tear them down via the map's own `removeLayer` lifecycle. */
+interface AtmosphereRegistration {
+  radial: RadialGradientAtmosphereLayer | null;
+  starfield: StarfieldLayer | null;
 }
 
 /** Channels a layer listens to; defaults to "travelers" when omitted. */
@@ -59,6 +72,7 @@ export class MapLibreSpatialEngine implements SpatialEngine {
   private readonly options: SpatialEngineOptions;
   private readonly telemetry: InMemoryTelemetryService;
   private readonly layers = new Map<string, LayerRegistration>();
+  private readonly atmosphere: AtmosphereRegistration = { radial: null, starfield: null };
   private map: MapLibreMap | null = null;
   private camera: SpatialCameraController | null = null;
   private mounted = false;
@@ -103,6 +117,11 @@ export class MapLibreSpatialEngine implements SpatialEngine {
     for (const { layer } of this.layers.values()) {
       this.attachLayer(layer);
     }
+
+    // Atmosphere custom layers — opt-in via `options.atmosphere`. These
+    // do not go through the SpatialLayer registry because they are
+    // CustomLayerInterface, not standard paint layers.
+    this.attachAtmosphere(this.options.atmosphere);
 
     this.mounted = true;
   }
@@ -203,6 +222,7 @@ export class MapLibreSpatialEngine implements SpatialEngine {
         layer.onDetach(this.makeContext());
       }
       this.layers.clear();
+      this.detachAtmosphere();
       this.telemetry.shutdown();
       this.map?.remove();
       this.map = null;
@@ -225,6 +245,58 @@ export class MapLibreSpatialEngine implements SpatialEngine {
     const registration = this.layers.get(layer.id);
     if (registration) {
       registration.unsubscribe = unsubscribe;
+    }
+  }
+
+  /**
+   * Build & add the opt-in atmosphere custom layers (radial gradient halo
+   * + starfield). Both go through `map.addLayer` directly with their
+   * `CustomLayerInterface` spec. The starfield is added FIRST so it renders
+   * behind the radial gradient (MapLibre renders custom layers in id
+   * order; the gradient's id sorts after the starfield's id).
+   */
+  private attachAtmosphere(options: AtmosphereOptions | undefined): void {
+    if (!this.map) return;
+    if (!options || options.disabled) return;
+
+    if (options.starfield && !options.starfield.disabled) {
+      const layer = new StarfieldLayer(options.starfield as StarfieldOptions);
+      if (!this.map.getLayer(layer.id)) {
+        this.map.addLayer(layer.layerSpec);
+      }
+      this.atmosphere.starfield = layer;
+    }
+
+    if (options.radialGradient && !options.radialGradient.disabled) {
+      const layer = new RadialGradientAtmosphereLayer(options.radialGradient as RadialGradientAtmosphereOptions);
+      if (!this.map.getLayer(layer.id)) {
+        this.map.addLayer(layer.layerSpec);
+      }
+      this.atmosphere.radial = layer;
+    }
+  }
+
+  /**
+   * Tear down the atmosphere custom layers so the WebGL resources
+   * (programs, buffers) the layers allocated in `onAdd` are released
+   * before the map itself is removed.
+   */
+  private detachAtmosphere(): void {
+    if (!this.map) {
+      this.atmosphere.radial = null;
+      this.atmosphere.starfield = null;
+      return;
+    }
+    const map = this.map;
+    if (this.atmosphere.radial) {
+      const id = this.atmosphere.radial.id;
+      if (map.getLayer(id)) map.removeLayer(id);
+      this.atmosphere.radial = null;
+    }
+    if (this.atmosphere.starfield) {
+      const id = this.atmosphere.starfield.id;
+      if (map.getLayer(id)) map.removeLayer(id);
+      this.atmosphere.starfield = null;
     }
   }
 

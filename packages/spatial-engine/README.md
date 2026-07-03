@@ -106,16 +106,22 @@ Every symbol below is exported from the package root (`@repo/spatial-engine`). T
 | `AmbientPulseLayer` | class | Soft ochre circle dots bound to the `travelers` channel. |
 | `SymbolBadgesLayer` | class | Country / region badges bound to the `specialists` channel. |
 | `RouteLayer` | class | Polyline + numbered stop markers bound to the `trips` channel. |
+| `RadialGradientAtmosphereLayer` | class | Custom 2D WebGL layer that draws the soft halo behind the globe (opt-in via `atmosphere.radialGradient`). |
+| `StarfieldLayer` | class | Custom 3D WebGL layer that draws ~26k stars depth-tested against the globe (opt-in via `atmosphere.starfield`). |
 | `AmbientPulseLayerOptions` | type | `{ palette, radius? }`. |
 | `SymbolBadgesLayerOptions` | type | `{ palette, labelKey? }`. |
 | `RouteLayerOptions` | type | `{ palette, orderKey? }`. |
+| `RadialGradientAtmosphereOptions` | type | `{ innerColor?, outerColor?, intensity?, radius?, disabled? }`. |
+| `StarfieldOptions` | type | `{ count?, minBrightness?, maxBrightness?, seed?, disabled? }`. |
+| `AtmosphereOptions` | type | `{ radialGradient?, starfield?, disabled? }` — pass to `SpatialEngineOptions.atmosphere` or `GlobeWorkspace`'s `atmosphere` prop. |
+| `DEFAULT_ATMOSPHERE` | const | The soft default `AtmosphereOptions` exported alongside `GlobeWorkspace`. |
 
 ### 3.4 React components (`./components`)
 
 | Symbol | Kind | Purpose |
 |---|---|---|
 | `GlobeWorkspace` | component | High-level React wrapper; owns one discovery engine for its lifetime. |
-| `GlobeWorkspaceProps` | type | `{ theme?, styleOverride?, initialFocus?, initialCenter?, initialZoom?, disableIntro?, className?, testId? }`. |
+| `GlobeWorkspaceProps` | type | `{ theme?, styleOverride?, initialFocus?, initialCenter?, initialZoom?, disableIntro?, terrain?, fog?, atmosphere?, className?, testId? }`. |
 | `WorkspaceCanvas` | component | High-level React wrapper for the 2D itinerary editor. |
 | `WorkspaceCanvasProps` | type | `{ styleOverride?, initialFocus?, initialCenter?, initialZoom?, disableIntro?, className?, testId? }`. |
 
@@ -359,11 +365,66 @@ The trip-page `WorkspaceTripCanvas` is a thin wrapper over `WorkspaceCanvas` tha
 
 1. **Mapbox "standard" 3D style is gone.** CARTO Positron / Dark Matter are flat 2D vector styles. Globe projection is added on top, but the photorealistic 3D buildings are not.
 2. **Terrain is gone.** `mapbox-dem` with exaggeration `1.4` has no MapLibre equivalent configured. Workspace precision editing does not need terrain; the discovery globe does not show enough zoom to miss it.
-3. **Fog halo is deferred.** The soft horizon fog is planned but blocked: `StyleSpecification.fog` is not exported from the stable `@maplibre/maplibre-gl-style-spec` yet (the only stable path is via the `"sky"` spec's `fog-color` / `fog-ground-blend` / `horizon-fog-blend`, which require a hand-written style.json wrapper). Tracked as a Phase 2 follow-up.
+3. **Fog halo is shipped.** The soft radial-gradient halo + ~26k-starfield behind the globe are now opt-in via `<GlobeWorkspace atmosphere={DEFAULT_ATMOSPHERE} />` (or a partial `AtmosphereOptions` for either layer alone). These are custom WebGL layers, not standard paint layers, so they don't depend on `StyleSpecification.fog`. See `§15` for the full options bag and the premultiplied-alpha gotcha.
 
 ---
 
-## 11. Reduced motion
+## 11. Atmosphere layers (radial gradient + starfield)
+
+The engine ships two opt-in custom WebGL layers that draw a soft radial-gradient halo and a ~26k-star backdrop on the globe. They are independent — you can enable either, both, or neither.
+
+```tsx
+import { GlobeWorkspace, DEFAULT_ATMOSPHERE } from "@repo/spatial-engine";
+
+// Soft default — slate-blue halo fading to deep indigo + ~26k stars.
+<GlobeWorkspace atmosphere={DEFAULT_ATMOSPHERE} />
+
+// Mix and match: gradient only, or stars only, or custom colors.
+<GlobeWorkspace
+  atmosphere={{
+    radialGradient: { innerColor: "rgb(80, 110, 140)", intensity: 0.8 },
+    starfield: { count: 12000, maxBrightness: 0.9 }
+  }}
+/>
+
+// Off (default) — pass undefined or omit the prop entirely.
+<GlobeWorkspace />
+```
+
+### 11.1 Options
+
+| Option | Type | Default | Purpose |
+|---|---|---|---|
+| `atmosphere.disabled` | `boolean` | `false` | Skip both layers entirely. |
+| `atmosphere.radialGradient` | `RadialGradientAtmosphereOptions` | `undefined` | Opt in to the halo. |
+| `atmosphere.starfield` | `StarfieldOptions` | `undefined` | Opt in to the stars. |
+| `radialGradient.innerColor` | `string` | `rgb(60, 90, 120)` | Center color. CSS `rgb()`, `rgba()`, `#rrggbb`, or `#rgb`. |
+| `radialGradient.outerColor` | `string` | `rgb(5, 8, 15)` | Edge color — fades into space. |
+| `radialGradient.intensity` | `number` | `0.6` | Overall alpha multiplier (0-1). |
+| `radialGradient.radius` | `number` | `0.7` | How far the gradient extends as a fraction of the viewport min-dimension (0-1). |
+| `starfield.count` | `number` | `26000` | Stars on a Fibonacci sphere. |
+| `starfield.minBrightness` | `number` | `0.3` | Lower bound for per-star alpha. |
+| `starfield.maxBrightness` | `number` | `1.0` | Upper bound for per-star alpha. |
+| `starfield.seed` | `number` | `1` | Reserved for downstream PRNGs; currently no visible effect. |
+
+### 11.2 Why custom layers and not a paint layer
+
+The halo and stars need raw GL — the gradient is a Gaussian-ish falloff in the fragment shader, and the starfield has to participate in the depth buffer so the planet occludes stars on the far side. Both are implemented as MapLibre `CustomLayerInterface` (not `SpatialLayer`), with these distinguishing marks:
+
+- `RadialGradientAtmosphereLayer` — `renderingMode: "2d"`, fullscreen quad, drawn after the basemap.
+- `StarfieldLayer` — `renderingMode: "3d"`, depth-tested against the globe's depth so the planet naturally occludes stars behind it.
+
+### 11.3 Premultiplied alpha
+
+MapLibre sets the custom-layer blend function to `gl.blendFunc(ONE, ONE_MINUS_SRC_ALPHA)`. Both layer fragment shaders therefore emit **premultiplied alpha** — `vec4(rgb * alpha, alpha)`. Forgetting this multiplication gives a washed-out, chalky halo. The shaders in `radial-gradient-atmosphere.ts` and `starfield.ts` already do the right thing; if you fork them, keep the premultiplication.
+
+### 11.4 Lifecycle
+
+`createDiscoveryEngine`/`createWorkspaceEngine` do not register the atmosphere layers. The engine attaches them when `options.atmosphere` is provided at `mount()`, and detaches them via `map.removeLayer(...)` (which fires each layer's `onRemove`) before `map.remove()`. The WebGL programs and buffers the layers allocated in `onAdd` are released in `onRemove` — no leaks on unmount.
+
+---
+
+## 12. Reduced motion
 
 Every animation in the engine respects `prefers-reduced-motion`. The hook is `useReducedMotion` from `@repo/ui` (which wraps `window.matchMedia("(prefers-reduced-motion: reduce)")`). Both React components import it and pass the boolean down through the engine:
 
@@ -381,9 +442,9 @@ There is no separate `ReducedMotionPref` type to thread through; the engine take
 
 ---
 
-## 12. Known limitations
+## 13. Known limitations
 
-- **`StyleSpecification.fog` is not exported from the stable `@maplibre/maplibre-gl-style-spec`** (verified against `@maplibre/maplibre-gl-style-spec@24.10.0`). The soft horizon fog halo on the globe is therefore deferred. The workaround is to write a custom style.json that wraps the `sky` specification with `fog-color` + `fog-ground-blend`, but that loses the `MapStyleEndpoint`-as-URL contract that `CartoBasemapStyleProvider` relies on. Tracked for Phase 2.
+- **`StyleSpecification.fog` is not exported from the stable `@maplibre/maplibre-gl-style-spec`** (verified against `@maplibre/maplibre-gl-style-spec@24.10.0`). The built-in horizon fog is therefore not exposed via the standard style spec. The soft halo + starfield ship instead as opt-in custom WebGL layers (see §11).
 - **No native terrain.** MapLibre supports `setTerrain(...)` but the engine doesn't expose it. Globe and Workspace both render on flat vector tiles.
 - **`followUser` is a no-op.** `SpatialCameraController.followUser(active)` tracks the *intent* (a `this.following` boolean) so future telemetry wiring has a stable hook, but it does not subscribe to `navigator.geolocation` yet.
 - **`SpatialEngine.setPalette()` does not push paint-property updates to layers.** It stores the latest palette for components that read it. Layer paint colors are baked at `onAttach` time. A future Phase 2 task will push paint updates to registered layers.
@@ -391,7 +452,7 @@ There is no separate `ReducedMotionPref` type to thread through; the engine take
 
 ---
 
-## 13. Cross-references
+## 14. Cross-references
 
 - **`docs/future-versions.md`** — Phase 1c (Spatial Engine foundation), 1d (2D Workspace + LayerRegistry + RouteLayer + fixtures), 1e (CinematicMap migration in flight), 1f (Weather + LiveTraveler + Supabase Realtime + persistence).
 - **`docs/roadmap.md`** — row 7.4 (`Migrate @repo/maps Trip consumers to @repo/spatial-engine WorkspaceCanvas (2D) variant`); row 7.5 (`Replace InMemoryTelemetryService with a Supabase Realtime adapter`).
@@ -400,7 +461,7 @@ There is no separate `ReducedMotionPref` type to thread through; the engine take
 
 ---
 
-## 14. Scripts
+## 15. Scripts
 
 From the package root:
 

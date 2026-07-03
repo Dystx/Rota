@@ -145,6 +145,19 @@ export interface FogOptions {
   disabled?: boolean;
 }
 
+/** Soft halo + starfield layers — opt-in custom WebGL layers drawn on top
+ * of the globe. Distinct from `FogOptions` (which maps to MapLibre's built-in
+ * `sky` spec). The radial gradient and starfield are independent so callers
+ * can mix and match (e.g. fog + gradient, no stars; gradient only; etc.). */
+export interface AtmosphereOptions {
+  /** Radial-gradient "softer halo" overlay. Default: undefined (off). */
+  radialGradient?: import("../adapters/maplibre/layers/radial-gradient-atmosphere").RadialGradientAtmosphereOptions;
+  /** ~26k star points on a unit sphere, depth-tested against the globe. Default: undefined (off). */
+  starfield?: import("../adapters/maplibre/layers/starfield").StarfieldOptions;
+  /** Disable the atmosphere entirely. Default: false. */
+  disabled?: boolean;
+}
+
 /** Constructor options for any SpatialEngine implementation. */
 export interface SpatialEngineOptions {
   style: MapStyleEndpoint;
@@ -161,4 +174,6 @@ export interface SpatialEngineOptions {
   terrain?: TerrainOptions;
   /** Atmospheric fog + starfield on the globe. Default: enabled with soft config. */
   fog?: FogOptions;
+  /** Opt-in radial gradient halo + starfield custom WebGL layers. Default: undefined (off). */
+  atmosphere?: AtmosphereOptions;
 }

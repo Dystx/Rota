@@ -332,12 +332,15 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       <div
         ref={containerRef}
         data-testid={testId}
+        role="application"
+        aria-label={`Interactive workspace map of ${initialFocus ? "the selected route" : "Portugal"} — use arrow keys to pan, plus and minus to zoom`}
+        tabIndex={0}
         data-projection="mercator"
         data-reduced-motion={reducedMotion ? "true" : "false"}
         data-intro={disableIntro ? "off" : "on"}
         className={
           className ??
-          "relative h-[640px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-linen-dark shadow-[0_24px_60px_rgba(7,17,19,0.06)]"
+          "relative h-[640px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-linen-dark shadow-[0_24px_60px_rgba(7,17,19,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         }
       >
         {mountError ? (

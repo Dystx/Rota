@@ -58,7 +58,8 @@ const mocks = vi.hoisted(() => {
 
     private readonly handlers = new Map<string, MockHandler[]>();
     private readonly sources = new Map<string, MockGeoJSONSource>();
-    private readonly layers = new Map<string, { id: string; type: string; source: string }>();
+    private readonly layers = new Map<string, { id: string; type: string; source?: string }>();
+    private readonly removedLayerIds: string[] = [];
     private _center: { lng: number; lat: number } = { lng: -8.165, lat: 39.55 };
     private _zoom = 3.4;
     private _pitch = 0;
@@ -134,20 +135,26 @@ const mocks = vi.hoisted(() => {
       return this;
     }
 
-    addLayer(layer: { id: string; type: string; source: string }): MockMap {
+    addLayer(layer: { id: string; type: string; source: string } | { id: string; type: string }): MockMap {
       if (this._removed) return this;
       this.layers.set(layer.id, layer);
       return this;
     }
 
-    getLayer(id: string): { id: string; type: string; source: string } | undefined {
+    getLayer(id: string): { id: string; type: string; source?: string } | undefined {
       if (this._removed) return undefined;
       return this.layers.get(id);
     }
 
     removeLayer(id: string): MockMap {
       this.layers.delete(id);
+      this.removedLayerIds.push(id);
       return this;
+    }
+
+    /** Layer ids removed from this map — used by the atmosphere-cleanup test. */
+    get removedLayerIdList(): string[] {
+      return [...this.removedLayerIds];
     }
 
     queryRenderedFeatures(
@@ -234,6 +241,12 @@ vi.mock("maplibre-gl", () => ({
 
 // Pull the component AFTER the mock is registered so it sees the stub.
 import { GlobeWorkspace } from "../components/globe-workspace";
+import { DEFAULT_ATMOSPHERE } from "../components/globe-workspace";
+import {
+  createDiscoveryEngine,
+  RADIAL_GRADIENT_ATMOSPHERE_LAYER_ID,
+  STARFIELD_LAYER_ID
+} from "../index";
 
 const { MockMap, MockGeoJSONSource } = mocks;
 
@@ -265,11 +278,6 @@ afterEach(() => {
  *  unmount-while-mounting race) lands. */
 async function flushLifecycle(): Promise<void> {
   await act(async () => {
-    // 32 microtask turns is plenty for: the `load` event fires → map.
-    // mount promise resolves → engine.mount continuation runs → the
-    // `.then` in the GlobeWorkspace effect chains subscribe, raf, and
-    // observer registration → finally a possible deferred `map.remove()`
-    // after an in-flight shutdown. We over-flush rather than flake.
     for (let i = 0; i < 32; i++) {
       await Promise.resolve();
     }
@@ -333,6 +341,52 @@ describe("GlobeWorkspace lifecycle — memory safety", () => {
     });
     await flushLifecycle();
     expect(mapB.removed).toBe(true);
+  });
+
+  it("removes atmosphere custom layers and releases WebGL resources on unmount", async () => {
+    // Drive the engine directly instead of going through the React
+    // component, so the test does not depend on the same act/microtask
+    // dance that the React useEffect chain relies on. The contract under
+    // test is: the engine attaches the atmosphere custom layers when
+    // the option is provided, and tears them down (which fires each
+    // layer's `onRemove` and releases its WebGL resources) before the
+    // map itself is removed.
+    const engine = createDiscoveryEngine({
+      style: { id: "test-style", name: "Test", url: "https://example.test/style.json" },
+      atmosphere: DEFAULT_ATMOSPHERE
+    });
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    await engine.mount(container);
+    await flushLifecycle();
+
+    const map = MockMap.allInstances[0];
+    expect(map).toBeDefined();
+    // Both atmosphere layers were added by the engine during mount.
+    expect(map.getLayer(RADIAL_GRADIENT_ATMOSPHERE_LAYER_ID)).toBeDefined();
+    expect(map.getLayer(STARFIELD_LAYER_ID)).toBeDefined();
+
+    await act(async () => {
+      engine.unmount();
+    });
+    await flushLifecycle();
+
+    // The engine must have explicitly removed both atmosphere layers from
+    // the map before tearing down the map itself. This is the only signal
+    // MapLibre's CustomLayerInterface gives us for "onRemove fired and the
+    // WebGL program/buffer were released" — the layer's own onRemove is
+    // what deletes the GL resources.
+    const removed = map.removedLayerIdList;
+    expect(removed).toContain(RADIAL_GRADIENT_ATMOSPHERE_LAYER_ID);
+    expect(removed).toContain(STARFIELD_LAYER_ID);
+    // The standard layers go through their own onDetach path — they
+    // should also have been removed before the map itself was destroyed.
+    expect(removed).toContain("spatial-engine:ambient-pulse:layer");
+    expect(removed).toContain("spatial-engine:symbol-badges:layer");
+
+    document.body.removeChild(container);
   });
 
   it("does not call source.setData() after unmount", async () => {
