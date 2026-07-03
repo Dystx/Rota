@@ -24,32 +24,32 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 
 ---
 
-## 2. Current State vs Refined 2026 Phases (last verified 2026-07-02)
+## 2. Current State vs Refined 2026 Phases (last verified 2026-07-03)
 
 ### Phase 1 — Foundations & Architecture Setup
 
 | Requirement | Status |
 |---|---|
 | Monorepo (`pnpm` + `turbo`) with apps + packages layout | ✅ **Done** — 12 packages + 2 runnable apps |
-| PostgreSQL + PostGIS + pgvector extensions | ❌ **Not started** |
-| Tailwind v4 design tokens (matches `packages/ui/src/styles.css`) | ✅ **Done** — token system in `packages/ui` |
-| Cinematic Concierge aesthetic via design tokens | ✅ **Done** — paper/cream/ink/atlantic/aqua tokens; reduced-motion media query |
+| PostgreSQL + PostGIS + pgvector extensions | 🟡 **Local-only** — migration `202607022000_enable_postgis_pgvector_and_places_embeddings.sql` ships PostGIS + pgvector + places extensions + GIST/HNSW indexes; blocked by Phase 2 hosted Supabase credentials |
+| Tailwind v4 design tokens (matches `packages/ui/src/styles.css`) | ✅ **Done** — `tailwindcss: ^4.2.4` pinned as direct dep; `@theme` block generates both CSS variables in `:root` and utility classes for olive/ochre palette (`4591c5a`, `081b40f`, `baf0042`) |
+| Visual identity = prototype (olive/ochre + cream/sage) | ✅ **Done** — `@theme` block in `packages/ui/src/styles.css`; home page (`efac8b0`), 12 prototype ports, and 4 marketing pages all render at 100% parity with `docs/prototype.html`; shared `TopNav` + `SiteFooter` from `apps/web/app/_components/` (commits `1c5b9cd`, `3d23441`) |
 
 ### Phase 2 — Knowledge Graph Seeding (Portugal Module)
 
 | Requirement | Status |
 |---|---|
 | `places` table seeded for Lisbon, Sintra, Porto, Algarve | 🟡 **Partial** — `places` table exists; coverage unverified |
-| Text descriptions → pgvector embeddings | ❌ **Not started** — no embeddings yet |
+| Text descriptions → pgvector embeddings | 🟡 **Local-only** — `places.embedding VECTOR(1536)` + HNSW index added in `202607022000_*` migration; data population pending |
 | Mapbox custom minimalist skin | ✅ **Done** — `packages/maps` cinematic-map controller with reduced-motion |
-| Spatial columns (PostGIS geometry) | ❌ **Not started** |
+| Spatial columns (PostGIS geometry) | 🟡 **Local-only** — `places.coordinates GEOMETRY(Point, 4326)` + GIST index added in `202607022000_*`; population pending |
 
 ### Phase 3 — Invisible AI Engine (Tier 1 Activation)
 
 | Requirement | Status |
 |---|---|
-| Trip Brief parser (Vercel AI SDK) | 🟡 **Partial** — `packages/ai/src/prompt-normalization.test.ts` exists; needs SDK wiring |
-| Smart Question Cards pipeline | 🟡 **Partial** — `packages/ui/src/components/prompt-composer.tsx` exists |
+| Trip Brief parser (deterministic provider → Vercel AI SDK) | 🟡 **Partial** — `packages/ai/src/prompt-normalization.ts` deterministic provider live and consumed by `/planner` (commit `56cf3c5`); Vercel AI SDK wiring deferred to Phase 7 |
+| Smart Question Cards pipeline | ✅ **Done** — `apps/web/app/planner/planner-client.tsx` renders `PromptComposer` + `FollowUpPanel` for `needs_follow_up` results with chip selection + free-text input (commit `56cf3c5`); `BriefConfirmation` + `BriefField` for candidate review; URL-encoded brief handoff to `/trip/new` |
 | Geometric optimization (travel-time + opening-hour validation) | ✅ **Done** — `packages/routing` + `packages/ai` step 4 |
 | Invisible UI controls (`Reduce driving`, `Make it more relaxed`) | 🟡 **Partial** — primitives exist; semantic re-search on stop replacement not yet wired |
 
@@ -83,13 +83,13 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 | Stack item | Spec | Current |
 |---|---|---|
 | Next.js 16 + RSC | required | ✅ in use (Next 16.2.4 per dev.log) |
-| Vercel AI SDK | required | ❌ not wired — `packages/ai` uses direct OpenAI integration |
+| Vercel AI SDK | required | ❌ not wired — `packages/ai` uses direct OpenAI integration (deterministic provider live; SDK deferred to Phase 7) |
 | Zustand | required | ❌ not in use — no transient state store |
-| Tailwind v4 | required | 🟡 unspecified version; existing CSS-token system in place |
+| Tailwind v4 | required | ✅ v4.2.4 pinned as direct dep in `apps/web` and `packages/ui` |
 | Bun | optional runtime | ❌ not in use — pnpm/Node |
 | Upstash QStash + Redis | queue/cache | ❌ not in use — `apps/workers` is bounded-local |
-| PostGIS | required | ❌ not enabled |
-| pgvector | required | ❌ not enabled |
+| PostGIS | required | 🟡 migration `202607022000_*` enables locally; awaiting hosted |
+| pgvector | required | 🟡 migration `202607022000_*` enables locally; awaiting hosted |
 
 ### Pre-existing tech debt (carried, recently fixed)
 
@@ -99,6 +99,8 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 - Vitest include pattern excluded `*.test.tsx`; **fixed** (`253da10`).
 - `.sisyphus/`, `.omk/`, `.kimi/`, `.playwright-mcp/` untracked tool state; **removed** (`bc1aa48`, `339ffb9`).
 - 9 scratch debug scripts + `apps/web/playwright-report/`; **deleted** (`253da10`).
+- Marketing pages (`/portugal`, `/how-it-works`, `/human-review`, `/pricing`) had Cinematic Concierge sticky header alongside `TopNav`; **fixed** with `bare` prop on `PageShell`/`ArchiveLayout` (`1c5b9cd`).
+- `/planner` was a static "Synthesize Itinerary" CTA pointing at `/logistics`; **wired** to real `PromptComposer` + `normalizeTripPrompt` + `BriefConfirmation` flow (`56cf3c5`).
 
 ---
 
@@ -114,6 +116,19 @@ Repo cleanup, copy fixes, db shadow removal, vitest `*.test.tsx` discovery, proj
 
 All 4 sub-items done. Audit evidence at `docs/audit/phase-0-cinematic-redesign.md`.
 
+### Phase 1b — Visual Parity + Planner Intent-Engine ✅ Complete (2026-07-03)
+
+Eight-stage 100% parity push against `docs/prototype.html`:
+- `4591c5a` — `@theme` block in `packages/ui/src/styles.css` so Tailwind v4 generates both CSS variables and utility classes for the olive/ochre palette
+- `baf0042`, `081b40f` — additive color tokens + `@theme` wiring
+- `66fc9cc` — Cinematic Concierge palette repointed to olive/ochre (variable VALUES re-mapped, names preserved)
+- `efac8b0` — home page rewrite + shared `TopNav` / `SiteFooter` / `DestinationBento` + layout fonts (Inter + Playfair Display + JetBrains Mono) + Material Symbols
+- `3d23441` — `TopNav` + `SiteFooter` on all 12 prototype ports
+- `b3d0e28` — sync updated prototype.html + delete legacy home-client.tsx
+- `1c5b9cd` — `bare` prop on `PageShell` + `ArchiveLayout` to suppress the inner Cinematic Concierge sticky header so the 4 marketing pages (`/portugal`, `/how-it-works`, `/human-review`, `/pricing`) can wrap with the shared `TopNav` + `SiteFooter` without a duplicate nav row
+- `56cf3c5` — `/planner` wired to `@repo/ai`'s `normalizeTripPrompt`: `PromptComposer` (input + examples + loading stages) + `FollowUpPanel` (chip-based `needs_follow_up` answers) + `BriefConfirmation` + `BriefField` (candidate review) + URL-encoded brief handoff to `/trip/new`
+- `e055636` — visual-review screenshots + 100% parity summary
+
 ### Phase 2 — Production Supabase Reconciliation *(BLOCKER for launch)*
 
 Goal: bring hosted Supabase to parity with local; eliminates the spec's Phase 1 RLS drift blocker.
@@ -125,10 +140,12 @@ Goal: bring hosted Supabase to parity with local; eliminates the spec's Phase 1 
 | 2.3 | Apply `202605011800_add_indexes_constraints_trip_transaction.sql` | local migration |
 | 2.4 | Apply `202605020230_create_payment_webhook_events.sql` | local migration |
 | 2.5 | Apply `20260504010324_admin_audit_trail.sql` | local migration |
-| 2.6 | Verify `public.reviewer_auth_links` and `public.user_profiles` exist | hosted |
-| 2.7 | Enable **Leaked Password Protection** in Supabase Auth dashboard | hosted |
-| 2.8 | Rotate `SUPABASE_SERVICE_ROLE_KEY` and update prod secrets | hosted + Vercel |
-| 2.9 | Verify RLS actively constrains user-facing reads (per `docs/ops/launch.md` §3 smoke test) | hosted |
+| 2.6 | Apply `202607022000_enable_postgis_pgvector_and_places_embeddings.sql` (adds PostGIS + pgvector + places extension columns + GIST/HNSW indexes) | local migration |
+| 2.7 | Apply `202607022100_create_user_geolocation_logs.sql`, `202607022110_create_specialist_profiles.sql`, `202607022120_alter_chat_threads_add_service_level.sql`, `202607022130_alter_chat_messages_add_metadata.sql`, `202607022140_create_guide_dispatches.sql` (spec-v4 schema additions) | local migrations |
+| 2.8 | Verify `public.reviewer_auth_links` and `public.user_profiles` exist | hosted |
+| 2.9 | Enable **Leaked Password Protection** in Supabase Auth dashboard | hosted |
+| 2.10 | Rotate `SUPABASE_SERVICE_ROLE_KEY` and update prod secrets | hosted + Vercel |
+| 2.11 | Verify RLS actively constrains user-facing reads (per `docs/ops/launch.md` §3 smoke test) | hosted |
 
 **Exit criteria**: every line in `docs/ops/launch.md` §1 checked; outsider test user cannot read another user's trip.
 
@@ -155,10 +172,10 @@ Replace deterministic stubs with live providers at the package boundary:
 
 | # | Task | Spec Phase |
 |---|---|---|
-| 5.1 | Enable PostGIS extension on hosted | Refined 1 |
-| 5.2 | Enable pgvector extension on hosted | Refined 1 |
-| 5.3 | Add `embedding` column to `places` + add spatial column | Refined 2 |
-| 5.4 | Confirm Tailwind v4 dependency (currently unspecified) | Refined 1 |
+| 5.1 | Enable PostGIS extension on hosted | Refined 1 — local migration `202607022000_*` ready |
+| 5.2 | Enable pgvector extension on hosted | Refined 1 — local migration `202607022000_*` ready |
+| 5.3 | Add `embedding` column to `places` + add spatial column | Refined 2 — `places.coordinates GEOMETRY(Point, 4326)` + `places.embedding VECTOR(1536)` + GIST + HNSW indexes ready in local migration |
+| 5.4 | Confirm Tailwind v4 dependency | Refined 1 — ✅ v4.2.4 pinned (`0037fd9`) |
 
 ### Phase 6 — Spec-Phase 2 Backfill (Knowledge Graph — Portugal Module)
 
