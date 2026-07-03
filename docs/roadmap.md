@@ -6,6 +6,7 @@
 > - **v2.0 long-term vision** → [`docs/spec.md`](./spec.md) — 3-tier Tiered Service Model (preserved for historical reference).
 > - **Refined 2026 scope** → [`docs/spec-refined-2026.md`](./spec-refined-2026.md) — visual identity (olive/ochre) + UI/UX details; Tier 3 + Mobile deferred.
 > - **Operational launch-readiness** → §3 below. Drives *how* we ship.
+> - **Engineering lifecycle (8-phase master plan)** → [`docs/engineering-lifecycle.md`](./engineering-lifecycle.md) — week-by-week engineering sequencing; this roadmap is the operational view of the same work.
 >
 > Section 2 maps current state to the v4 5-phase engineering plan.
 
@@ -107,6 +108,19 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 ## 3. Operational Roadmap — Launch-Readiness Phases
 
 These phases unblock production deployment. They run alongside the refined 5-phase engineering plan; many refined-phase items have local-only implementations that need operational work below to ship.
+
+### Decision Log (2026-07-03)
+
+| # | Question | Decision | Notes |
+|---|---|---|---|
+| 1 | Two-app architecture (`apps/web` + `apps/ops`)? | **Stay single-app with route groups** | Specialist MAU <5%; Vercel per-route middleware covers 80% of the need. Revisit at Stripe Connect or SSO inflection. ADR in PR-10. |
+| 2 | `apps/mobile/` (Expo + React Native)? | **Defer; PWA is the user-facing path** | Per refined spec; PWA + IndexedDB cover offline; no native-app demand validated. |
+| 3 | Roadmap reconciliation? | **`docs/engineering-lifecycle.md` is the granular view; this file is the operational view** | Cross-references at the top of each file. |
+| 4 | DuckDB runtime? | **Node-side `duckdb-async`** | Faster for batch Parquet I/O; stable C++ core. WASM deferred. |
+| 5 | Stripe account + business registration? | **Later** | Defer until CP-4 is unblocked by business-side provisioning. |
+| 6 | Resend account? | **Later** | Coupled to the Stripe receipt flow. |
+| 7 | The 11 carry-over LOWs from the first review? | **Fix all** | See `docs/reviews/2026-07-03-llm-review.md` for the working list. |
+| 8 | Tier 3 reactivation metrics? | **Start tracking** | Define metrics + instrument data; no Tier 3 development yet. PM-owned break-even threshold. |
 
 ### Phase 0 — Audit + Housekeeping ✅ Complete (2026-07-02)
 

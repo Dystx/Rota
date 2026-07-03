@@ -21,6 +21,15 @@ CREATE TABLE IF NOT EXISTS public.triage_rate_limit (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- Retention window: opportunistically drop buckets older than 5 minutes
+-- so the table doesn't grow unbounded. The constant is hard-coded here
+-- (not configurable) because the function is a one-line "increment
+-- counter, return whether under cap" — adding a parameter would force
+-- every caller to pass it for no real benefit. Bump to 10 if you start
+-- seeing bursts that span the 5-minute cleanup window.
+COMMENT ON TABLE public.triage_rate_limit IS
+  'Per-minute triage rate-limit counter. 5-minute retention enforced in consume_triage_token() on every insert.';
+
 ALTER TABLE public.triage_rate_limit ENABLE ROW LEVEL SECURITY;
 
 -- No policies: only the SECURITY DEFINER function below can

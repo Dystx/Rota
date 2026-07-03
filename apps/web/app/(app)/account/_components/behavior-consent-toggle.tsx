@@ -25,9 +25,17 @@ export function BehaviorConsentToggle() {
   // the off position during SSR because the real default is
   // "no consent on file" — the same as off — but we still want
   // the user to see something rather than a flash of unchecked.
+  // `suppressHydrationWarning` quiets the React warning when the
+  // placeholder swaps for the real toggle on hydration; the
+  // placeholder text is identical between server and client so
+  // the swap is a no-op for screen readers.
   if (enabled === null) {
     return (
-      <div className="grid gap-3" data-testid="behavior-consent-loading">
+      <div
+        className="grid gap-3"
+        data-testid="behavior-consent-loading"
+        suppressHydrationWarning
+      >
         <p className="text-sm text-[var(--color-muted-foreground)]">
           Loading personalization preferences…
         </p>

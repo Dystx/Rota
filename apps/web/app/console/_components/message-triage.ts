@@ -37,15 +37,33 @@ const MAX_PER_MINUTE = 30;
 
 async function consumeToken(): Promise<"granted" | "limited" | "unavailable"> {
   try {
-    const supabase = createServiceRoleSupabaseClient();
+    const supabase = getServiceRoleClient();
     const { data, error } = await supabase.rpc("consume_triage_token", {
       max_per_minute: MAX_PER_MINUTE
     });
     if (error) return "unavailable";
-    return data === true ? "granted" : "limited";
+    // Distinguish "limited" (RPC returned `false`, bucket is full) from
+    // "unavailable" (RPC returned null or an unexpected shape). The
+    // rationale suffix differs between the two so ops can spot a
+    // degraded state vs. a real rate-limit hit.
+    if (data === true) return "granted";
+    if (data === false) return "limited";
+    return "unavailable";
   } catch {
     return "unavailable";
   }
+}
+
+// Module-level service-role client cache. Avoids a per-request
+// `createClient()` round-trip and an extra `createServerConfig()` env
+// read on every triage call. Tests should `vi.resetModules()` to
+// discard the cached client.
+let serviceRoleClient: ReturnType<typeof createServiceRoleSupabaseClient> | null = null;
+function getServiceRoleClient() {
+  if (!serviceRoleClient) {
+    serviceRoleClient = createServiceRoleSupabaseClient();
+  }
+  return serviceRoleClient;
 }
 
 export async function triageInboundMessage(

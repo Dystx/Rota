@@ -186,6 +186,12 @@ export function peekBehaviorBuffer(): readonly BehaviorEvent[] {
  * Drain and return all pending events. The future POST handler
  * calls this, sends the batch, and re-pushes any events that
  * arrived during the in-flight request so nothing is lost.
+ *
+ * TODO(LOW-11 / P6-1): the Supabase `user_behavior_events` table
+ * doesn't exist yet. The flush path is wired for when it does
+ * (P6-1 in docs/engineering-lifecycle.md). Until then, the
+ * drain helper is exported for tests + the future Settings →
+ * "Clear my profile data" button.
  */
 export function drainBehaviorBuffer(): readonly BehaviorEvent[] {
   return buffer.drain();

@@ -70,6 +70,11 @@ const STATUS_LABELS: Record<PipelineItem["status"], { title: string; dot: "secon
   in_revision: { title: "In Revision", dot: "ochre" },
   active_chat: { title: "Active Chats", dot: "surface-tint" }
 };
+// LOW-9: keys here are the exhaustive source of truth at the type
+// level. The `Record<PipelineItem["status"], ...>` shape means a
+// missing key is a compile error. The runtime side is enforced by
+// `mapTripStatus` (line 198) returning one of these three strings.
+// Adding a new status: add a key here AND a case in mapTripStatus.
 
 const STATUS_ORDER: PipelineItem["status"][] = ["draft", "in_revision", "active_chat"];
 
@@ -125,6 +130,9 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
             clientName: typeof row.trip_brief_id === "string" || typeof row.trip_brief_id === "number"
               ? `Brief #${row.trip_brief_id}`
               : "—",
+            // TODO(LOW-3): enrich with the real client name via a
+            // trip_briefs join. Out of scope for the Realtime path;
+            // needs a separate `consumer-name` enrichment pass.
             status: mapTripStatus(row.status),
             slaHours: null, // not on the trips table; fallback items only
             updatedAt: typeof row.updated_at === "string" ? row.updated_at : null
@@ -199,6 +207,11 @@ function mapTripStatus(raw: unknown): PipelineItem["status"] {
   if (typeof raw !== "string") return "draft";
   if (raw === "in_review" || raw === "in_revision" || raw === "needs_revision") return "in_revision";
   if (raw === "active" || raw === "in_progress" || raw === "on_trip") return "active_chat";
+  // Terminal-but-recent statuses default to the active_chat lane so
+  // completed / cancelled / archived trips don't visually mis-classify
+  // as "New Drafts". The exhaustive list lives here; add new upstream
+  // statuses explicitly rather than relying on the fallthrough.
+  if (raw === "completed" || raw === "cancelled" || raw === "archived") return "active_chat";
   return "draft";
 }
 
