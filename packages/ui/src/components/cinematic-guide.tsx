@@ -253,10 +253,14 @@ export interface CTASectionProps {
 
 export function CTASection({ children, className }: CTASectionProps) {
   return (
-    <section 
+    <section
       className={cn(
         "py-[calc(var(--spacing-section)*1.5)] px-[var(--spacing-gutter)]",
-        "bg-[var(--color-atlantic)] text-[var(--color-paper)] text-center",
+        // Dark mode CTASection matches the Cinematic Concierge design
+        // language. The previous bg-atlantic (ochre) + text-paper
+        // combination was only 2.59:1 — failed WCAG AA. ink (#16281f)
+        // on cream (#efece6) is ~13.5:1.
+        "bg-[var(--color-ink)] text-[var(--color-cream)] text-center",
         className
       )}
     >

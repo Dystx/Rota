@@ -93,6 +93,13 @@
   --color-iberian-gold: #eab875;          /* --color-ochre-light */
   --color-iberian-limestone: #efece6;     /* --color-cream / --color-linen-dark */
   --color-iberian-azulejo: #3c5447;       /* --color-olive-light */
+  /* Ochre variant that's AA-compliant on light surfaces (linen, paper,
+     background, cream). Default --color-ochre-light (#eab875) is only
+     ~1.53:1 on light bg; this darker variant is ~6.8:1. Reserve for
+     "ochre accent on light surface" cases (eyebrow kickers, inline
+     labels, links) where the regular ochre-light is decorative-only
+     on dark bg. */
+  --color-ochre-on-light: #8a5a1f;
   --cinematic-overlay-hero: linear-gradient(
     to top,
     rgba(22, 40, 31, 0.72) 0%,
@@ -198,6 +205,9 @@
   --color-iberian-gold: #eab875;
   --color-iberian-limestone: #efece6;
   --color-iberian-azulejo: #3c5447;
+  /* Darker ochre for AA-compliant use on light surfaces. See :root
+     alias above for the rationale. */
+  --color-ochre-on-light: #8a5a1f;
 
   /* ----- BORDER RADIUS ----- */
   --radius: 0.25rem;
