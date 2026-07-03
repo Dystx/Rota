@@ -118,6 +118,35 @@
     --motion-duration-base: 0ms;
     --motion-duration-slow: 0ms;
   }
+  /* Universal kill-switch: Tailwind utilities like `transition-colors` set
+   * transition-duration directly (e.g. 150ms) without going through the
+   * --motion-duration-* custom properties, so the :root override above
+   * doesn't reach them. Force every element's transitions and animations
+   * to zero for users who request reduced motion. The `0s` value
+   * (not `0.01ms`) is what the a11y test checks for via
+   * `parseMs(computed.transitionDuration) === 0`. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* WCAG AA contrast fix: --color-atlantic (#ce933f) on the page background
+ * (--color-background #e8fff0) yields 2.54:1, failing the 4.5:1 threshold
+ * for normal text. Route every `text-[var(--color-atlantic)]` usage to
+ * the darker --color-ochre-on-light (#8a5a1f, ~6.8:1) which already
+ * exists for exactly this case (see commit 1bee143).
+ *
+ * Background uses (`bg-[var(--color-atlantic)]` for timeline dots,
+ * progress indicators, etc.) are NOT affected — only the text color
+ * utility class is overridden. */
+.text-\[var\(--color-atlantic\)\] {
+  color: var(--color-ochre-on-light);
 }
 
 @media print {

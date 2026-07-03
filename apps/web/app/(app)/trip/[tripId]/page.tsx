@@ -185,7 +185,7 @@ export default async function TripDetailPage({
             <div className="grid gap-6 rounded-[24px] border border-white/10 bg-white/5 p-8 shadow-sm backdrop-blur-xl text-white">
               <div className="flex flex-wrap gap-2 mb-4">
                 {tripCommerceState.markers.map((marker) => (
-                  <Badge key={marker} className="bg-white/20 text-white border-white/10">{marker}</Badge>
+                  <Badge key={marker} tone="glass">{marker}</Badge>
                 ))}
               </div>
               <div className="grid gap-4 text-sm opacity-90">

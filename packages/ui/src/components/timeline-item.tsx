@@ -137,7 +137,7 @@ export function TimelineItem({
       >
         <div className="flex items-baseline gap-3">
           {activity.timeLabel && (
-            <span className="font-display text-sm md:text-base text-[var(--color-atlantic)] shrink-0">
+            <span className="font-display text-sm md:text-base text-[var(--color-ochre-on-light)] shrink-0">
               {activity.timeLabel}
             </span>
           )}

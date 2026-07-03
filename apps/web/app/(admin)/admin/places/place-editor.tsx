@@ -211,7 +211,7 @@ export function PlaceEditor() {
             <CardTitle>Places index</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-6 min-w-0">
-            <div data-testid="places-table" className="min-w-0 overflow-x-auto">
+            <div data-testid="places-table" className="min-w-0 overflow-x-auto" tabIndex={0} role="region" aria-label="Places table — scrollable">
               {isLoading ? <p className="text-sm text-[var(--color-muted-foreground)]">Loading places…</p> : null}
               <DataTable columns={["Place", "Region", "Category", "Quality", "Source confidence", "Action"]} rows={rows} />
             </div>

@@ -261,7 +261,7 @@ test.describe("Accessibility Audits - Behavior", () => {
 
     await page.goto("/trip/new");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("h1")).toContainText("Polish your plan");
+    await expect(page.locator("h1")).toContainText("Confirm your brief");
     trace.push("Navigated to /trip/new");
 
     await page.waitForTimeout(5000);

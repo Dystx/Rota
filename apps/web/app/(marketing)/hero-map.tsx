@@ -150,12 +150,14 @@ function ToggleButton({
 }
 
 function HeroSkeleton({ projection }: { projection: HeroProjection }) {
+  const label = projection === "globe" ? "Loading 3D globe" : "Loading 2D workspace";
   return (
     <div
       data-testid="hero-skeleton"
       data-projection={projection}
       className="absolute inset-0 h-full w-full animate-pulse bg-gradient-to-br from-primary via-olive-dark to-primary"
-      aria-label={projection === "globe" ? "Loading 3D globe" : "Loading 2D workspace"}
-    />
+    >
+      <span className="sr-only">{label}</span>
+    </div>
   );
 }
