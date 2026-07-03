@@ -433,3 +433,15 @@ export function resolveDefaultAnalyticsProvider(): AnalyticsProvider {
     return createNoopAnalyticsProvider();
   }
 }
+
+// Tier 3 reactivation metrics (decision 8 of the 2026-07-03 log).
+// Re-exported here so a future dashboard can import the catalog +
+// recording helpers without reaching into the package internals.
+export {
+  TIER_3_METRICS,
+  listTier3Metrics,
+  recordTier3Metric,
+  resetTier3MetricsForTests,
+  type Tier3Metric,
+  type Tier3MetricReading
+} from "./tier-3-metrics";
