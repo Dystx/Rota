@@ -173,6 +173,20 @@ const mocks = vi.hoisted(() => {
       return this;
     }
 
+    /** MapLibre v5 terrain — 3D DEM source. Real engine calls this in
+     *  GlobeWorkspace via the engine's terrain option; the test mock
+     *  must stub it or the mount promise rejects. */
+    setTerrain(_terrain: { source: string; exaggeration?: number }): MockMap {
+      return this;
+    }
+
+    /** MapLibre v5 atmospheric perspective. Real engine calls this in
+     *  GlobeWorkspace via the engine's fog option; the test mock must
+     *  stub it or the mount promise rejects. */
+    setSky(_sky: Record<string, unknown>): MockMap {
+      return this;
+    }
+
     moveLayer(_id: string, _beforeId?: string): MockMap {
       return this;
     }
