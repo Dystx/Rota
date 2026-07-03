@@ -122,3 +122,53 @@ export async function updatePlace(id: string, patch: UpdatePlaceInput, options?:
 
   return parsePlaceRow(data as RawPlaceRow);
 }
+
+/** Floor for `places.quality`. The specialist feedback
+ *  loop never drops a place below this — once a place
+ *  hits the floor, it's flagged for editorial review
+ *  rather than continuing to decay. */
+export const MIN_PLACE_QUALITY = 0;
+/** Maximum decrement per specialist action. Prevents
+ *  a single bad-faith action from tanking a place. */
+export const MAX_DECREMENT_PER_ACTION = 2;
+
+/** Specialist feedback loop: decrement a place's
+ *  `quality` field by `delta` (capped at
+ *  `MAX_DECREMENT_PER_ACTION` per call, floored at
+ *  `MIN_PLACE_QUALITY`). Returns the new quality, or
+ *  null if the place doesn't exist.
+ *
+ * The loop is wired in two places:
+ *   - The side-by-side review panel's
+ *     `onSwapForHiddenGem` callback (PR-10) — when a
+ *     specialist swaps a stop, decrement by 1.
+ *   - The "Fix logistics bottleneck" action — decrement
+ *     by 1.
+ *
+ * A future PR adds the periodic aggregation job: if N
+ *  specialists in M days all flag the same place, the
+ *  platform automatically applies a larger decrement.
+ *  That lives in `apps/workers` (QStash-cron). This PR
+ *  ships the single-action API. */
+export async function decrementPlaceQuality(
+  id: string,
+  delta = 1,
+  options?: DataClientOptions
+): Promise<{ newQuality: number; place: Place } | null> {
+  const safeDelta = Math.max(0, Math.min(delta, MAX_DECREMENT_PER_ACTION));
+  const current = await getPlaceById(id, options);
+  if (!current) return null;
+  const currentQuality = current.quality ?? 5;
+  const newQuality = Math.max(MIN_PLACE_QUALITY, currentQuality - safeDelta);
+  if (newQuality === currentQuality) {
+    // Already at the floor; no-op.
+    return { newQuality, place: current };
+  }
+  const updated = await updatePlace(
+    id,
+    { ...current, quality: newQuality },
+    options
+  );
+  if (!updated) return null;
+  return { newQuality, place: updated };
+}
