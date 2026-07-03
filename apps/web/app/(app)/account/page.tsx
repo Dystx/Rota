@@ -5,6 +5,7 @@ import { buildEmailPreview } from "@repo/emails";
 import { getCheckoutPlan } from "@repo/payments";
 import { ArchiveLayout, Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
+import { BehaviorConsentToggle } from "./_components/behavior-consent-toggle";
 
 export const metadata: Metadata = {
   title: "My Account",
@@ -150,10 +151,13 @@ export default async function AccountPage() {
         <CardHeader>
           <CardTitle>Preferences</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-1 flex-col">
+        <CardContent className="flex flex-1 flex-col gap-4">
           <p className="rota-muted text-sm leading-relaxed">
             Account settings and personal travel preferences will appear here. Manage your notification settings and saved defaults.
           </p>
+          <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
+            <BehaviorConsentToggle />
+          </div>
         </CardContent>
       </Card>
     </ArchiveLayout>

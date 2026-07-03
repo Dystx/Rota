@@ -16,6 +16,14 @@
  *  - pin: user pinned a stop to a specific day
  *  - mute: user muted a category of suggestions
  *
+ * **Consent gate (privacy).** Recording is OFF by default. The
+ * traveler must opt in via the Preferences card on the account
+ * page (`setBehaviorConsent(true)`); the toggle persists in
+ * `localStorage["rota.behavioral-profiler.consent"]`. Until they
+ * opt in, `recordBehavior()` is a no-op. The test mode escape
+ * hatch bypasses the consent check so unit tests can verify the
+ * recording path without touching localStorage.
+ *
  * None of these fire network requests in this scaffold. Callers
  * wire them via `onSkip`, `onExtend`, etc. on the relevant UI
  * components. The next Phase 6 commit will add the POST handler
@@ -41,6 +49,7 @@ export interface BehaviorEvent {
 }
 
 const RING_BUFFER_LIMIT = 100;
+const CONSENT_STORAGE_KEY = "rota.behavioral-profiler.consent";
 
 class BehaviorBuffer {
   private readonly capacity = RING_BUFFER_LIMIT;
@@ -116,13 +125,52 @@ export function setBehaviorTestMode(enabled: boolean): void {
   testMode = enabled;
 }
 
+/** Module-level cache of the consent flag. Avoids a localStorage
+ *  hit on every `recordBehavior` call. */
+let consentCache: boolean | null = null;
+
+/**
+ * Read the opt-in flag from localStorage. Returns `false` in SSR
+ * (no `window`) and when the key is unset — opt-in, not opt-out.
+ */
+export function getBehaviorConsent(): boolean {
+  if (typeof window === "undefined") return false;
+  if (consentCache !== null) return consentCache;
+  try {
+    consentCache = window.localStorage.getItem(CONSENT_STORAGE_KEY) === "true";
+  } catch {
+    // Private mode / disabled storage → treat as no consent.
+    consentCache = false;
+  }
+  return consentCache;
+}
+
+/**
+ * Persist the opt-in flag. Called by the Preferences card on the
+ * account page when the traveler toggles the "Personalize my route
+ * suggestions" switch. The change takes effect immediately for
+ * any in-flight components.
+ */
+export function setBehaviorConsent(enabled: boolean): void {
+  consentCache = enabled;
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(CONSENT_STORAGE_KEY, enabled ? "true" : "false");
+  } catch {
+    // Swallow — the in-memory flag is still set for the current
+    // session. The next page load will fall back to the default.
+  }
+}
+
 /**
  * Record a behavioral event. Safe to call from any client
  * component; the profiler is a no-op on the server (in Node
- * without testMode set).
+ * without testMode set) and when the traveler has not opted in
+ * (unless the test mode is forcing the recording path).
  */
 export function recordBehavior(event: Omit<BehaviorEvent, "timestamp">): void {
   if (typeof window === "undefined" && !testMode) return;
+  if (!testMode && !getBehaviorConsent()) return;
   buffer.push({ ...event, timestamp: Date.now() });
 }
 

@@ -166,13 +166,23 @@ export async function parseTripBriefIntent(
   const openai = createOpenAI({ apiKey });
   const modelId = options.model ?? process.env.RUMIA_LLM_MODEL ?? "gpt-4o-mini";
 
-  // Cast to `any` for the schema param: the Vercel AI SDK v5
-  // FlexibleSchema<unknown> expects internal Zod v4 type fields
-  // (_type, _parse, etc.) that aren't present when the schema is
-  // constructed from enum values re-exported by @repo/types (which
-  // pins a different Zod minor). The runtime call is fine; the
-  // mismatch is a TypeScript-only friction. A future cleanup is to
-  // align all packages on the same Zod version.
+  // `as any` is required here: the Vercel AI SDK v5 types
+  // `FlexibleSchema<unknown>` against Zod v4 (`_type`, `_parse`,
+  // `_getType`, etc.). `@repo/types` pins `zod@^3.25.76` whose
+  // ZodObject doesn't expose those class fields, so a structural
+  // assignability check fails. The runtime call is correct — the
+  // SDK walks the schema with standard Zod methods (`safeParse`,
+  // `parse`, `_def`, `_type` via duck-typing) and the
+  // `TripBriefIntentSchema` we pass satisfies that contract.
+  //
+  // The pnpm-lock.yaml shows both `zod@3.25.76` (from @repo/types)
+  // and `zod@4.3.6` (transitive via @ai-sdk/provider-utils) in
+  // node_modules. Pinning the workspace to a single Zod version
+  // would unblock removing this cast. Tracked as a follow-up
+  // (HIGH #9 from the post-Phase 7 code review); not a per-file
+  // fix because it requires a coordinated upgrade across every
+  // package that consumes Zod and every test that constructs a
+  // schema.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { object } = await generateObject({
     model: openai(modelId),

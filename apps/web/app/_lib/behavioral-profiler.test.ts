@@ -1,11 +1,13 @@
-import { describe, expect, it, beforeEach, afterEach } from "vitest";
+import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 import {
   drainBehaviorBuffer,
+  getBehaviorConsent,
   makeExtendHandler,
   makeReplaceHandler,
   makeSkipHandler,
   peekBehaviorBuffer,
   recordBehavior,
+  setBehaviorConsent,
   setBehaviorTestMode
 } from "./behavioral-profiler";
 
@@ -70,5 +72,68 @@ describe("behavioral-profiler", () => {
     expect(peekBehaviorBuffer().length).toBe(100);
     // Oldest 20 events were dropped; first surviving event is s20
     expect(peekBehaviorBuffer()[0]?.targetId).toBe("s20");
+  });
+});
+
+describe("behavioral-profiler — consent gate", () => {
+  // These tests run in production mode (testMode = false) so the
+  // consent gate is actually enforced. `window` is stubbed to a
+  // localStorage shim so `getBehaviorConsent` has a storage layer
+  // to read from.
+  const store: Record<string, string> = {};
+
+  beforeEach(() => {
+    drainBehaviorBuffer();
+    setBehaviorTestMode(false);
+    vi.stubGlobal("window", {
+      localStorage: {
+        getItem: (key: string) => (key in store ? store[key]! : null),
+        setItem: (key: string, value: string) => {
+          store[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete store[key];
+        },
+        clear: () => {
+          for (const key of Object.keys(store)) delete store[key];
+        }
+      }
+    });
+    for (const key of Object.keys(store)) delete store[key];
+    setBehaviorConsent(false);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    setBehaviorConsent(false);
+    setBehaviorTestMode(false);
+  });
+
+  it("getBehaviorConsent returns false by default (opt-in)", () => {
+    expect(getBehaviorConsent()).toBe(false);
+  });
+
+  it("setBehaviorConsent(true) flips the cached flag", () => {
+    setBehaviorConsent(true);
+    expect(getBehaviorConsent()).toBe(true);
+  });
+
+  it("setBehaviorConsent persists the choice in localStorage", () => {
+    setBehaviorConsent(true);
+    expect(store["rota.behavioral-profiler.consent"]).toBe("true");
+    setBehaviorConsent(false);
+    expect(store["rota.behavioral-profiler.consent"]).toBe("false");
+  });
+
+  it("recordBehavior is a no-op when consent is false", () => {
+    setBehaviorConsent(false);
+    recordBehavior({ type: "skip", tripId: "t", targetId: "s" });
+    expect(peekBehaviorBuffer()).toHaveLength(0);
+  });
+
+  it("recordBehavior records when consent is true", () => {
+    setBehaviorConsent(true);
+    recordBehavior({ type: "skip", tripId: "t", targetId: "s" });
+    expect(peekBehaviorBuffer()).toHaveLength(1);
   });
 });
