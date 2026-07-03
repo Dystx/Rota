@@ -5,6 +5,7 @@ import { internalError, isApiResponse, requireApiRole, validationError, type Aut
 type PlacesRouteDependencies = {
   createPlaceRecord?: typeof createPlace;
   listPlaceRecords?: typeof listPlaces;
+  writeAuditTrailRecord?: typeof writeAuditTrail;
   requireAdmin?: () => Promise<AuthorizedApiContext | Response>;
 };
 
@@ -30,6 +31,7 @@ export async function handlePlacesGetRequest(dependencies: PlacesRouteDependenci
 export async function handlePlacesPostRequest(request: Request, dependencies: PlacesRouteDependencies = {}) {
   const requireAdmin = dependencies.requireAdmin ?? (() => requireApiRole(["admin"]));
   const createPlaceRecord = dependencies.createPlaceRecord ?? createPlace;
+  const writeAuditTrailRecord = dependencies.writeAuditTrailRecord ?? writeAuditTrail;
   const auth = await requireAdmin();
 
   if (isApiResponse(auth)) {
@@ -45,8 +47,8 @@ export async function handlePlacesPostRequest(request: Request, dependencies: Pl
 
   try {
     const place = await createPlaceRecord(parsed.data, { client: auth.client });
-    
-    await writeAuditTrail({
+
+    await writeAuditTrailRecord({
       actorUserId: auth.userId,
       action: "create",
       entityType: "places",

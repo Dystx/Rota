@@ -113,6 +113,11 @@ describe("places admin API authorization", () => {
 
         return savedPlace;
       },
+      writeAuditTrailRecord: async () => {
+        // No-op for the success-path test; the audit-trail
+        // contract is exercised in apps/web/app/api/places
+        // integration tests, not here.
+      },
       requireAdmin: async () => adminAuth
     });
 
