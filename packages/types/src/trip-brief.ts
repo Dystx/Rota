@@ -146,13 +146,28 @@ export const TripBriefSchema = z
     // comparison below compares apples to apples. A value like
     // "10/14/2024" would otherwise lex-compare against "2024-10-14"
     // and pass when it shouldn't.
+    //
+    // Empty strings are also accepted as the "no date set" sentinel
+    // — `TRIP_BRIEF_DEFAULTS` in this file and the LLM brief
+    // generator (`packages/ai/src/llm-generator.ts intentToTripBrief`)
+    // both spread an empty string for the optional date fields when
+    // the traveler has not picked a window yet. The `superRefine`
+    // below uses `Boolean(value.startDate)` to test presence, so
+    // empty strings correctly count as "not set" without triggering
+    // the "both dates or neither" check. Without the empty-string
+    // branch, every LLM-generated brief and every default-stamped
+    // form draft would fail validation at the door.
     startDate: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Use ISO date format YYYY-MM-DD.")
+      .union([
+        z.literal(""),
+        z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use ISO date format YYYY-MM-DD.")
+      ])
       .optional(),
     endDate: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Use ISO date format YYYY-MM-DD.")
+      .union([
+        z.literal(""),
+        z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use ISO date format YYYY-MM-DD.")
+      ])
       .optional(),
     travelersCount: z.coerce
       .number({ invalid_type_error: "Number of travelers is required." })
