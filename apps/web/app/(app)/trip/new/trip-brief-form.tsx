@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   TripBriefSchema,
   budgetLevels,
@@ -36,7 +36,7 @@ type FormState = {
 
 type FieldErrors = Partial<Record<keyof FormState, string>>;
 
-const initialState: FormState = {
+const defaultState: FormState = {
   destinationCountry: "portugal",
   regions: ["porto", "douro-valley"],
   tripLengthDays: "5",
@@ -54,6 +54,38 @@ const initialState: FormState = {
   rawBrief:
     "We want a calm five-day Portugal trip with local food, old streets, sea views, and enough buffer time to avoid feeling rushed."
 };
+
+function briefToFormState(brief: TripBrief): FormState {
+  return {
+    destinationCountry: "portugal",
+    regions: [...brief.regions],
+    tripLengthDays: brief.tripLengthDays !== undefined ? String(brief.tripLengthDays) : defaultState.tripLengthDays,
+    startDate: brief.startDate ?? "",
+    endDate: brief.endDate ?? "",
+    travelersCount: String(brief.travelersCount),
+    travelerType: brief.travelerType,
+    budgetLevel: brief.budgetLevel ?? defaultState.budgetLevel,
+    pace: brief.pace ?? defaultState.pace,
+    interests: [...brief.interests],
+    foodPreferences: [...brief.foodPreferences],
+    avoidances: [...brief.avoidances],
+    transportMode: brief.transportMode,
+    accommodationLocation: brief.accommodationLocation,
+    rawBrief: brief.rawBrief
+  };
+}
+
+function parseBriefFromQuery(raw: string | null): TripBrief | null {
+  if (!raw) return null;
+  try {
+    const decoded = decodeURIComponent(raw);
+    const parsed = JSON.parse(decoded) as unknown;
+    const result = TripBriefSchema.safeParse(parsed);
+    return result.success ? result.data : null;
+  } catch {
+    return null;
+  }
+}
 
 const labels: Record<string, string> = {
   portugal: "Portugal",
@@ -88,11 +120,20 @@ function normalizeErrors(issues: FieldErrors) {
 
 export function TripBriefForm() {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(initialState);
+  const searchParams = useSearchParams();
+  const incomingBrief = parseBriefFromQuery(searchParams.get("brief"));
+  const [form, setForm] = useState<FormState>(
+    incomingBrief ? briefToFormState(incomingBrief) : defaultState
+  );
   const [errors, setErrors] = useState<FieldErrors>({});
   const [validatedBrief, setValidatedBrief] = useState<TripBrief | null>(null);
-  const [submitMessage, setSubmitMessage] = useState("");
+  const [submitMessage, setSubmitMessage] = useState(
+    incomingBrief
+      ? "Pre-filled from your planner prompt — review and refine before saving."
+      : ""
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [prefilled] = useState<boolean>(Boolean(incomingBrief));
 
   function updateValue<Key extends keyof FormState>(key: Key, value: FormState[Key]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -185,6 +226,17 @@ export function TripBriefForm() {
 
   return (
     <div className="grid gap-10">
+      {prefilled && (
+        <Card className="bg-olive-light/10 border border-olive-light/30 text-olive-dark" data-testid="planner-handoff-banner">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-headline-sm text-headline-sm">Pre-filled from the planner</CardTitle>
+            <p className="text-sm opacity-80 mt-2">
+              We carried your AI Intent Engine brief into this form. Adjust anything that doesn&apos;t feel right before
+              submitting.
+            </p>
+          </CardHeader>
+        </Card>
+      )}
       <Card className="rota-glass-panel shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle>Trip requirements</CardTitle>
@@ -400,6 +452,14 @@ export function TripBriefForm() {
         </Card>
       )}
     </div>
+  );
+}
+
+export function TripBriefFormBoundary() {
+  return (
+    <Suspense fallback={null}>
+      <TripBriefForm />
+    </Suspense>
   );
 }
 

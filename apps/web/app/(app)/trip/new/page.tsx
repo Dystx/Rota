@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { PageShell, Card, CardContent, CardHeader, StatPill } from "@repo/ui";
-import { TripBriefForm } from "./trip-brief-form";
+import { TripBriefFormBoundary } from "./trip-brief-form";
 
 export const metadata: Metadata = {
   title: "Trip Details Confirmation",
@@ -37,7 +37,7 @@ export default function NewTripPage() {
       </section>
 
       <div className="grid gap-12 lg:grid-cols-[1.3fr_0.7fr] items-start">
-        <TripBriefForm />
+        <TripBriefFormBoundary />
 
         <div className="grid gap-6 sticky top-32">
           <Card className="border-none shadow-none bg-transparent">
