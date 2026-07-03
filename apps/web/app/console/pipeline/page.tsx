@@ -1,7 +1,6 @@
 import { ConsoleNav } from "../_components/console-nav";
 import { SiteFooter } from "../../_components/site-footer";
-import { KanbanCard } from "../_components/kanban-card";
-import { KanbanLane } from "../_components/kanban-lane";
+import { PipelineBoard } from "../_components/pipeline-board";
 
 const AMBIENT_PATTERN =
   "url(\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNlOGZmZjAiLz48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJyZ2JhKDQzLCA2MiwgNTIsIDAuMSkiLz48L3N2Zz4=\")";
@@ -50,58 +49,11 @@ export default function ConsolePipelinePage() {
           <div
             className="flex-1 flex gap-gutter overflow-x-auto pb-4 rounded-xl"
             style={{ backgroundImage: AMBIENT_PATTERN }}
+            tabIndex={0}
+            role="region"
+            aria-label="Operations pipeline board"
           >
-            <KanbanLane title="New Drafts" count={2} dot="secondary">
-              <KanbanCard
-                title="Tokyo Culinary Tour"
-                body="Client requested focus on omakase experiences and hidden izakayas in Shinjuku."
-                clientName="E. Sato"
-                badge={{ label: "SLA: 2h", tone: "error" }}
-                avatar={{
-                  src: "https://i.pravatar.cc/24?img=12",
-                  alt: "E. Sato avatar",
-                }}
-              />
-              <KanbanCard
-                title="Alpine Ski Retreat"
-                body="Family of 4, needs gear rental integration and ski school bookings."
-                clientName="J. Doe"
-                badge={{ label: "SLA: 12h", tone: "ochre" }}
-                avatar={{ initials: "JD", alt: "J. Doe initials" }}
-              />
-            </KanbanLane>
-
-            <KanbanLane title="In Revision" count={1} dot="ochre">
-              <KanbanCard
-                title="Amalfi Coast Honeymoon"
-                body="Reviewing proposed yacht charter schedule and dinner reservations."
-                clientName="M. Rossi"
-                badge={{ label: "Updated 10m ago", tone: "ochre-dark" }}
-                avatar={{
-                  src: "https://i.pravatar.cc/24?img=20",
-                  alt: "M. Rossi avatar",
-                }}
-                accent="ochre"
-              />
-            </KanbanLane>
-
-            <KanbanLane title="Active Chats" count={1} dot="surface-tint">
-              <KanbanCard
-                title="Iceland Ring Road"
-                body="Can we add an extra day near Vik? The forecast looks great."
-                clientName="L. Chen"
-                avatar={{ initials: "L", alt: "L. Chen initials" }}
-                indicator={
-                  <span
-                    aria-hidden
-                    className="material-symbols-outlined text-ochre-dark"
-                    title="New message"
-                  >
-                    mark_email_unread
-                  </span>
-                }
-              />
-            </KanbanLane>
+            <PipelineBoard />
           </div>
         </main>
         <SiteFooter />
