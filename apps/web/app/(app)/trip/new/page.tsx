@@ -13,13 +13,28 @@ export const metadata: Metadata = {
 export default function NewTripPage() {
   return (
     <PageShell variant="app">
-      <div className="mx-auto max-w-3xl text-center mb-12">
-        <StatPill label="Advanced details" value="Manual confirmation" />
-        <h1 className="rota-display mt-6 mb-4">Confirm your brief</h1>
-        <p className="rota-muted text-xl max-w-2xl mx-auto">
-          Review and manually adjust the specifics of your trip. We use these structured details to craft a paced, realistic Portugal itinerary.
-        </p>
-      </div>
+      <section className="relative w-full flex flex-col justify-center items-center overflow-hidden pt-12 pb-12 mb-12">
+        <div className="absolute inset-0 w-full h-full -z-10">
+          <div
+            className="w-full h-full bg-cover bg-center filter brightness-[0.85] contrast-110 saturate-110"
+            style={{
+              backgroundImage:
+                "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCX3bKR-Xr7E_XjZsIHsO8GXIycFbn1UViEGxIXcvq3q5URIvlKF1tHXI8Q6I2K_aOmqDtA0I9xgu3nukH3AKzEV0E_ZVN-jTVndO-ZmUgFTgQ6Qja0ApRYSCmHU7_rtk4zuAXTpszEFhJntzw9Hc1PU-yQqKvq_VB1tCp5kV0RyNrRw34OBeBnei4hZhWWHXgKziQfaoH-stdy5vUUyvroiRc1Xl46gkiOU5z3CByCu7z7MeZue5KAtydhEggtzf5NL-NDqysiKt-S')",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80" />
+        </div>
+
+        <div className="relative z-10 w-full max-w-3xl text-center flex flex-col items-center gap-6">
+          <StatPill label="Advanced details" value="Manual confirmation" />
+          <h1 className="font-display text-display-mobile md:text-display text-foreground drop-shadow-2xl">
+            Confirm your brief
+          </h1>
+          <p className="rota-muted text-xl max-w-2xl mx-auto">
+            Review and manually adjust the specifics of your trip. We use these structured details to craft a paced, realistic Portugal itinerary.
+          </p>
+        </div>
+      </section>
 
       <div className="grid gap-12 lg:grid-cols-[1.3fr_0.7fr] items-start">
         <TripBriefForm />
@@ -36,14 +51,14 @@ export default function NewTripPage() {
                   Many travelers pack too much into a single day. By understanding your pace and transport preferences, we ensure you spend more time experiencing Portugal and less time in transit.
                 </p>
               </div>
-              
+
               <div>
                 <p className="font-medium text-[var(--color-foreground)] mb-2">Local Nuance</p>
                 <p className="rota-muted text-sm">
                   We don't just match generic tags. We cross-reference your interests against regional realities—knowing which coastal towns have the best winter seafood or where to avoid summer crowds.
                 </p>
               </div>
-              
+
               <div>
                 <p className="font-medium text-[var(--color-foreground)] mb-2">The Concierge Audit</p>
                 <p className="rota-muted text-sm">
