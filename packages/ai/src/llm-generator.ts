@@ -29,6 +29,10 @@ import { z } from "zod";
 import {
   destinationCountries,
   portugalRegions,
+  spainRegions,
+  italyRegions,
+  franceRegions,
+  greeceRegions,
   travelerTypes,
   budgetLevels,
   paceOptions,
@@ -48,7 +52,23 @@ import {
  */
 export const TripBriefIntentSchema = z.object({
   destinationCountry: z.enum(destinationCountries),
-  regions: z.array(z.enum(portugalRegions)).min(1).max(5),
+  // Phase 7: regions is a union of every country's region enum.
+  // The cross-field validation (region must belong to country)
+  // runs downstream in the TripBriefSchema's superRefine — here
+  // we just accept the wider union so the LLM can output any
+  // valid region.
+  regions: z
+    .array(
+      z.enum([
+        ...portugalRegions,
+        ...spainRegions,
+        ...italyRegions,
+        ...franceRegions,
+        ...greeceRegions
+      ])
+    )
+    .min(1)
+    .max(5),
   interests: z.array(z.enum(interestOptions)).min(1).max(6),
   pace: z.enum(paceOptions),
   transportMode: z.enum(["no-car", "rental-car", "train-and-transfers"] as const),
@@ -100,8 +120,8 @@ const SYSTEM_PROMPT = `You are the intent parser for Rumia, a premium travel con
 Given a free-text trip brief, extract a structured TripBriefIntent.
 
 Rules:
-- destinationCountry is always "portugal" for now (only supported country).
-- regions must be 1-5 of the official Portugal regions (porto, douro-valley, lisbon, sintra, cascais, alentejo, algarve, coimbra, aveiro). Map synonyms ("Porto wine country" → "douro-valley"; "the coast" → "cascais" or "algarve" depending on context).
+- destinationCountry is one of: "portugal" (default), "spain", "italy", "france", "greece". Infer from the brief; default to "portugal" if ambiguous.
+- regions must be 1-5 from the official region set for the chosen country. Map synonyms: "wine country" → "douro-valley" (PT) / "bordeaux" (FR) / "tuscany" (IT); "the coast" → "algarve" (PT) / "amalfi-coast" (IT) / "french-riviera" (FR); "Greek islands" → "santorini" / "mykonos" (GR).
 - interests must be 1-6 of: local-food, old-streets, sea-views, wine, design-and-architecture, nature, family-friendly, hidden-gems.
 - pace: "calm" (2-3 stops/day, generous buffers), "balanced" (3-4 stops), or "full" (4-5 stops, tighter timing).
 - transportMode: "no-car" (walking/transit only), "rental-car" (driving), or "train-and-transfers" (trains + private transfers).
