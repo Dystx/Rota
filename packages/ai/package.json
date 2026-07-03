@@ -7,8 +7,10 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.0",
     "@repo/analytics": "workspace:*",
-    "@repo/types": "workspace:*"
+    "@repo/types": "workspace:*",
+    "ai": "^5.0.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

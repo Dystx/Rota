@@ -5,8 +5,28 @@ import {
   type TripQuestion
 } from "@repo/types";
 import { enrichItineraryWithCoords } from "./enrich";
+import {
+  intentToTripBrief,
+  parseTripBriefIntent
+} from "./llm-generator";
 
 export * from "./prompt-normalization";
+export * from "./llm-generator";
+
+/**
+ * Feature flag: when `USE_LLM=true` AND `OPENAI_API_KEY` is set,
+ * the LLM parses the raw brief into a structured intent before
+ * the deterministic itinerary assembly runs. When either is
+ * missing, the deterministic stub runs unchanged.
+ *
+ * This keeps the LLM as an *additive* swap — no behaviour change
+ * for existing tests, CI, or local dev without an API key.
+ */
+function shouldUseLLM(): boolean {
+  return (
+    process.env.USE_LLM === "true" && Boolean(process.env.OPENAI_API_KEY)
+  );
+}
 
 export interface ItineraryGenerator {
   generate(tripBrief: TripBrief): Promise<Itinerary>;
@@ -147,6 +167,28 @@ class DeterministicItineraryGenerator implements ItineraryGenerator {
 const generator = new DeterministicItineraryGenerator();
 
 export async function generateItineraryFromBrief(tripBrief: TripBrief): Promise<Itinerary> {
-  const itinerary = await generator.generate(tripBrief);
-  return enrichItineraryWithCoords(itinerary, tripBrief);
+  let resolvedBrief = tripBrief;
+
+  // LLM path: re-parse the raw brief through the model so preferences
+  // ("foodie couple, 5 days, hate tourist buses") land as structured
+  // regions/interests/avoidances instead of whatever the form defaults
+  // produced. The deterministic assembly then runs on the LLM-merged brief.
+  if (shouldUseLLM()) {
+    try {
+      const intent = await parseTripBriefIntent(tripBrief.rawBrief);
+      resolvedBrief = intentToTripBrief(intent);
+    } catch (err) {
+      // If the LLM fails (rate limit, validation, network), fall through
+      // to the deterministic generator rather than failing the whole
+      // request. Log so ops can see the degradation.
+      // eslint-disable-next-line no-console
+      console.warn(
+        "[@repo/ai] LLM intent parse failed, falling back to deterministic:",
+        err instanceof Error ? err.message : err
+      );
+    }
+  }
+
+  const itinerary = await generator.generate(resolvedBrief);
+  return enrichItineraryWithCoords(itinerary, resolvedBrief);
 }
