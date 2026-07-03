@@ -56,7 +56,11 @@ export function TripCard({
         )}
         {(cta || href) && (
           <div className="mt-auto pt-1">
-            {cta ? (
+            {cta && href ? (
+              <Button asChild variant={tone === "highlight" ? "primary" : "ghost"}>
+                <a href={href}>{cta}</a>
+              </Button>
+            ) : cta ? (
               cta
             ) : href ? (
               <Button asChild variant={tone === "highlight" ? "primary" : "ghost"}>

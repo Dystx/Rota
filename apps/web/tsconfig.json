@@ -23,8 +23,6 @@
       "@repo/types/*": ["../../packages/types/src/*"],
       "@repo/ui": ["../../packages/ui/src/index.ts"],
       "@repo/ui/*": ["../../packages/ui/src/*"],
-      "@repo/maps": ["../../packages/maps/src/index.ts"],
-      "@repo/maps/*": ["../../packages/maps/src/*"],
       "@repo/workers": ["../../apps/workers/src/index.ts"],
       "@repo/workers/*": ["../../apps/workers/src/*"]
     },

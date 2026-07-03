@@ -81,9 +81,11 @@ export function PromptComposer({
                 key={i}
                 type="button"
                 onClick={() => onPromptChange(ex)}
+                aria-label={ex}
+                title={ex}
                 className="text-xs px-4 py-2 min-h-[44px] rounded-full border border-[var(--color-border)] bg-[var(--color-cream)] text-[var(--color-ink)] hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] font-medium"
               >
-                {ex.length > 35 ? ex.slice(0, 35) + '...' : ex}
+                <span className="line-clamp-1">{ex.length > 35 ? ex.slice(0, 35) + '...' : ex}</span>
               </button>
             ))}
           </div>

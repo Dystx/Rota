@@ -1,44 +1,42 @@
-import Link from "next/link";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
+import { MobilityTiles } from "../_components/logistics/mobility-tiles";
 
 /**
- * Logistics page — "Will you rent a car?"
+ * Logistics page — Mock 1.3 (Smart Logistical Cards).
  *
  * Source: docs/prototype.html (LogisticsPage component).
+ * Single centered glass card on a blurred transit-network background with
+ * two large selectable mobility tiles and a back/continue footer.
+ * State (selected tile) is owned by the client-only `MobilityTiles` component.
  */
 export default function LogisticsPage() {
   return (
     <>
       <TopNav />
-      <div className="pt-header-height min-h-screen flex flex-col">
-        <main className="flex-1 bg-background min-h-screen text-on-background relative overflow-hidden flex flex-col justify-center items-center p-container-padding-sm md:p-container-padding-lg">
-          <div className="relative z-10 w-full max-w-2xl mx-auto">
-            <div className="bg-glass-light rounded-xl p-8 md:p-12 shadow-2xl flex flex-col gap-8 border border-white/20">
-              <header className="text-center">
-                <h1 className="font-headline-lg text-headline-lg text-primary mb-2">
-                  Will you rent a car?
-                </h1>
-              </header>
-              <div className="flex justify-between items-center mt-4 pt-6 border-t border-olive-dark/10">
-                <Link
-                  href="/planner"
-                  className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-sm">arrow_back</span> Back
-                </Link>
-                <Link
-                  href="/checkout"
-                  className="bg-olive-dark text-on-primary font-label-ui text-label-ui px-6 py-3 rounded-lg hover:bg-primary transition-colors flex items-center gap-2"
-                >
-                  Continue <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                </Link>
-              </div>
-            </div>
+      <div className="pt-header-height min-h-screen relative overflow-hidden flex flex-col justify-center items-center p-container-padding-sm md:p-container-padding-lg">
+        {/* Deep Map Blur Background */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center transform scale-105"
+            style={{
+              backgroundImage:
+                "url('https://picsum.photos/seed/transit-network-blur/1920/1080')",
+              filter: "blur(12px) brightness(1.05)",
+            }}
+          />
+          <div className="absolute inset-0 bg-glass-light/30" />
+        </div>
+
+        {/* Main Card Container */}
+        <main id="main-content" className="relative z-10 w-full max-w-2xl mx-auto">
+          <div className="glass-panel-light rounded-xl p-8 md:p-12 deep-shadow flex flex-col gap-8">
+            <MobilityTiles />
           </div>
         </main>
-        <SiteFooter />
       </div>
+
+      <SiteFooter />
     </>
   );
 }

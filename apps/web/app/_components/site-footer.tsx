@@ -11,7 +11,7 @@ export function SiteFooter() {
     <footer className="bg-linen-dark w-full border-t border-olive-dark/5 py-12 px-container-padding-lg flex flex-col md:flex-row justify-between items-center gap-4 mt-section-gap">
       <Link
         href="/"
-        className="font-headline-sm text-headline-sm italic text-primary"
+        className="font-headline-sm text-headline-sm italic text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
       >
         Rumia
       </Link>
@@ -22,7 +22,7 @@ export function SiteFooter() {
         <li>
           <a
             href="#"
-            className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             Privacy Policy
           </a>
@@ -30,7 +30,7 @@ export function SiteFooter() {
         <li>
           <a
             href="#"
-            className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             Terms of Service
           </a>
@@ -38,7 +38,7 @@ export function SiteFooter() {
         <li>
           <a
             href="#"
-            className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             Sustainability
           </a>
@@ -46,7 +46,7 @@ export function SiteFooter() {
         <li>
           <a
             href="#"
-            className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             Global Support
           </a>

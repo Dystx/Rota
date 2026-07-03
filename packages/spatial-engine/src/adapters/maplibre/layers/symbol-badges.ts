@@ -4,6 +4,7 @@ import type { SpatialFeatureCollection, SpatialLayer, SpatialLayerContext, Spati
 
 const SOURCE_ID = "spatial-engine:symbol-badges:source";
 const LAYER_ID = "spatial-engine:symbol-badges:layer";
+export const SYMBOL_BADGES_LAYER_ID = LAYER_ID;
 
 export interface SymbolBadgesLayerOptions {
   palette: SpatialPalette;

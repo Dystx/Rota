@@ -4,6 +4,7 @@ import * as React from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { getDestinationPreset } from "@repo/spatial-engine";
+import { useMapStore } from "@/store/useMapStore";
 
 // MapLibre is browser-only — same SSR guard as the GlobeWorkspace.
 const WorkspaceCanvas = dynamic(
@@ -30,6 +31,21 @@ function WorkspaceCanvasInner() {
   const focusSlug = params.get("focus");
   const preset = getDestinationPreset(focusSlug);
 
+  const setViewport = useMapStore((state) => state.setViewport);
+  const selectStop = useMapStore((state) => state.selectStop);
+
+  // If the bento card hydrated the Zustand store before the navigation
+  // finished, mirror that selection here so the filmstrip + active
+  // stop indicators light up on first paint.
+  React.useEffect(() => {
+    if (preset && preset.camera.center) {
+      selectStop(preset.slug, [preset.camera.center[0], preset.camera.center[1]]);
+    }
+    // Intentionally only depends on `focusSlug`: the store absorbs the
+    // coordinates; subsequent renders should not re-fire.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusSlug]);
+
   return (
     <div
       data-testid="explore-workspace-canvas-frame"
@@ -40,6 +56,8 @@ function WorkspaceCanvasInner() {
         className="h-full w-full"
         testId="explore-workspace-canvas"
         initialFocus={preset?.camera}
+        onViewportChange={setViewport}
+        onStopClick={(id, coords) => selectStop(id, coords)}
       />
     </div>
   );

@@ -15,12 +15,11 @@ import {
   MapPanel,
   PageShell,
   RevealSection,
-  RouteMap,
   StatPill,
   TravelTimeChip
 } from "@repo/ui";
 import { buildPartnerClickHref, selectRelevantPartners } from "@/lib/partner-enrichment";
-import { PrewarmLink } from "./map-components";
+import { PrewarmLink, RouteMap } from "./map-components";
 
 export default async function TripMapPage({
   params,
@@ -171,7 +170,7 @@ export default async function TripMapPage({
                       key={routeDay.dayIndex}
                       href={`/trip/${tripId}/map?day=${routeDay.dayIndex}`}
                       className={[
-                        "inline-flex items-center rounded-full border px-5 py-2 text-sm font-medium transition-all min-h-[44px]",
+                        "inline-flex items-center rounded-full border px-5 py-2 text-sm font-medium transition-all min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-foreground)] focus-visible:ring-offset-2",
                         isActive
                           ? "border-[var(--color-foreground)] bg-[var(--color-foreground)] text-white shadow-md"
                           : "border-[var(--color-border)] bg-white/80 text-[var(--color-muted-foreground)] hover:bg-white hover:text-[var(--color-foreground)]"
@@ -185,7 +184,7 @@ export default async function TripMapPage({
             </RevealSection>
 
             <RevealSection delayMs={160}>
-              <RouteMap selectedDayId={activeDay ? String(activeDay.dayIndex) : undefined} days={mapDays} warnings={mapWarnings}>
+              <RouteMap tripId={tripId} selectedDayId={activeDay ? String(activeDay.dayIndex) : undefined} days={mapDays} warnings={mapWarnings}>
                 <MapPanel position="right" className="w-[380px] p-6">
                   <div className="flex flex-col gap-6">
                     <div>

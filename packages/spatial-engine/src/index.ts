@@ -10,13 +10,15 @@
  *  - Two reference layers: AmbientPulseLayer, SymbolBadgesLayer
  *  - GlobeWorkspace React component for the Discovery Hub
  *
- * Phase 2 (separate commit shape, requires sign-off) will:
- *  - Migrate @repo/maps consumers (CinematicMap, ProviderMap) into the
- *    SpatialEngine via a 2D WorkspaceCanvas variant
- *  - Replace InMemoryTelemetryService with a Supabase Realtime adapter
- *  - Promote the LayerRegistry + GeoJSON batched updates + camera
- *    choreography hooks
+ * Phase 1e (complete): the legacy `@repo/maps` package
+ * (`CinematicMap`, `ProviderMap`) was absorbed into the spatial
+ * engine via the `WorkspaceCanvas` 2D variant and the
+ * `WorkspaceTripCanvas` wrapper in `apps/web`.
  */
+
+import { AMBIENT_PULSE_LAYER_ID } from "./adapters/maplibre/layers/ambient-pulse";
+import { SYMBOL_BADGES_LAYER_ID } from "./adapters/maplibre/layers/symbol-badges";
+import { ROUTE_STOPS_LAYER_ID } from "./adapters/maplibre/layers/route-layer";
 
 export * from "./core/types";
 export * from "./core/map-style-provider";
@@ -31,12 +33,26 @@ export {
   type SpatialPalette
 } from "./adapters/maplibre/spatial-engine";
 export { mountMapLibreInstance, type MapLibreInstanceOptions } from "./adapters/maplibre/map-instance";
-export { AmbientPulseLayer, type AmbientPulseLayerOptions } from "./adapters/maplibre/layers/ambient-pulse";
-export { SymbolBadgesLayer, type SymbolBadgesLayerOptions } from "./adapters/maplibre/layers/symbol-badges";
-export { RouteLayer, type RouteLayerOptions } from "./adapters/maplibre/layers/route-layer";
+export { AmbientPulseLayer, AMBIENT_PULSE_LAYER_ID, type AmbientPulseLayerOptions } from "./adapters/maplibre/layers/ambient-pulse";
+export { SymbolBadgesLayer, SYMBOL_BADGES_LAYER_ID, type SymbolBadgesLayerOptions } from "./adapters/maplibre/layers/symbol-badges";
+export { RouteLayer, ROUTE_LINE_LAYER_ID, ROUTE_STOPS_LAYER_ID, type RouteLayerOptions } from "./adapters/maplibre/layers/route-layer";
+
+/**
+ * Layer IDs that participate in the click → `onStopClick` forwarding.
+ * Workspace / globe consumers query this set to filter `queryRenderedFeatures`.
+ */
+export const CLICKABLE_LAYER_IDS: readonly string[] = [
+  AMBIENT_PULSE_LAYER_ID,
+  SYMBOL_BADGES_LAYER_ID,
+  ROUTE_STOPS_LAYER_ID
+] as const;
 
 export { GlobeWorkspace, type GlobeWorkspaceProps } from "./components/globe-workspace";
-export { WorkspaceCanvas, type WorkspaceCanvasProps } from "./components/workspace-canvas";
+export {
+  WorkspaceCanvas,
+  type WorkspaceCanvasHandle,
+  type WorkspaceCanvasProps
+} from "./components/workspace-canvas";
 export {
   fixtureTravelerCollection,
   fixtureSpecialistCollection,

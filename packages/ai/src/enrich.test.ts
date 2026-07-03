@@ -114,17 +114,14 @@ describe("enrichItineraryWithCoords", () => {
     const stops = enriched.days.flatMap((day) => day.stops);
 
     expect(stops.every((stop) => stop.lng !== undefined && stop.lat !== undefined)).toBe(true);
-    expect(stops.map((stop) => stop.geocodeSource)).toEqual(["mapbox", "mapbox", "mapbox", "mapbox"]);
+    expect(stops.map((stop) => stop.geocodeSource)).toEqual(["nominatim", "nominatim", "nominatim", "nominatim"]);
     expect(stops.map((stop) => stop.geocodeConfidence)).toEqual([0.91, 0.92, 0.93, 0.94]);
-    expect(geocodeBatchStub).toHaveBeenCalledWith(
-      [
-        { placeName: "Ribeira walk", regionBias: baseBrief.regions, countries: ["pt", "es"] },
-        { placeName: "Porto lunch", regionBias: baseBrief.regions, countries: ["pt", "es"] },
-        { placeName: "Douro viewpoint", regionBias: baseBrief.regions, countries: ["pt", "es"] },
-        { placeName: "Douro tasting", regionBias: baseBrief.regions, countries: ["pt", "es"] }
-      ],
-      { token: "sk.test-token" }
-    );
+    expect(geocodeBatchStub).toHaveBeenCalledWith([
+      { placeName: "Ribeira walk", regionBias: baseBrief.regions, countries: ["pt", "es"] },
+      { placeName: "Porto lunch", regionBias: baseBrief.regions, countries: ["pt", "es"] },
+      { placeName: "Douro viewpoint", regionBias: baseBrief.regions, countries: ["pt", "es"] },
+      { placeName: "Douro tasting", regionBias: baseBrief.regions, countries: ["pt", "es"] }
+    ]);
     expect(analytics.outbox[0]).toMatchObject({
       name: "cinematic_geocode_completed",
       properties: {

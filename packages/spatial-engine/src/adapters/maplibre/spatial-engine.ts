@@ -62,6 +62,7 @@ export class MapLibreSpatialEngine implements SpatialEngine {
   private map: MapLibreMap | null = null;
   private camera: SpatialCameraController | null = null;
   private mounted = false;
+  private shuttingDown = false;
   private palette: SpatialPalette;
 
   constructor(options: SpatialEngineOptions) {
@@ -72,7 +73,7 @@ export class MapLibreSpatialEngine implements SpatialEngine {
   }
 
   async mount(container: HTMLElement): Promise<void> {
-    if (this.mounted) return;
+    if (this.mounted || this.shuttingDown) return;
 
     const { map, executor } = await mountMapLibreInstance({
       container,
@@ -81,6 +82,15 @@ export class MapLibreSpatialEngine implements SpatialEngine {
       reducedMotion: this.options.reducedMotion,
       projection: this.options.projection ?? "globe"
     });
+
+    // `unmount()` may have been called while we were awaiting the
+    // style load — React often tears a component down before the async
+    // mount resolves. Honor that signal here so we never leak a Map
+    // the consumer already asked us to throw away.
+    if (this.shuttingDown) {
+      map.remove();
+      return;
+    }
 
     this.map = map;
     this.camera = new SpatialCameraController(executor, {
@@ -180,17 +190,23 @@ export class MapLibreSpatialEngine implements SpatialEngine {
   }
 
   unmount(): void {
-    if (!this.mounted) return;
-    for (const { layer, unsubscribe } of this.layers.values()) {
-      unsubscribe?.();
-      layer.onDetach(this.makeContext());
+    if (this.shuttingDown) return;
+    this.shuttingDown = true;
+    // Note: `map.remove()` runs even when `this.mounted === false` —
+    // the in-flight `mount()` will see `shuttingDown` and drop the map
+    // it just constructed. This is what makes the lifecycle leak-safe.
+    if (this.mounted) {
+      for (const { layer, unsubscribe } of this.layers.values()) {
+        unsubscribe?.();
+        layer.onDetach(this.makeContext());
+      }
+      this.layers.clear();
+      this.telemetry.shutdown();
+      this.map?.remove();
+      this.map = null;
+      this.camera = null;
+      this.mounted = false;
     }
-    this.layers.clear();
-    this.telemetry.shutdown();
-    this.map?.remove();
-    this.map = null;
-    this.camera = null;
-    this.mounted = false;
   }
 
   /**

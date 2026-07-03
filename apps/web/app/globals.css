@@ -9,3 +9,45 @@ body {
 a {
   text-decoration: none;
 }
+
+/* Shimmer sweep used by the Specialist Recommendation card.
+   Triggered by the `group-hover:animate-shimmer` utility below so the
+   gold accent band glides left-to-right only when the user hovers the card. */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+/* Soft pulse used by the active timeline node. */
+@keyframes ochre-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.5;
+  }
+}
+
+.animate-ochre-pulse {
+  animation: ochre-pulse 2s ease-in-out infinite;
+}
+
+/* Hide scrollbars but keep scroll behaviour (used on chat timeline aside). */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

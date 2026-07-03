@@ -16,7 +16,7 @@ export default function ExplorePage() {
   return (
     <>
       <TopNav />
-      <main className="pt-header-height min-h-screen bg-background text-on-background antialiased">
+      <main id="main-content" className="pt-header-height min-h-screen bg-background text-on-background antialiased">
         <section className="mx-auto grid max-w-7xl gap-12 px-container-padding-sm md:px-[48px] py-section-gap">
           <header className="grid gap-4 text-center md:text-left">
             <p className="font-mono-micro text-mono-micro uppercase tracking-[0.2em] text-ochre-dark">
@@ -42,7 +42,7 @@ export default function ExplorePage() {
                 MapLibre setProjection
               </h2>
               <p className="rota-muted text-sm mt-2">
-                One call — <code className="font-mono-micro">map.setProjection(&#123; type: "globe" &#125;)</code> —
+                One call — <code className="font-mono-micro">{`map.setProjection({ type: "globe" })`}</code> —
                 turns the flat canvas into a smooth interactive orb with a soft fog halo.
               </p>
             </article>

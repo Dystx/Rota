@@ -7,7 +7,6 @@
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit -p tsconfig.json",
-    "check:mapbox-budget": "node scripts/check-mapbox-budget.mjs",
     "test": "vitest run --config ../../vitest.config.ts apps/web/app/api/trips/route.test.ts && pnpm test:e2e && pnpm test:visual && pnpm test:a11y",
     "test:e2e": "playwright test --config playwright.config.ts --grep @smoke",
     "test:visual": "playwright test --config playwright.config.ts --grep @visual",
@@ -21,7 +20,6 @@
     "@repo/config": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/emails": "workspace:*",
-    "@repo/maps": "workspace:*",
     "@repo/monitoring": "workspace:*",
     "@repo/payments": "workspace:*",
     "@repo/routing": "workspace:*",
@@ -35,7 +33,8 @@
     "next": "^16.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "tailwindcss": "^4.2.4"
+    "tailwindcss": "^4.2.4",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

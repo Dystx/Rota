@@ -65,10 +65,10 @@ export default function HomePage() {
               </div>
               <Link
                 href="/planner"
-                className="bg-olive-light text-on-primary font-label-ui text-label-ui px-8 py-3 rounded-full hover:bg-olive-dark transition-all duration-200 shadow-md flex items-center gap-2 group"
+                className="bg-olive-light text-on-primary font-label-ui text-label-ui px-8 py-3 rounded-full hover:bg-olive-dark transition-all duration-200 shadow-md flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
                 Begin Journey{" "}
-                <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
+                <span className="material-symbols-outlined text-[16px] motion-safe:group-hover:translate-x-1 motion-safe:transition-transform" aria-hidden="true">
                   arrow_forward
                 </span>
               </Link>

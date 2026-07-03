@@ -1,18 +1,47 @@
 "use client";
 
+/**
+ * CinematicMapSection — scroll-driven chapter surface for the trip
+ * detail page. Phase 1e migration: this file used to render
+ * `<CinematicMap>` from `@repo/maps` (Mapbox). It now renders
+ * `<WorkspaceTripCanvas>` from the local `_components` folder,
+ * which is a thin wrapper around `@repo/spatial-engine`'s
+ * `WorkspaceCanvas` (MapLibre).
+ *
+ * The section still owns:
+ *   - the `useScroll` integration that maps progress to chapters
+ *   - the `ChapterNav` dots + `<AnimatePresence>` caption
+ *   - the `?chapter=` deep-link URL sync + `cinematic_chapter_activated`
+ *     analytics event
+ *
+ * What changed:
+ *   - `<CinematicMap>` is gone, replaced by `<WorkspaceTripCanvas>`
+ *     with an imperative `flyTo`/`jumpTo` handle.
+ *   - The kill-switch (`MAPBOX_KILL_SWITCH=1`,
+ *     `NEXT_PUBLIC_MAPBOX_KILL_SWITCH=1`) is gone — the spatial
+ *     engine has no equivalent failure mode; CARTO basemaps are
+ *     open data.
+ *   - `cinematic_map_lazy_mounted` and `cinematic_map_load_completed`
+ *     events are gone; the spatial engine fires its own
+ *     `spatial_engine_mounted` event from inside the canvas.
+ *   - The `isMapProviderEnabled()` token gate is gone — no token
+ *     is required to render the spatial engine.
+ */
+
 import * as React from "react";
-import {
-  CinematicMap,
-  isKillSwitchActive,
-  isMapProviderEnabled,
-  progressToActiveIndex,
-  stopsToChapters,
-} from "@repo/maps";
-import { resolveDefaultAnalyticsProvider, tryCapture } from "@repo/analytics";
 import { ChapterNav } from "@repo/ui/components/chapter-nav";
 import { useReducedMotion } from "@repo/ui/hooks/use-reduced-motion";
 import { m, AnimatePresence, useScroll } from "motion/react";
 import type { TripDay } from "@repo/types";
+
+import {
+  progressToActiveIndex,
+  stopsToChapters,
+  type ChapterCameraTarget
+} from "../_lib/chapter-mapping";
+import WorkspaceTripCanvas, {
+  type WorkspaceTripCanvasHandle
+} from "./workspace-trip-canvas";
 
 type ChapterActivationSource = "scroll" | "click" | "keyboard" | "deep-link";
 
@@ -32,9 +61,12 @@ function parseChapterIndex(search: string, chapterCount: number): number {
   return index >= 0 && index < chapterCount ? index : -1;
 }
 
-export function StaticFallback({ days }: { days: TripDay[] }) {
+export function StaticFallback({ days: _days }: { days: TripDay[] }) {
   return (
-    <div data-testid="static-fallback-svg" className="flex flex-col items-center justify-center h-full bg-muted/30 rounded-lg">
+    <div
+      data-testid="static-fallback-svg"
+      className="flex flex-col items-center justify-center h-full bg-muted/30 rounded-lg"
+    >
       <svg
         width="64"
         height="64"
@@ -60,38 +92,41 @@ interface CinematicMapSectionProps {
   reducedMotion: boolean;
 }
 
-export default function CinematicMapSection({ days, tripId, reducedMotion }: CinematicMapSectionProps) {
-  const killSwitch = isKillSwitchActive();
-  const mapEnabled = isMapProviderEnabled();
-  const killSwitchTelemetryFiredRef = React.useRef(false);
-
-  React.useEffect(() => {
-    if (!killSwitch || killSwitchTelemetryFiredRef.current) return;
-    killSwitchTelemetryFiredRef.current = true;
-    const provider = resolveDefaultAnalyticsProvider();
-    void tryCapture(provider, {
-      name: "cinematic_kill_switch_triggered",
-      distinctId: `trip:${tripId}`,
-      properties: { reason: "manual", loadCount: 0, threshold: 0 },
-    });
-  }, [killSwitch, tripId]);
-
+/**
+ * Renamed to `WorkspaceTripCanvasSection` to reflect the new
+ * spatial-engine surface. The default export keeps the legacy
+ * name so the page (which imports it as `CinematicMapSection`)
+ * doesn't need a coordinated edit.
+ */
+export default function CinematicMapSection({
+  days,
+  tripId,
+  reducedMotion
+}: CinematicMapSectionProps) {
   // Hooks must be called unconditionally (React rules)
-  const chapters = React.useMemo(() => stopsToChapters(days), [days]);
+  const chapters = React.useMemo<ChapterCameraTarget[]>(
+    () => stopsToChapters(days),
+    [days]
+  );
   const sectionRef = React.useRef<HTMLDivElement>(null);
   const reducedMotionPreference = useReducedMotion();
   const effectiveReducedMotion = reducedMotion || reducedMotionPreference;
   const lastSourceRef = React.useRef<ChapterActivationSource>("scroll");
   const previousActiveChapterIdRef = React.useRef<string | null>(null);
+  const canvasRef = React.useRef<WorkspaceTripCanvasHandle | null>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "end start"],
+    offset: ["start end", "end start"]
   });
-  const [activeChapterId, setActiveChapterId] = React.useState<string>(chapters[0]?.id ?? '');
+  const [activeChapterId, setActiveChapterId] = React.useState<string>(
+    chapters[0]?.id ?? ""
+  );
 
   React.useEffect(() => {
     const firstChapterId = chapters[0]?.id ?? "";
-    setActiveChapterId((currentId) => (chapters.some((chapter) => chapter.id === currentId) ? currentId : firstChapterId));
+    setActiveChapterId((currentId) =>
+      chapters.some((chapter) => chapter.id === currentId) ? currentId : firstChapterId
+    );
   }, [chapters]);
 
   React.useEffect(() => {
@@ -103,7 +138,7 @@ export default function CinematicMapSection({ days, tripId, reducedMotion }: Cin
 
     lastSourceRef.current = "deep-link";
     setActiveChapterId(chapterId);
-    
+
     // T14: Focus section on valid deep-link mount without stealing focus otherwise
     sectionRef.current?.focus({ preventScroll: true });
   }, [chapters]);
@@ -117,15 +152,23 @@ export default function CinematicMapSection({ days, tripId, reducedMotion }: Cin
           const nextUrl = new URL(window.location.href);
           if (nextUrl.searchParams.has("chapter")) {
             nextUrl.searchParams.delete("chapter");
-            window.history.replaceState(null, "", `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+            window.history.replaceState(
+              null,
+              "",
+              `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`
+            );
           }
         }
         return;
       }
 
-      const lifecycleProgress = Math.min(ACTIVE_PROGRESS_END, Math.max(ACTIVE_PROGRESS_START, progress));
+      const lifecycleProgress = Math.min(
+        ACTIVE_PROGRESS_END,
+        Math.max(ACTIVE_PROGRESS_START, progress)
+      );
       const activeProgress =
-        (lifecycleProgress - ACTIVE_PROGRESS_START) / (ACTIVE_PROGRESS_END - ACTIVE_PROGRESS_START);
+        (lifecycleProgress - ACTIVE_PROGRESS_START) /
+        (ACTIVE_PROGRESS_END - ACTIVE_PROGRESS_START);
       const activeIndex = progressToActiveIndex(activeProgress, chapters.length);
       const chapterId = activeIndex >= 0 ? chapters[activeIndex]?.id : undefined;
       if (!chapterId) return;
@@ -153,21 +196,51 @@ export default function CinematicMapSection({ days, tripId, reducedMotion }: Cin
 
     const nextUrl = new URL(window.location.href);
     nextUrl.searchParams.set("chapter", String(activeIndex + 1));
-    window.history.replaceState(null, "", `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+    window.history.replaceState(
+      null,
+      "",
+      `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`
+    );
 
     const source = lastSourceRef.current;
-    const provider = resolveDefaultAnalyticsProvider();
-    void tryCapture(provider, {
-      name: "cinematic_chapter_activated",
-      distinctId: `trip:${tripId}`,
-      properties: {
-        tripId,
-        chapterIndex: activeIndex,
-        source,
-      },
+    // The spatial engine emits its own mount event so the only
+    // thing the section still fires is the
+    // `cinematic_chapter_activated` beat, which keeps the same
+    // event name + property shape as the Mapbox-era code.
+    import("@repo/analytics").then(({ resolveDefaultAnalyticsProvider, tryCapture }) => {
+      const provider = resolveDefaultAnalyticsProvider();
+      void tryCapture(provider, {
+        name: "cinematic_chapter_activated",
+        distinctId: `trip:${tripId}`,
+        properties: {
+          tripId,
+          chapterIndex: activeIndex,
+          source
+        }
+      });
     });
     lastSourceRef.current = "scroll";
   }, [activeChapterId, chapters, tripId]);
+
+  // Drive the camera imperatively when the active chapter
+  // changes. The first time around the canvas has already
+  // landed on the chapter via `initialFocus`; for subsequent
+  // changes we use the imperative handle so the engine stays
+  // mounted and the camera glides chapter-to-chapter.
+  React.useEffect(() => {
+    if (chapters.length === 0) return;
+    const activeChapter = chapters.find((chapter) => chapter.id === activeChapterId);
+    if (!activeChapter) return;
+
+    const handle = canvasRef.current;
+    if (!handle) return;
+
+    if (effectiveReducedMotion) {
+      handle.jumpTo({ chapter: activeChapter });
+    } else {
+      void handle.flyTo({ chapter: activeChapter });
+    }
+  }, [activeChapterId, chapters, effectiveReducedMotion]);
 
   const scrollToChapter = React.useCallback(
     (chapterIndex: number, source: "click" | "keyboard"): void => {
@@ -184,13 +257,17 @@ export default function CinematicMapSection({ days, tripId, reducedMotion }: Cin
 
       const sectionTop = section.getBoundingClientRect().top + window.scrollY;
       const progress = chapters.length <= 1 ? 0 : chapterIndex / (chapters.length - 1);
-      const targetProgress = ACTIVE_PROGRESS_START + progress * (ACTIVE_PROGRESS_END - ACTIVE_PROGRESS_START);
+      const targetProgress =
+        ACTIVE_PROGRESS_START + progress * (ACTIVE_PROGRESS_END - ACTIVE_PROGRESS_START);
       window.scrollTo({
-        top: sectionTop - window.innerHeight + (section.offsetHeight + window.innerHeight) * targetProgress,
-        behavior: effectiveReducedMotion ? "auto" : "smooth",
+        top:
+          sectionTop -
+          window.innerHeight +
+          (section.offsetHeight + window.innerHeight) * targetProgress,
+        behavior: effectiveReducedMotion ? "auto" : "smooth"
       });
     },
-    [chapters, effectiveReducedMotion],
+    [chapters, effectiveReducedMotion]
   );
 
   const handleChapterSelect = React.useCallback(
@@ -198,58 +275,65 @@ export default function CinematicMapSection({ days, tripId, reducedMotion }: Cin
       const chapterIndex = chapters.findIndex((chapter) => chapter.id === id);
       scrollToChapter(chapterIndex, source);
     },
-    [chapters, scrollToChapter],
+    [chapters, scrollToChapter]
   );
 
-  const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLElement>) => {
-    if (chapters.length === 0) return;
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLElement>) => {
+      if (chapters.length === 0) return;
 
-    const currentIndex = chapters.findIndex(c => c.id === activeChapterId);
-    let targetIndex = currentIndex !== -1 ? currentIndex : 0;
-    let handled = false;
+      const currentIndex = chapters.findIndex((c: ChapterCameraTarget) => c.id === activeChapterId);
+      let targetIndex = currentIndex !== -1 ? currentIndex : 0;
+      let handled = false;
 
-    switch (e.key) {
-      case "ArrowDown":
-      case "ArrowRight":
-        targetIndex = Math.min(targetIndex + 1, chapters.length - 1);
-        handled = true;
-        break;
-      case "ArrowUp":
-      case "ArrowLeft":
-        targetIndex = Math.max(targetIndex - 1, 0);
-        handled = true;
-        break;
-      case "Home":
-        targetIndex = 0;
-        handled = true;
-        break;
-      case "End":
-        targetIndex = chapters.length - 1;
-        handled = true;
-        break;
-      case "PageDown":
-        targetIndex = Math.min(targetIndex + 3, chapters.length - 1);
-        handled = true;
-        break;
-      case "PageUp":
-        targetIndex = Math.max(targetIndex - 3, 0);
-        handled = true;
-        break;
-    }
+      switch (e.key) {
+        case "ArrowDown":
+        case "ArrowRight":
+          targetIndex = Math.min(targetIndex + 1, chapters.length - 1);
+          handled = true;
+          break;
+        case "ArrowUp":
+        case "ArrowLeft":
+          targetIndex = Math.max(targetIndex - 1, 0);
+          handled = true;
+          break;
+        case "Home":
+          targetIndex = 0;
+          handled = true;
+          break;
+        case "End":
+          targetIndex = chapters.length - 1;
+          handled = true;
+          break;
+        case "PageDown":
+          targetIndex = Math.min(targetIndex + 3, chapters.length - 1);
+          handled = true;
+          break;
+        case "PageUp":
+          targetIndex = Math.max(targetIndex - 3, 0);
+          handled = true;
+          break;
+      }
 
-    if (handled) {
-      e.preventDefault();
-      // T14: section-level keys; ChapterNav has its own keys (T17); deep-link + URL + analytics owned by T13
-      scrollToChapter(targetIndex, "keyboard");
-    }
-  }, [activeChapterId, chapters, scrollToChapter]);
+      if (handled) {
+        e.preventDefault();
+        // T14: section-level keys; ChapterNav has its own keys (T17); deep-link + URL + analytics owned by T13
+        scrollToChapter(targetIndex, "keyboard");
+      }
+    },
+    [activeChapterId, chapters, scrollToChapter]
+  );
 
-  if (killSwitch || !mapEnabled || chapters.length === 0) {
+  if (chapters.length === 0) {
     return (
-      <div ref={sectionRef} className="relative w-full h-[60vh] md:h-[70vh]" style={{ position: 'relative' }}>
-        <section 
-          role="region" 
-          aria-label="Cinematic trip map" 
+      <div
+        ref={sectionRef}
+        className="relative w-full h-[60vh] md:h-[70vh]"
+        style={{ position: "relative" }}
+      >
+        <section
+          role="region"
+          aria-label="Cinematic trip map"
           tabIndex={-1}
           className="h-full w-full"
         >
@@ -259,43 +343,53 @@ export default function CinematicMapSection({ days, tripId, reducedMotion }: Cin
     );
   }
 
-  const activeChapter = chapters.find((c) => c.id === activeChapterId) || chapters[0];
-  
+  const activeChapter = chapters.find((c: ChapterCameraTarget) => c.id === activeChapterId) || chapters[0];
+
   const dayMatch = activeChapter?.id?.match(/day-(\d+)-/);
-  const dayDisplay = dayMatch && dayMatch[1] ? `Day ${parseInt(dayMatch[1], 10) + 1}` : '';
+  const dayDisplay = dayMatch && dayMatch[1] ? `Day ${parseInt(dayMatch[1], 10) + 1}` : "";
 
   return (
-    <div ref={sectionRef} className="relative w-full h-[60vh] md:h-[70vh]" style={{ position: 'relative' }}>
-      <section 
-        role="region" 
-        aria-label="Cinematic trip map" 
+    <div
+      ref={sectionRef}
+      className="relative w-full h-[60vh] md:h-[70vh]"
+      style={{ position: "relative" }}
+    >
+      <section
+        role="region"
+        aria-label="Cinematic trip map"
         tabIndex={-1}
         onKeyDown={handleKeyDown}
         className="h-full w-full sticky top-[var(--header-h,0)]"
       >
-        <CinematicMap 
-          chapters={chapters} 
-          activeChapterId={activeChapterId} 
-          tripId={tripId} 
-          reducedMotion={effectiveReducedMotion} 
-          onChapterChange={(id) => {
+        <WorkspaceTripCanvas
+          ref={canvasRef}
+          tripId={tripId}
+          chapters={chapters}
+          activeChapterId={activeChapterId}
+          reducedMotion={effectiveReducedMotion}
+          onChapterChange={(id: string) => {
             lastSourceRef.current = "scroll";
             setActiveChapterId(id);
-          }} 
-          className="absolute inset-0" 
+          }}
+          className="absolute inset-0"
         />
-        
-        <ChapterNav 
-          chapters={chapters.map(c => ({ id: c.id, label: c.title ?? '' }))} 
-          activeChapterId={activeChapterId} 
-          onSelect={handleChapterSelect} 
-          className="absolute right-4 top-4 hidden md:flex" 
+
+        <ChapterNav
+          chapters={chapters.map((c: ChapterCameraTarget) => ({ id: c.id, label: c.title ?? "" }))}
+          activeChapterId={activeChapterId}
+          onSelect={handleChapterSelect}
+          className="absolute right-4 top-4 hidden md:flex"
         />
 
         <div className="absolute left-4 bottom-4 pointer-events-none">
           {effectiveReducedMotion ? (
-            <div data-testid="chapter-caption" className="bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-sm border">
-              <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{dayDisplay}</div>
+            <div
+              data-testid="chapter-caption"
+              className="bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-sm border"
+            >
+              <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                {dayDisplay}
+              </div>
               <div className="text-lg font-semibold">{activeChapter?.title}</div>
             </div>
           ) : (
@@ -309,7 +403,9 @@ export default function CinematicMapSection({ days, tripId, reducedMotion }: Cin
                 data-testid="chapter-caption"
                 className="bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-sm border"
               >
-                <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{dayDisplay}</div>
+                <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                  {dayDisplay}
+                </div>
                 <div className="text-lg font-semibold">{activeChapter?.title}</div>
               </m.div>
             </AnimatePresence>

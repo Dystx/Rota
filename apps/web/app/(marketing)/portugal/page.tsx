@@ -67,18 +67,19 @@ export default function PortugalPage() {
           description: "Tell us what you want to experience, and we'll craft an itinerary that brings the best of these regions to life."
         }}
       >
-        <div data-testid="region-grid" className="contents">
+        <ul role="list" data-testid="region-grid" className="contents list-none p-0 m-0">
           {regions.map((region) => (
-            <TripCard
-              key={region.name}
-              testid={`region-card-${slugify(region.name)}`}
-              title={region.name}
-              caption={region.caption}
-              href="/planner"
-              cta={<span className="text-[13px] font-medium text-ochre-dark">Start your prompt →</span>}
-            />
+            <li key={region.name}>
+              <TripCard
+                testid={`region-card-${slugify(region.name)}`}
+                title={region.name}
+                caption={region.caption}
+                href="/planner"
+                cta={<span className="text-[13px] font-medium text-olive-light">Start your prompt →</span>}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       </ArchiveLayout>
       <SiteFooter />
     </>

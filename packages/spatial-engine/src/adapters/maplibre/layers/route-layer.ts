@@ -5,6 +5,8 @@ import type { SpatialFeatureCollection, SpatialLayer, SpatialLayerContext, Spati
 const SOURCE_ID = "spatial-engine:route:source";
 const LINE_LAYER_ID = "spatial-engine:route:line";
 const POINT_LAYER_ID = "spatial-engine:route:stops";
+export const ROUTE_LINE_LAYER_ID = LINE_LAYER_ID;
+export const ROUTE_STOPS_LAYER_ID = POINT_LAYER_ID;
 
 export interface RouteLayerOptions {
   palette: SpatialPalette;

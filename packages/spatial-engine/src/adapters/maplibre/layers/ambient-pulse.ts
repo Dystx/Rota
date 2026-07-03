@@ -4,6 +4,7 @@ import type { SpatialFeatureCollection, SpatialLayer, SpatialLayerContext, Spati
 
 const SOURCE_ID = "spatial-engine:ambient-pulse:source";
 const LAYER_ID = "spatial-engine:ambient-pulse:layer";
+export const AMBIENT_PULSE_LAYER_ID = LAYER_ID;
 
 export interface AmbientPulseLayerOptions {
   palette: SpatialPalette;

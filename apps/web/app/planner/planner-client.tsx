@@ -191,7 +191,7 @@ export function PlannerClient() {
             />
 
             {flow.kind === "candidate" && (
-              <div className="mt-section-gap">
+              <div className="mt-section-gap" role="status" aria-live="polite" aria-atomic="true">
                 <BriefConfirmation
                   title="We parsed your brief"
                   description={`Provider: deterministic-fallback · Confirm to lock the structured details, or edit any field to refine.`}
@@ -207,7 +207,7 @@ export function PlannerClient() {
                         aria-label="Continue with this brief"
                       >
                         {pending ? "Preparing…" : "Continue"}
-                        <span className="material-symbols-outlined text-base ml-2">arrow_forward</span>
+                        <span className="material-symbols-outlined text-base ml-2" aria-hidden="true">arrow_forward</span>
                       </Button>
                     </>
                   }
@@ -303,19 +303,28 @@ function FollowUpPanel({
         {questions.map((q) => {
           const current = answers[q.id] ?? "";
           const suggestions = FOLLOW_UP_ANSWERS[q.field] ?? q.options;
+          const selectedIndex = suggestions.findIndex((s) => s === current);
+          const activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
           return (
             <fieldset key={q.id} className="space-y-2">
               <legend className="font-label-ui text-label-ui font-semibold text-linen-dark">
                 {q.label}
               </legend>
               <p className="font-body-md text-body-md text-linen-dark/80">{q.question}</p>
-              <div className="flex flex-wrap gap-2">
-                {suggestions.map((opt) => {
+              <div
+                role="radiogroup"
+                aria-label={q.label}
+                className="flex flex-wrap gap-2"
+              >
+                {suggestions.map((opt, index) => {
                   const selected = current === opt;
                   return (
                     <button
                       key={opt}
                       type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      tabIndex={index === activeIndex ? 0 : -1}
                       onClick={() => onChange({ ...answers, [q.id]: opt })}
                       className={
                         "font-label-ui text-label-ui px-4 py-2 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light " +
@@ -335,6 +344,7 @@ function FollowUpPanel({
                   value={current}
                   onChange={(e) => onChange({ ...answers, [q.id]: e.target.value })}
                   placeholder="Or type your own…"
+                  aria-label="Describe your trip"
                   className="w-full bg-white/10 border border-white/25 rounded-full px-4 py-2 font-body-md text-body-md text-linen-dark placeholder:text-linen-dark/40 focus:outline-none focus:ring-2 focus:ring-ochre-light"
                 />
               )}
@@ -348,7 +358,7 @@ function FollowUpPanel({
         </Button>
         <Button variant="primary" onClick={onSubmit} aria-label="Continue with follow-up answers">
           Continue
-          <span className="material-symbols-outlined text-base ml-2">arrow_forward</span>
+          <span className="material-symbols-outlined text-base ml-2" aria-hidden="true">arrow_forward</span>
         </Button>
       </div>
     </div>
@@ -358,17 +368,17 @@ function FollowUpPanel({
 function SiteFooterLite() {
   return (
     <footer className="bg-linen-dark w-full border-t border-olive-dark/5 py-8 px-container-padding-lg flex flex-col md:flex-row justify-between items-center gap-4 mt-auto z-10">
-      <Link href="/" className="font-headline-lg text-headline-lg italic text-primary">
+      <Link href="/" className="font-headline-lg text-headline-lg italic text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2">
         Rumia
       </Link>
       <p className="font-label-ui text-label-ui text-olive-light text-center md:text-left">
         © 2024 Rumia. All rights reserved. Intentional Humanism in Travel.
       </p>
       <div className="flex gap-6">
-        <Link href="/pricing" className="font-label-ui text-label-ui text-olive-light hover:text-primary transition-colors opacity-80 hover:opacity-100">
+        <Link href="/pricing" className="font-label-ui text-label-ui text-olive-light hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2">
           Pricing
         </Link>
-        <Link href="/how-it-works" className="font-label-ui text-label-ui text-olive-light hover:text-primary transition-colors opacity-80 hover:opacity-100">
+        <Link href="/how-it-works" className="font-label-ui text-label-ui text-olive-light hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2">
           How it works
         </Link>
       </div>

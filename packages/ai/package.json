@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "@repo/analytics": "workspace:*",
-    "@repo/maps": "workspace:*",
     "@repo/types": "workspace:*"
   },
   "devDependencies": {

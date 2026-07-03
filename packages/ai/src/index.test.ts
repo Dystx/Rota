@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { TripBriefSchema } from "@repo/types";
 import { generateItineraryFromBrief } from "./index";
+import { __resetItineraryCache } from "./enrich";
 
 const tripBrief = TripBriefSchema.parse({
   destinationCountry: "portugal",
@@ -19,6 +20,24 @@ const tripBrief = TripBriefSchema.parse({
 });
 
 describe("generateItineraryFromBrief", () => {
+  beforeEach(() => {
+    // Phase 1e: `enrichItineraryWithCoords` now hits Nominatim
+    // by default. Stub `fetch` to a no-op so the test stays
+    // hermetic, and zero out the rate-limit interval so the
+    // test finishes in ms, not 1s/stop.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: false, status: 0, json: async () => [] }) as unknown as Response)
+    );
+    process.env.NOMINATIM_MIN_INTERVAL_MS = "0";
+    __resetItineraryCache();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    delete process.env.NOMINATIM_MIN_INTERVAL_MS;
+  });
+
   it("builds a deterministic itinerary with useful follow-up questions", async () => {
     const itinerary = await generateItineraryFromBrief(tripBrief);
 

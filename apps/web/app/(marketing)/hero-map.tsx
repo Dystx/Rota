@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import * as React from "react";
+import { useMapStore } from "@/store/useMapStore";
 
 // MapLibre is browser-only — same SSR guard used on /explore.
 const GlobeWorkspace = dynamic(
@@ -41,6 +42,13 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
   const [projection, setProjection] = React.useState<HeroProjection>(initialProjection);
   const [tick, setTick] = React.useState(0);
 
+  // Wire the visible map surface back to the cross-page Zustand store.
+  // The store is read by the bento grid (selection -> fly-to) and the
+  // workspace filmstrip (active stop). Subscribers here stay stable
+  // across renders — no need to memoise the handlers.
+  const setViewport = useMapStore((state) => state.setViewport);
+  const selectStop = useMapStore((state) => state.selectStop);
+
   // Bumping `tick` forces the dynamic child to remount on projection
   // switch so the GlobeWorkspace / WorkspaceCanvas lifecycle runs
   // cleanly. This is the simplest pattern that keeps both canvases
@@ -60,6 +68,8 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
           testId="hero-globe"
           initialCenter={[PORTUGAL_CENTER.lng, PORTUGAL_CENTER.lat]}
           initialZoom={3.4}
+          onViewportChange={setViewport}
+          onStopClick={(id, coords) => selectStop(id, coords)}
         />
       ) : (
         <WorkspaceCanvas
@@ -69,6 +79,8 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
           testId="hero-workspace"
           initialCenter={[PORTUGAL_CENTER.lng, PORTUGAL_CENTER.lat]}
           initialZoom={5.6}
+          onViewportChange={setViewport}
+          onStopClick={(id, coords) => selectStop(id, coords)}
         />
       )}
 

@@ -6,6 +6,8 @@ import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createDiscoveryEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
 import { CameraChoreography } from "../core/camera-choreography";
 import { fixtureAllCollections } from "../fixtures/travelers";
+import { CLICKABLE_LAYER_IDS } from "../index";
+import type { ViewportState } from "../core/viewport";
 import type { CameraTarget, MapStyleEndpoint } from "../core/types";
 
 export interface GlobeWorkspaceProps {
@@ -27,6 +29,19 @@ export interface GlobeWorkspaceProps {
   disableIntro?: boolean;
   className?: string;
   testId?: string;
+  /**
+   * Fired on every `moveend` with the latest viewport snapshot.
+   * The home bento / Zustand store wires this to keep the consumer
+   * selection in lock-step with what the user is actually looking at.
+   */
+  onViewportChange?: (viewport: ViewportState) => void;
+  /**
+   * Fired when the user clicks a layer feature (ambient pulse or
+   * symbol badge). `stopId` is the feature's `id` property; coordinates
+   * come from the click's `lngLat`. Layer id conventions are documented
+   * in the spatial-engine fixtures; map ids to slugs in the consumer.
+   */
+  onStopClick?: (stopId: string, coordinates: readonly [number, number]) => void;
 }
 
 const DEFAULT_HOME_CENTER: readonly [number, number] = [-8.2245, 39.3999];
@@ -49,13 +64,19 @@ export function GlobeWorkspace({
   initialZoom = DEFAULT_HOME_ZOOM,
   disableIntro = false,
   className,
-  testId = "globe-workspace"
+  testId = "globe-workspace",
+  onViewportChange,
+  onStopClick
 }: GlobeWorkspaceProps): React.ReactElement {
   // If `initialFocus` is set, it wins and the intro choreography is
   // skipped — the caller has already chosen where to land.
-  const resolvedInitialTarget: CameraTarget = initialFocus
-    ? initialFocus
-    : { center: initialCenter, zoom: initialZoom };
+  const resolvedInitialTarget: CameraTarget = React.useMemo(
+    () =>
+      initialFocus
+        ? initialFocus
+        : { center: initialCenter, zoom: initialZoom },
+    [initialFocus, initialCenter, initialZoom]
+  );
   const resolvedDisableIntro = disableIntro || initialFocus !== undefined;
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const engineRef = React.useRef<MapLibreSpatialEngine | null>(null);
@@ -92,6 +113,48 @@ export function GlobeWorkspace({
           // that opted into the channel.
         });
 
+        // Forward the live viewport to the consumer (e.g. Zustand store)
+        // so cross-page surfaces mirror what the user is actually looking
+        // at. Each `moveend` (pan, zoom, rotate) snapshots the renderer.
+        const map = engine.getRenderer();
+        const detachViewport = map && onViewportChange
+          ? (() => {
+              const handler = () => {
+                onViewportChange({
+                  center: map.getCenter().toArray() as [number, number],
+                  zoom: map.getZoom(),
+                  pitch: map.getPitch(),
+                  bearing: map.getBearing()
+                });
+              };
+              map.on("moveend", handler);
+              return () => map.off("moveend", handler);
+            })()
+          : () => undefined;
+
+        // Dispatch a single consumer-facing `onStopClick` for any
+        // clickable layer (ambient pulse, symbol badge, route stop).
+        // The first hit wins; richer fan-out can land in phase 2.
+        const detachClick = map && onStopClick
+          ? (() => {
+              const handler = (event: { point: { x: number; y: number }; lngLat: { lng: number; lat: number } }) => {
+                const features = map.queryRenderedFeatures(
+                  [event.point.x, event.point.y],
+                  { layers: CLICKABLE_LAYER_IDS as string[] }
+                );
+                const feature = features[0];
+                if (!feature) return;
+                const rawId =
+                  (feature as { id?: unknown }).id ??
+                  (feature.properties as Record<string, unknown> | null)?.id;
+                if (rawId === undefined || rawId === null) return;
+                onStopClick(String(rawId), [event.lngLat.lng, event.lngLat.lat]);
+              };
+              map.on("click", handler);
+              return () => map.off("click", handler);
+            })()
+          : () => undefined;
+
         // MapLibre measures the container once at mount. When the parent
         // layout hasn't settled yet (dynamic import, font load, etc.) the
         // canvas can be initialised at 0×0 or a partial width. Resize on
@@ -121,6 +184,8 @@ export function GlobeWorkspace({
         return () => {
           cancelAnimationFrame(raf);
           observer?.disconnect();
+          detachViewport();
+          detachClick();
           unsubscribe();
         };
       })
@@ -135,7 +200,7 @@ export function GlobeWorkspace({
       engine.unmount();
       engineRef.current = null;
     };
-  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, styleOverride, theme]);
+  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, styleOverride, theme, onViewportChange, onStopClick]);
 
   return (
     <div

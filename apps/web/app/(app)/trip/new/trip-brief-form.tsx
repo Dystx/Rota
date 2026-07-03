@@ -273,9 +273,11 @@ export function TripBriefForm() {
                   className="rota-form-input"
                   value={form.tripLengthDays}
                   onChange={(event) => updateValue("tripLengthDays", event.target.value)}
+                  aria-invalid={Boolean(errors.tripLengthDays)}
+                  aria-describedby={errors.tripLengthDays ? "tripLengthDays-error" : undefined}
                 />
                 <p className="rota-form-hint">Even without exact dates, how long is the trip?</p>
-                {errors.tripLengthDays ? <p className="rota-form-error">{errors.tripLengthDays}</p> : null}
+                {errors.tripLengthDays ? <p className="rota-form-error" id="tripLengthDays-error" role="alert">{errors.tripLengthDays}</p> : null}
               </div>
 
               <div className="rota-form-field">
@@ -290,8 +292,10 @@ export function TripBriefForm() {
                   className="rota-form-input"
                   value={form.travelersCount}
                   onChange={(event) => updateValue("travelersCount", event.target.value)}
+                  aria-invalid={Boolean(errors.travelersCount)}
+                  aria-describedby={errors.travelersCount ? "travelersCount-error" : undefined}
                 />
-                {errors.travelersCount ? <p className="rota-form-error">{errors.travelersCount}</p> : null}
+                {errors.travelersCount ? <p className="rota-form-error" id="travelersCount-error" role="alert">{errors.travelersCount}</p> : null}
               </div>
 
               <div className="rota-form-field">
@@ -304,8 +308,10 @@ export function TripBriefForm() {
                   className="rota-form-input"
                   value={form.startDate}
                   onChange={(event) => updateValue("startDate", event.target.value)}
+                  aria-invalid={Boolean(errors.startDate)}
+                  aria-describedby={errors.startDate ? "startDate-error" : undefined}
                 />
-                {errors.startDate ? <p className="rota-form-error">{errors.startDate}</p> : null}
+                {errors.startDate ? <p className="rota-form-error" id="startDate-error" role="alert">{errors.startDate}</p> : null}
               </div>
 
               <div className="rota-form-field">
@@ -318,8 +324,10 @@ export function TripBriefForm() {
                   className="rota-form-input"
                   value={form.endDate}
                   onChange={(event) => updateValue("endDate", event.target.value)}
+                  aria-invalid={Boolean(errors.endDate)}
+                  aria-describedby={errors.endDate ? "endDate-error" : undefined}
                 />
-                {errors.endDate ? <p className="rota-form-error">{errors.endDate}</p> : null}
+                {errors.endDate ? <p className="rota-form-error" id="endDate-error" role="alert">{errors.endDate}</p> : null}
               </div>
             </section>
 
@@ -331,24 +339,28 @@ export function TripBriefForm() {
                 value={form.travelerType}
                 options={travelerTypes}
                 onChange={(value) => updateValue("travelerType", value)}
+                error={errors.travelerType}
               />
               <SelectField
                 label="Budget level"
                 value={form.budgetLevel}
                 options={budgetLevels}
                 onChange={(value) => updateValue("budgetLevel", value)}
+                error={errors.budgetLevel}
               />
               <SelectField
                 label="Pace"
                 value={form.pace}
                 options={paceOptions}
                 onChange={(value) => updateValue("pace", value)}
+                error={errors.pace}
               />
               <SelectField
                 label="Transport mode"
                 value={form.transportMode}
                 options={transportModes}
                 onChange={(value) => updateValue("transportMode", value)}
+                error={errors.transportMode}
               />
             </section>
 
@@ -403,9 +415,11 @@ export function TripBriefForm() {
                   placeholder="e.g. Near the river in Porto"
                   value={form.accommodationLocation}
                   onChange={(event) => updateValue("accommodationLocation", event.target.value)}
+                  aria-invalid={Boolean(errors.accommodationLocation)}
+                  aria-describedby={errors.accommodationLocation ? "accommodationLocation-error" : undefined}
                 />
                 {errors.accommodationLocation ? (
-                  <p className="rota-form-error">{errors.accommodationLocation}</p>
+                  <p className="rota-form-error" id="accommodationLocation-error" role="alert">{errors.accommodationLocation}</p>
                 ) : null}
               </div>
               <div className="rota-form-field">
@@ -419,18 +433,20 @@ export function TripBriefForm() {
                   placeholder="Any other details? E.g., 'We have a morning flight out of Lisbon on the last day.'"
                   value={form.rawBrief}
                   onChange={(event) => updateValue("rawBrief", event.target.value)}
+                  aria-invalid={Boolean(errors.rawBrief)}
+                  aria-describedby={errors.rawBrief ? "rawBrief-error" : undefined}
                 />
-                {errors.rawBrief ? <p className="rota-form-error">{errors.rawBrief}</p> : null}
+                {errors.rawBrief ? <p className="rota-form-error" id="rawBrief-error" role="alert">{errors.rawBrief}</p> : null}
               </div>
             </div>
 
             <div className="flex items-center justify-between gap-4 border-t border-[var(--color-border)] pt-8 mt-4">
-              <p className="rota-muted text-sm font-medium">
+              <p className="rota-muted text-sm font-medium" role="status" aria-live="polite">
                 {normalizeErrors(errors) > 0
                   ? `${normalizeErrors(errors)} field${normalizeErrors(errors) > 1 ? "s" : ""} need attention.`
                   : submitMessage || "Ready for audit."}
               </p>
-              <Button type="submit" disabled={isSubmitting} className="min-w-[160px]">
+              <Button type="submit" disabled={isSubmitting} className="min-w-[160px] focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2">
                 {isSubmitting ? "Auditing..." : "Audit & Polish Plan"}
               </Button>
             </div>
@@ -467,24 +483,27 @@ function SelectField({
   label,
   value,
   options,
-  onChange
+  onChange,
+  error
 }: {
   label: string;
   value: string;
   options: readonly string[];
   onChange: (value: string) => void;
+  error?: string;
 }) {
   const id = `select-${label.toLowerCase().replace(/\s+/g, "-")}`;
   return (
     <div className="rota-form-field">
       <label htmlFor={id} className="rota-form-label">{label}</label>
-      <select id={id} className="rota-form-input" value={value} onChange={(event) => onChange(event.target.value)}>
+      <select id={id} className="rota-form-input" value={value} onChange={(event) => onChange(event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined}>
         {options.map((option) => (
           <option key={option} value={option}>
             {prettify(option)}
           </option>
         ))}
       </select>
+      {error ? <p className="rota-form-error" id={`${id}-error`} role="alert">{error}</p> : null}
     </div>
   );
 }
@@ -504,8 +523,9 @@ function CheckboxGroup({
   onToggle: (value: string) => void;
   error?: string;
 }) {
+  const id = `group-${label.toLowerCase().replace(/\s+/g, "-")}`;
   return (
-    <fieldset className="rota-form-field">
+    <fieldset className="rota-form-field" aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined}>
       <legend className="rota-form-label">{label}</legend>
       {description ? <p className="rota-form-hint">{description}</p> : null}
       <div className="grid gap-3 pt-1 sm:grid-cols-2 xl:grid-cols-3">
@@ -525,7 +545,7 @@ function CheckboxGroup({
           );
         })}
       </div>
-      {error ? <p className="rota-form-error">{error}</p> : null}
+      {error ? <p className="rota-form-error" id={`${id}-error`} role="alert">{error}</p> : null}
     </fieldset>
   );
 }

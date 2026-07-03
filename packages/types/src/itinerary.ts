@@ -18,7 +18,7 @@ export const TripStopSchema = z.object({
   lng: z.number().min(-180).max(180).optional(),
   lat: z.number().min(-90).max(90).optional(),
   geocodeConfidence: z.number().min(0).max(1).optional(),
-  geocodeSource: z.enum(["mapbox", "manual"]).nullable().optional()
+  geocodeSource: z.enum(["mapbox", "nominatim", "manual"]).nullable().optional()
 }).superRefine((value, context) => {
   const hasLng = value.lng !== undefined;
   const hasLat = value.lat !== undefined;

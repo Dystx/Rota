@@ -13,7 +13,7 @@ This platform is built as a modular monorepo, prioritizing decoupled UI developm
 - `@repo/routing`: Travel-time and map layer calculations.
 - `@repo/payments`: Checkout and pricing plan contracts.
 - `@repo/emails`: Transactional template and delivery abstractions.
-- `@repo/maps`: Map provider and schematic fallbacks.
+- `@repo/spatial-engine`: Provider-agnostic map and globe foundation (MapLibre adapter + CARTO basemaps); single map surface for home hero, `/explore`, `/explore/workspace`, and the trip routes.
 - `@repo/analytics`: Privacy-safe instrumentation.
 - `@repo/monitoring`: Error tracking and health checks.
 

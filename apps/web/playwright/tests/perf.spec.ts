@@ -184,7 +184,12 @@ test.describe("@perf Performance & Bundle Budgets", () => {
           }
           
           const urlLower = entry.name.toLowerCase();
-          if (urlLower.includes('mapbox') || urlLower.includes('leaflet') || urlLower.includes('map-provider') || urlLower.includes('provider-map') || urlLower.includes('@repo/maps')) {
+          if (
+            urlLower.includes('maplibre') ||
+            urlLower.includes('workspace-canvas') ||
+            urlLower.includes('trip-workspace-canvas') ||
+            urlLower.includes('@repo/spatial-engine')
+          ) {
             hasMapProvider = true;
           }
         }
