@@ -1,5 +1,6 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { AmbientPulseLayer } from "./layers/ambient-pulse";
+import { RouteLayer } from "./layers/route-layer";
 import { SymbolBadgesLayer } from "./layers/symbol-badges";
 import { mountMapLibreInstance } from "./map-instance";
 import { SpatialCameraController } from "../../core/camera-controller";
@@ -27,6 +28,11 @@ const LAYER_CHANNEL_BINDINGS = new WeakMap<SpatialLayer, Parameters<TelemetrySer
 /** Bind a layer to a specific telemetry channel (call from layer factory). */
 export function bindLayerToChannel(layer: SpatialLayer, channel: Parameters<TelemetryService["subscribe"]>[0]): void {
   LAYER_CHANNEL_BINDINGS.set(layer, channel);
+}
+
+/** Ordered list of registered layer ids, in render order. */
+function layerIdsInOrder(layers: Map<string, LayerRegistration>): string[] {
+  return [...layers.keys()];
 }
 
 const DEFAULT_PALETTE: SpatialPalette = {
@@ -72,7 +78,8 @@ export class MapLibreSpatialEngine implements SpatialEngine {
       container,
       style: this.options.style,
       initialTarget: this.options.initialTarget,
-      reducedMotion: this.options.reducedMotion
+      reducedMotion: this.options.reducedMotion,
+      projection: this.options.projection ?? "globe"
     });
 
     this.map = map;
@@ -96,12 +103,48 @@ export class MapLibreSpatialEngine implements SpatialEngine {
     if (this.mounted) {
       this.attachLayer(layer);
     }
+    void layer; // keep param named for clarity; MapLibre registration happens via attachLayer
   }
 
   setPalette(palette: SpatialPalette): void {
     this.palette = palette;
     // Real implementation would push paint-property updates to each layer;
     // phase 1 just stores the latest palette for components that read it.
+  }
+
+  setLayerVisibility(layerId: string, visible: boolean): void {
+    if (!this.mounted || !this.map) return;
+    if (!this.map.getLayer(layerId)) return;
+    this.map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
+  }
+
+  reorderLayer(layerId: string, toIndex: number): void {
+    if (!this.mounted || !this.map) return;
+    if (!this.map.getLayer(layerId)) return;
+    if (!this.layers.has(layerId)) return;
+
+    const ids = layerIdsInOrder(this.layers);
+    const fromIndex = ids.indexOf(layerId);
+    if (fromIndex === -1) return;
+    const clamped = Math.max(0, Math.min(toIndex, ids.length - 1));
+    const spliced = ids.splice(fromIndex, 1);
+    const removed = spliced[0];
+    if (!removed) return;
+    ids.splice(clamped, 0, removed);
+
+    // Move the layer to be just below the layer that should sit after it.
+    // If we want it at the top, pass no `beforeId` to moveLayer.
+    const nextId = ids[clamped + 1];
+    if (nextId && nextId !== layerId) {
+      this.map.moveLayer(layerId, nextId);
+    } else if (!nextId) {
+      this.map.moveLayer(layerId);
+    }
+  }
+
+  applyLayerUpdate(layer: SpatialLayer, collection: SpatialFeatureCollection): void {
+    if (!this.mounted || !this.map) return;
+    layer.onUpdate(this.makeContext(), collection);
   }
 
   getCamera(): CameraController {
@@ -187,6 +230,15 @@ export function createDiscoveryEngine(options: SpatialEngineOptions): MapLibreSp
   const engine = new MapLibreSpatialEngine(options);
   engine.register(new AmbientPulseLayer({ palette: DEFAULT_PALETTE }));
   engine.register(new SymbolBadgesLayer({ palette: DEFAULT_PALETTE }));
+  return engine;
+}
+
+/** WorkspaceCanvas engine: 2D, no globe projection, all three standard layers + itinerary route. */
+export function createWorkspaceEngine(options: SpatialEngineOptions): MapLibreSpatialEngine {
+  const engine = new MapLibreSpatialEngine(options);
+  engine.register(new AmbientPulseLayer({ palette: DEFAULT_PALETTE }));
+  engine.register(new SymbolBadgesLayer({ palette: DEFAULT_PALETTE }));
+  engine.register(new RouteLayer({ palette: DEFAULT_PALETTE }));
   return engine;
 }
 

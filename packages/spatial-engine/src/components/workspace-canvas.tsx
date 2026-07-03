@@ -1,0 +1,125 @@
+"use client";
+
+import * as React from "react";
+import { useReducedMotion } from "@repo/ui";
+import { CartoBasemapStyleProvider } from "../core/map-style-provider";
+import { createWorkspaceEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
+import { fixtureRouteCollection } from "../fixtures/routes";
+import { fixtureTravelerCollection, fixtureSpecialistCollection } from "../fixtures/travelers";
+import type { MapStyleEndpoint } from "../core/types";
+
+export interface WorkspaceCanvasProps {
+  /** Style endpoint override (tests, air-gapped environments). */
+  styleOverride?: MapStyleEndpoint;
+  /** Initial camera target — defaults to Lisbon at close zoom. */
+  initialCenter?: readonly [number, number];
+  initialZoom?: number;
+  className?: string;
+  testId?: string;
+}
+
+const DEFAULT_HOME_CENTER: readonly [number, number] = [-8.6291, 41.1579];
+const DEFAULT_HOME_ZOOM = 5.4;
+
+/**
+ * WorkspaceCanvas — the 2D counterpart to GlobeWorkspace. Renders an
+ * itinerary in flat mercator projection so editing precision is not
+ * lost to curvature. Same SpatialEngine abstraction; the projection
+ * option is the only renderer-specific difference.
+ */
+export function WorkspaceCanvas({
+  styleOverride,
+  initialCenter = DEFAULT_HOME_CENTER,
+  initialZoom = DEFAULT_HOME_ZOOM,
+  className,
+  testId = "workspace-canvas"
+}: WorkspaceCanvasProps): React.ReactElement {
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const engineRef = React.useRef<MapLibreSpatialEngine | null>(null);
+  const reducedMotion = useReducedMotion();
+  const [mountError, setMountError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let cancelled = false;
+    const styleProvider = new CartoBasemapStyleProvider();
+    const style = styleOverride ?? styleProvider.getStyle("light");
+    const engine = createWorkspaceEngine({
+      style,
+      initialTarget: { center: initialCenter, zoom: initialZoom },
+      reducedMotion,
+      projection: "mercator"
+    });
+    engineRef.current = engine;
+
+    engine.seedTelemetry("travelers", fixtureTravelerCollection());
+    engine.seedTelemetry("specialists", fixtureSpecialistCollection());
+    engine.seedTelemetry("trips", fixtureRouteCollection());
+
+    engine
+      .mount(container)
+      .then(() => {
+        if (cancelled) {
+          engine.unmount();
+          return;
+        }
+        const unsubscribe = engine.getTelemetry().subscribe("trips", () => undefined);
+
+        const refresh = () => engine.getRenderer()?.resize();
+        refresh();
+        const raf = requestAnimationFrame(refresh);
+
+        let observer: ResizeObserver | null = null;
+        if (typeof ResizeObserver !== "undefined") {
+          observer = new ResizeObserver(() => refresh());
+          observer.observe(container);
+        }
+
+        return () => {
+          cancelAnimationFrame(raf);
+          observer?.disconnect();
+          unsubscribe();
+        };
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          setMountError(err instanceof Error ? err.message : "Failed to mount workspace");
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      engine.unmount();
+      engineRef.current = null;
+    };
+  }, [initialCenter, initialZoom, reducedMotion, styleOverride]);
+
+  return (
+    <div
+      ref={containerRef}
+      data-testid={testId}
+      data-projection="mercator"
+      data-reduced-motion={reducedMotion ? "true" : "false"}
+      className={
+        className ??
+        "relative h-[640px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-linen-dark shadow-[0_24px_60px_rgba(7,17,19,0.06)]"
+      }
+    >
+      {mountError ? (
+        <div
+          role="alert"
+          className="absolute inset-0 flex items-center justify-center bg-linen-dark/90 text-center text-sm text-on-surface"
+        >
+          <div>
+            <p className="font-headline-sm text-headline-sm mb-2">Workspace unavailable</p>
+            <p className="rota-muted">{mountError}</p>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export default WorkspaceCanvas;

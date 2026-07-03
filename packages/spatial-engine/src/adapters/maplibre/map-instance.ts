@@ -7,6 +7,7 @@ export interface MapLibreInstanceOptions {
   style: MapStyleEndpoint;
   initialTarget?: CameraTarget;
   reducedMotion?: boolean;
+  projection?: "globe" | "mercator";
 }
 
 /**
@@ -53,8 +54,13 @@ export async function mountMapLibreInstance(options: MapLibreInstanceOptions): P
     map.once("error", onError);
   });
 
-  // Globe projection — the headline visual from the architecture brief.
-  map.setProjection({ type: "globe" });
+  // Globe projection is opt-in. Workspace mode (mercator) keeps the flat
+  // canvas so editing precision is not lost to curvature.
+  if (options.projection === "mercator") {
+    map.setProjection({ type: "mercator" });
+  } else {
+    map.setProjection({ type: "globe" });
+  }
 
   const executor: CameraExecutor = {
     flyTo: (flyOptions) =>

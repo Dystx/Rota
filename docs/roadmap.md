@@ -147,10 +147,30 @@ Greenfield `packages/spatial-engine` package with provider-agnostic core abstrac
 - `components/globe-workspace.tsx` — `GlobeWorkspace` React component (dynamic-imported via `next/dynamic` with skeleton fallback; ResizeObserver + `requestAnimationFrame` to recover from layout-not-settled init; reduced-motion respected; cleanup on unmount)
 - `app/(marketing)/explore/page.tsx` + `discovery-globe.tsx` — server-side metadata + TopNav/SiteFooter + 3 capability cards
 
+### Phase 1d — Spatial Engine 2D Workspace ✅ Complete (2026-07-03)
+
+Completes the Spatial Engine half-of the architectural promise: same engine, two projections, three reference layers.
+
+- `core/types.ts` — `SpatialEngineOptions.projection` (`"globe" | "mercator"`, default `"globe"`); `SpatialEngine` gains `setLayerVisibility`, `reorderLayer`, `applyLayerUpdate`
+- `adapters/maplibre/map-instance.ts` — `MapLibreInstanceOptions.projection`; mercator mode calls `setProjection({ type: "mercator" })` so editing precision isn't lost to curvature
+- `adapters/maplibre/spatial-engine.ts` — `createWorkspaceEngine` factory that wires ambient + specialist + route layers; `setLayerVisibility` / `reorderLayer` / `applyLayerUpdate` map to `setLayoutProperty` / `moveLayer` / `layer.onUpdate`
+- `core/layer-registry.ts` — `LayerRegistry` with `register(layer)`, `enable(layerId, visible)`, `reorder(layerId, toIndex)`, `list()`, `isVisible(layerId)`, `bindTelemetry(layer, telemetry, channel)` for explicit data-flow control
+- `adapters/maplibre/layers/route-layer.ts` — `RouteLayer` (ochre dashed `line` layer + primaryContainer `circle` stops; self-bound to `"trips"` channel via `bindLayerToChannel()`)
+- `fixtures/routes.ts` — `fixtureRouteCollection` (5-stop Porto→Lisbon LineString + point features with order/label/note), `fixtureRouteSummary`
+- `components/workspace-canvas.tsx` — `WorkspaceCanvas` React component (mercator projection, CARTO Positron style, reduced-motion + ResizeObserver; same lifecycle as `GlobeWorkspace`)
+- `app/(marketing)/explore/workspace/page.tsx` + `workspace-canvas-client.tsx` — new route at `/explore/workspace` rendering the 2D canvas + 5-day itinerary + layer-registry card + cross-link to the 3D globe
+
+Verified end-to-end via Playwright on /explore/workspace:
+- Mercator projection with CARTO Positron (light) basemap, country labels visible (Portugal, Spain, Madrid, Sevilla)
+- Ochre dashed LineString connects 5 stops Porto → Coimbra → Aveiro → Nazaré → Lisbon
+- Dark-green stop markers at each city
+- Ambient pulse + specialist badges render alongside the route
+- Cross-link "See the 3D globe" navigates to /explore
+
 Future migrations (separate sign-off):
-- Replace `@repo/maps` CinematicMap + ProviderMap consumers with `MapLibreSpatialEngine` + a 2D WorkspaceCanvas variant (Trip pages)
+- Replace `@repo/maps` CinematicMap + ProviderMap with `MapLibreSpatialEngine` + WorkspaceCanvas (Trip pages)
 - Swap `InMemoryTelemetryService` for a Supabase Realtime adapter
-- Promote the LayerRegistry + GeoJSON batched updates + camera choreography hooks
+- Promote GeoJSON batched updates + camera choreography hooks
 - Add CARTO fog halo once `StyleSpecification.fog` is exported from a stable `@maplibre/maplibre-gl-style-spec` release
 
 ### Phase 2 — Production Supabase Reconciliation *(BLOCKER for launch)*

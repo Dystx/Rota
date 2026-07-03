@@ -98,6 +98,12 @@ export interface SpatialEngine {
   setPalette(palette: SpatialPalette): void;
   getCamera(): CameraController;
   getTelemetry(): TelemetryService;
+  /** Toggle visibility for a registered layer. */
+  setLayerVisibility(layerId: string, visible: boolean): void;
+  /** Move a registered layer to a new render-order index. */
+  reorderLayer(layerId: string, toIndex: number): void;
+  /** Push a telemetry snapshot into a registered layer. */
+  applyLayerUpdate(layer: SpatialLayer, collection: SpatialFeatureCollection): void;
   unmount(): void;
 }
 
@@ -107,4 +113,10 @@ export interface SpatialEngineOptions {
   initialTarget?: CameraTarget;
   palette?: Partial<SpatialPalette>;
   reducedMotion?: boolean;
+  /**
+   * Projection mode. `globe` enables MapLibre's 3D globe projection (best
+   * for Discovery / marketing). `mercator` keeps the flat 2D canvas
+   * (precision editing — Workspace). Default: `globe`.
+   */
+  projection?: "globe" | "mercator";
 }
