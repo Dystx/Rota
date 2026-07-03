@@ -26,8 +26,17 @@ test.describe("@smoke @visual Marketing baselines", () => {
     const routeName = route === "/" ? "home" : route.replace(/\//g, "-").replace(/^-/, "");
     test(`marketing route ${route}`, async ({ page }, testInfo) => {
       await page.goto(route);
+      // The home page renders the GlobeWorkspace with a ~3.2s intro
+      // camera choreography (earth → europe beat). CSS animations are
+      // disabled above, but the WebGL camera position is driven by
+      // JavaScript and is non-deterministic for the screenshot if we
+      // capture mid-flight. Wait for the choreography to settle on the
+      // home page before the baseline compare.
+      if (route === "/") {
+        await page.waitForTimeout(4000);
+      }
       await disableAnimations(page);
-      
+
       await expect(page).toHaveScreenshot(`${testInfo.project.name}-marketing-${routeName}.png`, {
         fullPage: true,
         animations: "disabled",
