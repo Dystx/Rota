@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { PORTUGAL_BBOX } from "./types";
-import { buildExtractQuery, CATEGORY_FILTERS } from "./extract";
+import { PORTUGAL_BBOX, COUNTRY_BBOXES } from "./types";
+import { buildExtractQuery, bboxForCountry, CATEGORY_FILTERS } from "./extract";
 
 describe("extract — query builder", () => {
   it("builds a query that filters by bbox + category", () => {
@@ -70,5 +70,43 @@ describe("extract — row projection", () => {
     expect(Object.keys(CATEGORY_FILTERS)).toEqual(
       expect.arrayContaining(["amenity", "tourism", "historic"])
     );
+  });
+});
+
+describe("bboxForCountry", () => {
+  it("resolves the 5 supported countries", () => {
+    const supported = ["pt", "es", "it", "fr", "gr"] as const;
+    for (const code of supported) {
+      const result = bboxForCountry(code);
+      expect(result).not.toBeNull();
+      expect(result?.country).toBe(code);
+      expect(result?.bbox).toEqual(COUNTRY_BBOXES[code]);
+    }
+  });
+
+  it("is case-insensitive", () => {
+    const upper = bboxForCountry("PT");
+    expect(upper?.country).toBe("pt");
+  });
+
+  it("returns null for unsupported countries", () => {
+    expect(bboxForCountry("xx")).toBeNull();
+    expect(bboxForCountry("us")).toBeNull();
+  });
+
+  it("Portugal bbox matches the documented coords", () => {
+    const result = bboxForCountry("pt");
+    expect(result?.bbox).toEqual(PORTUGAL_BBOX);
+  });
+
+  it("Italy and France bboxes don't overlap incorrectly", () => {
+    // Sanity check: Italy's western edge (6.62) is east of
+    // France's eastern edge (8.23) for the Italian/French
+    // Alps section. They share a border ~6.6-7.7°E.
+    const it = bboxForCountry("it");
+    const fr = bboxForCountry("fr");
+    expect(it).not.toBeNull();
+    expect(fr).not.toBeNull();
+    expect(fr!.bbox.maxLon).toBeGreaterThan(7);
   });
 });

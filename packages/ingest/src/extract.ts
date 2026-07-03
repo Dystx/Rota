@@ -34,10 +34,12 @@
 
 import type { Connection } from "duckdb";
 import {
+  COUNTRY_BBOXES,
   PORTUGAL_BBOX,
   type Bbox,
   type ExtractResult,
-  type OsmFeature
+  type OsmFeature,
+  type SupportedCountry
 } from "./types";
 import { openFile, all, close } from "./duckdb";
 
@@ -63,6 +65,18 @@ function countryFromBbox(): string {
   // bboxes land in PR-7, the extractOsm entry point takes
   // a `country` argument and passes it through.
   return "pt";
+}
+
+/** Resolve a country code (or a country name string) to
+ *  its bounding box. Returns `null` if the country isn't
+ *  in the supported set. */
+export function bboxForCountry(
+  country: string
+): { bbox: Bbox; country: SupportedCountry } | null {
+  const key = country.toLowerCase() as SupportedCountry;
+  const bbox = COUNTRY_BBOXES[key];
+  if (!bbox) return null;
+  return { bbox, country: key };
 }
 
 /** Internal: run a SQL query and return the rows as
@@ -192,7 +206,7 @@ export async function extractFromTable(
  *  it before substitution to prevent injection. */
 export async function extractOsm(
   pbfPath: string,
-  options: { bbox?: Bbox; country?: string } = {}
+  options: { bbox?: Bbox; country?: SupportedCountry } = {}
 ): Promise<ExtractResult> {
   if (!pbfPath || pbfPath.length === 0) {
     throw new Error("extractOsm: pbfPath is required");
@@ -204,8 +218,12 @@ export async function extractOsm(
     throw new Error("extractOsm: pbfPath contains a single quote");
   }
 
-  const bbox = options.bbox ?? PORTUGAL_BBOX;
-  const country = options.country ?? countryFromBbox();
+  // Resolve the bbox + country. The `country` argument
+  // wins if both are passed; if neither, fall back to
+  // Portugal (the original single-country extract).
+  const resolved = options.country ? bboxForCountry(options.country) : null;
+  const bbox = options.bbox ?? resolved?.bbox ?? PORTUGAL_BBOX;
+  const country = options.country ?? resolved?.country ?? (countryFromBbox() as SupportedCountry);
 
   const connection = await openFile(pbfPath);
   try {

@@ -43,9 +43,8 @@ export interface OsmFeature {
   country: string;
 }
 
-/** Bounding box for the Portugal extract. Hard-coded
- *  for now; future per-country boxes (ES/IT/FR/GR) live in
- *  a sibling file. */
+/** Bounding box for the Portugal extract. The first
+ *  of the 5-country expansion set shipped in PR-14. */
 export const PORTUGAL_BBOX: Bbox = {
   minLat: 36.9601,
   maxLat: 42.1543,
@@ -60,6 +59,51 @@ export interface Bbox {
   minLon: number;
   maxLon: number;
 }
+
+/** Bounding boxes for the 5-country Phase 7 expansion set
+ *  (PT, ES, IT, FR, GR). Each is a mainland-only box;
+ *  island territories (Canary Islands, Azores, Sardinia,
+ *  Corsica, Crete, etc.) are deliberately excluded from
+ *  the v1 extract. A follow-up adds the island boxes
+ *  when the destination knowledge graph is ready to
+ *  accept them.
+ *
+ *  Coordinates are continental-approximate; they may
+ *  shave a few km at the edges for water boundaries.
+ *  Tune after the first PBF extract against a known
+ *  reference set. */
+export const COUNTRY_BBOXES = {
+  pt: PORTUGAL_BBOX,
+  es: {
+    minLat: 36.0,
+    maxLat: 43.79,
+    minLon: -9.30,
+    maxLon: 3.32
+  },
+  it: {
+    minLat: 36.62,
+    maxLat: 47.09,
+    minLon: 6.62,
+    maxLon: 18.52
+  },
+  fr: {
+    minLat: 42.39,
+    maxLat: 51.09,
+    minLon: -4.79,
+    maxLon: 8.23
+  },
+  gr: {
+    minLat: 34.80,
+    maxLat: 41.75,
+    minLon: 19.65,
+    maxLon: 28.25
+  }
+} as const satisfies Record<string, Bbox>;
+
+/** ISO-3166-1 alpha-2 country codes supported by the
+ *  destination knowledge graph. The set matches the
+ *  `COUNTRY_BBOXES` keys. */
+export type SupportedCountry = keyof typeof COUNTRY_BBOXES;
 
 /** Zod schema for the OsmFeature shape — used by the worker
  *  when it receives an extract payload from QStash. */

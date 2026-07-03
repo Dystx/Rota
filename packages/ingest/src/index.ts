@@ -36,6 +36,7 @@ export {
   extractOsm,
   extractFromTable,
   buildExtractQuery,
+  bboxForCountry,
   CATEGORY_FILTERS
 } from "./extract";
 export {

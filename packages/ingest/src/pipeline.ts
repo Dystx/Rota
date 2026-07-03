@@ -36,7 +36,7 @@ import { loadPlaces } from "./load";
 export type RunPipelineOptions = {
   pbfPath: string;
   bbox?: Bbox;
-  country?: string;
+  country?: import("./types").SupportedCountry;
   embeddingClient: import("./types").EmbeddingClient;
   supabaseLoader: import("./types").SupabaseLoader;
 };
