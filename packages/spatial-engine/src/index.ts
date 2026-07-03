@@ -43,6 +43,11 @@ export {
   fixtureAllCollections
 } from "./fixtures/travelers";
 export { fixtureRouteCollection, fixtureRouteSummary } from "./fixtures/routes";
+export {
+  DESTINATION_PRESETS,
+  getDestinationPreset,
+  type DestinationPreset
+} from "./fixtures/destinations";
 
 export { LayerRegistry } from "./core/layer-registry";
 export {

@@ -7,18 +7,27 @@ import { createWorkspaceEngine, type MapLibreSpatialEngine } from "../adapters/m
 import { CameraChoreography } from "../core/camera-choreography";
 import { fixtureRouteCollection } from "../fixtures/routes";
 import { fixtureTravelerCollection, fixtureSpecialistCollection } from "../fixtures/travelers";
-import type { MapStyleEndpoint } from "../core/types";
+import type { CameraTarget, MapStyleEndpoint } from "../core/types";
 
 export interface WorkspaceCanvasProps {
   /** Style endpoint override (tests, air-gapped environments). */
   styleOverride?: MapStyleEndpoint;
-  /** Initial camera target — defaults to Lisbon at close zoom. */
+  /**
+   * Composite initial camera target — takes precedence over the
+   * `initialCenter` / `initialZoom` defaults when provided. Lets
+   * callers (e.g. home bento cards → /explore/workspace?focus=lisbon)
+   * skip the intro choreography and land directly on a destination.
+   */
+  initialFocus?: CameraTarget;
+  /** Initial camera target — defaults to Porto at mid zoom. */
   initialCenter?: readonly [number, number];
   initialZoom?: number;
   /**
    * Disable the intro camera choreography (Portugal context → route
    * fit → stop 1). Defaults to false so the demo page always animates;
-   * real consumers can opt out for inline embeds.
+   * real consumers can opt out for inline embeds. When `initialFocus`
+   * is provided, the intro is skipped automatically — no need to set
+   * this explicitly.
    */
   disableIntro?: boolean;
   className?: string;
@@ -42,12 +51,19 @@ const INTRO_STOP_ZOOM = 11;
  */
 export function WorkspaceCanvas({
   styleOverride,
+  initialFocus,
   initialCenter = DEFAULT_HOME_CENTER,
   initialZoom = DEFAULT_HOME_ZOOM,
   disableIntro = false,
   className,
   testId = "workspace-canvas"
 }: WorkspaceCanvasProps): React.ReactElement {
+  // If `initialFocus` is set, it wins. Skip the intro choreography — the
+  // caller has already chosen where to land.
+  const resolvedInitialTarget: CameraTarget = initialFocus
+    ? initialFocus
+    : { center: initialCenter, zoom: initialZoom };
+  const resolvedDisableIntro = disableIntro || initialFocus !== undefined;
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const engineRef = React.useRef<MapLibreSpatialEngine | null>(null);
   const reducedMotion = useReducedMotion();
@@ -62,7 +78,7 @@ export function WorkspaceCanvas({
     const style = styleOverride ?? styleProvider.getStyle("light");
     const engine = createWorkspaceEngine({
       style,
-      initialTarget: { center: initialCenter, zoom: initialZoom },
+      initialTarget: resolvedInitialTarget,
       reducedMotion,
       projection: "mercator"
     });
@@ -91,7 +107,7 @@ export function WorkspaceCanvas({
           observer.observe(container);
         }
 
-        if (!disableIntro) {
+        if (!resolvedDisableIntro) {
           const intro = new CameraChoreography()
             .beat("iberian-context", { center: INTRO_CONTEXT_CENTER, zoom: INTRO_CONTEXT_ZOOM }, { duration: reducedMotion ? 0 : 1500 })
             .beat("fit-route", { center: INTRO_FIT_CENTER, zoom: INTRO_FIT_ZOOM, duration: reducedMotion ? 0 : 1400 })
@@ -120,7 +136,7 @@ export function WorkspaceCanvas({
       engine.unmount();
       engineRef.current = null;
     };
-  }, [disableIntro, initialCenter, initialZoom, reducedMotion, styleOverride]);
+  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, styleOverride]);
 
   return (
     <div

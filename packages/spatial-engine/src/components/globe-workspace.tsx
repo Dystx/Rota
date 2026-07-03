@@ -6,13 +6,20 @@ import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createDiscoveryEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
 import { CameraChoreography } from "../core/camera-choreography";
 import { fixtureAllCollections } from "../fixtures/travelers";
-import type { MapStyleEndpoint } from "../core/types";
+import type { CameraTarget, MapStyleEndpoint } from "../core/types";
 
 export interface GlobeWorkspaceProps {
   /** Theme selector — defaults to dark for the discovery hero. */
   theme?: "light" | "dark";
   /** Override the default style endpoint (e.g. tests, air-gapped environments). */
   styleOverride?: MapStyleEndpoint;
+  /**
+   * Composite initial camera target — takes precedence over the
+   * `initialCenter` / `initialZoom` defaults when provided. Lets
+   * callers deep-link the globe straight to a destination without
+   * running the intro choreography.
+   */
+  initialFocus?: CameraTarget;
   /** Initial camera target — defaults to Portugal at low altitude. */
   initialCenter?: readonly [number, number];
   initialZoom?: number;
@@ -37,12 +44,19 @@ const INTRO_HOME_ZOOM = 4.2;
 export function GlobeWorkspace({
   theme = "dark",
   styleOverride,
+  initialFocus,
   initialCenter = DEFAULT_HOME_CENTER,
   initialZoom = DEFAULT_HOME_ZOOM,
   disableIntro = false,
   className,
   testId = "globe-workspace"
 }: GlobeWorkspaceProps): React.ReactElement {
+  // If `initialFocus` is set, it wins and the intro choreography is
+  // skipped — the caller has already chosen where to land.
+  const resolvedInitialTarget: CameraTarget = initialFocus
+    ? initialFocus
+    : { center: initialCenter, zoom: initialZoom };
+  const resolvedDisableIntro = disableIntro || initialFocus !== undefined;
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const engineRef = React.useRef<MapLibreSpatialEngine | null>(null);
   const reducedMotion = useReducedMotion();
@@ -57,7 +71,7 @@ export function GlobeWorkspace({
     const style = styleOverride ?? styleProvider.getStyle(theme);
     const engine = createDiscoveryEngine({
       style,
-      initialTarget: { center: initialCenter, zoom: initialZoom },
+      initialTarget: resolvedInitialTarget,
       reducedMotion
     });
     engineRef.current = engine;
@@ -93,7 +107,7 @@ export function GlobeWorkspace({
           observer.observe(container);
         }
 
-        if (!disableIntro) {
+        if (!resolvedDisableIntro) {
           const intro = new CameraChoreography()
             .beat("earth", { center: [0, 30] as const, zoom: 1.4, duration: reducedMotion ? 0 : 1400 })
             .beat("europe", { center: INTRO_HOME_CENTER, zoom: INTRO_HOME_ZOOM, duration: reducedMotion ? 0 : 1800 });
@@ -121,7 +135,7 @@ export function GlobeWorkspace({
       engine.unmount();
       engineRef.current = null;
     };
-  }, [disableIntro, initialCenter, initialZoom, reducedMotion, styleOverride, theme]);
+  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, styleOverride, theme]);
 
   return (
     <div

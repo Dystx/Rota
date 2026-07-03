@@ -8,6 +8,12 @@ import Link from "next/link";
  *   - Lisbon & Surrounds (8-col, 2-row) — Capital Region
  *   - Douro Valley (4-col, 2-row) — Wine Country
  *   - The Azores (12-col, 1-row) — Island Archipelago
+ *
+ * Each card deep-links into the Spatial Engine's 2D workspace with a
+ * `?focus=<slug>` query param so the camera lands on that destination
+ * without the intro choreography. The full editorial archive remains
+ * reachable at /portugal via the dedicated marketing link in the card
+ * footer.
  */
 export function DestinationBento() {
   return (
@@ -15,7 +21,8 @@ export function DestinationBento() {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[250px]">
         {/* Bento Item 1: Lisbon (Large) */}
         <Link
-          href="/portugal"
+          href="/explore/workspace?focus=lisbon"
+          data-testid="bento-card-lisbon"
           className="md:col-span-8 row-span-2 group relative rounded-xl overflow-hidden shadow-lg border border-white/40 block"
         >
           <div
@@ -37,12 +44,17 @@ export function DestinationBento() {
               Explore the steep, historic streets, vibrant culinary scene,
               and nearby coastal retreats of Sintra and Cascais.
             </p>
+            <span className="mt-3 inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-light opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="material-symbols-outlined text-base">map</span>
+              View on the map →
+            </span>
           </div>
         </Link>
 
         {/* Bento Item 2: Douro Valley (Tall) */}
         <Link
-          href="/portugal"
+          href="/explore/workspace?focus=douro"
+          data-testid="bento-card-douro"
           className="md:col-span-4 row-span-2 group relative rounded-xl overflow-hidden shadow-lg border border-white/40 block"
         >
           <div
@@ -64,12 +76,17 @@ export function DestinationBento() {
               Terraced vineyards and ancient estates along the golden
               river.
             </p>
+            <span className="mt-3 inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-light opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="material-symbols-outlined text-base">map</span>
+              View on the map →
+            </span>
           </div>
         </Link>
 
         {/* Bento Item 3: Azores (Wide) */}
         <Link
-          href="/portugal"
+          href="/explore/workspace?focus=azores"
+          data-testid="bento-card-azores"
           className="md:col-span-12 row-span-1 group relative rounded-xl overflow-hidden shadow-lg border border-white/40 block"
         >
           <div
@@ -91,6 +108,10 @@ export function DestinationBento() {
               Volcanic craters, thermal springs, and untouched Atlantic
               wilderness.
             </p>
+            <span className="mt-3 inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-light opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="material-symbols-outlined text-base">map</span>
+              View on the map →
+            </span>
           </div>
         </Link>
       </div>
