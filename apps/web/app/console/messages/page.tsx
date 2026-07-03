@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type ChangeEvent, type DragEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type DragEvent } from "react";
 import { ConsoleNav } from "../_components/console-nav";
 import { SiteFooter } from "../../_components/site-footer";
 import { SnippetCard } from "../_components/snippet-card";
+import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
 interface Conversation {
   id: string;
@@ -40,6 +41,32 @@ export default function ConsoleMessagesPage() {
   const [activeId, setActiveId] = useState<string>(CONVERSATIONS[0]!.id);
   const [draft, setDraft] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  // Track Realtime connection to chat_messages. Feature-flagged so
+  // SSR / no-Supabase environments keep the hardcoded board.
+  const [isLive, setIsLive] = useState(false);
+  const [incomingCount, setIncomingCount] = useState(0);
+
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_USE_REALTIME_MESSAGES !== "true") return;
+
+    const supabase = createBrowserSupabaseClient();
+    const channel = supabase
+      .channel("console-messages")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "chat_messages" },
+        () => {
+          setIncomingCount((n) => n + 1);
+        }
+      )
+      .subscribe((status) => {
+        setIsLive(status === "SUBSCRIBED");
+      });
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
 
   const activeConversation =
     CONVERSATIONS.find((c) => c.id === activeId) ?? CONVERSATIONS[0]!;
@@ -182,6 +209,16 @@ export default function ConsoleMessagesPage() {
                     </span>
                     <span className="font-mono-technical text-mono-technical text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded">
                       Status: Planning
+                    </span>
+                    <span
+                      data-realtime={isLive ? "live" : "fallback"}
+                      className={`font-mono-technical text-mono-technical px-2 py-0.5 rounded ${
+                        isLive
+                          ? "bg-olive-light/20 text-olive-dark"
+                          : "bg-surface-container-high text-on-surface-variant"
+                      }`}
+                    >
+                      {isLive ? `Live · ${incomingCount} new` : "Offline"}
                     </span>
                   </div>
                 </div>
