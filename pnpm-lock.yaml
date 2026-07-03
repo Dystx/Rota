@@ -39,6 +39,9 @@ importers:
       '@repo/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
+      '@repo/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@repo/config':
         specifier: workspace:*
         version: link:../../packages/config
