@@ -213,9 +213,17 @@ export class MapLibreSpatialEngine implements SpatialEngine {
   unmount(): void {
     if (this.shuttingDown) return;
     this.shuttingDown = true;
-    // Note: `map.remove()` runs even when `this.mounted === false` —
-    // the in-flight `mount()` will see `shuttingDown` and drop the map
-    // it just constructed. This is what makes the lifecycle leak-safe.
+    // The lifecycle invariant: `map.remove()` MUST run exactly once per
+    // mount, regardless of the order between `unmount()` and the async
+    // `mount()` promise. Two cases:
+    //   1. `this.mounted === true` (mount completed): this.map is set;
+    //      we remove it here and null it out so the deferred path in
+    //      `mount()` can't double-remove (it checks `this.shuttingDown`
+    //      but doesn't check whether the map was already removed).
+    //   2. `this.mounted === false` (mount in flight): this.map is null;
+    //      we skip the remove here. The deferred path in `mount()`
+    //      will see `this.shuttingDown` and call `map.remove()` on the
+    //      local `map` variable when the await resolves.
     if (this.mounted) {
       for (const { layer, unsubscribe } of this.layers.values()) {
         unsubscribe?.();
@@ -224,11 +232,11 @@ export class MapLibreSpatialEngine implements SpatialEngine {
       this.layers.clear();
       this.detachAtmosphere();
       this.telemetry.shutdown();
-      this.map?.remove();
-      this.map = null;
-      this.camera = null;
       this.mounted = false;
     }
+    this.map?.remove();
+    this.map = null;
+    this.camera = null;
   }
 
   /**
