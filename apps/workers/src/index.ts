@@ -5,8 +5,8 @@ import {
   type EmailProvider
 } from "@repo/emails";
 import {
-  PIPELINE_NOT_IMPLEMENTED,
-  type PipelineResult
+  extractOsm,
+  type ExtractResult
 } from "@repo/ingest";
 import {
   classifyErrorKind,
@@ -17,6 +17,13 @@ import { getCheckoutPlan } from "@repo/payments";
 import { WorkerPlanSchema, type WorkerPlan } from "@repo/types";
 
 export const WORKER_EXECUTION_TARGET = "bounded-node-cron-compatible-local-runner";
+
+/** Path to the OSM PBF the worker extracts from. In dev this
+ *  is a small fixture (a few hundred KB) committed to the
+ *  repo. In production the PBF is a Geofabrik weekly snapshot
+ *  downloaded by the deploy pipeline into a durable volume
+ *  the worker can read. */
+const PBF_PATH = process.env.OSM_PBF_PATH ?? "/data/portugal-latest.osm.pbf";
 
 type WorkerPlanInput = {
   tripId?: string;
@@ -525,8 +532,10 @@ export type QStashHandlerResult = {
   body: {
     /** Echoed job kind for ops correlation. */
     kind: QStashJobKind;
-    /** Pipeline result when status is 200. */
-    result?: PipelineResult;
+    /** Stage result when status is 200. After PR-4 the
+     *  pipeline returns an `ExtractResult` from the extract
+     *  stage. PR-5 wraps it in a full `PipelineResult`. */
+    result?: ExtractResult;
     /** Error message when status is 4xx/5xx. */
     error?: string;
   };
@@ -534,7 +543,8 @@ export type QStashHandlerResult = {
 
 /** QStash HTTP handler. Validates the signature, dispatches by
  *  `kind`, and returns the result. The data pipeline dispatch
- *  is a stub for now (PR-4 + PR-5). */
+ *  calls `extractOsm()` (PR-4). PR-5 wires the embed + load
+ *  stages into the same dispatch. */
 export async function handleQStashRequest(
   signature: string | null,
   rawBody: string,
@@ -549,14 +559,19 @@ export async function handleQStashRequest(
   }
 
   if (payload.kind === "ingest_pipeline_run") {
-    // Stub: PR-4 implements `extractOsm`, PR-5 implements
-    // `embedFeatures` + `loadPlaces`. Until then, return the
-    // sentinel `PIPELINE_NOT_IMPLEMENTED` so QStash gets a
-    // 200 and the route layer serializes the placeholder.
-    return {
-      status: 200,
-      body: { kind: "ingest_pipeline_run", result: PIPELINE_NOT_IMPLEMENTED }
-    };
+    try {
+      const extract = await extractOsm(PBF_PATH);
+      return {
+        status: 200,
+        body: { kind: "ingest_pipeline_run", result: extract }
+      };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown extract error";
+      return {
+        status: 500,
+        body: { kind: "ingest_pipeline_run", error: message }
+      };
+    }
   }
 
   return {

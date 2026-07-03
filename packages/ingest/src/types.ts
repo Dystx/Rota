@@ -53,6 +53,15 @@ export const PORTUGAL_BBOX = {
   maxLon: -6.1892
 } as const;
 
+/** Bounding box shape. The Portugal one is a `readonly` tuple;
+ *  per-country boxes in PR-7 are plain objects. */
+export interface Bbox {
+  minLat: number;
+  maxLat: number;
+  minLon: number;
+  maxLon: number;
+}
+
 /** Zod schema for the OsmFeature shape — used by the worker
  *  when it receives an extract payload from QStash. */
 export const OsmFeatureSchema = z.object({

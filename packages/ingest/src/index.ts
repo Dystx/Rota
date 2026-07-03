@@ -32,3 +32,9 @@ export {
   all,
   close
 } from "./duckdb";
+export {
+  extractOsm,
+  extractFromTable,
+  buildExtractQuery,
+  CATEGORY_FILTERS
+} from "./extract";
