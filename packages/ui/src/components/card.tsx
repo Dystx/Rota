@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import type { ElementType, HTMLAttributes } from "react";
 import { cn } from "../lib/cn";
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
@@ -17,9 +17,20 @@ export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElemen
   return <div className={cn("grid gap-4 p-8 pb-4", className)} {...props} />;
 }
 
-export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
+/**
+ * CardTitle — heading element for a Card. Defaults to `<h3>` for
+ * backward compatibility, but consumers should set the `as` prop to
+ * match the surrounding heading hierarchy (typically `h2` when the
+ * parent page has a single `<h1>`). Skipping a level is an a11y
+ * violation per WCAG 1.3.1.
+ */
+export function CardTitle({
+  className,
+  as: Tag = "h3",
+  ...props
+}: HTMLAttributes<HTMLHeadingElement> & { as?: ElementType }) {
   return (
-    <h3
+    <Tag
       className={cn(
         "font-[family-name:var(--font-rota-display)] text-3xl tracking-tight text-[var(--color-foreground)]",
         className
