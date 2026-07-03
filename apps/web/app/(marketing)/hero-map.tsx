@@ -21,6 +21,15 @@ interface HeroMapProps {
 }
 
 /**
+ * The Iberian centroid (just west of Lisbon) used to seed both
+ * projections. The 3D globe lands here at zoom 3.4 with a -12°
+ * bearing so the Iberian Peninsula reads as Portugal-first on first
+ * paint; the 2D workspace lands at zoom 5.6 to match the dedicated
+ * /explore/workspace "iberian-context" beat.
+ */
+const PORTUGAL_CENTER = { lng: -8.165, lat: 39.55 };
+
+/**
  * HeroMap — the interactive canopies that replace the static sunset
  * hero image on /. Defaults to the 3D globe (Discovery) per the
  * executive summary's "The application opens with an immersive
@@ -49,6 +58,8 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
           disableIntro
           className="absolute inset-0 h-full w-full"
           testId="hero-globe"
+          initialCenter={[PORTUGAL_CENTER.lng, PORTUGAL_CENTER.lat]}
+          initialZoom={3.4}
         />
       ) : (
         <WorkspaceCanvas
@@ -56,6 +67,8 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
           disableIntro
           className="absolute inset-0 h-full w-full"
           testId="hero-workspace"
+          initialCenter={[PORTUGAL_CENTER.lng, PORTUGAL_CENTER.lat]}
+          initialZoom={5.6}
         />
       )}
 
