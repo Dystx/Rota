@@ -5,6 +5,8 @@ import { ConsoleNav } from "../_components/console-nav";
 import { SiteFooter } from "../../_components/site-footer";
 import { SnippetCard } from "../_components/snippet-card";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import { triageInboundMessage } from "../_components/message-triage";
+import type { TriageResult } from "@repo/ai";
 
 interface Conversation {
   id: string;
@@ -45,6 +47,9 @@ export default function ConsoleMessagesPage() {
   // SSR / no-Supabase environments keep the hardcoded board.
   const [isLive, setIsLive] = useState(false);
   const [incomingCount, setIncomingCount] = useState(0);
+  // Most recent triage classification surfaced in the header.
+  // null = no inbound message since the page loaded.
+  const [lastTriage, setLastTriage] = useState<TriageResult | null>(null);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_USE_REALTIME_MESSAGES !== "true") return;
@@ -55,8 +60,21 @@ export default function ConsoleMessagesPage() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "chat_messages" },
-        () => {
+        async (payload) => {
           setIncomingCount((n) => n + 1);
+          // Run the AI triage classifier on every inbound message.
+          // The server action falls back to keywordTriage() if
+          // USE_LLM is off or OPENAI_API_KEY is missing.
+          const row = (payload.new ?? {}) as Record<string, unknown>;
+          const body = typeof row.body === "string" ? row.body : "";
+          if (body) {
+            try {
+              const result = await triageInboundMessage({ message: body });
+              setLastTriage(result);
+            } catch {
+              // Triage is best-effort; never break the live channel.
+            }
+          }
         }
       )
       .subscribe((status) => {
@@ -220,6 +238,22 @@ export default function ConsoleMessagesPage() {
                     >
                       {isLive ? `Live · ${incomingCount} new` : "Offline"}
                     </span>
+                    {lastTriage ? (
+                      <span
+                        data-testid="triage-badge"
+                        data-tier={lastTriage.tier}
+                        className={`font-mono-technical text-mono-technical px-2 py-0.5 rounded ${
+                          lastTriage.tier === "emergency"
+                            ? "bg-error-container text-error animate-pulse"
+                            : lastTriage.tier === "logistical"
+                              ? "bg-ochre-light/30 text-ochre-dark"
+                              : "bg-surface-container-high text-on-surface-variant"
+                        }`}
+                        title={lastTriage.rationale}
+                      >
+                        Triage: {lastTriage.tier} ({Math.round(lastTriage.confidence * 100)}%)
+                      </span>
+                    ) : null}
                   </div>
                 </div>
               </div>

@@ -12,6 +12,7 @@ import {
 
 export * from "./prompt-normalization";
 export * from "./llm-generator";
+export * from "./triage";
 
 /**
  * Feature flag: when `USE_LLM=true` AND `OPENAI_API_KEY` is set,
