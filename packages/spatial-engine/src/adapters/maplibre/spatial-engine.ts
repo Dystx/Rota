@@ -80,7 +80,9 @@ export class MapLibreSpatialEngine implements SpatialEngine {
       style: this.options.style,
       initialTarget: this.options.initialTarget,
       reducedMotion: this.options.reducedMotion,
-      projection: this.options.projection ?? "globe"
+      projection: this.options.projection ?? "globe",
+      terrain: this.options.terrain,
+      fog: this.options.fog
     });
 
     // `unmount()` may have been called while we were awaiting the

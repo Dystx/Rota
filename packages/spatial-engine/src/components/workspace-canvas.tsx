@@ -9,7 +9,13 @@ import { fixtureRouteCollection } from "../fixtures/routes";
 import { fixtureTravelerCollection, fixtureSpecialistCollection } from "../fixtures/travelers";
 import { CLICKABLE_LAYER_IDS } from "../index";
 import type { ViewportState } from "../core/viewport";
-import type { CameraTarget, MapStyleEndpoint, SpatialFeatureCollection } from "../core/types";
+import type {
+  CameraTarget,
+  FogOptions,
+  MapStyleEndpoint,
+  SpatialFeatureCollection,
+  TerrainOptions
+} from "../core/types";
 
 /**
  * Imperative handle returned by `WorkspaceCanvas`'s `forwardRef`.
@@ -84,6 +90,18 @@ export interface WorkspaceCanvasProps {
    * click's `lngLat`. Wire this to `selectStop` in the Zustand store.
    */
   onStopClick?: (stopId: string, coordinates: readonly [number, number]) => void;
+  /**
+   * 3D terrain. Default: DISABLED on the 2D workspace canvas (mercator
+   * projection is for editing precision; mountains would obscure the
+   * route). Pass a `TerrainOptions` object to opt in.
+   */
+  terrain?: TerrainOptions;
+  /**
+   * Atmospheric fog / sky. Default: DISABLED on mercator (sky is a 3D
+   * feature; on flat 2D it has no effect). Pass a `FogOptions` object
+   * to opt in.
+   */
+  fog?: FogOptions;
 }
 
 const DEFAULT_HOME_CENTER: readonly [number, number] = [-8.6291, 41.1579];
@@ -113,7 +131,9 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       className,
       testId = "workspace-canvas",
       onViewportChange,
-      onStopClick
+      onStopClick,
+      terrain,
+      fog
     },
     ref
   ) {
@@ -123,6 +143,11 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       ? initialFocus
       : { center: initialCenter, zoom: initialZoom };
     const resolvedDisableIntro = disableIntro || initialFocus !== undefined;
+    // Terrain + fog default to DISABLED on the 2D workspace (mercator
+    // is for precision editing; sky/3D are globe-only). Pass a
+    // TerrainOptions / FogOptions to opt in.
+    const resolvedTerrain: TerrainOptions = terrain ?? { disabled: true };
+    const resolvedFog: FogOptions = fog ?? { disabled: true };
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const engineRef = React.useRef<MapLibreSpatialEngine | null>(null);
     const reducedMotion = useReducedMotion();
@@ -179,7 +204,9 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
         style,
         initialTarget: resolvedInitialTarget,
         reducedMotion,
-        projection: "mercator"
+        projection: "mercator",
+        terrain: resolvedTerrain,
+        fog: resolvedFog
       });
       engineRef.current = engine;
 
@@ -284,7 +311,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
     // target is captured on first mount, and route features are
     // re-seeded by the dedicated effect below when the prop changes.
     // This stops the engine from remounting on every parent render.
-    }, [reducedMotion, styleOverride, onViewportChange, onStopClick]);
+    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, onViewportChange, onStopClick]);
 
     // Re-seed the route layer when the parent swaps `routeFeatures`.
     // `null` is a valid value — it restores the deterministic fixture

@@ -1,6 +1,28 @@
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import type { CameraExecutor } from "../../core/camera-controller";
-import type { CameraTarget, MapStyleEndpoint } from "../../core/types";
+import type { CameraTarget, FogOptions, MapStyleEndpoint, TerrainOptions } from "../../core/types";
+
+/** Free, no-API-key DEM tiles — RGB-encoded terrarium format hosted on AWS. */
+const DEFAULT_TERRAIN_URL = "https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png";
+const DEFAULT_TERRAIN_SOURCE_ID = "spatial-engine:terrain-dem";
+const DEFAULT_TERRAIN_EXAGGERATION = 1.4;
+
+/**
+ * Default sky / fog config. Soft slate-blue at the horizon fading to
+ * deep indigo up high. Horizon blend is intentionally soft (0.8) so
+ * the basemap is not washed out at the visible edge — the user can
+ * crank it lower for a sharper terminator or higher for a moodier look.
+ *
+ * `space-color` and `star-intensity` are not part of MapLibre's
+ * `SkySpecification`; they live on a custom radial-gradient layer
+ * that can be added separately.
+ */
+const DEFAULT_FOG = {
+  color: "rgb(60, 90, 120)",   // fog + horizon (soft slate blue)
+  highColor: "rgb(25, 30, 45)", // sky (deep indigo at high altitude)
+  horizonBlend: 0.8,            // 0 = horizon color, 1 = fog color
+  fogGroundBlend: 0.5           // 0 = map center, 1 = horizon
+};
 
 export interface MapLibreInstanceOptions {
   container: HTMLElement;
@@ -8,6 +30,10 @@ export interface MapLibreInstanceOptions {
   initialTarget?: CameraTarget;
   reducedMotion?: boolean;
   projection?: "globe" | "mercator";
+  /** 3D terrain via raster DEM. Disabled by default. */
+  terrain?: TerrainOptions;
+  /** Sky / fog / starfield for the globe. Disabled by default. */
+  fog?: FogOptions;
 }
 
 /**
@@ -60,6 +86,47 @@ export async function mountMapLibreInstance(options: MapLibreInstanceOptions): P
     map.setProjection({ type: "mercator" });
   } else {
     map.setProjection({ type: "globe" });
+  }
+
+  // 3D terrain — raster DEM source + MapLibre's terrain renderer. The
+  // DEM is terrarium-encoded (RGB → elevation), free on AWS, no API key.
+  // Only on the globe; the mercator workspace deliberately stays flat
+  // for editing precision unless the caller opts in.
+  if (options.terrain && !options.terrain.disabled) {
+    const sourceId = options.terrain.sourceId ?? DEFAULT_TERRAIN_SOURCE_ID;
+    if (!map.getSource(sourceId)) {
+      map.addSource(sourceId, {
+        type: "raster-dem",
+        tiles: [options.terrain.sourceUrl ?? DEFAULT_TERRAIN_URL],
+        tileSize: 256,
+        maxzoom: 14,
+        encoding: "terrarium"
+      });
+    }
+    map.setTerrain({
+      source: sourceId,
+      exaggeration: options.terrain.exaggeration ?? DEFAULT_TERRAIN_EXAGGERATION
+    });
+  }
+
+  // Sky / fog — the global atmospheric perspective. In MapLibre v5 this
+  // lives in the style's `sky` property (SkySpecification bundles
+  // sky-color, horizon-color, fog-color, horizon-fog-blend,
+  // fog-ground-blend). `setSky` applies it at runtime so we don't have
+  // to fetch and rewrite the style URL.
+  //
+  // For a "softer halo" beyond the built-in fog, the original
+  // implementation ports MapTiler's RadialGradientLayer as a custom
+  // WebGL layer — that's a follow-up. The standard sky/fog below is
+  // already a meaningful upgrade over the previous flat black.
+  if (options.fog && !options.fog.disabled) {
+    map.setSky({
+      "sky-color": options.fog.highColor ?? DEFAULT_FOG.highColor,
+      "horizon-color": options.fog.color ?? DEFAULT_FOG.color,
+      "fog-color": options.fog.color ?? DEFAULT_FOG.color,
+      "horizon-fog-blend": options.fog.horizonBlend ?? DEFAULT_FOG.horizonBlend,
+      "fog-ground-blend": options.fog.fogGroundBlend ?? DEFAULT_FOG.fogGroundBlend
+    });
   }
 
   const executor: CameraExecutor = {

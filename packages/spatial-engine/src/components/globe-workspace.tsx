@@ -8,7 +8,35 @@ import { CameraChoreography } from "../core/camera-choreography";
 import { fixtureAllCollections } from "../fixtures/travelers";
 import { CLICKABLE_LAYER_IDS } from "../index";
 import type { ViewportState } from "../core/viewport";
-import type { CameraTarget, MapStyleEndpoint } from "../core/types";
+import type {
+  CameraTarget,
+  FogOptions,
+  MapStyleEndpoint,
+  TerrainOptions
+} from "../core/types";
+
+/**
+ * Default terrain config for the Discovery globe. AWS Terrarium tiles
+ * (free, no API key) at 1.4x vertical exaggeration — same as the
+ * Mapbox-era baseline so mountains feel familiar, not cartoonish.
+ */
+const DEFAULT_TERRAIN: TerrainOptions = {
+  exaggeration: 1.4
+};
+
+/**
+ * Default fog / sky for the Discovery globe. Soft slate blue at the
+ * horizon fading to deep indigo up high; soft horizon blend (0.8) so
+ * the basemap isn't washed out at the visible edge. `space-color` and
+ * `star-intensity` are not part of MapLibre's standard SkySpecification
+ * — they live on a follow-up custom radial-gradient layer.
+ */
+const DEFAULT_FOG: FogOptions = {
+  color: "rgb(60, 90, 120)",
+  highColor: "rgb(25, 30, 45)",
+  horizonBlend: 0.8,
+  fogGroundBlend: 0.5
+};
 
 export interface GlobeWorkspaceProps {
   /** Theme selector — defaults to dark for the discovery hero. */
@@ -27,6 +55,18 @@ export interface GlobeWorkspaceProps {
   initialZoom?: number;
   /** Disable the intro camera choreography (world → Portugal zoom). */
   disableIntro?: boolean;
+  /**
+   * 3D terrain via raster DEM. Default: enabled (AWS Terrarium tiles,
+   * 1.4x exaggeration). Pass `{ disabled: true }` to opt out, or a
+   * partial `TerrainOptions` to override specific fields.
+   */
+  terrain?: TerrainOptions;
+  /**
+   * Atmospheric fog / sky / starfield. Default: enabled with the soft
+   * config above. Pass `{ disabled: true }` to opt out, or a partial
+   * `FogOptions` to override specific fields.
+   */
+  fog?: FogOptions;
   className?: string;
   testId?: string;
   /**
@@ -63,6 +103,8 @@ export function GlobeWorkspace({
   initialCenter = DEFAULT_HOME_CENTER,
   initialZoom = DEFAULT_HOME_ZOOM,
   disableIntro = false,
+  terrain,
+  fog,
   className,
   testId = "globe-workspace",
   onViewportChange,
@@ -78,6 +120,10 @@ export function GlobeWorkspace({
     [initialFocus, initialCenter, initialZoom]
   );
   const resolvedDisableIntro = disableIntro || initialFocus !== undefined;
+  // Terrain + fog default to ON with the soft defaults above. Pass
+  // `{ disabled: true }` to opt out, or a partial object to override.
+  const resolvedTerrain: TerrainOptions = terrain ?? DEFAULT_TERRAIN;
+  const resolvedFog: FogOptions = fog ?? DEFAULT_FOG;
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const engineRef = React.useRef<MapLibreSpatialEngine | null>(null);
   const reducedMotion = useReducedMotion();
@@ -93,7 +139,9 @@ export function GlobeWorkspace({
     const engine = createDiscoveryEngine({
       style,
       initialTarget: resolvedInitialTarget,
-      reducedMotion
+      reducedMotion,
+      terrain: resolvedTerrain,
+      fog: resolvedFog
     });
     engineRef.current = engine;
     const seeds = fixtureAllCollections();
@@ -200,7 +248,7 @@ export function GlobeWorkspace({
       engine.unmount();
       engineRef.current = null;
     };
-  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, styleOverride, theme, onViewportChange, onStopClick]);
+  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, resolvedTerrain, resolvedFog, styleOverride, theme, onViewportChange, onStopClick]);
 
   return (
     <div

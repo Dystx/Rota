@@ -112,6 +112,39 @@ export interface SpatialEngine {
   unmount(): void;
 }
 
+/** Terrain configuration — turns on MapLibre's 3D terrain via a raster DEM. */
+export interface TerrainOptions {
+  /**
+   * Raster DEM tile URL. Default: AWS Terrarium tiles
+   * (https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png) —
+   * free, no API key, terrarium RGB encoding.
+   */
+  sourceUrl?: string;
+  /** DEM source id. Default: 'spatial-engine:terrain-dem'. */
+  sourceId?: string;
+  /** Vertical exaggeration multiplier. Default: 1.4 (matches the Mapbox-era default). */
+  exaggeration?: number;
+  /** Disable to opt out (e.g. for the 2D workspace canvas where curvature obscures edits). */
+  disabled?: boolean;
+}
+
+/** Fog / atmospheric perspective on the globe. Maps to MapLibre's
+ * SkySpecification at runtime — the standard sky / fog fields only.
+ * For the "softer halo" radial-gradient effect, layer a custom WebGL
+ * layer on top (follow-up: port MapTiler SDK's RadialGradientLayer). */
+export interface FogOptions {
+  /** Color at the horizon + fog. Default: a soft slate blue that matches dark-matter basemaps. */
+  color?: string;
+  /** Color at the top of the atmosphere (high altitude). Default: deep indigo. */
+  highColor?: string;
+  /** How much the fog blends at the horizon. 0 = sharp line, 1 = fully diffused. Default: 0.8 (soft). */
+  horizonBlend?: number;
+  /** How the fog blends with the ground. 0 = map center, 1 = horizon. Default: 0.5. */
+  fogGroundBlend?: number;
+  /** Disable to opt out. */
+  disabled?: boolean;
+}
+
 /** Constructor options for any SpatialEngine implementation. */
 export interface SpatialEngineOptions {
   style: MapStyleEndpoint;
@@ -124,4 +157,8 @@ export interface SpatialEngineOptions {
    * (precision editing — Workspace). Default: `globe`.
    */
   projection?: "globe" | "mercator";
+  /** Enable 3D terrain via a raster DEM. Disabled by default on Workspace (mercator); enabled on Discovery (globe). */
+  terrain?: TerrainOptions;
+  /** Atmospheric fog + starfield on the globe. Default: enabled with soft config. */
+  fog?: FogOptions;
 }
