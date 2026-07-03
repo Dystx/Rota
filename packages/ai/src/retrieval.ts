@@ -230,11 +230,12 @@ export function retrieveDestinations(
     .filter((c): c is RankedCandidate => c !== null)
     .sort((a, b) => b.score - a.score);
 
-  // Confidence: average top-3 score, penalized if no region matched.
-  const top = ranked.slice(0, 3);
-  const confidence = top.length === 0
-    ? 0
-    : top.reduce((sum, c) => sum + c.score, 0) / top.length;
+  // Confidence: the top-hit score. Using the mean of top-3 would
+  // dilute a single excellent match (e.g. 0.9, 0.5, 0.5 → 0.63)
+  // even though the user has one strong candidate. The downstream
+  // caller treats < 0.4 as "no region matched"; this semantic
+  // matches "any candidate at all" (the top hit is the answer).
+  const confidence = ranked[0]?.score ?? 0;
 
   return { candidates: ranked, confidence };
 }

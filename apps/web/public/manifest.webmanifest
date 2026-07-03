@@ -2,11 +2,14 @@
   "name": "Rumia",
   "short_name": "Rumia",
   "description": "Premium travel concierge for Portugal-first itineraries",
+  "id": "/",
+  "scope": "/",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F7F4F0",
   "theme_color": "#18181B",
   "orientation": "portrait-primary",
+  "categories": ["travel", "lifestyle"],
   "icons": [
     {
       "src": "/icon-192.svg",

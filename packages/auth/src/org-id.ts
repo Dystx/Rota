@@ -41,10 +41,17 @@ export function getOrgIdFromUser(user: User | null | undefined): string | null {
 
 /**
  * Server-side helper: ask the Supabase client for the current
- * session and return the org_id in one call. Throws when there's
- * no authenticated user (caller should handle the auth boundary).
+ * session and return the org_id in one call. Returns null when
+ * there's no authenticated user or no org claim (caller should
+ * handle the auth + tenancy boundary).
+ *
+ * Note: the previous name `requireOrgIdFromClient` implied
+ * throw-on-missing semantics, but the implementation only
+ * threw on `getSession` errors and returned null for missing
+ * sessions. Renamed to `getOrgIdFromClient` to match the
+ * other helpers (and to stop the lie about the contract).
  */
-export async function requireOrgIdFromClient(
+export async function getOrgIdFromClient(
   supabase: SupabaseClient
 ): Promise<string | null> {
   const { data, error } = await supabase.auth.getSession();

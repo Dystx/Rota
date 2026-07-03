@@ -131,14 +131,10 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
           };
           setItems((prev) => {
             const without = prev.filter((item) => item.id !== next.id);
-            // payload.eventType is the canonical field on RealtimePostgresChangesPayload
-            // (event is also exposed on the v2 client; the cast is a
-            // type-narrowing shortcut since the union already includes
-            // both spellings across SDK versions).
-            const isDelete =
-              (payload as { eventType?: string; event?: string }).eventType === "DELETE" ||
-              (payload as { eventType?: string; event?: string }).event === "DELETE";
-            if (isDelete) return without;
+            // eventType is the canonical field on
+            // RealtimePostgresChangesPayload (v2 SDK). The single
+            // helper avoids the repeated inline cast.
+            if (eventTypeOf(payload) === "DELETE") return without;
             return [...without, next];
           });
         }
@@ -148,7 +144,15 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
       });
 
     return () => {
-      void supabase.removeChannel(channel);
+      // Capture the error from removeChannel — the previous
+      // `void ...removeChannel(channel)` discarded both the
+      // promise and any error, so a closed socket leaked silently.
+      supabase
+        .removeChannel(channel)
+        .catch((err) => {
+          // eslint-disable-next-line no-console
+          console.warn("[pipeline] removeChannel failed:", err);
+        });
     };
   }, []);
 
@@ -196,6 +200,20 @@ function mapTripStatus(raw: unknown): PipelineItem["status"] {
   if (raw === "in_review" || raw === "in_revision" || raw === "needs_revision") return "in_revision";
   if (raw === "active" || raw === "in_progress" || raw === "on_trip") return "active_chat";
   return "draft";
+}
+
+/**
+ * Extract the event type from a Supabase Realtime payload. The
+ * v2 SDK types `RealtimePostgresChangesPayload` with `eventType`,
+ * but earlier versions used `event`. This helper centralises the
+ * read so the consumer doesn't need a cast at every call site.
+ */
+function eventTypeOf(payload: unknown): string | undefined {
+  if (typeof payload !== "object" || payload === null) return undefined;
+  const obj = payload as { eventType?: unknown; event?: unknown };
+  if (typeof obj.eventType === "string") return obj.eventType;
+  if (typeof obj.event === "string") return obj.event;
+  return undefined;
 }
 
 function initialsFor(name: string): string {

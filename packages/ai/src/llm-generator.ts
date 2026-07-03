@@ -39,6 +39,7 @@ import {
   interestOptions,
   foodPreferenceOptions,
   avoidanceOptions,
+  TRIP_BRIEF_DEFAULTS,
   type TripBrief
 } from "@repo/types";
 
@@ -97,11 +98,9 @@ export type TripBriefIntent = z.infer<typeof TripBriefIntentSchema>;
  */
 export function intentToTripBrief(intent: TripBriefIntent): TripBrief {
   return {
+    ...TRIP_BRIEF_DEFAULTS,
     destinationCountry: intent.destinationCountry,
     regions: intent.regions,
-    startDate: "",
-    endDate: "",
-    travelersCount: 2,
     travelerType: intent.travelerType,
     tripLengthDays: intent.tripLengthDays,
     budgetLevel: intent.budgetLevel,
@@ -110,7 +109,6 @@ export function intentToTripBrief(intent: TripBriefIntent): TripBrief {
     avoidances: intent.avoidances,
     foodPreferences: intent.foodPreferences,
     transportMode: intent.transportMode,
-    accommodationLocation: "",
     rawBrief: intent.rawBrief
   };
 }

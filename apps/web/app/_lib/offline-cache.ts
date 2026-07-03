@@ -11,9 +11,6 @@
  *
  * Schema (v1):
  *  - trips: { id, payload, cachedAt } — full trip object
- *  - routes: { id, geojson, cachedAt } — itinerary route geometry
- *    (separate from trips so we can cache routes without the full
- *    itinerary payload)
  *
  * No encryption at rest yet. The data is the same data the
  * traveler already sees when online, and the cache is cleared by
@@ -25,7 +22,6 @@
 const DB_NAME = "rumia-offline";
 const DB_VERSION = 1;
 const STORE_TRIPS = "trips";
-const STORE_ROUTES = "routes";
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -34,21 +30,31 @@ function openDb(): Promise<IDBDatabase> {
     return Promise.reject(new Error("IndexedDB is not available in this environment"));
   }
   if (dbPromise) return dbPromise;
-  dbPromise = new Promise((resolve, reject) => {
+  const promise = new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains(STORE_TRIPS)) {
         db.createObjectStore(STORE_TRIPS, { keyPath: "id" });
       }
-      if (!db.objectStoreNames.contains(STORE_ROUTES)) {
-        db.createObjectStore(STORE_ROUTES, { keyPath: "id" });
-      }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
-  return dbPromise;
+  // Clear the cached promise on failure so the next call retries
+  // (a permanently broken db should not poison every subsequent
+  // cacheTrip / getCachedTrip call until a hard reload).
+  promise.catch(() => {
+    dbPromise = null;
+  });
+  dbPromise = promise;
+  return promise;
+}
+
+export interface CachedTrip<T = unknown> {
+  id: string;
+  payload: T;
+  cachedAt: number;
 }
 
 export async function cacheTrip(
@@ -66,12 +72,12 @@ export async function cacheTrip(
 
 export async function getCachedTrip<T = unknown>(
   id: string
-): Promise<{ id: string; payload: T; cachedAt: number } | null> {
+): Promise<CachedTrip<T> | null> {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_TRIPS, "readonly");
     const request = tx.objectStore(STORE_TRIPS).get(id);
-    request.onsuccess = () => resolve((request.result as never) ?? null);
+    request.onsuccess = () => resolve((request.result as CachedTrip<T> | undefined) ?? null);
     request.onerror = () => reject(request.error);
   });
 }
@@ -89,9 +95,8 @@ export async function listCachedTripIds(): Promise<string[]> {
 export async function clearOfflineCache(): Promise<void> {
   const db = await openDb();
   await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction([STORE_TRIPS, STORE_ROUTES], "readwrite");
+    const tx = db.transaction(STORE_TRIPS, "readwrite");
     tx.objectStore(STORE_TRIPS).clear();
-    tx.objectStore(STORE_ROUTES).clear();
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });

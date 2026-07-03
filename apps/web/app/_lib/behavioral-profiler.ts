@@ -43,23 +43,60 @@ export interface BehaviorEvent {
 const RING_BUFFER_LIMIT = 100;
 
 class BehaviorBuffer {
-  private events: BehaviorEvent[] = [];
+  private readonly capacity = RING_BUFFER_LIMIT;
+  // Preallocated fixed-size backing store. Replaces the previous
+  // Array.push + Array.shift() implementation: `shift()` is O(n) and
+  // trashed GC whenever the buffer wrapped. The ring overwrites the
+  // oldest slot in O(1).
+  private readonly slots: (BehaviorEvent | undefined)[] = new Array(this.capacity);
+  /** Index of the next slot to write to. */
+  private head = 0;
+  /** Number of populated slots; never exceeds `capacity`. */
+  private count = 0;
 
   push(event: BehaviorEvent): void {
-    this.events.push(event);
-    if (this.events.length > RING_BUFFER_LIMIT) {
-      this.events.shift();
+    this.slots[this.head] = event;
+    this.head = (this.head + 1) % this.capacity;
+    if (this.count < this.capacity) {
+      this.count++;
     }
   }
 
+  /** Return events in insertion order (oldest first). */
+  private toArray(): BehaviorEvent[] {
+    const out: BehaviorEvent[] = [];
+    if (this.count < this.capacity) {
+      // Buffer not yet wrapped — slots 0..count-1 are in order.
+      for (let i = 0; i < this.count; i++) {
+        const event = this.slots[i];
+        if (event !== undefined) {
+          out.push(event);
+        }
+      }
+    } else {
+      // Buffer is full — start at `head` (oldest surviving slot)
+      // and walk `capacity` positions.
+      for (let i = 0; i < this.capacity; i++) {
+        const idx = (this.head + i) % this.capacity;
+        const event = this.slots[idx];
+        if (event !== undefined) {
+          out.push(event);
+        }
+      }
+    }
+    return out;
+  }
+
   drain(): readonly BehaviorEvent[] {
-    const copy = this.events.slice();
-    this.events.length = 0;
+    const copy = this.toArray();
+    this.slots.fill(undefined);
+    this.head = 0;
+    this.count = 0;
     return copy;
   }
 
   peek(): readonly BehaviorEvent[] {
-    return this.events.slice();
+    return this.toArray();
   }
 }
 

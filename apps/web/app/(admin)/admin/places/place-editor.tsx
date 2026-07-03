@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, DataTable } from "@repo/ui";
 import type { Place } from "@repo/types";
 
@@ -120,7 +120,10 @@ export function PlaceEditor() {
     };
   }, []);
 
-  function startEdit(place: PlaceRow) {
+  // startEdit is memoised so the rows useMemo doesn't rebuild on
+  // every keystroke in the form (the original non-memoised closure
+  // invalidated the rows array every render).
+  const startEdit = useCallback((place: PlaceRow) => {
     setEditingId(place.id);
     setDraft({
       category: place.category,
@@ -130,7 +133,7 @@ export function PlaceEditor() {
       sourceConfidence: place.sourceConfidence
     });
     setMessage(`Editing ${place.name}.`);
-  }
+  }, []);
 
   function resetForm() {
     setEditingId(null);
@@ -183,15 +186,21 @@ export function PlaceEditor() {
       }
 
       if (response.ok && payload.place) {
+        // Capture in a const so the setState callback doesn't
+        // need non-null assertions (TypeScript can't narrow
+        // payload.place inside the callback closure).
+        const saved = payload.place;
         setPlaces((current) => {
           if (!editingId) {
-            return [payload.place!, ...current.filter((place) => place.id !== payload.place!.id)];
+            return [saved, ...current.filter((place) => place.id !== saved.id)];
           }
-
-          return current.map((place) => (place.id === editingId ? payload.place! : place));
+          return current.map((place) => (place.id === editingId ? saved : place));
         });
 
-        setMessage(payload.message ?? (editingId ? `${payload.place.name} updated.` : `${payload.place.name} added.`));
+        setMessage(
+          payload.message ??
+            (editingId ? `${saved.name} updated.` : `${saved.name} added.`)
+        );
         resetForm();
         return;
       }
@@ -211,7 +220,7 @@ export function PlaceEditor() {
             <CardTitle>Places index</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-6 min-w-0">
-            <div data-testid="places-table" className="min-w-0 overflow-x-auto" tabIndex={0} role="region" aria-label="Places table — scrollable">
+            <div data-testid="places-table" className="min-w-0">
               {isLoading ? <p className="text-sm text-[var(--color-muted-foreground)]">Loading places…</p> : null}
               <DataTable columns={["Place", "Region", "Category", "Quality", "Source confidence", "Action"]} rows={rows} />
             </div>

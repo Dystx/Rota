@@ -213,3 +213,20 @@ export const TripBriefSchema = z
 export type TripBrief = z.infer<typeof TripBriefSchema>;
 
 export type TripBriefValidationErrors = z.inferFlattenedErrors<typeof TripBriefSchema>["fieldErrors"];
+
+/**
+ * Single source of truth for the default values used when the
+ * caller has not supplied a field (e.g. when the LLM intent
+ * parser is producing a TripBrief from a TripBriefIntent and
+ * the form did not capture certain fields). The shape mirrors
+ * TripBrief exactly. Callers should spread this into the
+ * result so a future default change (say, `accommodationLocation`
+ * switching from "" to "anywhere" by default) lands in one place
+ * instead of N.
+ */
+export const TRIP_BRIEF_DEFAULTS = {
+  startDate: "",
+  endDate: "",
+  travelersCount: 2,
+  accommodationLocation: ""
+} as const satisfies Partial<TripBrief>;

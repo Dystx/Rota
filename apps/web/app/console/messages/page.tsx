@@ -167,7 +167,12 @@ export default function ConsoleMessagesPage() {
                 <li key={conversation.id}>
                   <button
                     type="button"
-                    onClick={() => setActiveId(conversation.id)}
+                    onClick={() => {
+                      setActiveId(conversation.id);
+                      // Reset the "new since you looked" counter
+                      // when the operator opens a conversation.
+                      setIncomingCount(0);
+                    }}
                     aria-pressed={isSelected}
                     className={`w-full text-left p-4 border-b border-olive-light/5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-1 ${
                       isSelected

@@ -99,6 +99,20 @@ export async function triageMessage(input: TriageInput): Promise<TriageResult> {
   const openai = createOpenAI({ apiKey });
   const modelId = process.env.RUMIA_TRIAGE_MODEL ?? "gpt-4o-mini";
 
+  // Build a human-readable prompt. JSON.stringify forces the
+  // model to do string extraction over a JSON blob, which
+  // degrades output quality for short messages ("hi" becomes
+  // `{"message":"hi"}`). Inline the fields so the LLM sees
+  // the message in the same shape a human specialist would.
+  const promptLines = [input.message];
+  if (input.tripContext) {
+    const ctx = input.tripContext;
+    if (ctx.destinationCountry) promptLines.push(`Destination: ${ctx.destinationCountry}`);
+    if (ctx.regions && ctx.regions.length > 0) promptLines.push(`Regions: ${ctx.regions.join(", ")}`);
+    if (ctx.isOnTrip !== undefined) promptLines.push(`Currently on trip: ${ctx.isOnTrip ? "yes" : "no"}`);
+    if (ctx.currentLocalTime) promptLines.push(`Local time: ${ctx.currentLocalTime}`);
+  }
+
   // Same type-cast workaround as the itinerary intent parser —
   // Vercel AI SDK v5 × Zod-version mismatch. Runtime is correct.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -107,7 +121,7 @@ export async function triageMessage(input: TriageInput): Promise<TriageResult> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     schema: TriageResultSchema as any,
     system: SYSTEM_PROMPT,
-    prompt: JSON.stringify(input),
+    prompt: promptLines.join("\n"),
     temperature: 0.1
   });
 
@@ -158,9 +172,14 @@ export function keywordTriage(input: TriageInput): TriageResult {
     };
   }
   if (hasQuestionMark) {
+    // The bare-`?` path used to return confidence 0.55 which
+    // contradicts the system prompt's "confidence < 0.7 should
+    // escalate" rule and triggers false-positive escalations
+    // downstream. Bump to 0.7 (matches the explicit informational
+    // path above) so this branch behaves consistently.
     return {
       tier: "informational",
-      confidence: 0.55,
+      confidence: 0.7,
       rationale: "Question mark detected; treating as informational"
     };
   }
