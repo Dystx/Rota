@@ -1,26 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  /* Colors - Cinematic Concierge */
-  --color-paper: #fdfbf7;
-  --color-cream: #f4efe6;
-  --color-ink: #1a1c20;
-  --color-ink-soft: #2d3131;
-  --color-atlantic: #1f3b4d;
-  --color-aqua: #7fb2c4;
-  
+  /* ----------------------------------------------------------------------
+   * Color tokens — re-pointed to the Rumia v4 olive/ochre palette
+   * (docs/spec-v4.md §6, docs/prototype.html). Variable names preserved
+   * for backward compat with the .rota-* component classes and any
+   * page-level Tailwind utilities that reference them.
+   *
+   * Migration source values (Cinematic Concierge) are kept as comments
+   * for reference; the active hex values are now the v4 palette.
+   * ---------------------------------------------------------------------- */
+
+  /* Cinematic Concierge (legacy)             v4 olive/ochre (active) */
+  --color-paper: #e8fff0;  /* was #fdfbf7 */     /* --color-background-olive */
+  --color-cream: #efece6;  /* was #f4efe6 */     /* --color-linen-dark      */
+  --color-ink: #16281f;    /* was #1a1c20 */     /* --color-primary          */
+  --color-ink-soft: #2b3e34; /* was #2d3131 */    /* --color-primary-container */
+  --color-atlantic: #ce933f; /* was #1f3b4d */    /* --color-ochre-dark      */
+  --color-aqua: #eab875;    /* was #7fb2c4 */     /* --color-ochre-light     */
+
   --color-background: var(--color-paper);
   --color-surface: rgba(255, 255, 255, 0.86);
   --color-surface-muted: var(--color-cream);
   --color-foreground: var(--color-ink);
-  --color-muted-foreground: #5c6266;
-  --color-border: #e2dfd8;
+  --color-muted-foreground: #4a5a4e;  /* mid-olive; was #5c6266 */
+  --color-border: #d8dcd8;             /* was #e2dfd8 */
   --color-accent: var(--color-aqua);
   --color-secondary: var(--color-atlantic);
 
   --color-status-info-fg: var(--color-secondary);
-  --color-status-info-bg: rgba(127, 178, 196, 0.16);
-  --color-status-info-border: rgba(127, 178, 196, 0.4);
+  --color-status-info-bg: rgba(206, 147, 63, 0.14);    /* ochre-dark @ 14% */
+  --color-status-info-border: rgba(206, 147, 63, 0.4);  /* ochre-dark @ 40% */
   --color-status-info-dot: var(--color-accent);
 
   --color-status-success-fg: #2f5b40;
