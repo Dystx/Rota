@@ -33,7 +33,13 @@ test.describe("@smoke @visual Marketing baselines", () => {
       // capture mid-flight. Wait for the choreography to settle on the
       // home page before the baseline compare.
       if (route === "/") {
-        await page.waitForTimeout(4000);
+        // Home page renders the GlobeWorkspace with a ~3.2s intro camera
+        // choreography (earth → europe beat). The choreography is
+        // non-deterministic at the pixel level because the WebGL
+        // easing curve is frame-rate dependent. Wait 6s (well past the
+        // ~3.2s choreography + a settling buffer) so the camera is
+        // firmly on the final europe beat before the baseline compare.
+        await page.waitForTimeout(6000);
       }
       await disableAnimations(page);
 
