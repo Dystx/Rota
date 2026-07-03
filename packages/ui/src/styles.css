@@ -83,6 +83,26 @@
   --motion-duration-base: 400ms;
   --motion-duration-slow: 800ms;
   --motion-easing-cinematic: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Legacy iberian brand aliases — kept for cinematic-hero.tsx (and
+     chapter-heading.tsx, chapter-nav.tsx) compatibility. The canonical
+     v4 palette is olive/ochre; these aliases point at the nearest
+     canonical equivalent. New code should use the canonical tokens
+     directly. */
+  --color-iberian-shadow: #1d2a23;        /* --color-olive-dark */
+  --color-iberian-gold: #eab875;          /* --color-ochre-light */
+  --color-iberian-limestone: #efece6;     /* --color-cream / --color-linen-dark */
+  --color-iberian-azulejo: #3c5447;       /* --color-olive-light */
+  --cinematic-overlay-hero: linear-gradient(
+    to top,
+    rgba(22, 40, 31, 0.72) 0%,
+    rgba(22, 40, 31, 0) 60%
+  );
+  --cinematic-overlay-vignette: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.42) 100%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -167,6 +187,17 @@
   --color-surface-container-low: #e3f9ea;
   --color-ochre-light: #eab875;
   --color-secondary-container: #ffc16d;
+
+  /* ----- LEGACY IBERIAN BRAND ALIASES -----
+   * Kept so existing pages that reference `bg-iberian-shadow`,
+   * `text-iberian-gold`, `text-iberian-limestone`, `bg-iberian-azulejo`
+   * (cinematic-hero, chapter-heading, chapter-nav) still resolve. Each
+   * value matches the nearest canonical v4 token; new code should use
+   * the canonical name directly. */
+  --color-iberian-shadow: #1d2a23;
+  --color-iberian-gold: #eab875;
+  --color-iberian-limestone: #efece6;
+  --color-iberian-azulejo: #3c5447;
 
   /* ----- BORDER RADIUS ----- */
   --radius: 0.25rem;
