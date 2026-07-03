@@ -108,15 +108,25 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
         (payload) => {
           const row = (payload.new ?? payload.old) as Record<string, unknown> | null;
           if (!row || typeof row.id !== "string") return;
+          // The actual `trips` table schema (202604291900_…trips.sql):
+          //   id, trip_brief_id, country_slug, title, status, visibility,
+          //   is_paid, has_human_review, created_at, updated_at
+          // There is no `brief` or `sla_hours` column. The brief lives
+          // on the related `trip_briefs` row; a full join is out of
+          // scope for the Realtime path, so the card body shows the
+          // trip title + country, and the SLA badge is only emitted
+          // for the fallback dataset (see FALLBACK_ITEMS).
           const next: PipelineItem = {
             id: row.id,
             title: typeof row.title === "string" ? row.title : "Untitled trip",
-            body: typeof row.brief === "object" && row.brief && "summary" in row.brief
-              ? String((row.brief as Record<string, unknown>).summary ?? "")
+            body: typeof row.country_slug === "string"
+              ? `Country: ${row.country_slug.replace(/-/g, " ")}`
               : "",
-            clientName: typeof row.owner_user_id === "string" ? row.owner_user_id.slice(0, 8) : "—",
+            clientName: typeof row.trip_brief_id === "string" || typeof row.trip_brief_id === "number"
+              ? `Brief #${row.trip_brief_id}`
+              : "—",
             status: mapTripStatus(row.status),
-            slaHours: typeof row.sla_hours === "number" ? row.sla_hours : null,
+            slaHours: null, // not on the trips table; fallback items only
             updatedAt: typeof row.updated_at === "string" ? row.updated_at : null
           };
           setItems((prev) => {

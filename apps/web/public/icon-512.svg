@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="100" fill="#18181B"/>
+  <text x="256" y="320" font-family="Georgia, serif" font-size="200" font-weight="700" font-style="italic" fill="#E3A857" text-anchor="middle">R</text>
+  <text x="256" y="420" font-family="ui-sans-serif, system-ui" font-size="56" font-weight="500" fill="#F7F4F0" text-anchor="middle" letter-spacing="0.2em">RUMIA</text>
+</svg>

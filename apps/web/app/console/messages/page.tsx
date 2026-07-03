@@ -54,6 +54,12 @@ export default function ConsoleMessagesPage() {
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_USE_REALTIME_MESSAGES !== "true") return;
 
+    // Cancellation flag: the async triage callback awaits a server
+    // action. If the user navigates away during the await, we must
+    // not call setLastTriage on an unmounted component (React 18+
+    // warning + leaked triage badge on the next page).
+    let cancelled = false;
+
     const supabase = createBrowserSupabaseClient();
     const channel = supabase
       .channel("console-messages")
@@ -61,6 +67,7 @@ export default function ConsoleMessagesPage() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "chat_messages" },
         async (payload) => {
+          if (cancelled) return;
           setIncomingCount((n) => n + 1);
           // Run the AI triage classifier on every inbound message.
           // The server action falls back to keywordTriage() if
@@ -70,6 +77,7 @@ export default function ConsoleMessagesPage() {
           if (body) {
             try {
               const result = await triageInboundMessage({ message: body });
+              if (cancelled) return;
               setLastTriage(result);
             } catch {
               // Triage is best-effort; never break the live channel.
@@ -78,10 +86,12 @@ export default function ConsoleMessagesPage() {
         }
       )
       .subscribe((status) => {
+        if (cancelled) return;
         setIsLive(status === "SUBSCRIBED");
       });
 
     return () => {
+      cancelled = true;
       void supabase.removeChannel(channel);
     };
   }, []);
@@ -151,14 +161,16 @@ export default function ConsoleMessagesPage() {
               </label>
             </div>
             <ul className="flex-1 overflow-y-auto">
-              {CONVERSATIONS.map((conversation) => (
+              {CONVERSATIONS.map((conversation) => {
+                const isSelected = conversation.id === activeId;
+                return (
                 <li key={conversation.id}>
                   <button
                     type="button"
                     onClick={() => setActiveId(conversation.id)}
-                    aria-pressed={conversation.active}
+                    aria-pressed={isSelected}
                     className={`w-full text-left p-4 border-b border-olive-light/5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-1 ${
-                      conversation.active
+                      isSelected
                         ? "bg-surface-container border-l-4 border-ochre-light"
                         : "hover:bg-white/40"
                     }`}
@@ -198,7 +210,8 @@ export default function ConsoleMessagesPage() {
                     </div>
                   </button>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </aside>
 

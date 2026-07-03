@@ -142,8 +142,18 @@ export const TripBriefSchema = z
       .int("Trip length must be a whole number.")
       .min(2, "Trip length should be at least 2 days.")
       .max(21, "Trip length should stay within 21 days for this MVP."),
-    startDate: z.string().optional(),
-    endDate: z.string().optional(),
+    // ISO date format enforced so the `startDate < endDate`
+    // comparison below compares apples to apples. A value like
+    // "10/14/2024" would otherwise lex-compare against "2024-10-14"
+    // and pass when it shouldn't.
+    startDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Use ISO date format YYYY-MM-DD.")
+      .optional(),
+    endDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Use ISO date format YYYY-MM-DD.")
+      .optional(),
     travelersCount: z.coerce
       .number({ invalid_type_error: "Number of travelers is required." })
       .int("Travelers must be a whole number.")

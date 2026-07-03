@@ -25,7 +25,9 @@ describe("keywordTriage", () => {
 
   it("handles empty input gracefully", () => {
     const result = keywordTriage({ message: "" });
-    expect(result.tier).toBeDefined();
+    expect(result.tier).toMatch(/^informational$|^logistical$|^emergency$/);
+    expect(result.confidence).toBeGreaterThanOrEqual(0);
+    expect(result.confidence).toBeLessThanOrEqual(1);
   });
 });
 

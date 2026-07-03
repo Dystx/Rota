@@ -60,19 +60,35 @@ describe("retrieveDestinations", () => {
   });
 
   it("aligns pace with destination intensity", () => {
+    // lx-belem (intensity 0.3) and lx-sintra-pena (intensity 0.6) span
+    // both Lisbon and Sintra so they're in the candidate set. On a
+    // calm trip the low-intensity Belém should score higher than the
+    // high-intensity Pena; on a full trip the high-intensity Pena
+    // should score higher than low-intensity Belém. We compare the
+    // raw scores — interest/region weights are equal so the pace
+    // weight is the only variable.
     const calmTrip = retrieveDestinations(
-      intent({ regions: ["lisbon"], pace: "calm" })
+      intent({ regions: ["lisbon", "sintra"], pace: "calm" })
     );
     const fullTrip = retrieveDestinations(
-      intent({ regions: ["lisbon"], pace: "full" })
+      intent({ regions: ["lisbon", "sintra"], pace: "full" })
     );
-    // Calm trip should rank Belém (intensity 0.3) higher than
-    // Pena Palace (intensity 0.6) when the regions span both.
-    const calmVsFull = calmTrip.candidates
-      .map((c) => c.id)
-      .join("|");
-    expect(calmVsFull).toBeTruthy();
-    expect(fullTrip.candidates[0]?.region).toBe("lisbon");
+    const belemCalm = calmTrip.candidates.find((c) => c.id === "lx-belem");
+    const belemFull = fullTrip.candidates.find((c) => c.id === "lx-belem");
+    const penaCalm = calmTrip.candidates.find((c) => c.id === "lx-sintra-pena");
+    const penaFull = fullTrip.candidates.find((c) => c.id === "lx-sintra-pena");
+    // Belém is calm-friendly, so its calm score should exceed its
+    // full score (the pace term contributes 0.7 * 0.15 calm vs
+    // 0.3 * 0.15 full = 0.06 delta).
+    expect(belemCalm).toBeDefined();
+    expect(belemFull).toBeDefined();
+    if (belemCalm && belemFull) {
+      expect(belemCalm.score).toBeGreaterThan(belemFull.score);
+    }
+    // Conversely, Pena is full-friendly.
+    if (penaCalm && penaFull) {
+      expect(penaFull.score).toBeGreaterThan(penaCalm.score);
+    }
   });
 
   it("returns confidence between 0 and 1", () => {
