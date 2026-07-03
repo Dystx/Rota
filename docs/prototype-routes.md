@@ -98,9 +98,9 @@ The prototype uses **Tailwind CDN** with `tailwind.config = {...}` syntax. The c
 1. **Add new prototype-mapped routes as Next.js pages** (5 client-facing, 7 console routes) ✅ **DONE 2026-07-02**
 2. **Keep `(admin|app|reviewer)` route groups as-is** for now — adds `/console/*` as an alias/redirect layer later if desired
 3. **Apply `docs/design-tokens-olive-ochre.css`** by replacing `packages/ui/src/styles.css` content ✅ **DONE additively 2026-07-02**
-4. **Audit `.rota-*` component classes** in `packages/ui/src/styles.css` for hardcoded Cinematic Concierge references; rename or repoint to olive/ochre tokens
-5. **Replace page-level hero sections** in `(marketing)/*` and `(app)/trip/new/page.tsx` with prototype's hero layout (`h-[819px]` cinematic background + glass card overlay)
-6. **Verify** `pnpm typecheck` and `pnpm test` still pass after token swap
+4. **Audit `.rota-*` component classes** in `packages/ui/src/styles.css` for hardcoded Cinematic Concierge references; rename or repoint to olive/ochre tokens ✅ **DONE 2026-07-02**
+5. **Replace page-level hero sections** in `(marketing)/*` and `(app)/trip/new/page.tsx` with prototype's hero layout (`h-[819px]` cinematic background + glass card overlay) ✅ **DONE 2026-07-02**
+6. **Verify** `pnpm typecheck` and `pnpm test` still pass after token swap ✅ **DONE**
 
 Each step is its own commit; smallest-reviewable diff.
 
@@ -113,8 +113,21 @@ Each step is its own commit; smallest-reviewable diff.
 | 1. Add prototype-mapped routes as Next.js pages | ✅ **11/12 routes ported** | `c007883`, `8476954`, `af25df7`, `7bcf504` |
 | 2. Olive/ochre tokens applied to `packages/ui/src/styles.css` | ✅ Done additively | `baf0042`, `081b40f` |
 | 3. Prototype served verbatim at `/prototype.html` | ✅ Done | `061165d` |
-| 4. `.rota-*` audit | ⏳ Pending | — |
-| 5. Replace page-level heroes in `(marketing)/(app)` | ⏳ Pending | — |
+| 4. `.rota-*` audit + repoint | ✅ Done (Option D: value repoint in `:root`) | `66fc9cc` |
+| 5. Replace page-level heroes in `(marketing)/(app)` | ✅ Done (marketing + trip/new) | `022b228`, `a57a45e` |
+| 6. Verify pnpm typecheck / test / build | ✅ All pass (13/13 typecheck, 131/131 @repo/ui tests, 49/49 build) | — |
+
+---
+
+## Pending work (credentials-blocked)
+
+These items require Supabase project access from the user's environment, not local code changes:
+
+| Item | Reference | What's needed |
+|---|---|---|
+| **Phase 2 — Production Supabase reconciliation** | `docs/ops/launch.md` §1 + `docs/roadmap.md` Phase 2 | Hosted Supabase project URL + service-role key + apply permission. 12 + 4 v4 migrations to apply in order (oldest first, PITR backup before each). |
+| **v4 schema apply** | `supabase/migrations/202607022{100,110,120,130,140}_*.sql` | Same access as Phase 2; the migrations are committed locally. |
+| **E2E + visual + a11y + perf test suites** | `pnpm test:e2e` etc. | Running Supabase (local CLI or hosted) so Playwright global-setup can resolve the project URL. |
 
 ### Routes ported
 
