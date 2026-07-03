@@ -99,6 +99,15 @@ export interface GlobeWorkspaceProps {
    * and match the radial gradient and starfield independently.
    */
   atmosphere?: AtmosphereOptions;
+  /**
+   * Override the projection. Default: `"globe"`. The engine factory
+   * (`createDiscoveryEngine`) sets the initial projection from this
+   * prop; runtime changes after mount call `engine.setProjectionType`
+   * so the engine itself does not remount. The `hero-map.tsx` 2D ↔ 3D
+   * toggle relies on this to avoid rebuilding the layer registry and
+   * re-allocating the WebGL custom layers on every projection switch.
+   */
+  projection?: "globe" | "mercator";
   className?: string;
   testId?: string;
   /**
@@ -141,7 +150,8 @@ export function GlobeWorkspace({
   className,
   testId = "globe-workspace",
   onViewportChange,
-  onStopClick
+  onStopClick,
+  projection
 }: GlobeWorkspaceProps): React.ReactElement {
   // If `initialFocus` is set, it wins and the intro choreography is
   // skipped — the caller has already chosen where to land.
@@ -173,6 +183,10 @@ export function GlobeWorkspace({
       style,
       initialTarget: resolvedInitialTarget,
       reducedMotion,
+      // The factory default is "globe"; honor an explicit `projection`
+      // prop so the engine starts in the right mode on first mount
+      // (no wasted setProjection call after mount).
+      projection: projection ?? "globe",
       terrain: resolvedTerrain,
       fog: resolvedFog,
       atmosphere
@@ -282,7 +296,29 @@ export function GlobeWorkspace({
       engine.unmount();
       engineRef.current = null;
     };
-  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, resolvedTerrain, resolvedFog, atmosphere, styleOverride, theme, onViewportChange, onStopClick]);
+  }, [resolvedDisableIntro, resolvedInitialTarget, reducedMotion, resolvedTerrain, resolvedFog, atmosphere, styleOverride, theme, onViewportChange, onStopClick, projection]);
+
+  // Runtime projection switch (post-mount). The mount effect above
+  // handles the initial value; this effect fires on every subsequent
+  // change to `projection` and calls `engine.setProjectionType` so
+  // MapLibre re-projects in place — no canvas teardown, no layer
+  // registry rebuild, no WebGL buffer churn. The 2D ↔ 3D toggle in
+  // `hero-map.tsx` is the primary consumer; it used to remount the
+  // component (forcing a full WebGL lifecycle) and now just flips
+  // this prop. The dependency list intentionally omits `engineRef`
+  // and `projection` (the engine mutates those internally, and
+  // `projection` is the trigger we want to react to).
+  React.useEffect(() => {
+    const engine = engineRef.current;
+    if (!engine || projection === undefined) return;
+    try {
+      engine.setProjectionType(projection);
+    } catch {
+      // Engine not mounted yet (mount() is async); the mount effect
+      // already passed the right projection to the factory, so a
+      // pre-mount toggle is a no-op.
+    }
+  }, [projection]);
 
   return (
     <div

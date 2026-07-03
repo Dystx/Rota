@@ -102,6 +102,15 @@ export interface WorkspaceCanvasProps {
    * to opt in.
    */
   fog?: FogOptions;
+  /**
+   * Override the projection. Default: `"mercator"` (the workspace is
+   * a 2D editing surface). The engine factory initializes from this
+   * prop; runtime changes after mount call `engine.setProjectionType`
+   * so the engine itself does not remount. See `GlobeWorkspace` for
+   * the full design rationale; the projection switch is the same
+   * code path either way.
+   */
+  projection?: "globe" | "mercator";
 }
 
 const DEFAULT_HOME_CENTER: readonly [number, number] = [-8.6291, 41.1579];
@@ -133,7 +142,8 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       onViewportChange,
       onStopClick,
       terrain,
-      fog
+      fog,
+      projection
     },
     ref
   ) {
@@ -204,7 +214,10 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
         style,
         initialTarget: resolvedInitialTarget,
         reducedMotion,
-        projection: "mercator",
+        // The factory default is "mercator"; honor an explicit
+        // `projection` prop so the engine starts in the right mode
+        // on first mount (no wasted setProjection call after mount).
+        projection: projection ?? "mercator",
         terrain: resolvedTerrain,
         fog: resolvedFog
       });
@@ -311,7 +324,26 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
     // target is captured on first mount, and route features are
     // re-seeded by the dedicated effect below when the prop changes.
     // This stops the engine from remounting on every parent render.
-    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, onViewportChange, onStopClick]);
+    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, onViewportChange, onStopClick, projection]);
+
+    // Runtime projection switch (post-mount). The mount effect above
+    // handles the initial value; this effect fires on every subsequent
+    // change to `projection` and calls `engine.setProjectionType` so
+    // MapLibre re-projects in place — no canvas teardown, no layer
+    // registry rebuild. The dependency list intentionally omits
+    // `engineRef` and includes `projection` (the trigger we want to
+    // react to).
+    React.useEffect(() => {
+      const engine = engineRef.current;
+      if (!engine || projection === undefined) return;
+      try {
+        engine.setProjectionType(projection);
+      } catch {
+        // Engine not mounted yet (mount() is async); the mount effect
+        // already passed the right projection to the factory, so a
+        // pre-mount toggle is a no-op.
+      }
+    }, [projection]);
 
     // Re-seed the route layer when the parent swaps `routeFeatures`.
     // `null` is a valid value — it restores the deterministic fixture

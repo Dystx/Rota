@@ -105,6 +105,16 @@ export interface SpatialEngine {
   /** Push a telemetry snapshot into a registered layer. */
   applyLayerUpdate(layer: SpatialLayer, collection: SpatialFeatureCollection): void;
   /**
+   * Switch the projection at runtime. Avoids a full canvas teardown —
+   * MapLibre re-projects the existing tile/source data in place so the
+   * layer registry, telemetry, and camera state survive the switch.
+   * No-op if not mounted. The 2D ↔ 3D toggle in `hero-map.tsx` uses
+   * this so toggling does not remount the engine (which would
+   * re-download the style, recreate every custom WebGL layer, and
+   * leak buffers if not torn down cleanly).
+   */
+  setProjectionType(type: "globe" | "mercator"): void;
+  /**
    * Convenience for run-once camera intros. Throws if the engine hasn't
    * mounted yet. Resolves when the last beat has settled.
    */

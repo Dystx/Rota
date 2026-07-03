@@ -178,6 +178,26 @@ export class MapLibreSpatialEngine implements SpatialEngine {
     layer.onUpdate(this.makeContext(), collection);
   }
 
+  /**
+   * Switch the MapLibre projection in place. The renderer handles the
+   * visual transition (mercator ↔ globe) without re-creating the
+   * canvas, so the layer registry, telemetry wiring, and camera state
+   * survive the switch. This is what makes the 2D ↔ 3D toggle in
+   * `hero-map.tsx` cheap — the engine does not remount.
+   *
+   * MapLibre's `setProjection` triggers a 'projectiontransition' event
+   * on the map; the rendering engine re-uses the cached tile/source
+   * data and the WebGL context. Custom `CustomLayerInterface` layers
+   * (radial gradient, starfield) keep their `onAdd` resources.
+   *
+   * No-op if the engine is not yet mounted — `mount()` sets the
+   * initial projection itself.
+   */
+  setProjectionType(type: "globe" | "mercator"): void {
+    if (!this.map) return;
+    this.map.setProjection({ type });
+  }
+
   async playChoreography(choreography: import("../../core/camera-choreography").CameraChoreography): Promise<void> {
     if (!this.camera) {
       throw new Error("SpatialEngine.playChoreography() called before mount()");

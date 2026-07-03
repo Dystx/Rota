@@ -40,7 +40,6 @@ const PORTUGAL_CENTER = { lng: -8.165, lat: 39.55 };
  */
 export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
   const [projection, setProjection] = React.useState<HeroProjection>(initialProjection);
-  const [tick, setTick] = React.useState(0);
 
   // Wire the visible map surface back to the cross-page Zustand store.
   // The store is read by the bento grid (selection -> fly-to) and the
@@ -49,40 +48,35 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
   const setViewport = useMapStore((state) => state.setViewport);
   const selectStop = useMapStore((state) => state.selectStop);
 
-  // Bumping `tick` forces the dynamic child to remount on projection
-  // switch so the GlobeWorkspace / WorkspaceCanvas lifecycle runs
-  // cleanly. This is the simplest pattern that keeps both canvases
-  // out of each other's residual state.
-  React.useEffect(() => {
-    setTick((current) => current + 1);
-  }, [projection]);
-
+  // Render a SINGLE GlobeWorkspace for both projection modes and let
+  // the engine switch projection in place via `setProjectionType`.
+  // The previous design (`key={globe-${tick}}` + `key={workspace-${tick}}`)
+  // remounted the whole component on every toggle, which:
+  //   1. Re-downloaded the basemap style (network round trip)
+  //   2. Re-created every registered SpatialLayer (ambient pulse,
+  //      symbol badges, route layer)
+  //   3. Re-allocated the WebGL custom layers (radial gradient,
+  //      starfield) and their buffers/programs
+  //   4. Risked leaking WebGL resources if the teardown race fired
+  //      in the wrong order
+  // The fix lives in `GlobeWorkspace`'s `projection` prop + the
+  // engine's `setProjectionType` method; this component just toggles
+  // the prop. WorkspaceCanvas is no longer used here (it owns its own
+  // mercator-only mount lifecycle) but is still exported from
+  // `@repo/spatial-engine` for the dedicated /explore/workspace page.
   return (
     <div className="absolute inset-0 z-0" data-testid="hero-map" data-projection={projection}>
-      {projection === "globe" ? (
-        <GlobeWorkspace
-          key={`globe-${tick}`}
-          theme="dark"
-          disableIntro
-          className="absolute inset-0 h-full w-full"
-          testId="hero-globe"
-          initialCenter={[PORTUGAL_CENTER.lng, PORTUGAL_CENTER.lat]}
-          initialZoom={3.4}
-          onViewportChange={setViewport}
-          onStopClick={(id, coords) => selectStop(id, coords)}
-        />
-      ) : (
-        <WorkspaceCanvas
-          key={`workspace-${tick}`}
-          disableIntro
-          className="absolute inset-0 h-full w-full"
-          testId="hero-workspace"
-          initialCenter={[PORTUGAL_CENTER.lng, PORTUGAL_CENTER.lat]}
-          initialZoom={5.6}
-          onViewportChange={setViewport}
-          onStopClick={(id, coords) => selectStop(id, coords)}
-        />
-      )}
+      <GlobeWorkspace
+        theme="dark"
+        disableIntro
+        className="absolute inset-0 h-full w-full"
+        testId="hero-globe"
+        initialCenter={[PORTUGAL_CENTER.lng, PORTUGAL_CENTER.lat]}
+        initialZoom={3.4}
+        onViewportChange={setViewport}
+        onStopClick={(id, coords) => selectStop(id, coords)}
+        projection={projection}
+      />
 
       <ProjectionToggle value={projection} onChange={setProjection} />
     </div>
