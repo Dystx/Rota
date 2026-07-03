@@ -4,6 +4,7 @@ import * as React from "react";
 import { useReducedMotion } from "@repo/ui";
 import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createWorkspaceEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
+import { CameraChoreography } from "../core/camera-choreography";
 import { fixtureRouteCollection } from "../fixtures/routes";
 import { fixtureTravelerCollection, fixtureSpecialistCollection } from "../fixtures/travelers";
 import type { MapStyleEndpoint } from "../core/types";
@@ -14,12 +15,24 @@ export interface WorkspaceCanvasProps {
   /** Initial camera target — defaults to Lisbon at close zoom. */
   initialCenter?: readonly [number, number];
   initialZoom?: number;
+  /**
+   * Disable the intro camera choreography (Portugal context → route
+   * fit → stop 1). Defaults to false so the demo page always animates;
+   * real consumers can opt out for inline embeds.
+   */
+  disableIntro?: boolean;
   className?: string;
   testId?: string;
 }
 
 const DEFAULT_HOME_CENTER: readonly [number, number] = [-8.6291, 41.1579];
 const DEFAULT_HOME_ZOOM = 5.4;
+const INTRO_CONTEXT_CENTER: readonly [number, number] = [-9.1393, 38.7223];
+const INTRO_CONTEXT_ZOOM = 4.2;
+const INTRO_FIT_CENTER: readonly [number, number] = [-8.6291, 39.85];
+const INTRO_FIT_ZOOM = 6.4;
+const INTRO_STOP_CENTER: readonly [number, number] = [-8.6291, 41.1579];
+const INTRO_STOP_ZOOM = 11;
 
 /**
  * WorkspaceCanvas — the 2D counterpart to GlobeWorkspace. Renders an
@@ -31,6 +44,7 @@ export function WorkspaceCanvas({
   styleOverride,
   initialCenter = DEFAULT_HOME_CENTER,
   initialZoom = DEFAULT_HOME_ZOOM,
+  disableIntro = false,
   className,
   testId = "workspace-canvas"
 }: WorkspaceCanvasProps): React.ReactElement {
@@ -60,7 +74,7 @@ export function WorkspaceCanvas({
 
     engine
       .mount(container)
-      .then(() => {
+      .then(async () => {
         if (cancelled) {
           engine.unmount();
           return;
@@ -75,6 +89,18 @@ export function WorkspaceCanvas({
         if (typeof ResizeObserver !== "undefined") {
           observer = new ResizeObserver(() => refresh());
           observer.observe(container);
+        }
+
+        if (!disableIntro) {
+          const intro = new CameraChoreography()
+            .beat("iberian-context", { center: INTRO_CONTEXT_CENTER, zoom: INTRO_CONTEXT_ZOOM }, { duration: reducedMotion ? 0 : 1500 })
+            .beat("fit-route", { center: INTRO_FIT_CENTER, zoom: INTRO_FIT_ZOOM, duration: reducedMotion ? 0 : 1400 })
+            .beat("first-stop", { center: INTRO_STOP_CENTER, zoom: INTRO_STOP_ZOOM, duration: reducedMotion ? 0 : 900 });
+          try {
+            await engine.playChoreography(intro);
+          } catch {
+            // Choreography is best-effort; never let it block the page.
+          }
         }
 
         return () => {
@@ -94,7 +120,7 @@ export function WorkspaceCanvas({
       engine.unmount();
       engineRef.current = null;
     };
-  }, [initialCenter, initialZoom, reducedMotion, styleOverride]);
+  }, [disableIntro, initialCenter, initialZoom, reducedMotion, styleOverride]);
 
   return (
     <div
@@ -102,6 +128,7 @@ export function WorkspaceCanvas({
       data-testid={testId}
       data-projection="mercator"
       data-reduced-motion={reducedMotion ? "true" : "false"}
+      data-intro={disableIntro ? "off" : "on"}
       className={
         className ??
         "relative h-[640px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-linen-dark shadow-[0_24px_60px_rgba(7,17,19,0.06)]"

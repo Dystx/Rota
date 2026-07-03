@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
 import { DestinationBento } from "../_components/destination-bento";
+import { HeroMap } from "./hero-map";
 
 export const metadata: Metadata = {
   title: "Discover Intentionally. | Rumia",
@@ -12,13 +13,14 @@ export const metadata: Metadata = {
 };
 
 /**
- * Rumia landing page — 100% parity with docs/prototype.html
+ * Rumia landing page — spatial-engine hero
  *
- * Three sections:
+ * Four sections:
  *  1. TopNav (fixed glass-morphism navigation)
- *  2. Hero — 819px cinematic gate with Portugal bg image, glass card
- *     containing the editable "We are visiting Portugal for 7 days..."
- *     text + "Begin Journey" CTA
+ *  2. Hero — 819px cinematic gate with an interactive Spatial Engine
+ *     canopy (3D globe by default; toggle to 2D planning map). Glass card
+ *     overlay containing the editable "We are visiting Portugal for 7
+ *     days..." text + "Begin Journey" CTA.
  *  3. DestinationBento — 12-column grid with Lisbon (8-col), Douro (4-col),
  *     Azores (12-col) cards
  *  4. SiteFooter
@@ -29,25 +31,20 @@ export default function HomePage() {
       <TopNav />
 
       <main className="flex-1" id="main-content">
-        {/* Hero Section (Cinematic Gate) */}
+        {/* Hero Section (Cinematic Gate with Spatial Engine canopy) */}
         <section className="relative h-[819px] min-h-[600px] w-full flex flex-col justify-center items-center overflow-hidden">
-          {/* Background "Video Loop" (mocked with image) */}
-          <div className="absolute inset-0 w-full h-full">
-            <div
-              className="w-full h-full bg-cover bg-center filter brightness-[0.85] contrast-125 saturate-110"
-              style={{
-                backgroundImage:
-                  "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCX3bKR-Xr7E_XjZsIHsO8GXIycFbn1UViEGxIXcvq3q5URIvlKF1tHXI8Q6I2K_aOmqDtA0I9xgu3nukH3AKzEV0E_ZVN-jTVndO-ZmUgFTgQ6Qja0ApRYSCmHU7_rtk4zuAXTpszEFhJntzw9Hc1PU-yQqKvq_VB1tCp5kV0RyNrRw34OBeBnei4hZhWWHXgKziQfaoH-stdy5vUUyvroiRc1Xl46gkiOU5z3CByCu7z7MeZue5KAtydhEggtzf5NL-NDqysiKt-S')",
-              }}
-            />
-            {/* Gradient Overlay for readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90" />
-            <div className="absolute inset-0 bg-primary/20 mix-blend-multiply" />
-          </div>
+          {/* Interactive 3D/2D map canopy — replaces the static sunset
+              image so the executive summary's "Discovery Experience"
+              directive (immersive interactive globe at app launch) is
+              the actual default landing surface, not a placeholder. */}
+          <HeroMap initialProjection="globe" />
+
+          {/* Gradient Overlay for headline readability above any map */}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/55 via-primary/15 to-background/95 z-[1] pointer-events-none" />
 
           {/* Hero Content */}
           <div className="relative z-10 w-full max-w-4xl mx-auto px-container-padding-lg text-center flex flex-col items-center">
-            <h1 className="font-display text-display text-on-secondary mb-section-gap tracking-tight drop-shadow-2xl">
+            <h1 className="font-display text-display text-linen-dark mb-section-gap tracking-tight drop-shadow-2xl">
               Discover <span className="italic text-ochre-light">Intentionally.</span>
             </h1>
 

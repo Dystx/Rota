@@ -4,6 +4,7 @@ import * as React from "react";
 import { useReducedMotion } from "@repo/ui";
 import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createDiscoveryEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
+import { CameraChoreography } from "../core/camera-choreography";
 import { fixtureAllCollections } from "../fixtures/travelers";
 import type { MapStyleEndpoint } from "../core/types";
 
@@ -15,12 +16,16 @@ export interface GlobeWorkspaceProps {
   /** Initial camera target — defaults to Portugal at low altitude. */
   initialCenter?: readonly [number, number];
   initialZoom?: number;
+  /** Disable the intro camera choreography (world → Portugal zoom). */
+  disableIntro?: boolean;
   className?: string;
   testId?: string;
 }
 
 const DEFAULT_HOME_CENTER: readonly [number, number] = [-8.2245, 39.3999];
 const DEFAULT_HOME_ZOOM = 1.6;
+const INTRO_HOME_CENTER: readonly [number, number] = [-8.2245, 39.3999];
+const INTRO_HOME_ZOOM = 4.2;
 
 /**
  * RumiaGlobeWorkspace — the high-level entry point that owns one
@@ -34,6 +39,7 @@ export function GlobeWorkspace({
   styleOverride,
   initialCenter = DEFAULT_HOME_CENTER,
   initialZoom = DEFAULT_HOME_ZOOM,
+  disableIntro = false,
   className,
   testId = "globe-workspace"
 }: GlobeWorkspaceProps): React.ReactElement {
@@ -61,7 +67,7 @@ export function GlobeWorkspace({
 
     engine
       .mount(container)
-      .then(() => {
+      .then(async () => {
         if (cancelled) {
           engine.unmount();
           return;
@@ -87,6 +93,17 @@ export function GlobeWorkspace({
           observer.observe(container);
         }
 
+        if (!disableIntro) {
+          const intro = new CameraChoreography()
+            .beat("earth", { center: [0, 30] as const, zoom: 1.4, duration: reducedMotion ? 0 : 1400 })
+            .beat("europe", { center: INTRO_HOME_CENTER, zoom: INTRO_HOME_ZOOM, duration: reducedMotion ? 0 : 1800 });
+          try {
+            await engine.playChoreography(intro);
+          } catch {
+            // Choreography is best-effort; never let it block the page.
+          }
+        }
+
         return () => {
           cancelAnimationFrame(raf);
           observer?.disconnect();
@@ -104,7 +121,7 @@ export function GlobeWorkspace({
       engine.unmount();
       engineRef.current = null;
     };
-  }, [initialCenter, initialZoom, reducedMotion, styleOverride, theme]);
+  }, [disableIntro, initialCenter, initialZoom, reducedMotion, styleOverride, theme]);
 
   return (
     <div
@@ -112,6 +129,7 @@ export function GlobeWorkspace({
       data-testid={testId}
       data-theme={theme}
       data-reduced-motion={reducedMotion ? "true" : "false"}
+      data-intro={disableIntro ? "off" : "on"}
       className={
         className ??
         "relative h-[640px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-sage shadow-[0_24px_60px_rgba(7,17,19,0.06)]"

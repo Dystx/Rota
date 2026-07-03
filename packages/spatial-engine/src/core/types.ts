@@ -104,6 +104,11 @@ export interface SpatialEngine {
   reorderLayer(layerId: string, toIndex: number): void;
   /** Push a telemetry snapshot into a registered layer. */
   applyLayerUpdate(layer: SpatialLayer, collection: SpatialFeatureCollection): void;
+  /**
+   * Convenience for run-once camera intros. Throws if the engine hasn't
+   * mounted yet. Resolves when the last beat has settled.
+   */
+  playChoreography(choreography: import("./camera-choreography").CameraChoreography): Promise<void>;
   unmount(): void;
 }
 

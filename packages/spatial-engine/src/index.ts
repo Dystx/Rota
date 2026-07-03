@@ -45,3 +45,8 @@ export {
 export { fixtureRouteCollection, fixtureRouteSummary } from "./fixtures/routes";
 
 export { LayerRegistry } from "./core/layer-registry";
+export {
+  CameraChoreography,
+  singleBeat,
+  type CameraChoreographyBeat
+} from "./core/camera-choreography";

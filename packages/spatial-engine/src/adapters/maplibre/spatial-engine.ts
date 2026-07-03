@@ -147,6 +147,13 @@ export class MapLibreSpatialEngine implements SpatialEngine {
     layer.onUpdate(this.makeContext(), collection);
   }
 
+  async playChoreography(choreography: import("../../core/camera-choreography").CameraChoreography): Promise<void> {
+    if (!this.camera) {
+      throw new Error("SpatialEngine.playChoreography() called before mount()");
+    }
+    await choreography.play(this.camera);
+  }
+
   getCamera(): CameraController {
     if (!this.camera) {
       throw new Error("SpatialEngine.getCamera() called before mount()");
