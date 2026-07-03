@@ -486,6 +486,37 @@ function snapshotState(state: LocalWorkerState): WorkerRunResult {
 // dispatch shape, and a stub that returns the not-yet-
 // implemented result so the route compiles and QStash health
 // checks pass.
+//
+// --- Idempotency contract (sender + receiver) -----------------------
+//
+// QStash retries deliveries on 5xx and on signature-valid
+// re-posts within the dedup window. We dedupe in two places:
+//
+//  1. SENDER (not yet written — the cron scheduler for the
+//     ingest pipeline lands with the QStash schedule PR):
+//     every `qstash.publish()` MUST pass
+//       headers: { "Upstash-Idempotency-Key": <job idempotencyKey> }
+//     so QStash collapses duplicates that arrive within the
+//     dedup window. This is the primary dedup mechanism.
+//
+//  2. RECEIVER (this file, `runJob()` at line ~308 and
+//     `handleQStashRequest()` below): even with sender-side
+//     dedup, a delivery can land twice if QStash already
+//     delivered the first message but our worker crashed
+//     before recording completion. We short-circuit to
+//     `status: "skipped"` when `state.completedDeliveries`
+//     already contains the `idempotencyKey`. This is the
+//     safety net.
+//
+// The `idempotencyKey` field lives INSIDE the payload
+// (QStashPayload discriminated union, see line ~134). The
+// `Upstash-Idempotency-Key` HEADER on the publish() call
+// is what QStash itself sees; the two must match for the
+// dedup chain to be consistent. See
+// `docs/ops/serverless-database-connections.md § 3` and
+// `packages/ingest/README.md § "QStash idempotency"` for
+// the full pattern.
+// -------------------------------------------------------------------
 
 /** Upstash QStash signature verification — uses the project's
  *  shared signing secret. Returns true if the request signature

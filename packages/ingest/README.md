@@ -84,3 +84,75 @@ pnpm --filter @repo/ingest typecheck
 The pipeline stages land in later PRs; this PR is package
 scaffold + types + DuckDB connection helper. Tests land with
 the implementations.
+
+## HNSW index build — memory budget
+
+The pgvector HNSW index on `places.embedding` is rebuilt by the
+`202607032300_migrate_places_embedding_to_halfvec.sql` migration
+(when pgvector ≥ 0.7.0 is available) and by any future
+`ALTER TYPE ... HALFVEC(3072)` migration. HNSW builds are
+**memory-hungry** — the working buffer is the whole `places`
+table on disk, plus neighbor-graph scratch. On Supabase's
+default tier the build OOMs and rolls back if you don't bump
+`maintenance_work_mem` first.
+
+Run this in the Supabase SQL editor (or via the `psql` console)
+**before** applying the migration, in the same session:
+
+```sql
+-- Bump maintenance_work_mem for the HNSW build. 2GB is conservative
+-- for our ~12k-row corpus; scale to 4GB for 1M+ rows.
+set maintenance_work_mem = '2GB';
+
+-- Apply the halfvec migration, then re-run ANALYZE so the planner
+-- picks up the new HNSW index stats.
+\i supabase/migrations/202607032300_migrate_places_embedding_to_halfvec.sql
+
+vacuum analyze public.places;
+```
+
+The `set` is per-session, so run the migration in the same
+connection. `VACUUM ANALYZE` (not just `ANALYZE`) is required
+because the HNSW index needs a fresh visibility map for the
+neighbor graph to populate correctly.
+
+If the build still OOMs, drop `ef_construction` to 32 in the
+migration (trades a few percent recall for ~half the memory)
+or run the build on a paid Supabase tier where
+`maintenance_work_mem` can be raised higher.
+
+## pgvector dimension limit — forward compat
+
+`pgvector`'s `VECTOR(n)` and `HALFVEC(n)` types cap `n` at
+**2000** in pgvector 0.6 and earlier; pgvector 0.7.0+ raises
+the cap to **16000** (Supabase currently runs 0.7+). Our
+current model is `text-embedding-3-small` at 1536-dim — well
+under either cap. The next model bump
+(`text-embedding-3-large` at 3072-dim) also fits.
+
+The halfvec migration above is what makes the bump safe: it
+doubles the available headroom by halving per-vector memory
+and is the on-disk format we want long-term.
+
+## QStash idempotency — sender-side pattern
+
+The receiver (`apps/workers/src/index.ts handleQStashRequest`)
+deduplicates on the `idempotencyKey` field of the job
+envelope. When the QStash sender lands (cron schedule for the
+ingest pipeline), it must pass that same key as the
+`Upstash-Idempotency-Key` header on the `qstash.publish()` call
+so QStash itself collapses duplicates before they reach the
+worker:
+
+```ts
+await qstash.publish({
+  url: `${WORKER_BASE_URL}/qstash`,
+  body: JSON.stringify(payload),
+  headers: { "Upstash-Idempotency-Key": payload.idempotencyKey }
+});
+```
+
+The receiver-side dedup is a safety net for retries where
+QStash did deliver a message but the worker crashed before
+recording it. The sender-side header is the primary
+deduplication mechanism.
