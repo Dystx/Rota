@@ -17,6 +17,8 @@
       "@repo/config/*": ["../../packages/config/src/*"],
       "@repo/routing": ["../../packages/routing/src/index.ts"],
       "@repo/routing/*": ["../../packages/routing/src/*"],
+      "@repo/spatial-engine": ["../../packages/spatial-engine/src/index.ts"],
+      "@repo/spatial-engine/*": ["../../packages/spatial-engine/src/*"],
       "@repo/types": ["../../packages/types/src/index.ts"],
       "@repo/types/*": ["../../packages/types/src/*"],
       "@repo/ui": ["../../packages/ui/src/index.ts"],

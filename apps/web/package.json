@@ -25,6 +25,7 @@
     "@repo/monitoring": "workspace:*",
     "@repo/payments": "workspace:*",
     "@repo/routing": "workspace:*",
+    "@repo/spatial-engine": "workspace:*",
     "@repo/types": "workspace:*",
     "@repo/ui": "workspace:*",
     "@repo/workers": "workspace:*",

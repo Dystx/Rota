@@ -1,0 +1,193 @@
+import type { Map as MapLibreMap } from "maplibre-gl";
+import { AmbientPulseLayer } from "./layers/ambient-pulse";
+import { SymbolBadgesLayer } from "./layers/symbol-badges";
+import { mountMapLibreInstance } from "./map-instance";
+import { SpatialCameraController } from "../../core/camera-controller";
+import { InMemoryTelemetryService } from "../../core/telemetry-service";
+import type {
+  CameraController,
+  CameraTarget,
+  SpatialEngine,
+  SpatialEngineOptions,
+  SpatialFeatureCollection,
+  SpatialLayer,
+  SpatialLayerContext,
+  SpatialPalette,
+  TelemetryService
+} from "../../core/types";
+
+interface LayerRegistration {
+  layer: SpatialLayer;
+  unsubscribe?: () => void;
+}
+
+/** Channels a layer listens to; defaults to "travelers" when omitted. */
+const LAYER_CHANNEL_BINDINGS = new WeakMap<SpatialLayer, Parameters<TelemetryService["subscribe"]>[0]>();
+
+/** Bind a layer to a specific telemetry channel (call from layer factory). */
+export function bindLayerToChannel(layer: SpatialLayer, channel: Parameters<TelemetryService["subscribe"]>[0]): void {
+  LAYER_CHANNEL_BINDINGS.set(layer, channel);
+}
+
+const DEFAULT_PALETTE: SpatialPalette = {
+  primary: "#16281f",
+  primaryContainer: "#2b3e34",
+  ochre: "#ce933f",
+  ochreLight: "#eab875",
+  linen: "#efece6",
+  sage: "#e8fff0",
+  onPrimary: "#ffffff",
+  onSurface: "#0c1f16",
+  onSurfaceVariant: "#2b3e34"
+};
+
+/**
+ * MapLibre-backed SpatialEngine. This is the only place that knows the
+ * renderer is MapLibre; everything above this line sees only the abstract
+ * SpatialEngine / CameraController / TelemetryService / SpatialLayer
+ * interfaces from `core/types.ts`.
+ */
+export class MapLibreSpatialEngine implements SpatialEngine {
+  readonly style: SpatialEngineOptions["style"];
+
+  private readonly options: SpatialEngineOptions;
+  private readonly telemetry: InMemoryTelemetryService;
+  private readonly layers = new Map<string, LayerRegistration>();
+  private map: MapLibreMap | null = null;
+  private camera: SpatialCameraController | null = null;
+  private mounted = false;
+  private palette: SpatialPalette;
+
+  constructor(options: SpatialEngineOptions) {
+    this.options = options;
+    this.style = options.style;
+    this.telemetry = new InMemoryTelemetryService();
+    this.palette = { ...DEFAULT_PALETTE, ...(options.palette ?? {}) };
+  }
+
+  async mount(container: HTMLElement): Promise<void> {
+    if (this.mounted) return;
+
+    const { map, executor } = await mountMapLibreInstance({
+      container,
+      style: this.options.style,
+      initialTarget: this.options.initialTarget,
+      reducedMotion: this.options.reducedMotion
+    });
+
+    this.map = map;
+    this.camera = new SpatialCameraController(executor, {
+      reducedMotion: this.options.reducedMotion ?? false,
+      homeTarget: this.options.initialTarget
+    });
+
+    for (const { layer } of this.layers.values()) {
+      this.attachLayer(layer);
+    }
+
+    this.mounted = true;
+  }
+
+  register(layer: SpatialLayer): void {
+    if (this.layers.has(layer.id)) return;
+    const registration: LayerRegistration = { layer };
+    this.layers.set(layer.id, registration);
+
+    if (this.mounted) {
+      this.attachLayer(layer);
+    }
+  }
+
+  setPalette(palette: SpatialPalette): void {
+    this.palette = palette;
+    // Real implementation would push paint-property updates to each layer;
+    // phase 1 just stores the latest palette for components that read it.
+  }
+
+  getCamera(): CameraController {
+    if (!this.camera) {
+      throw new Error("SpatialEngine.getCamera() called before mount()");
+    }
+    return this.camera;
+  }
+
+  getTelemetry(): TelemetryService {
+    return this.telemetry;
+  }
+
+  /**
+   * Renderer handle for advanced integrations (e.g. ResizeObserver in the
+   * GlobeWorkspace React component). Most consumers should use the
+   * abstract CameraController / TelemetryService instead.
+   */
+  getRenderer(): MapLibreMap | null {
+    return this.map;
+  }
+
+  /** Internal helper used by GlobeWorkspace fixtures to seed a channel. */
+  seedTelemetry(channel: Parameters<TelemetryService["subscribe"]>[0], collection: SpatialFeatureCollection): void {
+    this.telemetry.seed(channel, collection);
+  }
+
+  unmount(): void {
+    if (!this.mounted) return;
+    for (const { layer, unsubscribe } of this.layers.values()) {
+      unsubscribe?.();
+      layer.onDetach(this.makeContext());
+    }
+    this.layers.clear();
+    this.telemetry.shutdown();
+    this.map?.remove();
+    this.map = null;
+    this.camera = null;
+    this.mounted = false;
+  }
+
+  /**
+   * Internal: attach a layer to the live map and wire it to its bound
+   * telemetry channel (defaults to "travelers"). The first push replays
+   * any seeded data so the layer has content from the first frame.
+   */
+  private attachLayer(layer: SpatialLayer): void {
+    const channel = LAYER_CHANNEL_BINDINGS.get(layer) ?? "travelers";
+    layer.onAttach(this.makeContext());
+    const unsubscribe = this.telemetry.subscribe(channel, (collection) => {
+      layer.onUpdate(this.makeContext(), collection);
+    });
+    const registration = this.layers.get(layer.id);
+    if (registration) {
+      registration.unsubscribe = unsubscribe;
+    }
+  }
+
+  private makeContext(): SpatialLayerContext & { map: MapLibreMap; palette: SpatialPalette } {
+    if (!this.map) {
+      throw new Error("SpatialEngine.makeContext() called before mount()");
+    }
+    return {
+      map: this.map,
+      palette: this.palette,
+      setData: (collection) => {
+        // Layers reach into their own source; this hook lets future
+        // overlays share a single source if we want a unified registry.
+      },
+      setVisibility: (visible) => {
+        if (!this.map) return;
+        const visibility = visible ? "visible" : "none";
+        for (const id of this.layers.keys()) {
+          if (this.map.getLayer(id)) this.map.setLayoutProperty(id, "visibility", visibility);
+        }
+      }
+    };
+  }
+}
+
+/** Convenience constructor that wires the standard ambient + badges layers. */
+export function createDiscoveryEngine(options: SpatialEngineOptions): MapLibreSpatialEngine {
+  const engine = new MapLibreSpatialEngine(options);
+  engine.register(new AmbientPulseLayer({ palette: DEFAULT_PALETTE }));
+  engine.register(new SymbolBadgesLayer({ palette: DEFAULT_PALETTE }));
+  return engine;
+}
+
+export type { CameraTarget, SpatialEngineOptions, SpatialPalette };

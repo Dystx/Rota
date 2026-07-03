@@ -127,7 +127,31 @@ Eight-stage 100% parity push against `docs/prototype.html`:
 - `b3d0e28` — sync updated prototype.html + delete legacy home-client.tsx
 - `1c5b9cd` — `bare` prop on `PageShell` + `ArchiveLayout` to suppress the inner Cinematic Concierge sticky header so the 4 marketing pages (`/portugal`, `/how-it-works`, `/human-review`, `/pricing`) can wrap with the shared `TopNav` + `SiteFooter` without a duplicate nav row
 - `56cf3c5` — `/planner` wired to `@repo/ai`'s `normalizeTripPrompt`: `PromptComposer` (input + examples + loading stages) + `FollowUpPanel` (chip-based `needs_follow_up` answers) + `BriefConfirmation` + `BriefField` (candidate review) + URL-encoded brief handoff to `/trip/new`
+- `47f4291` — `/trip/new`'s `TripBriefForm` consumes `?brief=<json>` from the planner handoff; `parseBriefFromQuery` (decode + JSON.parse + `TripBriefSchema.safeParse`) + `briefToFormState` (TripBrief → FormState with default fallback) + Suspense boundary + "Pre-filled from the planner" banner
 - `e055636` — visual-review screenshots + 100% parity summary
+
+### Phase 1c — Spatial Engine Foundation ✅ Complete (2026-07-03)
+
+Greenfield `packages/spatial-engine` package with provider-agnostic core abstractions + MapLibre GL JS adapter. New `/explore` Discovery Hub route renders a 3D interactive globe of Portugal seeded with traveler + specialist pins via the TelemetryService.
+
+- `core/types.ts` — `SpatialEngine`, `SpatialLayer`, `SpatialLayerContext`, `SpatialPalette`, `MapStyleEndpoint`, `MapStyleProvider`, `CameraController`, `CameraTarget`, `CameraExecutor`, `TelemetryService`, `TelemetryChannel`, `SpatialFeature`, `SpatialFeatureCollection`, `SpatialEngineOptions`
+- `core/map-style-provider.ts` — `CartoBasemapStyleProvider` (CARTO Dark Matter for theme="dark", CARTO Positron for theme="light"; both with attribution baked in)
+- `core/camera-controller.ts` — `SpatialCameraController` + `CameraExecutor` adapter interface (`focus`/`returnHome`/`followUser`/`fitBounds`; reduced-motion-aware)
+- `core/telemetry-service.ts` — `InMemoryTelemetryService` with `subscribe`/`publish`/`seed`/`shutdown`, RAF-equivalent 80ms batching of `publish()` into single listener flush, replay-on-subscribe for new subscribers
+- `adapters/maplibre/`:
+  - `spatial-engine.ts` — `MapLibreSpatialEngine` (the only place that knows the renderer is MapLibre), `bindLayerToChannel` (WeakMap registry), `createDiscoveryEngine` (registers the standard ambient + badges layers)
+  - `map-instance.ts` — `mountMapLibreInstance` (style + initial target + `setProjection({type:'globe'})`; Promise-wrapped flyTo/jumpTo/fitBounds executor)
+  - `layers/ambient-pulse.ts` — `AmbientPulseLayer` (ochre `circle` layer bound to "travelers" channel, configurable radius + stroke)
+  - `layers/symbol-badges.ts` — `SymbolBadgesLayer` (primaryContainer `circle` layer bound to "specialists" channel with zoom-interpolated radius)
+- `fixtures/travelers.ts` — `fixtureTravelerCollection` (3 PT travelers), `fixtureSpecialistCollection` (3 PT specialists), `fixtureAllCollections`
+- `components/globe-workspace.tsx` — `GlobeWorkspace` React component (dynamic-imported via `next/dynamic` with skeleton fallback; ResizeObserver + `requestAnimationFrame` to recover from layout-not-settled init; reduced-motion respected; cleanup on unmount)
+- `app/(marketing)/explore/page.tsx` + `discovery-globe.tsx` — server-side metadata + TopNav/SiteFooter + 3 capability cards
+
+Future migrations (separate sign-off):
+- Replace `@repo/maps` CinematicMap + ProviderMap consumers with `MapLibreSpatialEngine` + a 2D WorkspaceCanvas variant (Trip pages)
+- Swap `InMemoryTelemetryService` for a Supabase Realtime adapter
+- Promote the LayerRegistry + GeoJSON batched updates + camera choreography hooks
+- Add CARTO fog halo once `StyleSpecification.fog` is exported from a stable `@maplibre/maplibre-gl-style-spec` release
 
 ### Phase 2 — Production Supabase Reconciliation *(BLOCKER for launch)*
 
@@ -192,6 +216,8 @@ Replace deterministic stubs with live providers at the package boundary:
 | 7.1 | Wire Vercel AI SDK into `packages/ai` (replace direct OpenAI integration) | Refined 3 |
 | 7.2 | Introduce Zustand store for transient map/UI state | Refined 3 |
 | 7.3 | Wire `Replace this stop` to drop the node + re-run semantic search | Refined 3 |
+| 7.4 | Migrate `@repo/maps` Trip consumers to `@repo/spatial-engine` WorkspaceCanvas (2D) variant | Refined 3 |
+| 7.5 | Replace `InMemoryTelemetryService` with a Supabase Realtime adapter | Refined 3 |
 
 ### Phase 8 — Spec-Phase 4 Backfill (Workspace + Checkout)
 

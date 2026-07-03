@@ -1,0 +1,30 @@
+{
+  "name": "@repo/spatial-engine",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./globe": "./src/components/globe-workspace.tsx"
+  },
+  "dependencies": {
+    "@repo/analytics": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "maplibre-gl": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^25",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts"
+  }
+}
