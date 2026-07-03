@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 import { PageShell, SectionHeading, FeatureGrid, FeatureGridItem } from "@repo/ui";
+import { TopNav } from "../../_components/top-nav";
+import { SiteFooter } from "../../_components/site-footer";
 
 export const metadata: Metadata = {
   title: "How It Works | Portugal Travel Concierge",
@@ -34,20 +36,24 @@ const flow = [
 
 export default function HowItWorksPage() {
   return (
-    <PageShell>
-      <SectionHeading
-        eyebrow="The Journey"
-        title="From idea to itinerary in five steps"
-        description="A deliberate progression that takes the friction out of planning while maintaining high standards for local travel."
-        h1={true}
-      />
-      <FeatureGrid>
-        {flow.map((step) => (
-          <FeatureGridItem key={step.title} title={step.title}>
-            {step.description}
-          </FeatureGridItem>
-        ))}
-      </FeatureGrid>
-    </PageShell>
+    <>
+      <TopNav />
+      <PageShell bare>
+        <SectionHeading
+          eyebrow="The Journey"
+          title="From idea to itinerary in five steps"
+          description="A deliberate progression that takes the friction out of planning while maintaining high standards for local travel."
+          h1={true}
+        />
+        <FeatureGrid>
+          {flow.map((step) => (
+            <FeatureGridItem key={step.title} title={step.title}>
+              {step.description}
+            </FeatureGridItem>
+          ))}
+        </FeatureGrid>
+      </PageShell>
+      <SiteFooter />
+    </>
   );
 }

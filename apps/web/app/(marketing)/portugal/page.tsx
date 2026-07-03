@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 import { ArchiveLayout, TripCard } from "@repo/ui";
+import { TopNav } from "../../_components/top-nav";
+import { SiteFooter } from "../../_components/site-footer";
 
 export const metadata: Metadata = {
   title: "Curated Portugal Regions & Experiences | Portugal Travel Concierge",
@@ -54,26 +56,31 @@ function slugify(text: string) {
 
 export default function PortugalPage() {
   return (
-    <ArchiveLayout
-      testid="portugal-header"
-      header={{
-        eyebrow: "Our Focus",
-        title: "Deeply local Portugal knowledge",
-        description: "Tell us what you want to experience, and we'll craft an itinerary that brings the best of these regions to life."
-      }}
-    >
-      <div data-testid="region-grid" className="contents">
-        {regions.map((region) => (
-          <TripCard
-            key={region.name}
-            testid={`region-card-${slugify(region.name)}`}
-            title={region.name}
-            caption={region.caption}
-            href="/"
-            cta={<span className="text-[13px] font-medium text-[var(--color-atlantic)]">Start your prompt &rarr;</span>}
-          />
-        ))}
-      </div>
-    </ArchiveLayout>
+    <>
+      <TopNav />
+      <ArchiveLayout
+        bare
+        testid="portugal-header"
+        header={{
+          eyebrow: "Our Focus",
+          title: "Deeply local Portugal knowledge",
+          description: "Tell us what you want to experience, and we'll craft an itinerary that brings the best of these regions to life."
+        }}
+      >
+        <div data-testid="region-grid" className="contents">
+          {regions.map((region) => (
+            <TripCard
+              key={region.name}
+              testid={`region-card-${slugify(region.name)}`}
+              title={region.name}
+              caption={region.caption}
+              href="/planner"
+              cta={<span className="text-[13px] font-medium text-ochre-dark">Start your prompt →</span>}
+            />
+          ))}
+        </div>
+      </ArchiveLayout>
+      <SiteFooter />
+    </>
   );
 }

@@ -17,6 +17,7 @@ export interface ArchiveLayoutProps {
   children: ReactNode;
   emptyState?: ReactNode;
   testid?: string;
+  bare?: boolean;
 }
 
 export function ArchiveLayout({
@@ -25,13 +26,14 @@ export function ArchiveLayout({
   children,
   emptyState,
   testid,
+  bare = false,
 }: ArchiveLayoutProps) {
   // Count truthy children to determine empty state
   const childrenArray = Children.toArray(children).filter(Boolean);
   const isListEmpty = childrenArray.length === 0;
 
   return (
-    <PageShell data-testid={testid}>
+    <PageShell data-testid={testid} bare={bare}>
       <div className="grid gap-8 lg:gap-12">
         <SectionHeading
           eyebrow={header.eyebrow || ""}

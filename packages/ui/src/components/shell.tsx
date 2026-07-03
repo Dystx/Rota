@@ -4,38 +4,47 @@ import { cn } from "../lib/cn";
 export function PageShell({
   className,
   children,
-  variant = "marketing"
+  variant = "marketing",
+  bare = false
 }: HTMLAttributes<HTMLDivElement> & {
   variant?: "marketing" | "app" | "reviewer" | "admin";
+  /**
+   * When true, suppresses the built-in Cinematic Concierge header so the page
+   * can be wrapped externally with a shared TopNav + SiteFooter (used by the
+   * marketing pages that match the prototype's visual identity).
+   */
+  bare?: boolean;
 }) {
   return (
     <div className={cn("min-h-screen bg-[var(--color-background)] selection:bg-[var(--color-accent)]/30", className)}>
-      <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[rgba(247,250,249,0.7)] backdrop-blur-2xl">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-6 lg:px-12">
-          <div className="flex items-center gap-4">
-            <p className="font-[family-name:var(--font-rota-display)] text-2xl text-[var(--color-foreground)]">
-              rumia.pt
-            </p>
-            <div className="h-4 w-px bg-[var(--color-border)]" />
-            <p className="text-[11px] uppercase tracking-[0.2em] font-medium text-[var(--color-muted-foreground)]">
-              {variant === "marketing"
-                ? "Portugal travel concierge"
-                : variant === "reviewer"
-                  ? "Reviewer workspace"
-                  : variant === "admin"
-                    ? "Admin CMS"
-                    : "Trip planner"}
-            </p>
+      {!bare && (
+        <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[rgba(247,250,249,0.7)] backdrop-blur-2xl">
+          <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-6 lg:px-12">
+            <div className="flex items-center gap-4">
+              <p className="font-[family-name:var(--font-rota-display)] text-2xl text-[var(--color-foreground)]">
+                rumia.pt
+              </p>
+              <div className="h-4 w-px bg-[var(--color-border)]" />
+              <p className="text-[11px] uppercase tracking-[0.2em] font-medium text-[var(--color-muted-foreground)]">
+                {variant === "marketing"
+                  ? "Portugal travel concierge"
+                  : variant === "reviewer"
+                    ? "Reviewer workspace"
+                    : variant === "admin"
+                      ? "Admin CMS"
+                      : "Trip planner"}
+              </p>
+            </div>
+            <nav className="hidden gap-8 text-[13px] font-medium uppercase tracking-wider text-[var(--color-muted-foreground)] md:flex">
+              <a href="/" className="hover:text-[var(--color-foreground)] transition-colors">Home</a>
+              <a href="/trip/new" className="hover:text-[var(--color-foreground)] transition-colors">Trip brief</a>
+              <a href="/reviewer/queue" className="hover:text-[var(--color-foreground)] transition-colors">Reviewer</a>
+              <a href="/admin/places" className="hover:text-[var(--color-foreground)] transition-colors">Admin</a>
+            </nav>
           </div>
-          <nav className="hidden gap-8 text-[13px] font-medium uppercase tracking-wider text-[var(--color-muted-foreground)] md:flex">
-            <a href="/" className="hover:text-[var(--color-foreground)] transition-colors">Home</a>
-            <a href="/trip/new" className="hover:text-[var(--color-foreground)] transition-colors">Trip brief</a>
-            <a href="/reviewer/queue" className="hover:text-[var(--color-foreground)] transition-colors">Reviewer</a>
-            <a href="/admin/places" className="hover:text-[var(--color-foreground)] transition-colors">Admin</a>
-          </nav>
-        </div>
-      </header>
-      <main id="main-content" className="mx-auto grid max-w-[1400px] gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">{children}</main>
+        </header>
+      )}
+      <main id="main-content" className={cn("mx-auto grid max-w-[1400px] gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24", bare && "pt-header-height")}>{children}</main>
     </div>
   );
 }
