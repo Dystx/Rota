@@ -7,9 +7,12 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.0",
     "@repo/config": "workspace:*",
     "@repo/types": "workspace:*",
+    "@supabase/supabase-js": "^2.56.0",
     "@upstash/redis": "^1.34.3",
+    "ai": "^5.0.0",
     "duckdb": "^1.2.1",
     "zod": "^3.25.76"
   },

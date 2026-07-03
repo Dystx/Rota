@@ -38,3 +38,17 @@ export {
   buildExtractQuery,
   CATEGORY_FILTERS
 } from "./extract";
+export {
+  embedFeatures,
+  flattenTagsForEmbedding
+} from "./embed";
+export {
+  loadPlaces,
+  featureToRow
+} from "./load";
+export {
+  runPipeline,
+  type RunPipelineOptions
+} from "./pipeline";
+export { createOpenAIEmbeddingClient } from "./openai-client";
+export { createSupabaseLoader } from "./supabase-loader";

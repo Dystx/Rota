@@ -237,15 +237,24 @@ importers:
 
   packages/ingest:
     dependencies:
+      '@ai-sdk/openai':
+        specifier: ^2.0.0
+        version: 2.0.110(zod@3.25.76)
       '@repo/config':
         specifier: workspace:*
         version: link:../config
       '@repo/types':
         specifier: workspace:*
         version: link:../types
+      '@supabase/supabase-js':
+        specifier: ^2.56.0
+        version: 2.105.1
       '@upstash/redis':
         specifier: ^1.34.3
         version: 1.38.0
+      ai:
+        specifier: ^5.0.0
+        version: 5.0.210(zod@3.25.76)
       duckdb:
         specifier: ^1.2.1
         version: 1.4.4(encoding@0.1.13)

@@ -5,8 +5,10 @@ import {
   type EmailProvider
 } from "@repo/emails";
 import {
-  extractOsm,
-  type ExtractResult
+  runPipeline,
+  createOpenAIEmbeddingClient,
+  createSupabaseLoader,
+  type PipelineResult
 } from "@repo/ingest";
 import {
   classifyErrorKind,
@@ -532,10 +534,10 @@ export type QStashHandlerResult = {
   body: {
     /** Echoed job kind for ops correlation. */
     kind: QStashJobKind;
-    /** Stage result when status is 200. After PR-4 the
-     *  pipeline returns an `ExtractResult` from the extract
-     *  stage. PR-5 wraps it in a full `PipelineResult`. */
-    result?: ExtractResult;
+    /** Stage result when status is 200. After PR-5 the
+     *  pipeline returns a full `PipelineResult` (extract +
+     *  embed + load). */
+    result?: PipelineResult;
     /** Error message when status is 4xx/5xx. */
     error?: string;
   };
@@ -543,8 +545,8 @@ export type QStashHandlerResult = {
 
 /** QStash HTTP handler. Validates the signature, dispatches by
  *  `kind`, and returns the result. The data pipeline dispatch
- *  calls `extractOsm()` (PR-4). PR-5 wires the embed + load
- *  stages into the same dispatch. */
+ *  calls `runPipeline()` (PR-5) which chains extract → embed →
+ *  load. */
 export async function handleQStashRequest(
   signature: string | null,
   rawBody: string,
@@ -560,13 +562,19 @@ export async function handleQStashRequest(
 
   if (payload.kind === "ingest_pipeline_run") {
     try {
-      const extract = await extractOsm(PBF_PATH);
+      const embeddingClient = createOpenAIEmbeddingClient();
+      const supabaseLoader = createSupabaseLoader();
+      const result = await runPipeline({
+        pbfPath: PBF_PATH,
+        embeddingClient,
+        supabaseLoader
+      });
       return {
         status: 200,
-        body: { kind: "ingest_pipeline_run", result: extract }
+        body: { kind: "ingest_pipeline_run", result }
       };
     } catch (err) {
-      const message = err instanceof Error ? err.message : "unknown extract error";
+      const message = err instanceof Error ? err.message : "unknown pipeline error";
       return {
         status: 500,
         body: { kind: "ingest_pipeline_run", error: message }

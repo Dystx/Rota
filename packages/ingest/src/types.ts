@@ -46,15 +46,14 @@ export interface OsmFeature {
 /** Bounding box for the Portugal extract. Hard-coded
  *  for now; future per-country boxes (ES/IT/FR/GR) live in
  *  a sibling file. */
-export const PORTUGAL_BBOX = {
+export const PORTUGAL_BBOX: Bbox = {
   minLat: 36.9601,
   maxLat: 42.1543,
   minLon: -9.5,
   maxLon: -6.1892
-} as const;
+};
 
-/** Bounding box shape. The Portugal one is a `readonly` tuple;
- *  per-country boxes in PR-7 are plain objects. */
+/** Bounding box shape. */
 export interface Bbox {
   minLat: number;
   maxLat: number;
@@ -143,3 +142,66 @@ export const PIPELINE_NOT_IMPLEMENTED: PipelineResult = {
   startedAt: "1970-01-01T00:00:00Z",
   completedAt: "1970-01-01T00:00:00Z"
 };
+
+/** Inputs to an embedding batch call. `inputs` is the
+ *  flattened-tag text for each feature. The same length
+ *  constraint applies on `outputs`: an `EmbeddingResponse`
+ *  returns one vector per input, in the same order. */
+export interface EmbeddingRequest {
+  inputs: readonly string[];
+  model: string;
+}
+
+/** A single 1536-dim vector. The shape is intentionally
+ *  permissive (`number[]`) so a real OpenAI client can
+ *  pass through whatever it gets back; the load stage
+ *  validates dimension at write time. */
+export interface EmbeddingResponse {
+  embeddings: readonly (readonly number[])[];
+  model: string;
+  totalTokens: number;
+}
+
+/** Minimal contract an embedding provider must satisfy.
+ *  Production wires the Vercel AI SDK's
+ *  `embedMany({ model, values })` into this shape; the
+ *  test uses a deterministic in-memory stub. */
+export interface EmbeddingClient {
+  embed(request: EmbeddingRequest): Promise<EmbeddingResponse>;
+}
+
+/** A row that the load stage will upsert. The shape is
+ *  narrowed from `EmbeddedFeature` because we drop the
+ *  `country` field (it's encoded into the country_slug
+ *  column) and the `embeddingModel` field (recorded
+ *  separately in the load audit). */
+export interface PlaceRow {
+  /** OSM stable id — primary key for the ON CONFLICT upsert. */
+  osmId: string;
+  name: string;
+  category: string;
+  geometryWkt: string;
+  countrySlug: string;
+  embedding: readonly number[];
+  metadata: Record<string, string>;
+}
+
+/** Inputs to a load batch. The client accepts a batch of
+ *  rows and returns the per-row outcome so the orchestrator
+ *  can build the `LoadResult` aggregate. */
+export interface LoadRequest {
+  rows: readonly PlaceRow[];
+}
+
+export interface LoadResponse {
+  inserted: number;
+  updated: number;
+  failed: number;
+}
+
+/** Contract the load stage expects. Production wires the
+ *  Supabase upsert (D-6 in ADR-003). Tests use a counting
+ *  stub. */
+export interface SupabaseLoader {
+  load(request: LoadRequest): Promise<LoadResponse>;
+}
