@@ -7,12 +7,15 @@ import {
 import { enrichItineraryWithCoords } from "./enrich";
 import {
   intentToTripBrief,
-  parseTripBriefIntent
+  parseTripBriefIntent,
+  type TripBriefIntent
 } from "./llm-generator";
+import { retrieveDestinations } from "./retrieval";
 
 export * from "./prompt-normalization";
 export * from "./llm-generator";
 export * from "./triage";
+export * from "./retrieval";
 
 /**
  * Feature flag: when `USE_LLM=true` AND `OPENAI_API_KEY` is set,
@@ -169,6 +172,7 @@ const generator = new DeterministicItineraryGenerator();
 
 export async function generateItineraryFromBrief(tripBrief: TripBrief): Promise<Itinerary> {
   let resolvedBrief = tripBrief;
+  let lastIntent: TripBriefIntent | null = null;
 
   // LLM path: re-parse the raw brief through the model so preferences
   // ("foodie couple, 5 days, hate tourist buses") land as structured
@@ -178,6 +182,7 @@ export async function generateItineraryFromBrief(tripBrief: TripBrief): Promise<
     try {
       const intent = await parseTripBriefIntent(tripBrief.rawBrief);
       resolvedBrief = intentToTripBrief(intent);
+      lastIntent = intent;
     } catch (err) {
       // If the LLM fails (rate limit, validation, network), fall through
       // to the deterministic generator rather than failing the whole
@@ -188,6 +193,40 @@ export async function generateItineraryFromBrief(tripBrief: TripBrief): Promise<
         err instanceof Error ? err.message : err
       );
     }
+  }
+
+  // Retrieval (Phase 3 step 2): rank candidate destinations against
+  // the intent. When the LLM path produced an intent, retrieval
+  // runs against that; otherwise it runs against the raw tripBrief
+  // shaped as a minimal intent. The deterministic generator
+  // continues to own itinerary assembly — retrieval only informs
+  // future stages (the route layer can prefer higher-ranked stops
+  // when sequencing days).
+  const retrievalIntent: TripBriefIntent =
+    lastIntent ?? {
+      destinationCountry: tripBrief.destinationCountry,
+      regions: tripBrief.regions,
+      interests: tripBrief.interests,
+      pace: tripBrief.pace,
+      transportMode: tripBrief.transportMode,
+      tripLengthDays: tripBrief.tripLengthDays,
+      avoidances: tripBrief.avoidances,
+      foodPreferences: tripBrief.foodPreferences,
+      travelerType: tripBrief.travelerType,
+      budgetLevel: tripBrief.budgetLevel,
+      rawBrief: tripBrief.rawBrief,
+      parseConfidence: 0.5
+    };
+  const retrieval = retrieveDestinations(retrievalIntent);
+  // The retrieval result is not yet threaded into the generator
+  // (that's Phase 3 step 3 — the routing layer). For now we expose
+  // it as a console hint so the next phase has a single seam.
+  if (retrieval.candidates.length === 0) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[@repo/ai] Retrieval returned no candidates for intent:",
+      retrievalIntent.regions
+    );
   }
 
   const itinerary = await generator.generate(resolvedBrief);
