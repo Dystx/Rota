@@ -7,9 +7,9 @@ import { getBehaviorConsent, setBehaviorConsent } from "@/app/_lib/behavioral-pr
  * Opt-in toggle for the behavioral profiler. Recording is off by
  * default; this control lets the traveler turn it on and then
  * refines their route suggestions based on the signals they
- * generate (skip / extend / replace / pin / mute). When the
- * toggle is on, a "Clear recorded data" button drains the local
- * ring buffer.
+ * generate (skip / extend / replace / pin / mute). Turning the
+ * toggle off stops new events from being recorded; the in-memory
+ * ring buffer is cleared on the next page reload.
  */
 export function BehaviorConsentToggle() {
   const [enabled, setEnabled] = useState<boolean | null>(null);
