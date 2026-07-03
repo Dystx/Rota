@@ -161,26 +161,35 @@ export function HomeClient() {
 
   return (
     <div className="w-full flex flex-col gap-12 lg:gap-24 items-center">
-      <div className="w-full max-w-4xl mx-auto space-y-8 text-center pt-12 lg:pt-20">
-        <h1 className="rota-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--color-ink)]">
-          No AI chat.<br className="hidden md:block" /> Just a calmer, better Portugal route.
-        </h1>
-        <p className="text-xl md:text-2xl text-[var(--color-muted-foreground)] max-w-2xl mx-auto font-serif">
-          Tell us what you want to experience, and our cinematic concierge will structure a premium local itinerary.
-        </p>
-      </div>
+      <section className="relative w-full flex flex-col justify-center items-center overflow-hidden pt-12 lg:pt-20 pb-12 lg:pb-20">
+        <div className="absolute inset-0 w-full h-full -z-10">
+          <div
+            className="w-full h-full bg-cover bg-center filter brightness-[0.85] contrast-110 saturate-110"
+            style={{
+              backgroundImage:
+                "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCX3bKR-Xr7E_XjZsIHsO8GXIycFbn1UViEGxIXcvq3q5URIvlKF1tHXI8Q6I2K_aOmqDtA0I9xgu3nukH3AKzEV0E_ZVN-jTVndO-ZmUgFTgQ6Qja0ApRYSCmHU7_rtk4zuAXTpszEFhJntzw9Hc1PU-yQqKvq_VB1tCp5kV0RyNrRw34OBeBnei4hZhWWHXgKziQfaoH-stdy5vUUyvroiRc1Xl46gkiOU5z3CByCu7z7MeZue5KAtydhEggtzf5NL-NDqysiKt-S')",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80" />
+        </div>
 
-      <div className="w-full relative z-10 px-[var(--spacing-gutter,24px)]">
-        <PromptComposer
-          state={state}
-          promptValue={prompt}
-          onPromptChange={setPrompt}
-          onSubmit={handleGenerate}
-          examplePrompts={EXAMPLE_PROMPTS}
-          errorMessage={errorMessage}
-          followUpPanel={followUpPanel}
-        />
-      </div>
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-[var(--spacing-gutter,24px)] text-center flex flex-col items-center gap-8">
+          <h1 className="font-display text-display text-foreground drop-shadow-2xl">
+            Discover <span className="italic text-ochre-light">Intentionally.</span>
+          </h1>
+          <div className="w-full max-w-3xl bg-glass-light backdrop-blur-[24px] border border-white/40 rounded-xl p-card-padding shadow-2xl">
+            <PromptComposer
+              state={state}
+              promptValue={prompt}
+              onPromptChange={setPrompt}
+              onSubmit={handleGenerate}
+              examplePrompts={EXAMPLE_PROMPTS}
+              errorMessage={errorMessage}
+              followUpPanel={followUpPanel}
+            />
+          </div>
+        </div>
+      </section>
 
       <AnimatePresence mode="wait">
         {candidate && (
