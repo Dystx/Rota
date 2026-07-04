@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState, type ChangeEvent, type DragEvent } from "react";
+import {
+  useEffect,
+  useState,
+  useTransition,
+  type ChangeEvent,
+  type DragEvent,
+} from "react";
 import { SiteFooter } from "../../_components/site-footer";
 import { SnippetCard } from "../_components/snippet-card";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
@@ -52,6 +58,28 @@ export default function ConsoleMessagesPage() {
   // Most recent triage classification surfaced in the header.
   // null = no inbound message since the page loaded.
   const [lastTriage, setLastTriage] = useState<TriageResult | null>(null);
+  // Phase 3.1: "Push to Timeline" submission state.
+  // null = idle; "submitting" while the POST is in flight; a
+  // string = success message (e.g. "Recorded — id 0fa1…") or
+  // an error message from the API.
+  const [timelineStatus, setTimelineStatus] = useState<
+    "idle" | "submitting" | { kind: "ok"; id: string } | { kind: "error"; message: string }
+  >("idle");
+  const [isTimelinePending, startTimelineTransition] = useTransition();
+  // Phase 3.2: chat-composer submission state. Same shape as
+  // timelineStatus. On success, draft is cleared so the next
+  // message can be typed immediately.
+  const [chatStatus, setChatStatus] = useState<
+    "idle" | "submitting" | { kind: "ok"; id: string } | { kind: "error"; message: string }
+  >("idle");
+  const [isChatPending, startChatTransition] = useTransition();
+  // Optimistic list of operator messages the user has just sent.
+  // Real-time subscription will also pick up the row from the
+  // server; this list is what we render above the composer
+  // *immediately* after send so the UI feels responsive.
+  const [sentMessages, setSentMessages] = useState<
+    Array<{ id: string; body: string; createdAt: string }>
+  >([]);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_USE_REALTIME_MESSAGES !== "true") return;
@@ -413,50 +441,143 @@ export default function ConsoleMessagesPage() {
                     : "border-outline-variant"
                 }`}
               >
-                <label className="block">
-                  <span className="sr-only">Type a message</span>
-                  <textarea
-                    rows={3}
-                    value={draft}
-                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                      setDraft(event.target.value)
+                <form
+                  data-testid="chat-composer-form"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const trimmed = draft.trim();
+                    if (!trimmed) {
+                      setChatStatus({ kind: "error", message: "Message is empty." });
+                      return;
                     }
-                    placeholder="Type a message or drag a snippet here…"
-                    className="w-full font-body-md text-body-md bg-transparent text-primary placeholder:text-on-surface-variant p-3 resize-none focus:outline-none"
-                  />
-                </label>
-                <div className="flex items-center justify-between px-3 py-2 border-t border-outline-variant/40">
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      aria-label="Attach file"
-                      className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-                    >
-                      <span aria-hidden className="material-symbols-outlined">
-                        attach_file
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="AI assistance"
-                      className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-                    >
-                      <span aria-hidden className="material-symbols-outlined">
-                        auto_awesome
-                      </span>
-                    </button>
+                    setChatStatus("submitting");
+                    const body = trimmed;
+                    startChatTransition(async () => {
+                      try {
+                        const response = await fetch("/api/console/chat-messages", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            conversationId: activeConversation.id,
+                            body,
+                          }),
+                        });
+                        const data = (await response.json()) as {
+                          ok?: boolean;
+                          id?: string;
+                          createdAt?: string;
+                          error?: string;
+                        };
+                        if (!response.ok || !data.ok || !data.id || !data.createdAt) {
+                          setChatStatus({
+                            kind: "error",
+                            message: data.error ?? `HTTP ${response.status}`,
+                          });
+                          return;
+                        }
+                        // Optimistic insert into the local list
+                        // so the operator sees the message
+                        // immediately. The Realtime channel
+                        // will de-dupe if the same row comes
+                        // back from the server.
+                        setSentMessages((current) => {
+                          if (current.some((m) => m.id === data.id)) return current;
+                          return [
+                            ...current,
+                            { id: data.id!, body, createdAt: data.createdAt! },
+                          ];
+                        });
+                        setDraft("");
+                        setChatStatus({ kind: "ok", id: data.id });
+                      } catch (error) {
+                        setChatStatus({
+                          kind: "error",
+                          message:
+                            error instanceof Error
+                              ? error.message
+                              : "Network error",
+                        });
+                      }
+                    });
+                  }}
+                >
+                  <label className="block">
+                    <span className="sr-only">Type a message</span>
+                    <textarea
+                      name="body"
+                      rows={3}
+                      value={draft}
+                      onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                        setDraft(event.target.value)
+                      }
+                      onKeyDown={(event) => {
+                        // Cmd/Ctrl + Enter to send, matching the
+                        // convention on the trip-review surface.
+                        if (
+                          (event.metaKey || event.ctrlKey) &&
+                          event.key === "Enter"
+                        ) {
+                          event.preventDefault();
+                          event.currentTarget.form?.requestSubmit();
+                        }
+                      }}
+                      placeholder="Type a message or drag a snippet here…"
+                      data-testid="chat-composer-input"
+                      className="w-full font-body-md text-body-md bg-transparent text-primary placeholder:text-on-surface-variant p-3 resize-none focus:outline-none"
+                    />
+                  </label>
+                  <div className="flex items-center justify-between px-3 py-2 border-t border-outline-variant/40">
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        aria-label="Attach file"
+                        className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                      >
+                        <span aria-hidden className="material-symbols-outlined">
+                          attach_file
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="AI assistance"
+                        className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                      >
+                        <span aria-hidden className="material-symbols-outlined">
+                          auto_awesome
+                        </span>
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {chatStatus !== "idle" && chatStatus !== "submitting" ? (
+                        <p
+                          data-testid="chat-composer-status"
+                          role={chatStatus.kind === "error" ? "alert" : "status"}
+                          className={
+                            chatStatus.kind === "error"
+                              ? "font-mono-micro text-mono-micro text-red-700"
+                              : "font-mono-micro text-mono-micro text-emerald-700"
+                          }
+                        >
+                          {chatStatus.kind === "error"
+                            ? chatStatus.message
+                            : "Sent"}
+                        </p>
+                      ) : null}
+                      <button
+                        type="submit"
+                        disabled={isChatPending || draft.trim().length === 0}
+                        data-testid="chat-composer-send"
+                        aria-label="Send message"
+                        className="inline-flex items-center gap-2 bg-primary text-on-primary font-label-ui text-label-ui px-4 py-2 rounded-lg hover:bg-olive-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        <span aria-hidden className="material-symbols-outlined text-[18px]">
+                          send
+                        </span>
+                        {isChatPending ? "Sending…" : "Send"}
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    aria-label="Send message"
-                    className="inline-flex items-center gap-2 bg-primary text-on-primary font-label-ui text-label-ui px-4 py-2 rounded-lg hover:bg-olive-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-                  >
-                    <span aria-hidden className="material-symbols-outlined text-[18px]">
-                      send
-                    </span>
-                    Send
-                  </button>
-                </div>
+                </form>
               </div>
             </div>
           </section>
@@ -539,13 +660,75 @@ export default function ConsoleMessagesPage() {
                   itinerary. The change is logged and visible in the
                   workspace.
                 </p>
-                <form className="flex flex-col gap-3" onSubmit={(e) => e.preventDefault()}>
+                <form
+                  className="flex flex-col gap-3"
+                  data-testid="push-to-timeline-form"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const form = event.currentTarget;
+                    const formData = new FormData(form);
+                    const payload = {
+                      conversationId: activeConversation.id,
+                      eventType: String(formData.get("eventType") ?? "activity"),
+                      title: String(formData.get("title") ?? "").trim(),
+                      eventDate: String(formData.get("eventDate") ?? ""),
+                      eventTime: String(formData.get("eventTime") ?? ""),
+                      internalNotes: String(formData.get("internalNotes") ?? "").trim() || undefined,
+                    };
+                    if (!payload.title) {
+                      setTimelineStatus({ kind: "error", message: "Title is required." });
+                      return;
+                    }
+                    if (!payload.eventDate || !payload.eventTime) {
+                      setTimelineStatus({ kind: "error", message: "Date and time are required." });
+                      return;
+                    }
+                    setTimelineStatus("submitting");
+                    startTimelineTransition(async () => {
+                      try {
+                        const response = await fetch("/api/console/itinerary-events", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify(payload),
+                        });
+                        const data = (await response.json()) as {
+                          ok?: boolean;
+                          id?: string;
+                          error?: string;
+                        };
+                        if (!response.ok || !data.ok || !data.id) {
+                          setTimelineStatus({
+                            kind: "error",
+                            message: data.error ?? `HTTP ${response.status}`,
+                          });
+                          return;
+                        }
+                        setTimelineStatus({ kind: "ok", id: data.id });
+                        // Reset non-required fields so the operator can
+                        // push a second event without first clearing the
+                        // first one. Date and time are reset to a
+                        // sensible near-future default.
+                        form.reset();
+                      } catch (error) {
+                        setTimelineStatus({
+                          kind: "error",
+                          message:
+                            error instanceof Error
+                              ? error.message
+                              : "Network error",
+                        });
+                      }
+                    });
+                  }}
+                >
                   <label className="block">
                     <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light block mb-1">
                       Event Type
                     </span>
                     <select
+                      name="eventType"
                       defaultValue="activity"
+                      data-testid="push-event-type"
                       className="w-full font-body-md text-body-md bg-white/10 border border-white/20 text-on-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ochre-light"
                     >
                       <option value="activity" className="text-primary">
@@ -567,8 +750,10 @@ export default function ConsoleMessagesPage() {
                       Title
                     </span>
                     <input
+                      name="title"
                       type="text"
                       defaultValue="Camellia Tea Ceremony"
+                      data-testid="push-event-title"
                       className="w-full font-body-md text-body-md bg-white/10 border border-white/20 text-on-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ochre-light"
                     />
                   </label>
@@ -578,8 +763,10 @@ export default function ConsoleMessagesPage() {
                         Date
                       </span>
                       <input
+                        name="eventDate"
                         type="date"
                         defaultValue="2024-10-14"
+                        data-testid="push-event-date"
                         className="w-full font-body-md text-body-md bg-white/10 border border-white/20 text-on-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ochre-light"
                       />
                     </label>
@@ -588,8 +775,10 @@ export default function ConsoleMessagesPage() {
                         Time
                       </span>
                       <input
+                        name="eventTime"
                         type="time"
                         defaultValue="14:00"
+                        data-testid="push-event-time"
                         className="w-full font-body-md text-body-md bg-white/10 border border-white/20 text-on-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ochre-light"
                       />
                     </label>
@@ -599,24 +788,41 @@ export default function ConsoleMessagesPage() {
                       Internal Notes
                     </span>
                     <textarea
+                      name="internalNotes"
                       rows={2}
                       placeholder="For the team only…"
+                      data-testid="push-event-notes"
                       className="w-full font-body-md text-body-md bg-white/10 border border-white/20 text-on-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ochre-light resize-none"
                     />
                   </label>
+                  <button
+                    type="submit"
+                    disabled={isTimelinePending}
+                    data-testid="push-event-submit"
+                    className="mt-2 w-full inline-flex items-center justify-center gap-2 bg-ochre-dark text-white font-label-ui text-label-ui px-4 py-2.5 rounded-lg hover:bg-ochre-light hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <span aria-hidden className="material-symbols-outlined text-[18px]">
+                      sync_alt
+                    </span>
+                    {isTimelinePending ? "Pushing…" : "Push to Timeline"}
+                  </button>
+                  {timelineStatus !== "idle" && timelineStatus !== "submitting" ? (
+                    <p
+                      data-testid="push-event-status"
+                      role={timelineStatus.kind === "error" ? "alert" : "status"}
+                      className={
+                        timelineStatus.kind === "error"
+                          ? "font-body-sm text-body-sm text-red-300"
+                          : "font-body-sm text-body-sm text-emerald-300"
+                      }
+                    >
+                      {timelineStatus.kind === "error"
+                        ? `Error: ${timelineStatus.message}`
+                        : `Recorded — id ${timelineStatus.id.slice(0, 8)}`}
+                    </p>
+                  ) : null}
                 </form>
               </div>
-              <footer className="p-4 bg-black/30 border-t border-white/10 shrink-0">
-                <button
-                  type="button"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-ochre-dark text-white font-label-ui text-label-ui px-4 py-2.5 rounded-lg hover:bg-ochre-light hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark transition-colors"
-                >
-                  <span aria-hidden className="material-symbols-outlined text-[18px]">
-                    sync_alt
-                  </span>
-                  Push to Timeline
-                </button>
-              </footer>
             </section>
           </aside>
         </main>

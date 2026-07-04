@@ -203,13 +203,46 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
     const itemId = String(active.id);
     const newStatus = over.id as PipelineItem["status"];
     if (!STATUS_ORDER.includes(newStatus)) return;
+
+    // Find the prior status for the optimistic update and
+    // server-action body — we need it to detect "no change" and
+    // to roll back the optimistic move on failure.
+    const previous = items.find((item) => item.id === itemId);
+    if (!previous || previous.status === newStatus) return;
+
     setItems((prev) =>
       prev.map((item) =>
-        item.id === itemId && item.status !== newStatus
-          ? { ...item, status: newStatus }
-          : item
+        item.id === itemId ? { ...item, status: newStatus } : item
       )
     );
+
+    // Skip persistence for fallback items: their ids start with
+    // "fallback-" and don't exist in the `trips` table.
+    if (itemId.startsWith("fallback-")) return;
+
+    void fetch("/api/console/pipeline/move", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tripId: itemId, toStatus: newStatus }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          const data = (await response.json().catch(() => ({}))) as {
+            error?: string;
+          };
+          throw new Error(data.error ?? `HTTP ${response.status}`);
+        }
+      })
+      .catch((error: unknown) => {
+        // Roll back the optimistic update on failure.
+        // eslint-disable-next-line no-console
+        console.warn("[pipeline] failed to persist move:", error);
+        setItems((prev) =>
+          prev.map((item) =>
+            item.id === itemId ? { ...item, status: previous.status } : item
+          )
+        );
+      });
   };
 
   return (
