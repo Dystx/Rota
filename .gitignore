@@ -41,3 +41,7 @@ apps/web/check-*.cjs
 # --- Tooling runtime state (oh-my-kimi + Kimi CLI) ---
 .omk/
 .kimi/
+.kimi-code/
+
+# --- Supabase CLI local state (project ref, version probes) ---
+supabase/.temp/
