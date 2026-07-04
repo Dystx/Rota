@@ -17,6 +17,7 @@
     "test:perf": "pnpm --dir apps/web test:perf",
     "qa:motion-gate": "node apps/web/scripts/check-motion-imports.mjs",
     "qa:mapbox-budget": "node apps/web/scripts/check-mapbox-budget.mjs",
+    "qa:perf-budget": "node scripts/perf-budget.mjs",
     "check:migrations": "node scripts/check-migrations.mjs"
   },
   "devDependencies": {

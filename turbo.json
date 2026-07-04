@@ -11,6 +11,10 @@
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]
+    },
+    "quality": {
+      "dependsOn": ["^build"],
+      "outputs": []
     }
   }
 }
