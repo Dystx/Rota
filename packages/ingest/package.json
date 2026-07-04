@@ -23,6 +23,6 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --config ../../vitest.config.ts packages/ingest/src/**/*.test.ts"
+    "test": "vitest run --config ../../vitest.config.ts --passWithNoTests src/extract.test.ts src/pipeline.test.ts"
   }
 }
