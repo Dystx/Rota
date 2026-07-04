@@ -3,6 +3,7 @@ export * from "./itinerary";
 export * from "./place";
 export * from "./partner";
 export * from "./region";
+export * from "./region-ids";
 export * from "./reviewer-assignment";
 export * from "./reviewer";
 export * from "./routing";

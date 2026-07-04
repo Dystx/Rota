@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { submitSpecialistProfile, type ProfileInput } from "../actions";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
+import { RegionPicker } from "./region-picker";
 
 /** Profile shape read from the server component. The
  *  server reads via `getSpecialistProfileByUserId`;
@@ -25,8 +26,12 @@ type Props = {
 
 export function GuideOnboardingForm({ userId, initialProfile }: Props) {
   const [fullName, setFullName] = useState(initialProfile?.fullName ?? "");
-  const [regionsRaw, setRegionsRaw] = useState(
-    (initialProfile?.regionsCovered ?? []).join(", ")
+  // The form stores synthetic region UUIDs (see
+  // `packages/types/src/region-ids.ts`). The RegionPicker
+  // presents slugs to the user and emits UUIDs on change,
+  // so this state can pass through unchanged to the action.
+  const [selectedRegionIds, setSelectedRegionIds] = useState<string[]>(
+    () => [...(initialProfile?.regionsCovered ?? [])]
   );
   const [tier3OnCall, setTier3OnCall] = useState(
     initialProfile?.tier3OnCall ?? false
@@ -44,13 +49,6 @@ export function GuideOnboardingForm({ userId, initialProfile }: Props) {
   const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  function parseRegions(raw: string): string[] {
-    return raw
-      .split(/[,\s]+/u)
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-  }
-
   function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
@@ -58,7 +56,7 @@ export function GuideOnboardingForm({ userId, initialProfile }: Props) {
 
     const input: ProfileInput = {
       fullName,
-      regionsCovered: parseRegions(regionsRaw),
+      regionsCovered: selectedRegionIds,
       tier3OnCall,
       tier4LicensedGuide,
       rnaatLicenseNumber: rnaatLicenseNumber.length > 0 ? rnaatLicenseNumber : null,
@@ -95,24 +93,11 @@ export function GuideOnboardingForm({ userId, initialProfile }: Props) {
               data-testid="guide-onboarding-full-name"
             />
           </label>
-          <label className="grid gap-1.5">
-            <span className="text-sm font-medium text-foreground">
-              Regions covered (comma-separated UUIDs)
-            </span>
-            <input
-              type="text"
-              value={regionsRaw}
-              onChange={(e) => setRegionsRaw(e.target.value)}
-              placeholder="00000000-0000-0000-0000-000000000000, 00000000-0000-0000-0000-000000000001"
-              className="rounded-lg border border-[var(--color-border)] bg-white/80 px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-              data-testid="guide-onboarding-regions"
-            />
-            <span className="text-xs text-[var(--color-muted-foreground)]">
-              Region UUIDs from the regions table. Leave blank to set up
-              the rest of the profile first; add regions later from
-              the dashboard.
-            </span>
-          </label>
+          <RegionPicker
+            value={selectedRegionIds}
+            onChange={setSelectedRegionIds}
+            disabled={isPending}
+          />
           <label className="grid gap-1.5">
             <span className="text-sm font-medium text-foreground">
               Hourly rate (EUR)

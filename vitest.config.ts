@@ -10,6 +10,16 @@ export default defineConfig({
     }
   },
   test: {
+    // `.tsx` test files in `apps/web` (e.g. the RegionPicker test)
+    // use the automatic JSX runtime — `import * as React from "react"`
+    // is not added. esbuild's default is the classic runtime, which
+    // would throw `ReferenceError: React is not defined`. The vitest
+    // docs recommend this exact setting for React + TypeScript projects
+    // that use the automatic JSX transform (Next.js 16's default).
+    esbuild: {
+      jsx: "automatic",
+      jsxImportSource: "react"
+    },
     // `test.projects` is vitest 3.2's replacement for the deprecated
     // `environmentMatchGlobs`. Each project is its own vitest process
     // with its own include + environment.
