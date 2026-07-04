@@ -1,0 +1,359 @@
+<!-- 1.6 Level 2 Expert Chat -->
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rumia - Expert Chat with Ana</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@500;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error-container": "#93000a",
+                      "secondary-fixed": "#ffddb5",
+                      "on-secondary-fixed": "#2a1800",
+                      "error-container": "#ffdad6",
+                      "inverse-on-surface": "#e0f6e7",
+                      "on-primary-fixed": "#0c1f16",
+                      "tertiary-fixed-dim": "#c8c6c2",
+                      "glass-dark": "rgba(43, 62, 52, 0.85)",
+                      "primary-container": "#2b3e34",
+                      "surface-tint": "#4f6358",
+                      "on-secondary-container": "#784d00",
+                      "ochre-dark": "#CE933F",
+                      "on-tertiary-fixed": "#1c1c1a",
+                      "on-secondary": "#ffffff",
+                      "on-surface": "#0c1f16",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#d7eedf",
+                      "secondary-fixed-dim": "#f9bb68",
+                      "background": "#e8fff0",
+                      "on-primary-container": "#94a99c",
+                      "on-surface-variant": "#424844",
+                      "on-tertiary-container": "#a5a3a0",
+                      "surface-dim": "#c9dfd1",
+                      "surface-bright": "#e8fff0",
+                      "error": "#ba1a1a",
+                      "surface": "#e8fff0",
+                      "primary-fixed": "#d2e8d9",
+                      "inverse-surface": "#22342b",
+                      "secondary": "#825505",
+                      "linen-dark": "#EFECE6",
+                      "primary": "#16281f",
+                      "glass-light": "rgba(255, 255, 255, 0.65)",
+                      "primary-fixed-dim": "#b6ccbe",
+                      "grid-pattern": "rgba(43, 62, 52, 0.1)",
+                      "surface-container-highest": "#d2e8d9",
+                      "on-error": "#ffffff",
+                      "olive-light": "#3C5447",
+                      "outline": "#737874",
+                      "surface-container": "#ddf3e5",
+                      "outline-variant": "#c2c8c2",
+                      "on-background": "#0c1f16",
+                      "tertiary-container": "#3a3a37",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#242422",
+                      "surface-variant": "#d2e8d9",
+                      "on-tertiary-fixed-variant": "#474744",
+                      "on-secondary-fixed-variant": "#643f00",
+                      "tertiary-fixed": "#e5e2de",
+                      "on-primary-fixed-variant": "#384b41",
+                      "olive-dark": "#1D2A23",
+                      "inverse-primary": "#b6ccbe",
+                      "surface-container-low": "#e3f9ea",
+                      "ochre-light": "#EAB875",
+                      "secondary-container": "#ffc16d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "24px",
+                      "base": "4px",
+                      "container-padding-lg": "32px",
+                      "header-height": "64px",
+                      "card-padding": "20px",
+                      "gutter": "16px",
+                      "container-padding-sm": "24px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "mono-micro": [
+                              "JetBrains Mono"
+                      ],
+                      "label-ui": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Playfair Display"
+                      ],
+                      "display-mobile": [
+                              "Playfair Display"
+                      ],
+                      "display": [
+                              "Playfair Display"
+                      ],
+                      "mono-technical": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Playfair Display"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "mono-micro": [
+                              "10px",
+                              {
+                                      "lineHeight": "12px",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-ui": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-mobile": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display": [
+                              "72px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "mono-technical": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col antialiased selection:bg-ochre-light selection:text-primary">
+<!-- TopNavBar -->
+<nav class="bg-glass-light/65 dark:bg-glass-dark/85 backdrop-blur-md fixed top-0 w-full border-b border-white/20 dark:border-olive-dark/10 shadow-sm z-50">
+<div class="flex justify-between items-center h-header-height px-container-padding-lg max-w-full mx-auto z-50">
+<div class="font-headline-lg text-headline-lg italic text-primary dark:text-primary-fixed">Rumia</div>
+<div class="hidden md:flex gap-gutter items-center font-label-ui text-label-ui">
+<a class="text-on-surface-variant dark:text-on-primary-container hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200" href="#">Itineraries</a>
+<a class="text-ochre-light dark:text-ochre-dark border-b-2 border-ochre-light dark:border-ochre-dark pb-1 scale-95 active:opacity-80 transition-all" href="#">Expert Chat</a>
+<a class="text-on-surface-variant dark:text-on-primary-container hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200" href="#">Vault</a>
+</div>
+<div class="flex items-center gap-gutter">
+<button class="bg-olive-light text-white font-label-ui text-label-ui px-4 py-2 rounded-full hover:bg-olive-dark transition-colors duration-200 scale-95 active:opacity-80">Plan a Trip</button>
+<img alt="Traveler profile avatar" class="w-8 h-8 rounded-full object-cover border border-white/50" data-alt="A sophisticated close-up portrait of a traveler, softly lit against a blurred, elegant background, evoking a premium, calm travel experience in light mode." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVmgy1EBw1lVpSvs3ui-XBxXsCqpsHf65MiDBU7IdMr1xVOjlDGImswig1h5VAVM9hU_n6AgOvB_2fIDYfvIrWRpN97s3e4tMq8Z3vcagqkwnfpVQo5nnOIPbi_SI94-ZXgxqo4uycZMJeVjQGBojMGqlHy9a2S5sbhx3qR_8baPOqn0yJpx7aoNyyi8GpWuiJshoZBJ-H_WJ6NsdMeqn2clwTpGtKsOV1htRZfWHljV9ElUtJ_QIyglZdhbWmZjX2xvkZJ_cuyQd-"/>
+</div>
+</div>
+</nav>
+<!-- Main Content Layout -->
+<main class="flex-1 flex pt-header-height overflow-hidden max-w-[1600px] mx-auto w-full">
+<!-- Left Side: Visual Timeline -->
+<aside class="hidden lg:flex flex-col w-1/3 max-w-sm border-r border-olive-light/10 bg-surface-container-low/50 overflow-y-auto scrollbar-hide p-container-padding-lg">
+<div class="mb-section-gap">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-2">Kyoto Autumn Retreat</h2>
+<div class="flex items-center gap-2 text-on-surface-variant font-mono-technical text-mono-technical">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span>Oct 12 - Oct 20</span>
+</div>
+</div>
+<div class="relative pl-6 space-y-8 before:absolute before:inset-y-0 before:left-2.5 before:w-px before:bg-olive-light/20">
+<!-- Timeline Node 1 -->
+<div class="relative">
+<div class="absolute -left-[29px] w-5 h-5 rounded-full bg-surface-container-highest border-2 border-olive-light flex items-center justify-center z-10">
+<div class="w-2 h-2 rounded-full bg-olive-light"></div>
+</div>
+<div class="bg-glass-light/65 backdrop-blur-md p-4 rounded-xl border border-white/50 shadow-sm">
+<div class="font-mono-micro text-mono-micro text-olive-light/70 uppercase tracking-wider mb-1">Day 1 • Oct 12</div>
+<h3 class="font-label-ui text-label-ui text-primary mb-2">Arrival &amp; Check-in</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Arrive at KIX, transfer to The Ritz-Carlton Kyoto via private car.</p>
+</div>
+</div>
+<!-- Timeline Node 2 (Active/Discussing) -->
+<div class="relative">
+<div class="absolute -left-[29px] w-5 h-5 rounded-full bg-ochre-light/20 border-2 border-ochre-dark flex items-center justify-center z-10">
+<div class="w-2 h-2 rounded-full bg-ochre-dark animate-pulse"></div>
+</div>
+<div class="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-ochre-light/50 shadow-md ring-1 ring-ochre-light/20">
+<div class="font-mono-micro text-mono-micro text-ochre-dark uppercase tracking-wider mb-1">Day 2 • Oct 13</div>
+<h3 class="font-label-ui text-label-ui text-primary mb-2">Higashiyama Exploration</h3>
+<div class="w-full h-24 mb-2 rounded-lg overflow-hidden relative">
+<div class="w-full h-full bg-cover bg-center" data-alt="A serene, high-end photograph of a traditional wooden street in Higashiyama, Kyoto, softly illuminated by morning light, exuding calm and historical elegance in a bright, modern palette." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBgmY0HnW2cPlscC5F6e1x4YSiJxLY1St5m2WcBmdz68jOBYLpLb-Qw2e55kK5s2gWz7UTAJa-gvw_5BYvOmy3HvaMq-nyHXVViKXPTS09odoNUfyF1TQByzL98GZ9zMq9HxAS6nnwv0C2fOLhz3xoXKQCxUeAkmVLEzWQNwRrrDXA-gGDNJ0ukm4DFY_beu_Pht3JLWQlaSHGMhzvf-GRIci66GMsNz7vyWAHROvbasxDGpdASouyy6S7gGFm5ywgJ_5QbD74Xbt72')"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Morning walking tour with local historian.</p>
+</div>
+</div>
+<!-- Timeline Node 3 -->
+<div class="relative opacity-60">
+<div class="absolute -left-[29px] w-5 h-5 rounded-full bg-surface-container-highest border-2 border-olive-light/30 flex items-center justify-center z-10">
+</div>
+<div class="bg-glass-light/40 backdrop-blur-md p-4 rounded-xl border border-white/30">
+<div class="font-mono-micro text-mono-micro text-olive-light/50 uppercase tracking-wider mb-1">Day 3 • Oct 14</div>
+<h3 class="font-label-ui text-label-ui text-primary mb-2">Arashiyama Bamboo Grove</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-1">Early morning access to bamboo forest.</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Right Side: Chat Stream -->
+<section class="flex-1 flex flex-col bg-surface relative">
+<!-- Chat Header -->
+<div class="h-16 flex items-center px-container-padding-lg border-b border-olive-light/10 bg-glass-light/80 backdrop-blur-md shrink-0">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Ana - Local Specialist" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" data-alt="A professional yet warm portrait of a Japanese female local travel specialist named Ana, smiling softly against a minimalist, bright, high-key studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrkbLFrO9iTFPCjbWvzWwVn6pU-rkROJ-vO6PNHm0fLaX0d0I9Emc4cB8GtfVGjHnPY-0xkEXEGzkrqOxNDA1nqTf1pahqs5goruIMRMNlYu94x8ElOKnrSZqspl0535ISoEY542MK6M6mtBicUiASrXoHgFCRpLO0DqgdaW1tRD1Q49BCPNrQY9hbLcUeXcCntrG5b_qt40M0-GAtjBBLT_Tk7ka_rX0Jpf2gj1EwqzI5GcIMrRau-Edji0mmme3RWlzkCzFCprMm"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary leading-tight">Ana</h2>
+<p class="font-mono-micro text-mono-micro text-olive-light uppercase tracking-wider">Kyoto Specialist • Online</p>
+</div>
+</div>
+</div>
+<!-- Chat Messages -->
+<div class="flex-1 overflow-y-auto p-container-padding-lg space-y-section-gap scrollbar-hide flex flex-col justify-end pb-8">
+<!-- Date Separator -->
+<div class="flex justify-center">
+<span class="font-mono-micro text-mono-micro text-on-surface-variant/60 uppercase tracking-widest bg-surface-container-high/50 px-3 py-1 rounded-full">Today</span>
+</div>
+<!-- User Message -->
+<div class="flex justify-end">
+<div class="max-w-[75%] bg-primary text-white p-4 rounded-2xl rounded-tr-sm shadow-sm font-body-md text-body-md">
+<p>Hi Ana! I was looking at Day 2. Do you think we have enough time to fit in a tea ceremony after the walking tour, or will it feel too rushed?</p>
+</div>
+</div>
+<!-- Specialist Message (Text) -->
+<div class="flex justify-start gap-3">
+<img alt="Ana" class="w-8 h-8 rounded-full object-cover mt-1 shrink-0" data-alt="Small thumbnail avatar of Ana, the Kyoto local specialist, smiling warmly in a bright, modern setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYDM5JagdL7KKbgfiYvuBT1VtlfC0NjRTqbCMKlS79ciw5RsnMrg6T1kW88ZMKG7iAfuG4hC_Bk3ODr3yZB4_IYm04aIIW4zP9pCO3v7-yMrkO8k1NryGzJHDnrQeYv-aykGeYIy8MEbvMwaf2e7B-pzl5-MaKBBzP6vSmdN448CUMI6FSfxu9q8TTvHl7AZCVdtCMnKM8PVG4WEjJAIdgnAQGW3xkB8QVjc8QtsWy9mHP7dH4RCa7T5WZ6g5azg_UZB9QlMDdBsgt"/>
+<div class="max-w-[75%] space-y-2">
+<div class="bg-white p-4 rounded-2xl rounded-tl-sm shadow-[0_4px_24px_rgba(29,42,35,0.04)] border border-olive-light/5 font-body-md text-body-md text-on-surface">
+<p>Good morning! That's a great question. The walking tour usually wraps up around 1:00 PM near Kiyomizu-dera. It might be a bit tight if we try to do a formal ceremony immediately after.</p>
+<p class="mt-2">However, I know a wonderful, intimate tea house tucked away just a few streets over that offers a slightly abbreviated, yet very authentic experience. It would be perfect for your schedule.</p>
+</div>
+</div>
+</div>
+<!-- Specialist Override Node (Recommendation) -->
+<div class="flex justify-start gap-3">
+<div class="w-8 shrink-0"></div> <!-- Spacer for avatar alignment -->
+<div class="max-w-[85%] w-full">
+<div class="bg-glass-light/80 backdrop-blur-xl p-5 rounded-2xl border border-ochre-light/30 shadow-[0_8px_32px_rgba(29,42,35,0.08)] relative overflow-hidden group">
+<!-- Shimmer effect -->
+<div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none"></div>
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-ochre-dark text-[18px]" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="font-mono-micro text-mono-micro text-ochre-dark uppercase tracking-wider">Specialist Recommendation</span>
+</div>
+<span class="bg-surface-container-high text-olive-dark font-mono-technical text-[10px] px-2 py-0.5 rounded-full">Day 2 Update</span>
+</div>
+<div class="flex gap-4">
+<div class="w-24 h-24 rounded-lg overflow-hidden shrink-0 relative">
+<div class="w-full h-full bg-cover bg-center" data-alt="A close-up, serene image of traditional matcha green tea being prepared with a bamboo whisk in a rustic ceramic bowl, softly lit to highlight the textures and rich green color, fitting a calm, premium aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVdMF46aL0_b3wXOIP4tPXPsD6aGZ7b9eIJJUrpbElDMLruuebjmEH8PogE3LLp58luhZxOEi3_U9d2olGzj7fsGPGgnX3sk7d4KMlbEyyEqNW9ZOnaPERv7hw-BQqdFqdTwNRF8O4L34Mc5NxPisDKoUqjX-Z2gAImOYlb5bFG8w2GO68bmvakAFMfU80z142zblM12cCSeaZcQu6uDVELAzLJ6QMr_IFDib6j7i5JEygcsmJxNGwiYEKuEl52bNFWSqIe_gTYux_')"></div>
+</div>
+<div class="flex-1">
+<h4 class="font-headline-sm text-headline-sm text-primary mb-1">En Tea House Experience</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mb-3">A 45-minute casual yet authentic matcha preparation and tasting, perfectly timed post-tour.</p>
+<div class="flex items-center gap-4 text-xs font-label-ui text-olive-light">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span> 2:00 PM</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">payments</span> +$45/person</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-olive-light/10 flex justify-end gap-2">
+<button class="px-4 py-2 font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors">Decline</button>
+<button class="px-4 py-2 bg-ochre-light text-primary font-label-ui text-label-ui rounded-lg hover:bg-ochre-dark transition-colors shadow-sm">Add to Itinerary</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Chat Input Area -->
+<div class="p-4 bg-white/50 backdrop-blur-md border-t border-olive-light/10 shrink-0">
+<div class="max-w-4xl mx-auto relative flex items-end gap-2 bg-white rounded-2xl p-2 shadow-sm border border-olive-light/10 focus-within:border-ochre-light/50 focus-within:ring-1 focus-within:ring-ochre-light/30 transition-all">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors shrink-0">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<textarea class="flex-1 bg-transparent border-none focus:ring-0 resize-none py-2 px-2 font-body-md text-body-md text-primary placeholder:text-on-surface-variant/50 max-h-32 scrollbar-hide" placeholder="Reply to Ana..." rows="1"></textarea>
+<button class="p-2 bg-primary text-white rounded-xl hover:bg-olive-dark transition-colors shrink-0 flex items-center justify-center h-10 w-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+<div class="text-center mt-2">
+<span class="font-mono-micro text-mono-micro text-on-surface-variant/40">Press Enter to send, Shift + Enter for new line</span>
+</div>
+</div>
+</section>
+</main>
+<style>
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+    </style>
+</body></html>

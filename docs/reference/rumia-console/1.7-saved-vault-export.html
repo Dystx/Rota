@@ -1,0 +1,274 @@
+<!-- 1.7 Saved Vault & Export Panel -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Saved Vault &amp; Export Panel - Rumia</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@500;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#ffddb5",
+                        "on-secondary-fixed": "#2a1800",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#e0f6e7",
+                        "on-primary-fixed": "#0c1f16",
+                        "tertiary-fixed-dim": "#c8c6c2",
+                        "glass-dark": "rgba(43, 62, 52, 0.85)",
+                        "primary-container": "#2b3e34",
+                        "surface-tint": "#4f6358",
+                        "on-secondary-container": "#784d00",
+                        "ochre-dark": "#CE933F",
+                        "on-tertiary-fixed": "#1c1c1a",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#0c1f16",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#d7eedf",
+                        "secondary-fixed-dim": "#f9bb68",
+                        "background": "#e8fff0",
+                        "on-primary-container": "#94a99c",
+                        "on-surface-variant": "#424844",
+                        "on-tertiary-container": "#a5a3a0",
+                        "surface-dim": "#c9dfd1",
+                        "surface-bright": "#e8fff0",
+                        "error": "#ba1a1a",
+                        "surface": "#e8fff0",
+                        "primary-fixed": "#d2e8d9",
+                        "inverse-surface": "#22342b",
+                        "secondary": "#825505",
+                        "linen-dark": "#EFECE6",
+                        "primary": "#16281f",
+                        "glass-light": "rgba(255, 255, 255, 0.65)",
+                        "primary-fixed-dim": "#b6ccbe",
+                        "grid-pattern": "rgba(43, 62, 52, 0.1)",
+                        "surface-container-highest": "#d2e8d9",
+                        "on-error": "#ffffff",
+                        "olive-light": "#3C5447",
+                        "outline": "#737874",
+                        "surface-container": "#ddf3e5",
+                        "outline-variant": "#c2c8c2",
+                        "on-background": "#0c1f16",
+                        "tertiary-container": "#3a3a37",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#242422",
+                        "surface-variant": "#d2e8d9",
+                        "on-tertiary-fixed-variant": "#474744",
+                        "on-secondary-fixed-variant": "#643f00",
+                        "tertiary-fixed": "#e5e2de",
+                        "on-primary-fixed-variant": "#384b41",
+                        "olive-dark": "#1D2A23",
+                        "inverse-primary": "#b6ccbe",
+                        "surface-container-low": "#e3f9ea",
+                        "ochre-light": "#EAB875",
+                        "secondary-container": "#ffc16d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "24px",
+                        "base": "4px",
+                        "container-padding-lg": "32px",
+                        "header-height": "64px",
+                        "card-padding": "20px",
+                        "gutter": "16px",
+                        "container-padding-sm": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "mono-micro": ["JetBrains Mono"],
+                        "label-ui": ["Inter"],
+                        "headline-sm": ["Playfair Display"],
+                        "display-mobile": ["Playfair Display"],
+                        "display": ["Playfair Display"],
+                        "mono-technical": ["JetBrains Mono"],
+                        "headline-lg": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "mono-micro": ["10px", { "lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "label-ui": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-mobile": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "mono-technical": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "40px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md font-body-md">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full bg-glass-light/65 dark:bg-glass-dark/85 backdrop-blur-md border-b border-white/20 dark:border-olive-dark/10 shadow-sm z-50">
+<div class="flex justify-between items-center h-header-height px-container-padding-lg max-w-full mx-auto z-50">
+<div class="font-headline-lg text-headline-lg italic text-primary dark:text-primary-fixed">Rumia</div>
+<div class="hidden md:flex gap-gutter items-center font-headline-sm text-headline-sm font-label-ui text-label-ui">
+<a class="text-on-surface-variant dark:text-on-primary-container hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200" href="#">Itineraries</a>
+<a class="text-on-surface-variant dark:text-on-primary-container hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200" href="#">Expert Chat</a>
+<a class="text-ochre-light dark:text-ochre-dark border-b-2 border-ochre-light dark:border-ochre-dark pb-1 hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200" href="#">Vault</a>
+</div>
+<div class="flex items-center gap-gutter">
+<button class="hidden md:block bg-primary text-on-primary px-4 py-2 rounded-lg font-label-ui text-label-ui scale-95 active:opacity-80 transition-all hover:bg-olive-light duration-200">Plan a Trip</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/20">
+<img alt="Traveler profile avatar" class="w-full h-full object-cover" data-alt="Close up portrait of a sophisticated traveler with subtle warm lighting, evoking a sense of calm and intentional journeying, fitting a premium travel interface in light mode with olive green and warm ochre accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJOX7h2TqMQTVDIPuiLphNU8f1Wsyf1EFvUwf13ashOC7RQVX63zlnny8Urrbo5UuxVe_ABqpTxNRtBDx0VTni7nHS2aA0D8CdBbvMyWOnNGtvUfnRlJCoOJ87NrFBgCeOrb2qVDXMX36vMaWneuph4036HAPoIKJGqwoJRyWqHF0-Xp1Yol8kVu5iZIGxigm9n3kfmsy-toq0St9GNbq6RPW_sVDaGxIUv4l1h5-f9_IwzEQyviPZ1id_NJo60w9RPMzUfFKg7cJz"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[88px] pb-section-gap px-container-padding-sm md:px-container-padding-lg max-w-[1440px] mx-auto w-full flex flex-col md:flex-row gap-section-gap relative">
+<!-- Left: Vault Grid (Gallery) -->
+<section class="flex-grow flex flex-col gap-section-gap">
+<header class="flex justify-between items-end pb-4 border-b border-outline-variant/30">
+<div>
+<h1 class="font-display-mobile text-display-mobile md:font-display md:text-display text-primary">Saved Vault</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Your personalized archive of curated itineraries and inspirations.</p>
+</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-full hover:bg-surface-variant text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="view_list">view_list</span>
+</button>
+</div>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<article class="bg-glass-light/65 backdrop-blur-md rounded-xl border border-white/20 shadow-sm overflow-hidden group hover:shadow-lg transition-all duration-300 relative cursor-pointer" onclick="toggleExportPanel('export-panel')">
+<div class="h-48 w-full bg-surface-variant overflow-hidden relative">
+<div class="bg-cover bg-center w-full h-full group-hover:scale-105 transition-transform duration-500" data-alt="A serene, sun-drenched vineyard in the Douro Valley, Portugal, with terraced hills rolling down to a calm river. The lighting is golden hour, creating deep, warm shadows. The style is premium editorial photography, evoking exclusivity and calm intelligence, complementing a light mode UI with olive and ochre tones." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAQuBnuaIT6yn0Pc7BepPshMEtWuQbM0HI_KJm-x0VvXXE3ndg4aQ3U2PtwunuVfU7J5t39cJ4RQSmtLQ9uO_D381LBgngysz_1CHLoFrHX8wf6LfVe_vaGkhIVKUCthdb4f0-6Xl9rlm_q2pS1RBk_6uNvZIoRW49oQKGnHiexPusqIbV2i0Hndf2CdoXKVsZK_Z9FsfQAsBUgB8VrBWcyX1If3YHGkfqZu7S9NZo4H_XcCuZ9UEf04vB3Y9h1YFtXeUtu34YIB17k')"></div>
+<div class="absolute top-3 right-3 bg-white/80 backdrop-blur-sm px-2 py-1 rounded text-primary font-mono-micro text-mono-micro uppercase tracking-wider">Itinerary</div>
+</div>
+<div class="p-card-padding">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-1">Portugal Escape</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mb-3">Douro Terroir &amp; Lisbon Nights</p>
+<div class="flex justify-between items-center mt-4 pt-4 border-t border-outline-variant/20">
+<span class="font-mono-micro text-mono-micro text-on-surface-variant">7 DAYS • 2 GUESTS</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-ochre-dark transition-colors" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-glass-light/65 backdrop-blur-md rounded-xl border border-white/20 shadow-sm overflow-hidden group hover:shadow-lg transition-all duration-300 relative cursor-pointer">
+<div class="h-48 w-full bg-surface-variant overflow-hidden relative">
+<div class="bg-cover bg-center w-full h-full group-hover:scale-105 transition-transform duration-500" data-alt="Minimalist, modern architecture in Kyoto, Japan, blending natural wood with concrete. Soft, diffused daylight illuminates a Zen garden, creating a calm, high-precision aesthetic. The mood is tranquil and intelligent, perfectly suited for a premium travel platform with a light glassmorphism design." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDHwLKtuR9WIEdwvSytdpdQ8itx4uBl1oD6oqSqIT0dGXxsI6FHu8h2-DaEhBVTgj8GwbOuaGUhPwZjs2ZV4pB4pUiiXrz3yyhC3gVcq-PgvLrkyAo_q4u5CeYe7tKdr7M2RuYcwgwF2b0Yf1ubhmtT9GryV2Gtwsyo9DRxth2KahPIrsNQc-hF5d08gVEqiUX-FiZqFLjNN15f2mF-lgoNqKFiVE0o1daNdwgD12gunJ8fTttK3JuSbs9HQID1a2q9kcesvlXoT6aK')"></div>
+<div class="absolute top-3 right-3 bg-white/80 backdrop-blur-sm px-2 py-1 rounded text-primary font-mono-micro text-mono-micro uppercase tracking-wider">Draft</div>
+</div>
+<div class="p-card-padding">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-1">Kyoto Minimalism</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mb-3">Temples &amp; Modernity</p>
+<div class="flex justify-between items-center mt-4 pt-4 border-t border-outline-variant/20">
+<span class="font-mono-micro text-mono-micro text-on-surface-variant">10 DAYS • SOLO</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-ochre-dark transition-colors" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Right: Sliding Export Panel (Drawer) -->
+<aside class="hidden md:block w-full md:w-80 lg:w-96 bg-glass-light/65 backdrop-blur-md rounded-xl border border-white/20 shadow-md p-card-padding flex-shrink-0 sticky top-[88px] h-[calc(100vh-120px)] overflow-y-auto transition-transform duration-300 transform translate-x-0" id="export-panel">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-sm text-headline-sm text-primary">Export Options</h3>
+<button class="text-on-surface-variant hover:text-primary transition-colors" onclick="toggleExportPanel('export-panel')">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="mb-6 p-4 bg-surface-container-low rounded-lg border border-outline-variant/30">
+<h4 class="font-headline-sm text-headline-sm text-primary text-sm mb-1">Portugal Escape</h4>
+<p class="font-mono-micro text-mono-micro text-on-surface-variant uppercase tracking-wide">Selected Itinerary</p>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Option 1 -->
+<button class="w-full text-left group bg-surface hover:bg-surface-container-high border border-outline-variant/30 rounded-lg p-4 transition-all duration-200 flex items-start gap-4">
+<div class="p-2 bg-olive-light/10 text-olive-light rounded-md group-hover:bg-ochre-light/20 group-hover:text-ochre-dark transition-colors">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+</div>
+<div>
+<div class="font-label-ui text-label-ui text-primary mb-1 group-hover:text-ochre-dark transition-colors">Download PDF</div>
+<div class="font-body-md text-body-md text-sm text-on-surface-variant">Premium editorial layout for printing or offline viewing.</div>
+</div>
+</button>
+<!-- Option 2 -->
+<button class="w-full text-left group bg-surface hover:bg-surface-container-high border border-outline-variant/30 rounded-lg p-4 transition-all duration-200 flex items-start gap-4">
+<div class="p-2 bg-olive-light/10 text-olive-light rounded-md group-hover:bg-ochre-light/20 group-hover:text-ochre-dark transition-colors">
+<span class="material-symbols-outlined" data-icon="sync_saved_locally">sync_saved_locally</span>
+</div>
+<div>
+<div class="font-label-ui text-label-ui text-primary mb-1 group-hover:text-ochre-dark transition-colors">Sync to Mobile App</div>
+<div class="font-body-md text-body-md text-sm text-on-surface-variant">Send directly to the Rumia companion app for on-the-go access.</div>
+</div>
+</button>
+<!-- Option 3 -->
+<button class="w-full text-left group bg-surface hover:bg-surface-container-high border border-outline-variant/30 rounded-lg p-4 transition-all duration-200 flex items-start gap-4">
+<div class="p-2 bg-olive-light/10 text-olive-light rounded-md group-hover:bg-ochre-light/20 group-hover:text-ochre-dark transition-colors">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</div>
+<div>
+<div class="font-label-ui text-label-ui text-primary mb-1 group-hover:text-ochre-dark transition-colors">Share Link</div>
+<div class="font-body-md text-body-md text-sm text-on-surface-variant">Generate a secure web link to share with co-travelers.</div>
+</div>
+</button>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/30">
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-ui text-label-ui shadow-sm hover:bg-olive-light hover:shadow-md transition-all duration-200 flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="file_download">file_download</span>
+                     Execute Export
+                 </button>
+</div>
+</aside>
+</main>
+<!-- Footer -->
+<footer class="w-full bottom-0 bg-linen-dark dark:bg-olive-dark border-t border-olive-dark/5 dark:border-white/5 py-12 px-container-padding-lg flex flex-col md:flex-row justify-between items-center gap-4 mt-auto">
+<div class="font-headline-sm text-headline-sm italic text-primary dark:text-primary-fixed">Rumia</div>
+<div class="font-label-ui text-label-ui text-olive-light dark:text-primary-fixed-dim">© 2024 Rumia. All rights reserved. Intentional Humanism in Travel.</div>
+<div class="flex gap-4 font-label-ui text-label-ui">
+<a class="text-on-surface-variant opacity-80 hover:opacity-100 hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant opacity-80 hover:opacity-100 hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant opacity-80 hover:opacity-100 hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Sustainability</a>
+<a class="text-on-surface-variant opacity-80 hover:opacity-100 hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Global Support</a>
+</div>
+</footer>
+<script>
+        // Simple drawer toggle logic for demonstration
+        function toggleExportPanel(id) {
+            const panel = document.getElementById(id);
+            if(panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                // Allow reflow before adding translate class
+                setTimeout(() => {
+                    panel.classList.remove('translate-x-full');
+                    panel.classList.add('translate-x-0');
+                }, 10);
+            } else {
+                 panel.classList.remove('translate-x-0');
+                 panel.classList.add('translate-x-full');
+                 setTimeout(() => {
+                    panel.classList.add('hidden');
+                 }, 300);
+            }
+        }
+    </script>
+</body></html>

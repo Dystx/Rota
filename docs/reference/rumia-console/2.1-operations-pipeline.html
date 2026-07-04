@@ -1,0 +1,351 @@
+<!-- 2.1 Operations Pipeline Board -->
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Operations Pipeline Board</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error-container": "#93000a",
+                      "secondary-fixed": "#ffddb5",
+                      "on-secondary-fixed": "#2a1800",
+                      "error-container": "#ffdad6",
+                      "inverse-on-surface": "#e0f6e7",
+                      "on-primary-fixed": "#0c1f16",
+                      "tertiary-fixed-dim": "#c8c6c2",
+                      "glass-dark": "rgba(43, 62, 52, 0.85)",
+                      "primary-container": "#2b3e34",
+                      "surface-tint": "#4f6358",
+                      "on-secondary-container": "#784d00",
+                      "ochre-dark": "#CE933F",
+                      "on-tertiary-fixed": "#1c1c1a",
+                      "on-secondary": "#ffffff",
+                      "on-surface": "#0c1f16",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#d7eedf",
+                      "secondary-fixed-dim": "#f9bb68",
+                      "background": "#e8fff0",
+                      "on-primary-container": "#94a99c",
+                      "on-surface-variant": "#424844",
+                      "on-tertiary-container": "#a5a3a0",
+                      "surface-dim": "#c9dfd1",
+                      "surface-bright": "#e8fff0",
+                      "error": "#ba1a1a",
+                      "surface": "#e8fff0",
+                      "primary-fixed": "#d2e8d9",
+                      "inverse-surface": "#22342b",
+                      "secondary": "#825505",
+                      "linen-dark": "#EFECE6",
+                      "primary": "#16281f",
+                      "glass-light": "rgba(255, 255, 255, 0.65)",
+                      "primary-fixed-dim": "#b6ccbe",
+                      "grid-pattern": "rgba(43, 62, 52, 0.1)",
+                      "surface-container-highest": "#d2e8d9",
+                      "on-error": "#ffffff",
+                      "olive-light": "#3C5447",
+                      "outline": "#737874",
+                      "surface-container": "#ddf3e5",
+                      "outline-variant": "#c2c8c2",
+                      "on-background": "#0c1f16",
+                      "tertiary-container": "#3a3a37",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#242422",
+                      "surface-variant": "#d2e8d9",
+                      "on-tertiary-fixed-variant": "#474744",
+                      "on-secondary-fixed-variant": "#643f00",
+                      "tertiary-fixed": "#e5e2de",
+                      "on-primary-fixed-variant": "#384b41",
+                      "olive-dark": "#1D2A23",
+                      "inverse-primary": "#b6ccbe",
+                      "surface-container-low": "#e3f9ea",
+                      "ochre-light": "#EAB875",
+                      "secondary-container": "#ffc16d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "24px",
+                      "base": "4px",
+                      "container-padding-lg": "32px",
+                      "header-height": "64px",
+                      "card-padding": "20px",
+                      "gutter": "16px",
+                      "container-padding-sm": "24px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "mono-micro": [
+                              "JetBrains Mono"
+                      ],
+                      "label-ui": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Playfair Display"
+                      ],
+                      "display-mobile": [
+                              "Playfair Display"
+                      ],
+                      "display": [
+                              "Playfair Display"
+                      ],
+                      "mono-technical": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Playfair Display"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "mono-micro": [
+                              "10px",
+                              {
+                                      "lineHeight": "12px",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-ui": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-mobile": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display": [
+                              "72px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "mono-technical": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="bg-olive-dark dark:bg-black text-linen-dark dark:text-primary-fixed-dim font-body-md text-body-md font-mono-micro text-mono-micro fixed left-0 top-0 h-full w-64 bg-olive-dark/95 dark:bg-black/90 backdrop-blur-xl shadow-2xl flex flex-col h-full py-section-gap px-gutter z-50 transition-all duration-200 ease-in-out hidden md:flex">
+<div class="mb-section-gap px-3">
+<h1 class="font-headline-sm text-headline-sm text-ochre-light">Rumia Console</h1>
+<p class="font-mono-micro text-mono-micro text-on-primary-container/70 mt-1">Management Portal</p>
+</div>
+<button class="bg-ochre-light text-primary font-label-ui text-label-ui rounded-lg py-2 px-4 mb-section-gap hover:bg-ochre-dark transition-colors w-full flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span> New Entry
+        </button>
+<div class="flex-1 flex flex-col gap-2">
+<a class="bg-primary-container text-ochre-light rounded-lg border-l-4 border-ochre-light p-3 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+<span class="font-label-ui text-label-ui">Pipeline</span>
+</a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-ui text-label-ui">Revision Workspace</span>
+</a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-label-ui text-label-ui">Messaging Hub</span>
+</a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-label-ui text-label-ui">Knowledge Graph</span>
+</a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-ui text-label-ui">Metrics</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-2 pt-section-gap border-t border-white/10">
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-ui text-label-ui">System Config</span>
+</a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-ui text-label-ui">Logout</span>
+</a>
+<div class="mt-4 flex items-center gap-3 px-3">
+<img alt="Specialist/Admin profile" class="w-8 h-8 rounded-full object-cover border border-white/20" data-alt="A small, circular avatar portrait of a professional system administrator in a brightly lit modern office setting. Light mode aesthetic, warm, approachable but highly competent." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZaD-rU0LaK3GA0h2f0eS9thl7RY335HkCuJHik3VRuAS7KunCQAMaDDntGnbAcnEFO8LayN6S2O6zHoURmf-l5LI9dHgjuxfiu-IWPW2jv9OFDd-iVAV_pEvmIlnRfScDOnXQndRnCEB-E6X0JAnbz_0B8EofYWaZeyNhUaxPrgOUmtmjcCIc4Agd37rryta0ESE-65QfEzLAfGgHkxsuMLtsVzwtYzZo6L6iPj5L-OoYnxrPgku4gitkb5tnj9aAIOiOCl6Km3Pr"/>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 p-container-padding-lg max-h-screen overflow-hidden flex flex-col relative bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNlOGZmZjAiLz48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJyZ2JhKDQzLCA2MiwgNTIsIDAuMSkiLz48L3N2Zz4=')]">
+<header class="mb-section-gap flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-1">Operations Pipeline</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage active itineraries and client communications.</p>
+</div>
+<div class="flex gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 18px;">search</span>
+<input class="bg-surface-container rounded-full py-2 pl-10 pr-4 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-ochre-light border-none w-64 shadow-sm" placeholder="Search entries..." type="text"/>
+</div>
+<button class="bg-surface-container p-2 rounded-full text-on-surface-variant hover:text-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</header>
+<!-- Kanban Board -->
+<div class="flex-1 flex gap-gutter overflow-x-auto pb-4 custom-scrollbar">
+<!-- Lane 1: New Drafts -->
+<div class="flex-shrink-0 w-80 bg-glass-light border border-white/20 backdrop-blur-md rounded-xl p-card-padding flex flex-col h-full shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span> New Drafts
+                    </h3>
+<span class="font-mono-micro text-mono-micro bg-surface-container-high px-2 py-1 rounded text-on-surface-variant">3</span>
+</div>
+<div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-4 custom-scrollbar">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-olive-dark/5 hover:border-olive-dark/20 transition-all cursor-grab active:cursor-grabbing">
+<div class="flex justify-between items-start mb-2">
+<span class="font-mono-micro text-mono-micro text-error uppercase tracking-wider bg-error-container/30 px-2 py-0.5 rounded">SLA: 2h</span>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined" style="font-size: 16px;">more_horiz</span></button>
+</div>
+<h4 class="font-label-ui text-label-ui text-primary mb-1">Tokyo Culinary Tour</h4>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 text-xs mb-3">Client requested focus on omakase experiences and hidden izakayas in Shinjuku.</p>
+<div class="flex items-center gap-2 mt-auto">
+<img alt="Client Avatar" class="w-6 h-6 rounded-full object-cover" data-alt="Small circular avatar of a modern traveler, smiling slightly, bright natural lighting, professional headshot style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCS9jIGH_eKQIDMch8rv_uE0Woii2j4e69wAZvo6a9PdRB19Fy5ryYCEJk-PMYkHquNptaZArouov_FdrQeF2WzbVQCnB8nM_bK3SCeZH5OG9qd1GXy9v0gVcLCEw3hM_bXhTbxv3pVsXKjTeV_XbKlTdpPDsP80nsciHCOvOO1WkJ9vameWaAdeg9KCabuJNKMrWZkjbWcWh461c6HtwRkqipKYYroS3D3P0jVWH2CJXEU9J19kmY87dsEm8r4eNkro3GB6rb5Bu6c"/>
+<span class="font-mono-technical text-mono-technical text-on-surface-variant">E. Sato</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-olive-dark/5 hover:border-olive-dark/20 transition-all cursor-grab active:cursor-grabbing">
+<div class="flex justify-between items-start mb-2">
+<span class="font-mono-micro text-mono-micro text-ochre-dark uppercase tracking-wider bg-secondary-container/30 px-2 py-0.5 rounded">SLA: 12h</span>
+</div>
+<h4 class="font-label-ui text-label-ui text-primary mb-1">Alpine Ski Retreat</h4>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 text-xs mb-3">Family of 4, needs gear rental integration and ski school bookings.</p>
+<div class="flex items-center gap-2 mt-auto">
+<div class="w-6 h-6 rounded-full bg-surface-tint text-on-primary flex items-center justify-center font-mono-micro text-mono-micro">JD</div>
+<span class="font-mono-technical text-mono-technical text-on-surface-variant">J. Doe</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Lane 2: In Revision -->
+<div class="flex-shrink-0 w-80 bg-glass-light border border-white/20 backdrop-blur-md rounded-xl p-card-padding flex flex-col h-full shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-ochre-light"></span> In Revision
+                    </h3>
+<span class="font-mono-micro text-mono-micro bg-surface-container-high px-2 py-1 rounded text-on-surface-variant">1</span>
+</div>
+<div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-4 custom-scrollbar">
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-olive-dark/5 hover:border-olive-dark/20 transition-all cursor-grab active:cursor-grabbing border-l-2 border-l-ochre-light">
+<div class="flex justify-between items-start mb-2">
+<span class="font-mono-micro text-mono-micro text-on-surface-variant uppercase tracking-wider bg-surface-container-high px-2 py-0.5 rounded">Updated 10m ago</span>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined" style="font-size: 16px;">more_horiz</span></button>
+</div>
+<h4 class="font-label-ui text-label-ui text-primary mb-1">Amalfi Coast Honeymoon</h4>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 text-xs mb-3">Reviewing proposed yacht charter schedule and dinner reservations.</p>
+<div class="flex items-center gap-2 mt-auto">
+<img alt="Client Avatar" class="w-6 h-6 rounded-full object-cover" data-alt="Small circular avatar of a woman with sunglasses, coastal background, bright and sunny." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_1ohlPp-n4vGwfQZWiA5-jA_Y6NHih1ZI7wVU0pD1DUnRtwy1PcSLoDLLt49pVELvHDWqft7H_ab9OC6jlwkmvgmV5jGbOW9qokcclHNiBMv-lZvOg2WYspbQf3HZG8deVbY91r10mpImVKpcf7oM4-rPkjsTJcWJgxjp55oVhHcrC9oR-vrVrvg4W8r2z-oF_q27Y1DOY6SOAJ_lXIGd5Q90KAjQTFvyZd8nT0K5wQ9qRcEKDIvIFvLKNQgmli4PgpBp4W8txheC"/>
+<span class="font-mono-technical text-mono-technical text-on-surface-variant">M. Rossi</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Lane 3: Active Chats -->
+<div class="flex-shrink-0 w-80 bg-glass-light border border-white/20 backdrop-blur-md rounded-xl p-card-padding flex flex-col h-full shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-surface-tint"></span> Active Chats
+                    </h3>
+<span class="font-mono-micro text-mono-micro bg-surface-container-high px-2 py-1 rounded text-on-surface-variant">2</span>
+</div>
+<div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-4 custom-scrollbar">
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-olive-dark/5 hover:border-olive-dark/20 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-1 text-ochre-dark">
+<span class="material-symbols-outlined" style="font-size: 14px;">mark_email_unread</span>
+<span class="font-mono-micro text-mono-micro uppercase tracking-wider">New Message</span>
+</div>
+</div>
+<h4 class="font-label-ui text-label-ui text-primary mb-1">Iceland Ring Road</h4>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 text-xs mb-3">"Can we add an extra day near Vik? The forecast looks great."</p>
+<div class="flex items-center gap-2 mt-auto">
+<div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-mono-micro text-mono-micro">L</div>
+<span class="font-mono-technical text-mono-technical text-on-surface-variant">L. Chen</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<style>
+        /* Custom Scrollbar for Glassmorphism feel */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(60, 84, 71, 0.2); /* olive-light with opacity */
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(60, 84, 71, 0.4);
+        }
+    </style>
+</body></html>

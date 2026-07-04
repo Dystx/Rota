@@ -28,11 +28,13 @@ To enable rapid UI iteration and stable testing, we use a pattern where complex 
 
 ## Current Production Blockers
 
-While the local implementation is feature-ready for the current MVP scope, the hosted production environment is currently in a "drifted" state.
+The local implementation is feature-ready for the current MVP scope. The single remaining production blocker is the **hosted Supabase schema apply** (Phase 2 of the master roadmap), which is operator-driven — every migration is local-ready and the runbook is in place.
 
-1. **Schema Drift**: The hosted Supabase database is missing critical migrations including `owner_user_id` for trip isolation and the `admin_audit_trail` table.
-2. **Security Config**: RLS policies are not yet enforced on the hosted database, and leaked password protection is disabled in Supabase Auth.
-3. **Infrastructure**: Background worker jobs in `apps/workers` are currently bounded for local execution; they lack a hosted/distributed runner (e.g., Inngest or Upstash).
+For the authoritative breakdown, see:
+
+- [`docs/master-roadmap.md`](./master-roadmap.md) — the consolidated 6-phase Cloudflare Pages + R2 + PMTiles deployment blueprint with the phase-to-PR cross-reference and the 2026-07-04 status table.
+- [`docs/ops/launch.md`](./ops/launch.md) — the operator's playbook: 4 ordered migration batches (Phase-2 foundation / PostGIS + pgvector + places / PR-11 specialist / hybrid search + audit) + the security configuration + the 3-step smoke test (traveler / specialist / provider).
+- [`docs/roadmap.md`](./roadmap.md) — the operational launch-readiness view with the §3.10 visual reference catalog (13/13 at parity) and the §3.11 engineering-lifecycle cross-reference.
 
 ## Quality Gates
 

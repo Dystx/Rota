@@ -1,0 +1,480 @@
+<!-- 2.2 Master Revision Workspace -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Master Revision Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@500;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error-container": "#93000a",
+                      "secondary-fixed": "#ffddb5",
+                      "on-secondary-fixed": "#2a1800",
+                      "error-container": "#ffdad6",
+                      "inverse-on-surface": "#e0f6e7",
+                      "on-primary-fixed": "#0c1f16",
+                      "tertiary-fixed-dim": "#c8c6c2",
+                      "glass-dark": "rgba(43, 62, 52, 0.85)",
+                      "primary-container": "#2b3e34",
+                      "surface-tint": "#4f6358",
+                      "on-secondary-container": "#784d00",
+                      "ochre-dark": "#CE933F",
+                      "on-tertiary-fixed": "#1c1c1a",
+                      "on-secondary": "#ffffff",
+                      "on-surface": "#0c1f16",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#d7eedf",
+                      "secondary-fixed-dim": "#f9bb68",
+                      "background": "#e8fff0",
+                      "on-primary-container": "#94a99c",
+                      "on-surface-variant": "#424844",
+                      "on-tertiary-container": "#a5a3a0",
+                      "surface-dim": "#c9dfd1",
+                      "surface-bright": "#e8fff0",
+                      "error": "#ba1a1a",
+                      "surface": "#e8fff0",
+                      "primary-fixed": "#d2e8d9",
+                      "inverse-surface": "#22342b",
+                      "secondary": "#825505",
+                      "linen-dark": "#EFECE6",
+                      "primary": "#16281f",
+                      "glass-light": "rgba(255, 255, 255, 0.65)",
+                      "primary-fixed-dim": "#b6ccbe",
+                      "grid-pattern": "rgba(43, 62, 52, 0.1)",
+                      "surface-container-highest": "#d2e8d9",
+                      "on-error": "#ffffff",
+                      "olive-light": "#3C5447",
+                      "outline": "#737874",
+                      "surface-container": "#ddf3e5",
+                      "outline-variant": "#c2c8c2",
+                      "on-background": "#0c1f16",
+                      "tertiary-container": "#3a3a37",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#242422",
+                      "surface-variant": "#d2e8d9",
+                      "on-tertiary-fixed-variant": "#474744",
+                      "on-secondary-fixed-variant": "#643f00",
+                      "tertiary-fixed": "#e5e2de",
+                      "on-primary-fixed-variant": "#384b41",
+                      "olive-dark": "#1D2A23",
+                      "inverse-primary": "#b6ccbe",
+                      "surface-container-low": "#e3f9ea",
+                      "ochre-light": "#EAB875",
+                      "secondary-container": "#ffc16d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "24px",
+                      "base": "4px",
+                      "container-padding-lg": "32px",
+                      "header-height": "64px",
+                      "card-padding": "20px",
+                      "gutter": "16px",
+                      "container-padding-sm": "24px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "mono-micro": [
+                              "JetBrains Mono"
+                      ],
+                      "label-ui": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Playfair Display"
+                      ],
+                      "display-mobile": [
+                              "Playfair Display"
+                      ],
+                      "display": [
+                              "Playfair Display"
+                      ],
+                      "mono-technical": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Playfair Display"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "mono-micro": [
+                              "10px",
+                              {
+                                      "lineHeight": "12px",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-ui": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-mobile": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display": [
+                              "72px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "mono-technical": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .glass-panel-light {
+            background-color: theme('colors.glass-light');
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .acrylic-shadow {
+            box-shadow: 0 10px 30px -10px rgba(29, 42, 35, 0.1);
+        }
+        .premium-shadow {
+            box-shadow: 0 25px 50px -12px rgba(29, 42, 35, 0.25);
+        }
+        
+        /* Custom scrollbar for sleekness */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.surface-tint');
+            border-radius: theme('borderRadius.full');
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.primary');
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0idHJhbnNwYXJlbnQiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSg0MywgNjIsIDUyLCAwLjEpIi8+Cjwvc3ZnPg==')]">
+<!-- SideNavBar (from JSON) -->
+<nav class="hidden md:flex bg-olive-dark dark:bg-black fixed left-0 top-0 h-full w-64 bg-olive-dark/95 dark:bg-black/90 backdrop-blur-xl shadow-2xl flex-col py-section-gap px-gutter z-50">
+<!-- Header -->
+<div class="mb-section-gap flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-white/10">
+<img alt="Specialist/Admin profile" class="w-full h-full object-cover" data-alt="A macro photograph of a sleek, minimalist metallic sphere reflecting soft studio lighting, representing a modern specialist profile avatar. The metallic surface has a brushed texture, emitting an aura of professional precision and calm intelligence. The lighting is diffused and even, creating soft highlights that emphasize the premium glassmorphism aesthetic of the UI. The color palette relies heavily on deep olive tones and bright white reflections." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1FBucgQcmyT5LFUOoT7AI-vX4Bw0zxNGIQDBCN4nthe1Dk_Ul_ZrQ5WNCL9qiBhptwDFkqXleNSU2S9Yay58b21xRBQGM-IwbjFiiSwnLhp_hv5cVKGDgLUBxVrFdmpWReqk6G_BhgkV701P70VMzZARPbaVDYBtNqqntF46jtWVW7O9jgaZLtLNc3a-Zl87BsekGoDVvG5QfP-REoCvnGy-nYZ-kl4AIvjcKnqUYUr1i01tSFJSbnOHA3ig1O1zGWMYaEYe2ZmqF"/>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-ochre-light">Rumia Console</h1>
+<p class="font-mono-micro text-mono-micro text-linen-dark/60 mt-1 uppercase tracking-wider">Management Portal</p>
+</div>
+</div>
+<!-- CTA -->
+<button class="w-full bg-ochre-light text-on-surface-variant font-label-ui text-label-ui py-3 rounded-lg mb-8 hover:bg-ochre-dark hover:text-white transition-all duration-200 flex justify-center items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+            New Entry
+        </button>
+<!-- Main Navigation -->
+<div class="flex-1 flex flex-col gap-2 font-body-md text-body-md">
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+                Pipeline
+            </a>
+<a class="bg-primary-container text-ochre-light rounded-lg border-l-4 border-ochre-light p-3 flex items-center gap-3 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+                Revision Workspace
+            </a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+                Messaging Hub
+            </a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+                Knowledge Graph
+            </a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Metrics
+            </a>
+</div>
+<!-- Footer Navigation -->
+<div class="mt-auto flex flex-col gap-2 font-body-md text-body-md border-t border-white/10 pt-4">
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+                System Config
+            </a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-64 h-screen flex flex-col relative">
+<!-- Top Context Bar (Workspace Header) -->
+<header class="h-header-height px-container-padding-lg flex items-center justify-between border-b border-olive-light/10 bg-surface/50 backdrop-blur-md z-10 shrink-0">
+<div class="flex items-center gap-4">
+<div class="font-mono-micro text-mono-micro text-olive-light bg-surface-variant px-2 py-1 rounded">TRP-8924-JP</div>
+<h2 class="font-headline-sm text-headline-sm text-primary">Kyoto Autumn Residency</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-ochre-light animate-pulse"></span>
+<span class="font-label-ui text-label-ui text-on-surface-variant">2 Pending Revisions</span>
+</div>
+<button class="bg-primary text-white font-label-ui text-label-ui px-4 py-2 rounded-lg hover:bg-olive-light transition-colors duration-200 shadow-sm">
+                    Publish Changes
+                </button>
+</div>
+</header>
+<!-- Split Workspace -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Pane: Traveler Anchors -->
+<aside class="w-1/3 min-w-[320px] max-w-[400px] border-r border-olive-light/10 bg-glass-light overflow-y-auto custom-scrollbar p-container-padding-sm flex flex-col gap-section-gap">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-primary">Client Anchors</h3>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-size: 18px;">filter_list</span>
+</button>
+</div>
+<!-- Preference Card 1 -->
+<div class="bg-surface rounded-xl p-card-padding border border-white/20 acrylic-shadow">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2 text-olive-light">
+<span class="material-symbols-outlined" style="font-size: 16px;">restaurant</span>
+<span class="font-label-ui text-label-ui uppercase tracking-wide">Culinary</span>
+</div>
+<span class="font-mono-micro text-mono-micro bg-error-container text-on-error-container px-2 py-0.5 rounded">HARD CONSTRAINT</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mb-2">Severe shellfish allergy. Requires strict cross-contamination protocols.</p>
+<div class="h-px w-full bg-olive-light/10 my-3"></div>
+<p class="font-body-md text-body-md text-on-surface-variant italic">"We cannot risk eating at any traditional sushi counter unless they are explicitly warned in advance."</p>
+</div>
+<!-- Preference Card 2 -->
+<div class="bg-surface rounded-xl p-card-padding border border-white/20 acrylic-shadow">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2 text-olive-light">
+<span class="material-symbols-outlined" style="font-size: 16px;">directions_walk</span>
+<span class="font-label-ui text-label-ui uppercase tracking-wide">Pacing</span>
+</div>
+<span class="font-mono-micro text-mono-micro bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded">PREFERENCE</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mb-2">Max 2 scheduled activities per day. Requires afternoon downtime.</p>
+<div class="mt-3 flex gap-2">
+<span class="px-2 py-1 bg-surface-variant rounded font-mono-micro text-mono-micro text-on-surface-variant">SLOW MORNINGS</span>
+<span class="px-2 py-1 bg-surface-variant rounded font-mono-micro text-mono-micro text-on-surface-variant">LATE DINNERS</span>
+</div>
+</div>
+<!-- Preference Card 3 -->
+<div class="bg-surface rounded-xl p-card-padding border border-white/20 acrylic-shadow">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2 text-olive-light">
+<span class="material-symbols-outlined" style="font-size: 16px;">hotel</span>
+<span class="font-label-ui text-label-ui uppercase tracking-wide">Lodging</span>
+</div>
+<span class="font-mono-micro text-mono-micro bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded">FLEXIBLE</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mb-2">Prefers boutique ryokans over large western chains, but requires western bedding (no futons on tatami).</p>
+</div>
+</aside>
+<!-- Right Pane: Timeline Editor -->
+<section class="flex-1 bg-surface-container-lowest/50 overflow-y-auto custom-scrollbar p-container-padding-lg relative">
+<div class="max-w-3xl mx-auto pb-32"> <!-- Padding bottom for validation bar -->
+<h3 class="font-headline-lg text-headline-lg text-primary mb-8 border-b border-olive-light/10 pb-4">Day 3: Arashiyama Focus</h3>
+<!-- Timeline Item 1: Standard -->
+<div class="relative pl-8 mb-section-gap group">
+<!-- Timeline Line -->
+<div class="absolute left-[11px] top-8 bottom-[-24px] w-0.5 bg-olive-light/20 group-last:hidden"></div>
+<!-- Timeline Node -->
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-olive-light bg-surface flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-olive-light"></div>
+</div>
+<!-- Card Content -->
+<div class="glass-panel-light rounded-xl p-card-padding acrylic-shadow transition-transform duration-200 hover:-translate-y-1">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<span class="font-mono-technical text-mono-technical text-on-surface-variant">09:00 - 11:30</span>
+<span class="font-mono-micro text-mono-micro bg-surface-variant px-2 py-0.5 rounded uppercase tracking-widest text-on-surface">Confirmed</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary">Private Bamboo Grove Walk &amp; Tenryu-ji</h4>
+</div>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Guided early access walk to avoid crowds, followed by a private tea ceremony in the temple gardens.</p>
+<div class="flex items-center gap-4 text-olive-light bg-surface-container py-2 px-3 rounded-lg w-fit">
+<div class="flex items-center gap-1 font-label-ui text-label-ui">
+<span class="material-symbols-outlined" style="font-size: 16px;">directions_walk</span>
+                                    Moderate Activity
+                                </div>
+<div class="w-px h-4 bg-olive-light/30"></div>
+<div class="flex items-center gap-1 font-label-ui text-label-ui">
+<span class="material-symbols-outlined" style="font-size: 16px;">groups</span>
+                                    Guide: Tanaka-san
+                                </div>
+</div>
+</div>
+</div>
+<!-- Timeline Item 2: Overridden / Warning (Ochre Accents) -->
+<div class="relative pl-8 mb-section-gap group">
+<!-- Timeline Line -->
+<div class="absolute left-[11px] top-8 bottom-[-24px] w-0.5 bg-ochre-light/50 border-dashed border-r border-ochre-light/50 group-last:hidden"></div>
+<!-- Timeline Node -->
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-ochre-light bg-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-ochre-light" style="font-size: 14px; font-weight: 700;">priority_high</span>
+</div>
+<!-- Card Content -->
+<div class="bg-surface rounded-xl p-card-padding premium-shadow border-2 border-ochre-light/50 relative overflow-hidden">
+<!-- Warning Banner -->
+<div class="absolute top-0 left-0 right-0 bg-ochre-light/10 border-b border-ochre-light/20 py-1.5 px-card-padding flex items-center gap-2">
+<span class="material-symbols-outlined text-ochre-dark" style="font-size: 14px;">warning</span>
+<span class="font-mono-micro text-mono-micro text-ochre-dark">LOGISTICAL OVERRIDE REQUIRED</span>
+</div>
+<div class="pt-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<span class="font-mono-technical text-mono-technical text-on-surface-variant">12:30 - 14:00</span>
+<span class="font-mono-micro text-mono-micro bg-ochre-light/20 text-ochre-dark px-2 py-0.5 rounded uppercase tracking-widest">In Revision</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary">Lunch: Yudofu Sagano</h4>
+</div>
+<button class="text-outline hover:text-ochre-dark transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-through opacity-70">Traditional tofu tasting menu overlooking the river.</p>
+<!-- Editor Input Area -->
+<div class="bg-surface-container-lowest border border-ochre-light/30 rounded-lg p-4 mb-4">
+<label class="block font-label-ui text-label-ui text-ochre-dark mb-2">Editor Note: Shellfish Conflict</label>
+<p class="font-body-md text-body-md text-on-surface mb-3">Restaurant uses dashi (often containing hidden shellfish derivatives) in nearly all dishes. Unsafe for client anchor constraint.</p>
+<div class="relative">
+<input class="w-full bg-surface-variant border-none rounded-md py-2 pl-10 pr-4 font-body-md focus:ring-2 focus:ring-ochre-light outline-none text-on-surface" placeholder="Search alternate dining (No Shellfish)..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant" style="font-size: 18px;">search</span>
+</div>
+<!-- Suggested Alternatives -->
+<div class="mt-3 flex gap-2">
+<button class="px-3 py-1.5 border border-olive-light/20 rounded-md font-label-ui text-label-ui text-primary hover:bg-olive-light/5 flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">add</span>
+                                            Arashiyama Yoshimura (Soba)
+                                        </button>
+<button class="px-3 py-1.5 border border-olive-light/20 rounded-md font-label-ui text-label-ui text-primary hover:bg-olive-light/5 flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">add</span>
+                                            Shigetsu (Vegan Shojin Ryori)
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Timeline Item 3: Standard -->
+<div class="relative pl-8 mb-section-gap group">
+<!-- Timeline Node -->
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-olive-light bg-surface flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-olive-light"></div>
+</div>
+<!-- Card Content -->
+<div class="glass-panel-light rounded-xl p-card-padding acrylic-shadow opacity-70 hover:opacity-100 transition-opacity duration-200">
+<div class="flex justify-between items-start mb-2">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<span class="font-mono-technical text-mono-technical text-on-surface-variant">15:00 - 18:00</span>
+<span class="font-mono-micro text-mono-micro bg-surface-variant px-2 py-0.5 rounded uppercase tracking-widest text-on-surface">Downtime</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary">Return to Ryokan &amp; Rest</h4>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic">Aligns with pacing preference: Afternoon downtime.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Bottom Validation Bar -->
+<div class="absolute bottom-0 right-0 left-0 md:left-64 bg-glass-dark border-t border-white/10 p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-20 flex justify-between items-center backdrop-blur-xl">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-ochre-light" style="font-size: 20px;">rule</span>
+<span class="font-label-ui text-label-ui text-white tracking-wide">LOGISTICAL CHECKS</span>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-error/20 border border-error/30">
+<span class="material-symbols-outlined text-error-container" style="font-size: 14px;">error</span>
+<span class="font-mono-micro text-mono-micro text-error-container">1 CONFLICT</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-tint/30 border border-surface-tint/50">
+<span class="material-symbols-outlined text-primary-fixed" style="font-size: 14px;">check_circle</span>
+<span class="font-mono-micro text-mono-micro text-primary-fixed">TRANSIT FEASIBLE</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-tint/30 border border-surface-tint/50">
+<span class="material-symbols-outlined text-primary-fixed" style="font-size: 14px;">check_circle</span>
+<span class="font-mono-micro text-mono-micro text-primary-fixed">PACING MET</span>
+</div>
+</div>
+</div>
+<button class="bg-ochre-light text-primary font-label-ui text-label-ui px-6 py-2.5 rounded-lg hover:bg-white transition-colors duration-200 shadow-lg flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 18px;">auto_awesome</span>
+                Resolve Conflicts
+            </button>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,220 @@
+<!-- 1.3 Smart Logistical Cards -->
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rumia - Smart Logistical Cards</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@500;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#ffddb5",
+                        "on-secondary-fixed": "#2a1800",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#e0f6e7",
+                        "on-primary-fixed": "#0c1f16",
+                        "tertiary-fixed-dim": "#c8c6c2",
+                        "glass-dark": "rgba(43, 62, 52, 0.85)",
+                        "primary-container": "#2b3e34",
+                        "surface-tint": "#4f6358",
+                        "on-secondary-container": "#784d00",
+                        "ochre-dark": "#CE933F",
+                        "on-tertiary-fixed": "#1c1c1a",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#0c1f16",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#d7eedf",
+                        "secondary-fixed-dim": "#f9bb68",
+                        "background": "#e8fff0",
+                        "on-primary-container": "#94a99c",
+                        "on-surface-variant": "#424844",
+                        "on-tertiary-container": "#a5a3a0",
+                        "surface-dim": "#c9dfd1",
+                        "surface-bright": "#e8fff0",
+                        "error": "#ba1a1a",
+                        "surface": "#e8fff0",
+                        "primary-fixed": "#d2e8d9",
+                        "inverse-surface": "#22342b",
+                        "secondary": "#825505",
+                        "linen-dark": "#EFECE6",
+                        "primary": "#16281f",
+                        "glass-light": "rgba(255, 255, 255, 0.65)",
+                        "primary-fixed-dim": "#b6ccbe",
+                        "grid-pattern": "rgba(43, 62, 52, 0.1)",
+                        "surface-container-highest": "#d2e8d9",
+                        "on-error": "#ffffff",
+                        "olive-light": "#3C5447",
+                        "outline": "#737874",
+                        "surface-container": "#ddf3e5",
+                        "outline-variant": "#c2c8c2",
+                        "on-background": "#0c1f16",
+                        "tertiary-container": "#3a3a37",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#242422",
+                        "surface-variant": "#d2e8d9",
+                        "on-tertiary-fixed-variant": "#474744",
+                        "on-secondary-fixed-variant": "#643f00",
+                        "tertiary-fixed": "#e5e2de",
+                        "on-primary-fixed-variant": "#384b41",
+                        "olive-dark": "#1D2A23",
+                        "inverse-primary": "#b6ccbe",
+                        "surface-container-low": "#e3f9ea",
+                        "ochre-light": "#EAB875",
+                        "secondary-container": "#ffc16d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "24px",
+                        "base": "4px",
+                        "container-padding-lg": "32px",
+                        "header-height": "64px",
+                        "card-padding": "20px",
+                        "gutter": "16px",
+                        "container-padding-sm": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "mono-micro": ["JetBrains Mono"],
+                        "label-ui": ["Inter"],
+                        "headline-sm": ["Playfair Display"],
+                        "display-mobile": ["Playfair Display"],
+                        "display": ["Playfair Display"],
+                        "mono-technical": ["JetBrains Mono"],
+                        "headline-lg": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "mono-micro": ["10px", { "lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "label-ui": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-mobile": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "mono-technical": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "40px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel-light {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .deep-shadow {
+            box-shadow: 0 25px 50px -12px rgba(29, 42, 35, 0.25);
+        }
+        .hover-pull {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-pull:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen text-on-background relative overflow-hidden flex flex-col justify-center items-center p-container-padding-sm md:p-container-padding-lg">
+<!-- Deep Map Blur Background -->
+<div class="absolute inset-0 z-0 overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center transform scale-105" data-alt="A softly blurred, high-altitude view of a complex city road network and transit lines. The scene is bathed in a bright, ethereal light mode aesthetic, featuring a subtle interplay of muted earthy tones, soft whites, and light olive greens. The overall mood is calm, modern, and navigational, suggesting seamless travel logistics. Designed for a premium glassmorphism interface background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB6Qi9IH29YcTjFt1DNaB7gerD5GDk9VVHttBTrInDCfvzuGY4-w-P5vvDtvvuVUhxGp54zl3_hXTCBALfXuWyC5BURm0JyDv-fmpY5iAKqM1hUxWbIr2phajWDIaJ9vBvQzh50CYfdlBtTgSY0TxdqhHlFeDSqs8nkKYPuu0bJIxALaty1u0VBoIFCDUSVex1jvM0zOb56SfYN_GCf8qESphp5m-xqArf85ZOlH9OaqkpNrg4j2rng9wiErUA4_KMLNc2b-BVOl4-T'); filter: blur(12px) brightness(1.05);">
+</div>
+<div class="absolute inset-0 bg-glass-light/30"></div>
+</div>
+<!-- Main Card Container -->
+<main class="relative z-10 w-full max-w-2xl mx-auto">
+<div class="glass-panel-light rounded-xl p-8 md:p-12 deep-shadow flex flex-col gap-8">
+<!-- Header Section -->
+<header class="text-center">
+<div class="inline-block px-3 py-1 bg-olive-light/10 rounded-full mb-4">
+<span class="font-mono-micro text-mono-micro text-olive-dark uppercase tracking-widest">Logistics</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary mb-2">Will you rent a car?</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">We'll tailor your itinerary based on your mobility preferences.</p>
+</header>
+<!-- Dual Option Tiles -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- Option 1: Yes -->
+<button class="group relative flex flex-col items-center justify-center p-6 bg-surface-container-lowest/80 border border-olive-light/10 rounded-lg hover:border-ochre-light hover:bg-surface-container-lowest transition-all duration-300 hover-pull overflow-hidden" onclick="selectOption(this)">
+<div class="absolute inset-0 bg-ochre-light/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-4xl text-olive-dark mb-4 group-hover:text-ochre-dark transition-colors" data-icon="car_rental">car_rental</span>
+<span class="font-label-ui text-label-ui text-primary mb-1">Yes, airport pickup</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-center text-sm">Flexible exploration</span>
+<div class="absolute top-4 right-4 opacity-0 group-[.selected]:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-ochre-dark" data-icon="check_circle">check_circle</span>
+</div>
+</button>
+<!-- Option 2: No -->
+<button class="group relative flex flex-col items-center justify-center p-6 bg-surface-container-lowest/80 border border-olive-light/10 rounded-lg hover:border-ochre-light hover:bg-surface-container-lowest transition-all duration-300 hover-pull overflow-hidden" onclick="selectOption(this)">
+<div class="absolute inset-0 bg-ochre-light/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-4xl text-olive-dark mb-4 group-hover:text-ochre-dark transition-colors" data-icon="directions_transit">directions_transit</span>
+<span class="font-label-ui text-label-ui text-primary mb-1">No, transit &amp; walking</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-center text-sm">City immersion</span>
+<div class="absolute top-4 right-4 opacity-0 group-[.selected]:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-ochre-dark" data-icon="check_circle">check_circle</span>
+</div>
+</button>
+</div>
+<!-- Action Area -->
+<div class="flex justify-between items-center mt-4 pt-6 border-t border-olive-dark/10">
+<button class="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_back">arrow_back</span>
+                    Back
+                </button>
+<button class="bg-olive-dark text-on-primary font-label-ui text-label-ui px-6 py-3 rounded-lg hover:bg-primary transition-colors duration-200 hover-pull shadow-sm flex items-center gap-2" disabled="" id="continueBtn">
+                    Continue
+                    <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</main>
+<script>
+        function selectOption(element) {
+            // Remove selected class from all buttons in the grid
+            const buttons = element.parentElement.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.classList.remove('selected', 'border-ochre-light', 'bg-surface-container-lowest');
+                btn.classList.add('border-olive-light/10', 'bg-surface-container-lowest/80');
+                
+                // Reset icon color
+                const icon = btn.querySelector('.text-4xl');
+                if(icon) {
+                     icon.classList.remove('text-ochre-dark');
+                     icon.classList.add('text-olive-dark');
+                }
+            });
+
+            // Add selected class to clicked button
+            element.classList.add('selected', 'border-ochre-light', 'bg-surface-container-lowest');
+            element.classList.remove('border-olive-light/10', 'bg-surface-container-lowest/80');
+            
+            // Highlight icon
+            const icon = element.querySelector('.text-4xl');
+            if(icon) {
+                 icon.classList.remove('text-olive-dark');
+                 icon.classList.add('text-ochre-dark');
+            }
+
+            // Enable continue button
+            const continueBtn = document.getElementById('continueBtn');
+            continueBtn.removeAttribute('disabled');
+            continueBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    </script>
+</body></html>

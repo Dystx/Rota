@@ -1,0 +1,366 @@
+<!-- 1.4 Dynamic Workspace (Itinerary) -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rumia - Itineraries</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error-container": "#93000a",
+                      "secondary-fixed": "#ffddb5",
+                      "on-secondary-fixed": "#2a1800",
+                      "error-container": "#ffdad6",
+                      "inverse-on-surface": "#e0f6e7",
+                      "on-primary-fixed": "#0c1f16",
+                      "tertiary-fixed-dim": "#c8c6c2",
+                      "glass-dark": "rgba(43, 62, 52, 0.85)",
+                      "primary-container": "#2b3e34",
+                      "surface-tint": "#4f6358",
+                      "on-secondary-container": "#784d00",
+                      "ochre-dark": "#CE933F",
+                      "on-tertiary-fixed": "#1c1c1a",
+                      "on-secondary": "#ffffff",
+                      "on-surface": "#0c1f16",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#d7eedf",
+                      "secondary-fixed-dim": "#f9bb68",
+                      "background": "#e8fff0",
+                      "on-primary-container": "#94a99c",
+                      "on-surface-variant": "#424844",
+                      "on-tertiary-container": "#a5a3a0",
+                      "surface-dim": "#c9dfd1",
+                      "surface-bright": "#e8fff0",
+                      "error": "#ba1a1a",
+                      "surface": "#e8fff0",
+                      "primary-fixed": "#d2e8d9",
+                      "inverse-surface": "#22342b",
+                      "secondary": "#825505",
+                      "linen-dark": "#EFECE6",
+                      "primary": "#16281f",
+                      "glass-light": "rgba(255, 255, 255, 0.65)",
+                      "primary-fixed-dim": "#b6ccbe",
+                      "grid-pattern": "rgba(43, 62, 52, 0.1)",
+                      "surface-container-highest": "#d2e8d9",
+                      "on-error": "#ffffff",
+                      "olive-light": "#3C5447",
+                      "outline": "#737874",
+                      "surface-container": "#ddf3e5",
+                      "outline-variant": "#c2c8c2",
+                      "on-background": "#0c1f16",
+                      "tertiary-container": "#3a3a37",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#242422",
+                      "surface-variant": "#d2e8d9",
+                      "on-tertiary-fixed-variant": "#474744",
+                      "on-secondary-fixed-variant": "#643f00",
+                      "tertiary-fixed": "#e5e2de",
+                      "on-primary-fixed-variant": "#384b41",
+                      "olive-dark": "#1D2A23",
+                      "inverse-primary": "#b6ccbe",
+                      "surface-container-low": "#e3f9ea",
+                      "ochre-light": "#EAB875",
+                      "secondary-container": "#ffc16d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "24px",
+                      "base": "4px",
+                      "container-padding-lg": "32px",
+                      "header-height": "64px",
+                      "card-padding": "20px",
+                      "gutter": "16px",
+                      "container-padding-sm": "24px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "mono-micro": [
+                              "JetBrains Mono"
+                      ],
+                      "label-ui": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Playfair Display"
+                      ],
+                      "display-mobile": [
+                              "Playfair Display"
+                      ],
+                      "display": [
+                              "Playfair Display"
+                      ],
+                      "mono-technical": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Playfair Display"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "mono-micro": [
+                              "10px",
+                              {
+                                      "lineHeight": "12px",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-ui": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-mobile": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display": [
+                              "72px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "mono-technical": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+          .glass-panel-light {
+              background-color: rgba(255, 255, 255, 0.65);
+              backdrop-filter: blur(24px);
+              -webkit-backdrop-filter: blur(24px);
+              border: 1px solid rgba(255, 255, 255, 0.4);
+              box-shadow: 0 4px 30px rgba(29, 42, 35, 0.1);
+          }
+          
+          .glass-panel-dark {
+              background-color: rgba(43, 62, 52, 0.85);
+              backdrop-filter: blur(24px);
+              -webkit-backdrop-filter: blur(24px);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              box-shadow: 0 10px 40px rgba(29, 42, 35, 0.3);
+          }
+          
+          .scrollbar-hide::-webkit-scrollbar {
+              display: none;
+          }
+          .scrollbar-hide {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+          }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md h-screen w-screen overflow-hidden flex flex-col relative">
+<!-- Full Bleed Map Background -->
+<div class="absolute inset-0 z-0 bg-surface-container w-full h-full">
+<!-- Placeholder for actual map integration (e.g. Mapbox/Google Maps) -->
+<img alt="Map of Kyoto" class="w-full h-full object-cover opacity-80" data-alt="A highly detailed, aesthetically pleasing digital map of Kyoto, Japan, rendered in a light mode color palette with soft olive greens, gentle creams, and crisp white lines. The map emphasizes topography, winding rivers, and key historical landmarks. The lighting is bright and diffuse, creating a serene, modern, and premium travel aesthetic consistent with high-end editorial design." data-location="Kyoto, Japan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjgZsYyY9vVhfpF-YBuqVqPu7E1neqjdQ7wWXrAr_2F2o9TF8nfOwlFOJx0Cr1xJv37-kZzzyE7zJ-61R5DT6yWzbd1iL-TMpypzaVw9hTrAF2JVctC-2_8cPD3V7V1HdyScHV6IbqBdJAu0XWxlBAszPPkbMRTP9sWZUBjB6ts5y1gENDLDR4zCbz8QTeyB7FKeA3Alk7zTT2t5pxMFBfLnECNLORbOfEDh6pOC0zwuD9E_TWoBp7bGmjUe5shisW12LVR3dHphEj"/>
+<!-- Interactive Map Pins (Simulated) -->
+<div class="absolute top-[30%] left-[45%] flex flex-col items-center cursor-pointer group">
+<div class="w-8 h-8 rounded-full bg-olive-dark text-white flex items-center justify-center shadow-lg border-2 border-white transform transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">temple_buddhist</span>
+</div>
+<div class="mt-2 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm text-xs font-label-ui text-primary opacity-0 group-hover:opacity-100 transition-opacity">Kinkaku-ji</div>
+</div>
+<div class="absolute top-[50%] left-[60%] flex flex-col items-center cursor-pointer group">
+<div class="w-8 h-8 rounded-full bg-ochre-dark text-white flex items-center justify-center shadow-lg border-2 border-white transform transition-transform group-hover:scale-110 z-10">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<div class="mt-2 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm text-xs font-label-ui text-primary opacity-0 group-hover:opacity-100 transition-opacity">Kikunoi Honten</div>
+</div>
+</div>
+<!-- Top Nav Bar (from Shared Components) -->
+<header class="bg-glass-light/65 dark:bg-glass-dark/85 backdrop-blur-md fixed top-0 w-full border-b border-white/20 dark:border-olive-dark/10 shadow-sm flex justify-between items-center h-header-height px-container-padding-lg max-w-full mx-auto z-50">
+<div class="font-headline-lg text-headline-lg italic text-primary dark:text-primary-fixed">Rumia</div>
+<nav class="hidden md:flex gap-8 font-headline-sm text-headline-sm font-label-ui text-label-ui">
+<!-- Active Navigation -->
+<a class="text-ochre-light dark:text-ochre-dark border-b-2 border-ochre-light dark:border-ochre-dark pb-1 scale-95 active:opacity-80 transition-all" href="#">Itineraries</a>
+<!-- Inactive Navigation -->
+<a class="text-on-surface-variant dark:text-on-primary-container hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200 scale-95 active:opacity-80 transition-all" href="#">Expert Chat</a>
+<a class="text-on-surface-variant dark:text-on-primary-container hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200 scale-95 active:opacity-80 transition-all" href="#">Vault</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="bg-olive-light text-on-primary px-4 py-2 rounded-lg font-label-ui text-label-ui hover:bg-olive-dark transition-colors duration-200">Plan a Trip</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-white/20 shadow-sm">
+<img alt="Traveler profile avatar" class="w-full h-full object-cover" data-alt="A portrait of a confident, stylish traveler, bathed in soft, natural morning light. The traveler is looking slightly off-camera with a serene expression. The background is a beautifully blurred, light, airy aesthetic, fitting for a premium lifestyle and travel brand. The color palette focuses on soft creams, olive greens, and warm skin tones, ensuring a high-end, editorial feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCR0IueJNGBrIvO5rQJkn4EmRGfNMUFs7TqMuzJNQv0hVNiWDpK-xKuJVQI1Lsowhgj56odaSWqyWImGwWIT_av8IhR7oUeFBo5fOd3vDwgJspT1CMQNZMxVWounhyLh16djl6UGlgNTnoegULiSW95ILa2XlwKsDn_QTK8HbNKHZzzGKog5fu7QF-qCWlsKStloOvAKGS3dtJTzlFEJ4wRGms5X4GROcbD8tb5hQJhB1luj9Yr0vuKFagbfEq1TYIXuzeeD4p2P24k"/>
+</div>
+</div>
+</header>
+<!-- Main Workspace Content Overlay -->
+<main class="flex-1 flex flex-col justify-between mt-header-height z-10 p-container-padding-lg relative pointer-events-none">
+<!-- Top Controls / Refinements -->
+<div class="flex justify-between items-start pointer-events-auto w-full max-w-7xl mx-auto">
+<!-- Itinerary Header Panel -->
+<div class="glass-panel-light p-card-padding rounded-xl w-full md:w-96 flex flex-col gap-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-mono-micro text-mono-micro bg-olive-light/10 text-olive-dark px-2 py-1 rounded-sm uppercase tracking-wider">Day 3 of 7</span>
+<span class="font-mono-micro text-mono-micro bg-secondary-container/20 text-secondary-fixed-variant px-2 py-1 rounded-sm uppercase tracking-wider">Kyoto</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary">The Artisan's Path</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Exploring Higashiyama's hidden workshops and quiet garden sanctuaries.</p>
+</div>
+<div class="h-px w-full bg-gradient-to-r from-transparent via-olive-dark/10 to-transparent"></div>
+<!-- Refinement Toggles -->
+<div class="flex flex-col gap-3">
+<span class="font-label-ui text-label-ui text-on-surface-variant uppercase tracking-wider">Pace &amp; Tone</span>
+<div class="flex flex-wrap gap-2">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-ochre-light bg-ochre-light/10 text-ochre-dark font-label-ui text-label-ui hover:bg-ochre-light/20 transition-colors">
+<span class="material-symbols-outlined text-[16px]">self_improvement</span>
+                            Relaxed
+                        </button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-outline-variant bg-white/50 text-on-surface-variant font-label-ui text-label-ui hover:bg-white/80 transition-colors">
+<span class="material-symbols-outlined text-[16px]">directions_walk</span>
+                            Active
+                        </button>
+</div>
+<div class="flex flex-wrap gap-2 mt-2">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-ochre-light bg-ochre-light/10 text-ochre-dark font-label-ui text-label-ui hover:bg-ochre-light/20 transition-colors">
+<span class="material-symbols-outlined text-[16px]">diamond</span>
+                            Hidden Gems
+                        </button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-outline-variant bg-white/50 text-on-surface-variant font-label-ui text-label-ui hover:bg-white/80 transition-colors">
+<span class="material-symbols-outlined text-[16px]">tour</span>
+                            Classics
+                        </button>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="hidden md:flex flex-col gap-2">
+<button class="w-12 h-12 rounded-full glass-panel-light flex items-center justify-center text-primary hover:text-ochre-dark transition-colors shadow-sm">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="w-12 h-12 rounded-full glass-panel-light flex items-center justify-center text-primary hover:text-ochre-dark transition-colors shadow-sm">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<!-- Horizontal Filmstrip Cards (Bottom) -->
+<div class="w-full mt-auto mb-section-gap pointer-events-auto">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-4 px-container-padding-lg drop-shadow-md">Today's Stops</h2>
+<!-- Scrollable Container -->
+<div class="flex gap-gutter overflow-x-auto scrollbar-hide px-container-padding-lg pb-4 snap-x snap-mandatory">
+<!-- Stop Card 1 -->
+<div class="min-w-[300px] w-[300px] glass-panel-light rounded-xl overflow-hidden shadow-sm flex flex-col snap-center group cursor-pointer hover:-translate-y-1 transition-transform duration-300">
+<div class="h-32 w-full relative">
+<img alt="Zen Garden" class="w-full h-full object-cover" data-alt="A serene, high-quality photograph of a traditional Japanese zen garden in Kyoto, viewed from an engawa (wooden veranda). Meticulously raked white gravel surrounds carefully placed moss-covered stones. The lighting is soft and diffused, creating a peaceful, contemplative mood. The aesthetic is clean, modern, and perfectly aligned with a luxury travel brand's editorial style, utilizing earthy greens and soft whites." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO1BjUtGEnrDTMg2uYRmfuq53UdabGh5YFz-O-PoifvC4SWd0P1_X35SGmfb9iEZbmZ9NKgZL1hlx-kRQoxj-IhPJYiwy7AnY4C0Tuq978r5qnczu1ikuhU-wbPsAwhG92QpqYzIkTlmh9uej3RuHueEPx-cGj0fC8TCmgeh33Kj3kImu1_D7i33bv7KttBoeYGuYP768ozQb4bfcVPbnpZRGIfCKupyxlIAAQHRtcEpjkK_bnhYSy-NMVQ0jPZI_KDLOk_-hyOAHG"/>
+<div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-mono-micro text-mono-micro font-bold text-primary">09:00 AM</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-sm text-headline-sm text-primary leading-tight">Ryoan-ji Temple</h3>
+<button class="text-on-surface-variant hover:text-ochre-dark"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</div>
+<p class="font-label-ui text-label-ui text-on-surface-variant mb-3">Quiet contemplation at the famous rock garden.</p>
+<div class="mt-auto flex justify-between items-center border-t border-olive-dark/10 pt-3">
+<div class="flex items-center gap-1 text-on-surface-variant font-mono-micro text-mono-micro">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 1.5 hrs
+                            </div>
+<button class="text-ochre-dark font-label-ui text-label-ui hover:underline">Details</button>
+</div>
+</div>
+</div>
+<!-- Stop Card 2 (Active/Current) -->
+<div class="min-w-[300px] w-[300px] glass-panel-dark rounded-xl overflow-hidden shadow-2xl flex flex-col snap-center group cursor-pointer relative transform scale-[1.02] border-ochre-light/50">
+<div class="absolute top-0 left-0 w-full h-1 bg-ochre-light"></div>
+<div class="h-32 w-full relative">
+<img alt="Kaiseki Lunch" class="w-full h-full object-cover opacity-90" data-alt="An exquisite, close-up editorial shot of a multi-course Kaiseki meal served on beautiful artisanal ceramics. The setting is a traditional ryokan dining room with soft, warm lighting highlighting the textures and vibrant colors of the seasonal ingredients. The mood is refined and exclusive, utilizing a color palette of warm woods, deep olive tones, and bright pops of culinary color, reflecting premium intent." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzxqXW_jF4bwHYZv83gui0qt2LcW2c7L-_1C_h16onjN_jR6KoL1g-IReOImux4YKOkE1wFDDsU6p6wOlcsyU3HDF6S-FWw2FmS3bsZMI8mU1tNmhs-OomX_WSlpylNX21s6ovZRXRPmlrxNNPMy868lQmU1CBpzcy3xJ2agH8xC9Np5SnObyw4gIeh25LtBT7tVeBIwZJDctQp1FHbqDtPTU6t4cvveB5q1XsUk68JrRgUg13u_lZxaXp5rFDU05A0XXPClepZmHz"/>
+<div class="absolute top-2 left-2 bg-ochre-light/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-mono-micro text-mono-micro font-bold text-olive-dark">12:30 PM • NEXT</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-sm text-headline-sm text-linen-dark leading-tight">Kikunoi Honten</h3>
+<button class="text-primary-fixed-dim hover:text-ochre-light"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</div>
+<p class="font-label-ui text-label-ui text-primary-fixed-dim mb-3">Three-Michelin-starred Kaiseki experience.</p>
+<div class="mt-auto flex justify-between items-center border-t border-white/10 pt-3">
+<div class="flex items-center gap-1 text-primary-fixed-dim font-mono-micro text-mono-micro">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 2.0 hrs
+                            </div>
+<button class="bg-ochre-light text-olive-dark px-3 py-1 rounded-sm font-label-ui text-label-ui hover:bg-white transition-colors">Navigate</button>
+</div>
+</div>
+</div>
+<!-- Stop Card 3 -->
+<div class="min-w-[300px] w-[300px] glass-panel-light rounded-xl overflow-hidden shadow-sm flex flex-col snap-center group cursor-pointer hover:-translate-y-1 transition-transform duration-300">
+<div class="h-32 w-full relative">
+<img alt="Tea Ceremony" class="w-full h-full object-cover" data-alt="A beautifully composed photograph of a traditional Japanese tea house interior looking out onto a lush, green bamboo grove. The soft afternoon sunlight filters through shoji screens, casting gentle shadows on the tatami mats. The scene is calm, deeply authentic, and designed with a luxury lifestyle approach, featuring rich greens, warm woods, and soft, natural light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpPTvrxespKOpyz7rBrpL2wNYCeMKm_2w8e7RZO3_Q5pXJykjc2ozwShaxBLvYydFwjKuBPoKvxdxZpcK1QgMLt-TylnTnj4NFJadQlu4CkTufTe6e6MP5vyuaCpLg0mAvGEJDTWm4Xws-lgYK5LgVXZGecTgsGD8YBowTQTkKUhZnHfQESd42e7u_F1EvOsmUVFPmKUIKUH_g2-U6DpeGCGAy_MPBdGasa6JIMVM3WSBCDwWGRJRgiYk5Tqzcv62STqEcVtNNc03I"/>
+<div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-mono-micro text-mono-micro font-bold text-primary">03:00 PM</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-sm text-headline-sm text-primary leading-tight">Camellia Tea Ceremony</h3>
+<button class="text-on-surface-variant hover:text-ochre-dark"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</div>
+<p class="font-label-ui text-label-ui text-on-surface-variant mb-3">Private matcha preparation and tasting.</p>
+<div class="mt-auto flex justify-between items-center border-t border-olive-dark/10 pt-3">
+<div class="flex items-center gap-1 text-on-surface-variant font-mono-micro text-mono-micro">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 1.0 hr
+                            </div>
+<button class="text-ochre-dark font-label-ui text-label-ui hover:underline">Details</button>
+</div>
+</div>
+</div>
+<!-- Add Stop Button -->
+<div class="min-w-[150px] w-[150px] glass-panel-light rounded-xl overflow-hidden shadow-sm flex flex-col items-center justify-center snap-center cursor-pointer hover:bg-white/80 transition-colors border-dashed border-2 border-olive-dark/20">
+<span class="material-symbols-outlined text-4xl text-olive-light mb-2">add_circle</span>
+<span class="font-label-ui text-label-ui text-primary">Add Stop</span>
+</div>
+</div>
+</div>
+</main>
+</body></html>

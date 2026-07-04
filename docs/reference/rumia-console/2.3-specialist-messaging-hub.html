@@ -1,0 +1,499 @@
+<!-- 2.3 Specialist Messaging Hub -->
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Specialist Messaging Hub | Rumia</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@500;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error-container": "#93000a",
+                      "secondary-fixed": "#ffddb5",
+                      "on-secondary-fixed": "#2a1800",
+                      "error-container": "#ffdad6",
+                      "inverse-on-surface": "#e0f6e7",
+                      "on-primary-fixed": "#0c1f16",
+                      "tertiary-fixed-dim": "#c8c6c2",
+                      "glass-dark": "rgba(43, 62, 52, 0.85)",
+                      "primary-container": "#2b3e34",
+                      "surface-tint": "#4f6358",
+                      "on-secondary-container": "#784d00",
+                      "ochre-dark": "#CE933F",
+                      "on-tertiary-fixed": "#1c1c1a",
+                      "on-secondary": "#ffffff",
+                      "on-surface": "#0c1f16",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#d7eedf",
+                      "secondary-fixed-dim": "#f9bb68",
+                      "background": "#e8fff0",
+                      "on-primary-container": "#94a99c",
+                      "on-surface-variant": "#424844",
+                      "on-tertiary-container": "#a5a3a0",
+                      "surface-dim": "#c9dfd1",
+                      "surface-bright": "#e8fff0",
+                      "error": "#ba1a1a",
+                      "surface": "#e8fff0",
+                      "primary-fixed": "#d2e8d9",
+                      "inverse-surface": "#22342b",
+                      "secondary": "#825505",
+                      "linen-dark": "#EFECE6",
+                      "primary": "#16281f",
+                      "glass-light": "rgba(255, 255, 255, 0.65)",
+                      "primary-fixed-dim": "#b6ccbe",
+                      "grid-pattern": "rgba(43, 62, 52, 0.1)",
+                      "surface-container-highest": "#d2e8d9",
+                      "on-error": "#ffffff",
+                      "olive-light": "#3C5447",
+                      "outline": "#737874",
+                      "surface-container": "#ddf3e5",
+                      "outline-variant": "#c2c8c2",
+                      "on-background": "#0c1f16",
+                      "tertiary-container": "#3a3a37",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#242422",
+                      "surface-variant": "#d2e8d9",
+                      "on-tertiary-fixed-variant": "#474744",
+                      "on-secondary-fixed-variant": "#643f00",
+                      "tertiary-fixed": "#e5e2de",
+                      "on-primary-fixed-variant": "#384b41",
+                      "olive-dark": "#1D2A23",
+                      "inverse-primary": "#b6ccbe",
+                      "surface-container-low": "#e3f9ea",
+                      "ochre-light": "#EAB875",
+                      "secondary-container": "#ffc16d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "24px",
+                      "base": "4px",
+                      "container-padding-lg": "32px",
+                      "header-height": "64px",
+                      "card-padding": "20px",
+                      "gutter": "16px",
+                      "container-padding-sm": "24px"
+              },
+              "fontFamily": {
+                      "body-md": ["Inter"],
+                      "mono-micro": ["JetBrains Mono"],
+                      "label-ui": ["Inter"],
+                      "headline-sm": ["Playfair Display"],
+                      "display-mobile": ["Playfair Display"],
+                      "display": ["Playfair Display"],
+                      "mono-technical": ["JetBrains Mono"],
+                      "headline-lg": ["Playfair Display"]
+              },
+              "fontSize": {
+                      "body-md": ["14px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                      "mono-micro": ["10px", {"lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                      "label-ui": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "display-mobile": ["48px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                      "display": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "mono-technical": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "headline-lg": ["30px", {"lineHeight": "40px", "fontWeight": "700"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Base typography application */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e8fff0; /* background */
+            color: #0c1f16; /* on-background */
+        }
+        
+        /* Custom scrollbar for inner panels */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(60, 84, 71, 0.2);
+            border-radius: 10px;
+        }
+        
+        /* Drag and Drop visual feedback */
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        .drag-over {
+            background-color: rgba(234, 184, 117, 0.1); /* ochre-light tinted */
+            border: 2px dashed #EAB875;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen relative flex">
+<!-- Ambient Background Image (Cinematic imagery of global destination, blurred for UI focus) -->
+<div class="fixed inset-0 z-0 bg-cover bg-center opacity-40 blur-sm pointer-events-none" data-alt="A serene, high-key architectural photograph of a modern minimalist interior looking out over an ethereal, mist-covered mountain landscape in Kyoto. The lighting is soft and diffused, creating a calm, premium light-mode aesthetic with subtle olive and sage tones. Depth of field is shallow, rendering the background out of focus to serve as a perfect, non-distracting canvas for a glassmorphic user interface." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAzuUSpLY_qpMiZ-Z0grUYKktkoTiO8kWC9ir4bx4pfmPLiT6d3_SQSNzOQ739D9FFML1ReoKNHoJhZ-Di3IJN4xDKYrV9H3PEOwsjYR09nOgOr4ZY1JWOXHwDEOvkchgmhzA31cmnpDBrRySDVW2sDakngxkp0ZOmty7uYQRRMgSf7zgmGgcO3alIajUygLHt_rpSr60vKzDK5I5V_18_vm-FI_wxVNg4fj0cPG54nfv0wXE5swUGWOIBO9ETAASCh8o7h1JeCU-yX')">
+</div>
+<!-- SideNavBar (Shared Component) -->
+<nav class="fixed left-0 top-0 h-full w-64 bg-olive-dark/95 backdrop-blur-xl shadow-2xl flex flex-col py-section-gap px-gutter z-50">
+<!-- Header -->
+<div class="mb-8 px-3">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-ochre-light" data-weight="fill" style="font-variation-settings: 'FILL' 1;">travel_explore</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-ochre-light leading-tight">Rumia Console</h1>
+<p class="font-mono-micro text-mono-micro text-primary-fixed-dim uppercase tracking-wider">Management Portal</p>
+</div>
+</div>
+<button class="w-full mt-6 bg-linen-dark text-olive-dark font-label-ui text-label-ui py-2.5 rounded-lg shadow-sm hover:bg-white transition-colors duration-200 flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                New Entry
+            </button>
+</div>
+<!-- Primary Navigation -->
+<div class="flex-1 flex flex-col gap-2 font-body-md text-body-md text-linen-dark">
+<!-- Pipeline -->
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span>Pipeline</span>
+</a>
+<!-- Revision Workspace -->
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span>Revision Workspace</span>
+</a>
+<!-- Messaging Hub (ACTIVE) -->
+<a class="bg-primary-container text-ochre-light rounded-lg border-l-4 border-ochre-light p-3 flex items-center gap-3 duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble" data-weight="fill" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="font-semibold">Messaging Hub</span>
+</a>
+<!-- Knowledge Graph -->
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span>Knowledge Graph</span>
+</a>
+<!-- Metrics -->
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Metrics</span>
+</a>
+</div>
+<!-- Footer Navigation -->
+<div class="mt-auto border-t border-white/10 pt-4 flex flex-col gap-2 font-body-md text-body-md text-linen-dark">
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>System Config</span>
+</a>
+<a class="text-on-primary-container/70 p-3 flex items-center gap-3 hover:bg-primary-container/50 hover:text-linen-dark transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Logout</span>
+</a>
+<!-- Avatar block -->
+<div class="mt-4 flex items-center gap-3 px-3">
+<img alt="Specialist/Admin profile" class="w-8 h-8 rounded-full border border-white/20 object-cover" data-alt="A professional headshot of a travel specialist in a bright, modern office setting. The specialist is smiling warmly, wearing smart-casual attire. The lighting is soft and flattering, with a blurred background showing architectural elements and subtle greenery, fitting the intentional humanism and premium aesthetic of the brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2P4z_qH2YldwtiGD68jvLtRuUxodfj8u6lytvnmDMbPJhGkVOddozpjEejlFxjBMJKyr8PFjrt4895kmlJL3lNQae7MKNZVFCLXTOPE66tOnX96mOYHav8Xa_ZcWCsXqZ5tL0BKrDclLQBBveee6VXxkwYDjBQxL-_N-fwi5AwFWj-pNTM1LRrdUCDOmTy36GhXRrTQ9pmXC8jyclxBJx_TjBB6Vjd6dxz8HlAfsSW0ZtALzJdZrRxrubLUGB6I5fORTqnlefNt15"/>
+<div class="flex flex-col">
+<span class="font-label-ui text-label-ui text-linen-dark">S. Mercer</span>
+<span class="font-mono-micro text-mono-micro text-primary-fixed-dim">Lead Concierge</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Workspace Area -->
+<main class="ml-64 flex-1 h-screen flex p-container-padding-sm gap-gutter relative z-10 overflow-hidden">
+<!-- Column 1: Conversations List (Glass Panel) -->
+<aside class="w-[320px] flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
+<div class="p-4 border-b border-olive-light/10 flex justify-between items-center">
+<h2 class="font-headline-sm text-headline-sm text-primary">Active Threads</h2>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<!-- Search -->
+<div class="p-3 border-b border-olive-light/10 bg-surface-container-lowest/50">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">search</span>
+<input class="w-full bg-white/60 border-none rounded-lg pl-10 pr-4 py-2 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-ochre-light placeholder:text-outline-variant transition-shadow" placeholder="Search clients..." type="text"/>
+</div>
+</div>
+<!-- List -->
+<div class="flex-1 overflow-y-auto custom-scroll">
+<!-- Active Item -->
+<div class="p-4 bg-surface-container border-l-4 border-ochre-light cursor-pointer hover:bg-surface-container-high transition-colors">
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="A candid lifestyle portrait of a sophisticated female traveler in her late 30s, relaxing at an outdoor cafe in Europe. She wears chic, minimalist clothing. The image is bright, warm, and evokes a sense of relaxed luxury and discovery, aligning with the premium travel brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKf3jxQJAXvjl1RKI0ZWK3br3rzIZ9oykiogmnEMkWguG3Bg0eUfMU-rMMtLM8HCATSDgaik8DwgMhOHrJ12t0qoM0w9lgYtJhnt0AhxWQakWxtbgQ9N5Qi4_mf8rO3bEJd0alDdt8z_hXYd1zDmb9nhuOk-vJ4U53GS16gTAP2D105EwetjVC6u7Y4cwXGsnfBgYxOOV8qGjPaTN5TTETwoYjkFOmbh78tlHwdZPWBigOLQbHsDPtgMySnWR4XnPFAnVA_Rn_aabV"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+</div>
+<div>
+<h3 class="font-label-ui text-label-ui text-on-surface">Eleanor Vance</h3>
+<p class="font-mono-micro text-mono-micro text-primary mt-0.5 px-2 py-0.5 bg-primary/10 rounded-full inline-block">Kyoto, Japan</p>
+</div>
+</div>
+<span class="font-mono-micro text-mono-micro text-on-surface-variant">10:42 AM</span>
+</div>
+<p class="font-body-md text-[13px] text-on-surface-variant line-clamp-1 mt-2 pl-13">I'd love to add that tea ceremony to the itinerary.</p>
+</div>
+<!-- Inactive Item -->
+<div class="p-4 border-b border-olive-light/5 cursor-pointer hover:bg-white/40 transition-colors">
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="A portrait of a well-dressed older couple standing together in front of a majestic mountainous landscape. They appear happy and relaxed, embodying the spirit of comfortable, high-end adventure travel. The lighting is golden hour, casting a warm, premium glow over the scene." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgsyrbHlGrgtH_vxGmR2UAG--cS7RwxZsXE_6rnf02y95eLqoWsgSTxOf70JTXjN_-TtIkqAVuhicMIcAUj8uv2QZBcnGb9JP12s84YvkB7EoWNY9QdWQvbjtP24vAL8kyrvE67fFUTQwzMELAFcU3SZLSEejvPuVEgh-CqyeOUiZJoFxpCt8RERb6yXnQZaysXG4MSRmfWoNg-_L_byYaJ0Zf2AlIsyc2YH8cmJMcyiDfEf8gvO5D3OOrBRGi07at6vZOP3_6k5-W"/>
+<div>
+<h3 class="font-label-ui text-label-ui text-on-surface">The Hasting Family</h3>
+<p class="font-mono-micro text-mono-micro text-outline mt-0.5">Tuscany, Italy</p>
+</div>
+</div>
+<span class="font-mono-micro text-mono-micro text-outline">Yesterday</span>
+</div>
+<p class="font-body-md text-[13px] text-outline-variant line-clamp-1 mt-2">Could you confirm the car transfer?</p>
+</div>
+</div>
+</aside>
+<!-- Column 2: Chat Terminal (Widest, Center) -->
+<section class="flex-1 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
+<!-- Terminal Header -->
+<header class="px-6 py-4 border-b border-olive-light/10 bg-white/40 flex justify-between items-center backdrop-blur-sm">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="Same image as previous: A candid lifestyle portrait of a sophisticated female traveler in her late 30s, relaxing at an outdoor cafe in Europe. She wears chic, minimalist clothing. The image is bright, warm, and evokes a sense of relaxed luxury and discovery, aligning with the premium travel brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1jUPks2Fat64I1vaZ5HOcIxiSb7lEYjbxvnAcbyg47o_EBGzkv1jpIkfb7ysLSyF_TO7fxMbicy5EqA1OiTl4EyBIHdwLubr0N_NqZqZBCP2FZh5iUHANSuxX9oLkvIU0kNpwUURAzq1ddP4G_pxVZ1vFw5_fHnzjn-6j7pncjeZq6yzFnX2-xDF5Zgfn2GIHOCE-_Fy4JkW0n97hBh8ti3DO6n5H8us9TqFfABFbHlcmB1q3mvstbZyqxCrdHz9sazkNOrhWTgLg"/>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary">Eleanor Vance</h2>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="font-label-ui text-label-ui text-on-surface-variant">Online</span>
+<span class="text-outline-variant mx-1">•</span>
+<span class="font-mono-micro text-mono-micro text-on-secondary-container bg-secondary-container/20 px-2 py-0.5 rounded uppercase tracking-wide">Status: Planning</span>
+</div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-full hover:bg-black/5 text-on-surface-variant transition-colors" title="View Full Profile">
+<span class="material-symbols-outlined">person</span>
+</button>
+<button class="p-2 rounded-full hover:bg-black/5 text-on-surface-variant transition-colors" title="Open Itinerary">
+<span class="material-symbols-outlined">map</span>
+</button>
+</div>
+</header>
+<!-- Chat History Area -->
+<div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scroll" id="chat-history">
+<!-- Date Divider -->
+<div class="flex justify-center">
+<span class="font-mono-micro text-mono-micro text-outline-variant uppercase tracking-widest bg-white/50 px-3 py-1 rounded-full backdrop-blur-sm">Today</span>
+</div>
+<!-- Specialist Message (Outgoing) -->
+<div class="flex gap-4 justify-end">
+<div class="max-w-[70%]">
+<div class="bg-primary-container text-on-primary rounded-2xl rounded-tr-sm p-4 shadow-sm">
+<p class="font-body-md text-body-md">Good morning, Eleanor. I've been looking into the accommodations for your time in Kyoto. The ryokan in Higashiyama has confirmed availability for your dates.</p>
+</div>
+<span class="font-mono-micro text-mono-micro text-outline-variant float-right mt-1">10:15 AM</span>
+</div>
+</div>
+<!-- Client Message (Incoming) -->
+<div class="flex gap-4">
+<img class="w-8 h-8 rounded-full object-cover self-end mb-5" data-alt="Same image as previous: A candid lifestyle portrait of a sophisticated female traveler in her late 30s..." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpYhgbPnQDJogx3ImMqUtUxtCClr7P-Sazw0fooShEEhY6o0yd3DPFkePr-LFnEY6yWGUROlgUDaNxWQEgRJQVuigUKgK8gEN0Pb2YJtk_LNYQ-aMKKuuMlVxtAvZKEjF05RALnUVM-8R4FC3Jb95RXbSC68Xwuu2VUUAPMVKMaiQSvLEzmtHUlPyVmfPu-mOP1I9w-_NWJ7kcRuy9IAcfsPnBZ54G0eicPl0SYrxAyi6WIoGmZ1rcuzbmB89zwkpQh2sEbElXJ0ad"/>
+<div class="max-w-[70%]">
+<div class="bg-surface text-on-surface rounded-2xl rounded-tl-sm p-4 shadow-sm border border-black/5">
+<p class="font-body-md text-body-md">That sounds wonderful! I was also reading about a traditional tea ceremony experience. Is there one you recommend nearby?</p>
+</div>
+<span class="font-mono-micro text-mono-micro text-outline-variant float-left mt-1">10:30 AM</span>
+</div>
+</div>
+<!-- Client Message (Incoming) -->
+<div class="flex gap-4">
+<div class="w-8"></div> <!-- Spacer for alignment -->
+<div class="max-w-[70%]">
+<div class="bg-surface text-on-surface rounded-2xl rounded-tl-sm p-4 shadow-sm border border-black/5">
+<p class="font-body-md text-body-md">I'd love to add that tea ceremony to the itinerary if possible.</p>
+</div>
+<span class="font-mono-micro text-mono-micro text-outline-variant float-left mt-1">10:42 AM</span>
+</div>
+</div>
+<!-- Typig Indicator Placeholder (Hidden by default, structure for interactivity) -->
+<div class="flex gap-4 opacity-50">
+<div class="w-8 h-8 rounded-full bg-black/5 self-end mb-5"></div>
+<div class="bg-surface rounded-2xl rounded-tl-sm p-4 flex gap-1 items-center">
+<div class="w-1.5 h-1.5 bg-outline rounded-full animate-bounce"></div>
+<div class="w-1.5 h-1.5 bg-outline rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+<div class="w-1.5 h-1.5 bg-outline rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+</div>
+</div>
+</div>
+<!-- Input Area (Drop target for snippets) -->
+<div class="p-4 bg-white/60 backdrop-blur-md border-t border-olive-light/10">
+<div class="relative rounded-xl border border-outline-variant bg-white shadow-sm focus-within:border-ochre-light focus-within:ring-1 focus-within:ring-ochre-light transition-all flex flex-col" id="chat-input-container">
+<textarea class="w-full border-none bg-transparent resize-none focus:ring-0 font-body-md text-body-md text-on-surface p-4 pb-12 custom-scroll" id="chat-textarea" placeholder="Type a message or drag a snippet here..." rows="3"></textarea>
+<div class="absolute bottom-2 left-2 right-2 flex justify-between items-center bg-white">
+<div class="flex gap-1">
+<button class="p-2 text-outline hover:text-primary transition-colors rounded-lg hover:bg-black/5" title="Attach File">
+<span class="material-symbols-outlined text-[20px]">attach_file</span>
+</button>
+<button class="p-2 text-outline hover:text-primary transition-colors rounded-lg hover:bg-black/5" title="Generate with AI">
+<span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+</button>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-ui text-label-ui hover:bg-primary-container transition-all active:scale-95 flex items-center gap-2 shadow-sm">
+                            Send
+                            <span class="material-symbols-outlined text-[16px]">send</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Column 3: Tools & Context (Right Panel) -->
+<aside class="w-[340px] flex flex-col gap-gutter">
+<!-- Snippet Library (Top Half) -->
+<div class="flex-1 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
+<header class="px-4 py-3 border-b border-olive-light/10 bg-white/30 flex justify-between items-center">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[18px]">library_books</span>
+<h3 class="font-label-ui text-label-ui">Snippet Library</h3>
+</div>
+<button class="text-outline hover:text-primary">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+</button>
+</header>
+<div class="flex-1 overflow-y-auto p-4 custom-scroll">
+<div class="mb-4">
+<h4 class="font-mono-micro text-mono-micro text-outline uppercase tracking-wider mb-2">Kyoto Recommendations</h4>
+<!-- Snippet Items (Draggable) -->
+<div class="flex flex-col gap-2">
+<div class="snippet-item bg-white border border-outline-variant/30 p-3 rounded-lg cursor-grab active:cursor-grabbing hover:border-ochre-light/50 hover:shadow-sm transition-all group" draggable="true">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-ui text-[11px] text-primary">Camellia Tea Ceremony</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-ochre-light">drag_indicator</span>
+</div>
+<p class="font-body-md text-[12px] text-on-surface-variant line-clamp-2" data-fulltext="I highly recommend the Camellia Tea Ceremony located just off Ninenzaka. It offers a beautiful, authentic experience in a traditional machiya house, perfect for beginners and very welcoming.">I highly recommend the Camellia Tea Ceremony located just off Ninenzaka...</p>
+</div>
+<div class="snippet-item bg-white border border-outline-variant/30 p-3 rounded-lg cursor-grab active:cursor-grabbing hover:border-ochre-light/50 hover:shadow-sm transition-all group" draggable="true">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-ui text-[11px] text-primary">Arashiyama Early Morning</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-ochre-light">drag_indicator</span>
+</div>
+<p class="font-body-md text-[12px] text-on-surface-variant line-clamp-2" data-fulltext="To avoid the crowds at the Bamboo Grove, I suggest we schedule a driver for 7:00 AM. The morning light there is spectacular for photography.">To avoid the crowds at the Bamboo Grove, I suggest we schedule a driver...</p>
+</div>
+</div>
+</div>
+<div>
+<h4 class="font-mono-micro text-mono-micro text-outline uppercase tracking-wider mb-2">General Admin</h4>
+<div class="flex flex-col gap-2">
+<div class="snippet-item bg-white border border-outline-variant/30 p-3 rounded-lg cursor-grab active:cursor-grabbing hover:border-ochre-light/50 hover:shadow-sm transition-all group" draggable="true">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-ui text-[11px] text-primary">Deposit Reminder</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-ochre-light">drag_indicator</span>
+</div>
+<p class="font-body-md text-[12px] text-on-surface-variant line-clamp-2" data-fulltext="Just a gentle reminder that the deposit for the accommodations is due by Friday to secure the booking. You can use the secure link in your timeline.">Just a gentle reminder that the deposit for the accommodations is due...</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-3 bg-surface-container-lowest/50 text-center border-t border-olive-light/5">
+<p class="font-mono-micro text-mono-micro text-outline-variant">Drag snippets to chat</p>
+</div>
+</div>
+<!-- Timeline Integration (Bottom Half) -->
+<div class="flex-1 flex flex-col bg-glass-dark text-on-primary backdrop-blur-xl shadow-xl rounded-xl overflow-hidden border border-white/10">
+<header class="px-4 py-3 border-b border-white/10 flex justify-between items-center bg-black/20">
+<div class="flex items-center gap-2 text-ochre-light">
+<span class="material-symbols-outlined text-[18px]">timeline</span>
+<h3 class="font-label-ui text-label-ui">Update Timeline</h3>
+</div>
+</header>
+<div class="p-4 flex-1 flex flex-col gap-4 overflow-y-auto custom-scroll">
+<p class="font-body-md text-[13px] text-primary-fixed-dim leading-relaxed">Push decisions directly from the chat into the client's official itinerary timeline.</p>
+<div class="flex flex-col gap-3 mt-2">
+<div>
+<label class="block font-mono-micro text-mono-micro text-white/70 mb-1">Event Type</label>
+<select class="w-full bg-white/10 border border-white/20 rounded-md text-white font-body-md text-sm p-2 focus:ring-ochre-light focus:border-ochre-light appearance-none">
+<option class="text-black">Activity / Tour</option>
+<option class="text-black">Accommodation</option>
+<option class="text-black">Transfer</option>
+<option class="text-black">Dining</option>
+</select>
+</div>
+<div>
+<label class="block font-mono-micro text-mono-micro text-white/70 mb-1">Title</label>
+<input class="w-full bg-white/10 border border-white/20 rounded-md text-white font-body-md text-sm p-2 focus:ring-ochre-light focus:border-ochre-light placeholder:text-white/30" type="text" value="Camellia Tea Ceremony"/>
+</div>
+<div class="flex gap-2">
+<div class="flex-1">
+<label class="block font-mono-micro text-mono-micro text-white/70 mb-1">Date</label>
+<input class="w-full bg-white/10 border border-white/20 rounded-md text-white font-body-md text-sm p-2 focus:ring-ochre-light focus:border-ochre-light" type="date" value="2024-10-14"/>
+</div>
+<div class="flex-1">
+<label class="block font-mono-micro text-mono-micro text-white/70 mb-1">Time</label>
+<input class="w-full bg-white/10 border border-white/20 rounded-md text-white font-body-md text-sm p-2 focus:ring-ochre-light focus:border-ochre-light" type="time" value="14:00"/>
+</div>
+</div>
+<div>
+<label class="block font-mono-micro text-mono-micro text-white/70 mb-1">Internal Notes</label>
+<textarea class="w-full bg-white/10 border border-white/20 rounded-md text-white font-body-md text-sm p-2 focus:ring-ochre-light focus:border-ochre-light resize-none" rows="2"></textarea>
+</div>
+</div>
+</div>
+<div class="p-4 bg-black/30 border-t border-white/10">
+<button class="w-full bg-ochre-dark text-white font-label-ui text-label-ui py-2.5 rounded-lg shadow-sm hover:bg-ochre-light transition-colors duration-200 flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">sync_alt</span>
+                        Push to Timeline
+                    </button>
+</div>
+</div>
+</aside>
+</main>
+<script>
+        // Simple drag and drop logic for visual demonstration
+        const snippets = document.querySelectorAll('.snippet-item');
+        const chatInputContainer = document.getElementById('chat-input-container');
+        const chatTextarea = document.getElementById('chat-textarea');
+
+        snippets.forEach(snippet => {
+            snippet.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', snippet.querySelector('p').getAttribute('data-fulltext'));
+                snippet.classList.add('opacity-50');
+            });
+            snippet.addEventListener('dragend', () => {
+                snippet.classList.remove('opacity-50');
+                chatInputContainer.classList.remove('drag-over');
+            });
+        });
+
+        chatInputContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            chatInputContainer.classList.add('drag-over');
+        });
+
+        chatInputContainer.addEventListener('dragleave', () => {
+            chatInputContainer.classList.remove('drag-over');
+        });
+
+        chatInputContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            chatInputContainer.classList.remove('drag-over');
+            const data = e.dataTransfer.getData('text/plain');
+            
+            // Append text to textarea
+            const currentText = chatTextarea.value;
+            chatTextarea.value = currentText ? currentText + '\n\n' + data : data;
+            
+            // Slight pulse animation on textarea
+            chatTextarea.classList.add('bg-ochre-light/10');
+            setTimeout(() => {
+                chatTextarea.classList.remove('bg-ochre-light/10');
+            }, 300);
+        });
+    </script>
+</body></html>
