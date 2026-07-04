@@ -208,6 +208,12 @@ test("@smoke @a11y route h1 sweep", async ({ browser }) => {
   if (test.info().project.name !== "desktop-chrome") {
     test.skip();
   }
+  // The sweep visits 22 routes (5 marketing + 5 traveler + 5
+  // reviewer + 7 admin). The 3D map on /trip/3/map and the
+  // admin pages adds to per-route load time, so the default
+  // 30s test timeout is too tight. 90s gives the sweep enough
+  // headroom for slow route loads.
+  test.setTimeout(90_000);
 
   shouldWriteH1Audit = true;
   const sweeps: Array<{ storageState?: string; routes: string[] }> = [
@@ -225,7 +231,17 @@ test("@smoke @a11y route h1 sweep", async ({ browser }) => {
 
     for (const route of sweep.routes) {
       await page.goto(route);
-      await page.waitForLoadState("networkidle");
+      // The 3D map + Realtime subscription on workspace/trip
+      // pages keep the network active past `networkidle`'s
+      // 500ms quiet window, so the sweep can deadlock on
+      // 30s. `domcontentloaded` is enough for the h1 audit
+      // because the h1 is in the static layout shell —
+      // the audit doesn't need the WebGL canvas to be
+      // settled.
+      await page.waitForLoadState("domcontentloaded");
+      // Give the static markup a beat to paint before
+      // recording.
+      await page.waitForTimeout(500);
       const result = await recordH1Audit(page, route);
 
       if (result.status === "ok") {

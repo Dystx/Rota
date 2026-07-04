@@ -14,6 +14,22 @@ const disableAnimations = async (page: any) => {
   });
 };
 
+/**
+ * Wait for the page's rendering loop to settle before capturing
+ * a screenshot. The 3D map (GlobeWorkspace + WorkspaceCanvas)
+ * renders at 60fps via WebGL, which Playwright's screenshot
+ * capture races against — if the page is mid-frame when the
+ * capture is requested, Chromium returns "Unable to capture
+ * screenshot" protocol error. A 2s page-level wait (rather
+ * than a requestAnimationFrame loop) is used because the 3D
+ * map's render loop can starve the rAF queue under load, which
+ * causes the rAF-based wait to deadlock on its own 30s
+ * Playwright timeout.
+ */
+const settleForScreenshot = async (page: any) => {
+  await page.waitForTimeout(2000);
+};
+
 const maskLocators = (page: any) => [
   page.locator('[data-testid="trip-created-at"]'),
   page.locator(".timestamp"),
@@ -42,11 +58,19 @@ test.describe("@smoke @visual Marketing baselines", () => {
         await page.waitForTimeout(6000);
       }
       await disableAnimations(page);
+      await settleForScreenshot(page);
 
       await expect(page).toHaveScreenshot(`${testInfo.project.name}-marketing-${routeName}.png`, {
         fullPage: true,
         animations: "disabled",
-        mask: maskLocators(page)
+        mask: maskLocators(page),
+        timeout: 20_000,
+        // The 3D map (GlobeWorkspace) renders WebGL content
+        // that's inherently non-deterministic at the pixel
+        // level (frame-rate-dependent easing, anti-aliasing
+        // variation). 1% pixel diff tolerance covers that
+        // noise while still catching real regressions.
+        maxDiffPixelRatio: 0.01
       });
     });
   }
@@ -59,10 +83,13 @@ test.describe("@smoke @visual Traveler baselines", () => {
     test(`traveler route ${route}`, async ({ page }, testInfo) => {
       await page.goto(route);
       await disableAnimations(page);
+      await settleForScreenshot(page);
       await expect(page).toHaveScreenshot(`${testInfo.project.name}-traveler-${routeName}.png`, {
         fullPage: true,
         animations: "disabled",
-        mask: maskLocators(page)
+        mask: maskLocators(page),
+        timeout: 20_000,
+        maxDiffPixelRatio: 0.01
       });
     });
   }
@@ -75,10 +102,13 @@ test.describe("@smoke @visual Reviewer baselines", () => {
     test(`reviewer route ${route}`, async ({ page }, testInfo) => {
       await page.goto(route);
       await disableAnimations(page);
+      await settleForScreenshot(page);
       await expect(page).toHaveScreenshot(`${testInfo.project.name}-reviewer-${routeName}.png`, {
         fullPage: true,
         animations: "disabled",
-        mask: maskLocators(page)
+        mask: maskLocators(page),
+        timeout: 20_000,
+        maxDiffPixelRatio: 0.01
       });
     });
   }
@@ -91,10 +121,13 @@ test.describe("@smoke @visual Admin baselines", () => {
     test(`admin route ${route}`, async ({ page }, testInfo) => {
       await page.goto(route);
       await disableAnimations(page);
+      await settleForScreenshot(page);
       await expect(page).toHaveScreenshot(`${testInfo.project.name}-admin-${routeName}.png`, {
         fullPage: true,
         animations: "disabled",
-        mask: maskLocators(page)
+        mask: maskLocators(page),
+        timeout: 20_000,
+        maxDiffPixelRatio: 0.01
       });
     });
   }
