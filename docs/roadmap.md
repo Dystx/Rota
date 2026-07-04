@@ -6,9 +6,11 @@
 > - **v2.0 long-term vision** → [`docs/spec.md`](./spec.md) — 3-tier Tiered Service Model (preserved for historical reference).
 > - **Refined 2026 scope** → [`docs/spec-refined-2026.md`](./spec-refined-2026.md) — visual identity (olive/ochre) + UI/UX details; Tier 3 + Mobile deferred.
 > - **Operational launch-readiness** → §3 below. Drives *how* we ship.
-> - **Engineering lifecycle (8-phase master plan)** → [`docs/engineering-lifecycle.md`](./engineering-lifecycle.md) — week-by-week engineering sequencing; this roadmap is the operational view of the same work.
+> - **Engineering lifecycle (6-phase master plan)** → [`docs/engineering-lifecycle.md`](./engineering-lifecycle.md) — week-by-week engineering sequencing; this roadmap is the operational view of the same work.
 >
 > Section 2 maps current state to the v4 5-phase engineering plan.
+
+> **Last verified 2026-07-04.** Specialist onboarding + verification queue (PR-11) now in tree. Observability foundation (Sentry + perf budget) wired. 534/534 tests green. Operational Phase 2 hosted Supabase apply is the only blocker for production.
 
 ---
 
@@ -25,7 +27,7 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 
 ---
 
-## 2. Current State vs Refined 2026 Phases (last verified 2026-07-03)
+## 2. Current State vs Refined 2026 Phases (last verified 2026-07-04)
 
 ### Phase 1 — Foundations & Architecture Setup
 
@@ -33,8 +35,16 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 |---|---|
 | Monorepo (`pnpm` + `turbo`) with apps + packages layout | ✅ **Done** — 12 packages + 2 runnable apps |
 | PostgreSQL + PostGIS + pgvector extensions | 🟡 **Local-only** — migration `202607022000_enable_postgis_pgvector_and_places_embeddings.sql` ships PostGIS + pgvector + places extensions + GIST/HNSW indexes; blocked by Phase 2 hosted Supabase credentials |
+| `places.embedding` migrated to `halfvec(1536)` (HNSW-friendly) | 🟡 **Local-only** — migration `202607032300_migrate_places_embedding_to_halfvec.sql` is idempotent (skips if pgvector < 0.7.0); HNSW index build needs `maintenance_work_mem='2GB'` + `VACUUM ANALYZE` before apply per `packages/ingest/README.md` |
+| `places.osm_id` partial-unique for ingest upsert | 🟡 **Local-only** — migration `202607040000_add_places_osm_id.sql` ready; no schema change for editorial v1 rows |
 | Tailwind v4 design tokens (matches `packages/ui/src/styles.css`) | ✅ **Done** — `tailwindcss: ^4.2.4` pinned as direct dep; `@theme` block generates both CSS variables in `:root` and utility classes for olive/ochre palette (`4591c5a`, `081b40f`, `baf0042`) |
 | Visual identity = prototype (olive/ochre + cream/sage) | ✅ **Done** — `@theme` block in `packages/ui/src/styles.css`; home page (`efac8b0`), 12 prototype ports, and 4 marketing pages all render at 100% parity with `docs/prototype.html`; shared `TopNav` + `SiteFooter` from `apps/web/app/_components/` (commits `1c5b9cd`, `3d23441`) |
+| Spatial Engine: provider-agnostic core (`@repo/spatial-engine`) | ✅ **Done** — see Phase 1c/1d below |
+| Spatial Engine 2D ↔ 3D projection switch + layer registry | ✅ **Done** — Phase 1d |
+| `useMapStore` Zustand store + `useMapSourceSync` high-frequency path | ✅ **Done** — see Phase 1d + `app/(marketing)/explore/workspace/workspace-canvas-client.tsx` wiring (commits `389e164`, `f0b890c`, `debdfb8`, `c79ab2c`) |
+| Vitest 3.2 `test.projects` migration (drop deprecated `environmentMatchGlobs`) | ✅ **Done** — `vitest.config.ts` now declares a `jsdom` and a `node` project; `extends: true` carries the root `resolve.alias` (`@` → `apps/web`) into each project. 534/534 across 59 files (`6775e30`) |
+| Decorative-icon a11y sweep (Phase 1k P6) | ✅ **Done** — `aria-hidden="true"` on the 3 `material-symbols-outlined` decorative spans in `hero-map.tsx:140` and `workspace-shell.tsx:228, 274` (`25c5e0d`) |
+| Phase 1 code + 3 doc LOWs from 2026-07-03 review | ✅ **Done** — see `Pre-existing tech debt` below |
 
 ### Phase 2 — Knowledge Graph Seeding (Portugal Module)
 
@@ -67,6 +77,10 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 
 | Requirement | Status |
 |---|---|
+| `specialist_profiles` unified model (Tier 3 + Tier 4) | ✅ **Done** — migration `202607022110_create_specialist_profiles.sql`; `packages/db/src/specialists.ts` has `getSpecialistProfileByUserId` + `upsertSpecialistProfile`; enforced tier-4 license CHECK + tier-4 must-be-verified CHECK |
+| Specialist onboarding form (`/guide/onboarding`) | ✅ **Done** — see Phase 1e below; supports regions + skills + languages + bio + photo URL |
+| Specialist capabilities table (skills, languages, bio, photo) | ✅ **Done** — migration `202607040200_create_specialist_capabilities.sql`; `packages/db/src/specialists.ts` has `getSpecialistCapabilities` + `setSpecialistCapabilities` (replace-all diff) |
+| Admin verification queue (`/admin/specialists`) | ✅ **Done** — see Phase 1e; `setSpecialistVerified` + `flipVerification` server action; tier-4 unverify is refused at the application layer (DB CHECK mirror) |
 | Reviewer roster + assignments | ✅ **Done** — `reviewers`, `reviewer_assignments` tables; `/reviewer/*` routes |
 | Reviewer dashboard with error-checking alert panel | 🟡 **Partial** — `/reviewer/trips/[tripId]` exists; needs explicit route-timeline display per spec §7 SLA |
 | Asynchronous chat infrastructure | ❌ **Not started** — `chat_threads`/`chat_messages` tables don't exist |
@@ -85,12 +99,15 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 |---|---|---|
 | Next.js 16 + RSC | required | ✅ in use (Next 16.2.4 per dev.log) |
 | Vercel AI SDK | required | ❌ not wired — `packages/ai` uses direct OpenAI integration (deterministic provider live; SDK deferred to Phase 7) |
-| Zustand | required | ❌ not in use — no transient state store |
+| Zustand | required | ✅ in use — `apps/web/lib/store/useMapStore.ts` (Zustand 4.5.5) drives the high-frequency `useMapSourceSync` path. PR-11d matchmaking preview will reuse this pattern |
 | Tailwind v4 | required | ✅ v4.2.4 pinned as direct dep in `apps/web` and `packages/ui` |
 | Bun | optional runtime | ❌ not in use — pnpm/Node |
 | Upstash QStash + Redis | queue/cache | ❌ not in use — `apps/workers` is bounded-local |
 | PostGIS | required | 🟡 migration `202607022000_*` enables locally; awaiting hosted |
 | pgvector | required | 🟡 migration `202607022000_*` enables locally; awaiting hosted |
+| Sentry (error monitoring) | required | ✅ in use — `@sentry/nextjs` in `apps/web` (client + server + edge), `@sentry/node` in `apps/workers`. All env-gated; SDK is a no-op without `SENTRY_DSN` (`31f82f4`) |
+| Perf budget | required | ✅ in use — `scripts/perf-budget.mjs` (top-10 + sampled gzipped estimate) wired as `turbo run quality` (`0ca35d1`). Report-only by default; `PERF_BUDGET_KB` enforces |
+| PostHog (product analytics) | required | ❌ **Deferred** — user decision 2026-07-04. The funnel events `wizard_started` / `brief_submitted` / `upgrade_clicked` are deferred until there is real traffic to measure. `tryCapture` + `WebVitalsReporter` shims already exist; destination stays un-wired |
 
 ### Pre-existing tech debt (carried, recently fixed)
 
@@ -102,6 +119,12 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 - 9 scratch debug scripts + `apps/web/playwright-report/`; **deleted** (`253da10`).
 - Marketing pages (`/portugal`, `/how-it-works`, `/human-review`, `/pricing`) had Cinematic Concierge sticky header alongside `TopNav`; **fixed** with `bare` prop on `PageShell`/`ArchiveLayout` (`1c5b9cd`).
 - `/planner` was a static "Synthesize Itinerary" CTA pointing at `/logistics`; **wired** to real `PromptComposer` + `normalizeTripPrompt` + `BriefConfirmation` flow (`56cf3c5`).
+- Specialist onboarding form asked for "Region UUIDs from the regions table" as a freeform text field; **replaced** with the `RegionPicker` checkbox grid (PR-11a, `c79ab2c`). The `regions` table's `text` PK doesn't match `regions_covered UUID[]`, so a `region-ids.ts` static map (`8c3a8a1a-...` namespace) is the boundary; the synthetic-UUID design is documented inline for the future regions-table normalization (PR-11d).
+- `revalidatePath("/admin/specialists")` in the onboarding action was a dangling pointer (the route didn't exist); **resolved** by adding `/admin/specialists` (PR-11b, `abdb135`).
+- `flip-verification-form.tsx` shipped a `<form>` wrapper around a `type="button"` button (dead code); **removed** (`99a2020`).
+- The vitest root config used the deprecated `environmentMatchGlobs`; **migrated** to `test.projects` with `extends: true` so the root `resolve.alias` (`@` → `apps/web`) inherits (`6775e30`).
+- Three decorative `<span class="material-symbols-outlined">` lacked `aria-hidden="true"` in `hero-map.tsx` and `workspace-shell.tsx`; **fixed** to close Phase 1k P6 (`25c5e0d`).
+- The 11 carry-over LOWs from the 2026-07-03 review (LOW-1, LOW-2, LOW-3, LOW-4, LOW-5, LOW-6, LOW-7, LOW-8, LOW-9, LOW-10, LOW-11) were already addressed by the 4 code+3 doc commits on `main` by `b9481df`/`3d7ad96`/`5d1d640`/`866da29`. `audit/phase-1-rota-component-audit.md` and the axe evidence file (`apps/web/.sisyphus/evidence/future-roadmap/task-37-axe-violations.json`) reflect the new state.
 
 ---
 
@@ -109,18 +132,22 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 
 These phases unblock production deployment. They run alongside the refined 5-phase engineering plan; many refined-phase items have local-only implementations that need operational work below to ship.
 
-### Decision Log (2026-07-03)
+### Decision Log
 
-| # | Question | Decision | Notes |
-|---|---|---|---|
-| 1 | Two-app architecture (`apps/web` + `apps/ops`)? | **Stay single-app with route groups** | Specialist MAU <5%; Vercel per-route middleware covers 80% of the need. Revisit at Stripe Connect or SSO inflection. ADR in PR-10. |
-| 2 | `apps/mobile/` (Expo + React Native)? | **Defer; PWA is the user-facing path** | Per refined spec; PWA + IndexedDB cover offline; no native-app demand validated. |
-| 3 | Roadmap reconciliation? | **`docs/engineering-lifecycle.md` is the granular view; this file is the operational view** | Cross-references at the top of each file. |
-| 4 | DuckDB runtime? | **Node-side `duckdb-async`** | Faster for batch Parquet I/O; stable C++ core. WASM deferred. |
-| 5 | Stripe account + business registration? | **Later** | Defer until CP-4 is unblocked by business-side provisioning. |
-| 6 | Resend account? | **Later** | Coupled to the Stripe receipt flow. |
-| 7 | The 11 carry-over LOWs from the first review? | **Fix all** | See `docs/reviews/2026-07-03-llm-review.md` for the working list. |
-| 8 | Tier 3 reactivation metrics? | **Start tracking** | Define metrics + instrument data; no Tier 3 development yet. PM-owned break-even threshold. |
+| # | Question | Decision | Date | Notes |
+|---|---|---|---|---|
+| 1 | Two-app architecture (`apps/web` + `apps/ops`)? | **Stay single-app with route groups** | 2026-07-03 | Specialist MAU <5%; Vercel per-route middleware covers 80% of the need. Revisit at Stripe Connect or SSO inflection. ADR in PR-10. |
+| 2 | `apps/mobile/` (Expo + React Native)? | **Defer; PWA is the user-facing path** | 2026-07-03 | Per refined spec; PWA + IndexedDB cover offline; no native-app demand validated. |
+| 3 | Roadmap reconciliation? | **`docs/engineering-lifecycle.md` is the granular view; this file is the operational view** | 2026-07-03 | Cross-references at the top of each file. |
+| 4 | DuckDB runtime? | **Node-side `duckdb-async`** | 2026-07-03 | Faster for batch Parquet I/O; stable C++ core. WASM deferred. |
+| 5 | Stripe account + business registration? | **Later** | 2026-07-03 | Defer until CP-4 is unblocked by business-side provisioning. |
+| 6 | Resend account? | **Later** | 2026-07-03 | Coupled to the Stripe receipt flow. |
+| 7 | The 11 carry-over LOWs from the first review? | **Fix all** | 2026-07-03 | Addressed in 4 code+3 doc commits (`b9481df`/`3d7ad96`/`5d1d640`/`866da29`); axe evidence and audit doc updated. |
+| 8 | Tier 3 reactivation metrics? | **Start tracking** | 2026-07-03 | Define metrics + instrument data; no Tier 3 development yet. PM-owned break-even threshold. |
+| 9 | Specialist region picker storage shape? | **Synthetic-UUID map in `packages/types/src/region-ids.ts`** (8c3a8a1a-… namespace) | 2026-07-04 | `specialist_profiles.regions_covered UUID[]` collides with the static `portugalRegions` slug enum and the `regions` table's `text` PK. A single static map is the minimum change that keeps the form slug-driven, the zod `z.string().uuid()` schema unchanged, and the column unchanged. `isSyntheticRegionId` is the migration gate for the future regions-table normalization (PR-11d). |
+| 10 | PostHog install now or wait? | **Wait** | 2026-07-04 | The funnel events (`wizard_started`, `brief_submitted`, `upgrade_clicked`) need real traffic to be useful. The `tryCapture` + `WebVitalsReporter` shims already exist and stay no-op until a destination is wired. Revisit after the first 1k MAU. |
+| 11 | Sentry init: DSN-required or env-gated? | **Env-gated** | 2026-07-04 | All three config files (client/server/edge) and the workers init check for `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN`; the SDKs are no-ops without secrets. `next.config.ts` only wraps with `withSentryConfig` when the env is set. `dryRun: true` on the Sentry CLI without `SENTRY_AUTH_TOKEN` so dev/CI builds stay clean. |
+| 12 | Perf budget: enforce now or report-only? | **Report-only by default; enforce via env** | 2026-07-04 | `pnpm qa:perf-budget` runs in report mode (exit 0) without env. `PERF_BUDGET_KB=…` enforces; `PERF_BUDGET_FAIL=1` fails CI. Wired as `turbo run quality` so a real budget drops in later without a code change. The current build reads 77.7 MB raw / 8.7 MB gzipped (sampled) — most of the raw is source maps excluded by `hideSourceMaps: true`. |
 
 ### Phase 0 — Audit + Housekeeping ✅ Complete (2026-07-02)
 
@@ -181,6 +208,33 @@ Verified end-to-end via Playwright on /explore/workspace:
 - Ambient pulse + specialist badges render alongside the route
 - Cross-link "See the 3D globe" navigates to /explore
 
+### Phase 1e — Specialist Onboarding + Verification Queue (PR-11) ✅ Complete (2026-07-04)
+
+Specialist self-service path: specialists sign up, set regions / skills / languages / bio / photo, and an admin flips `is_verified` after KYC + license check.
+
+- `packages/types/src/region-ids.ts` — synthetic-UUID map (`8c3a8a1a-0000-0000-0000-0000000000NN` namespace) for the 9 Portugal regions. Round-trip tests + bijection assertion. `isSyntheticRegionId` is the single gate for the future regions-table normalization (PR-11d).
+- `packages/types/src/trip-brief.ts` — `specialistLanguages` enum + `specialistLanguageLabels` map (pt/en/es/fr/it/de); single source of truth for the closed language set.
+- `packages/db/src/specialists.ts` — adds `bio` and `photoUrl` to `SpecialistProfile` and the upsert schema; new `getSpecialistCapabilities` (bucketed read) + `setSpecialistCapabilities` (diff-based replace-all); new `listSpecialists` (admin queue) + `setSpecialistVerified` (with application-layer guard against the `specialist_profiles_tier4_must_be_verified` DB CHECK).
+- `supabase/migrations/202607040200_create_specialist_capabilities.sql` — `specialist_capabilities` table (one row per specialist/type/value), `bio` + `photo_url` columns on `specialist_profiles`, RLS for own rows, CHECK constraints on language enum and skill length. The plan's "wide table" shape was replaced with this normalized split; rationale in the migration header.
+- `apps/web/app/guide/onboarding/_components/region-picker.tsx` — 9-checkbox grid driven by `portugalRegions` (PR-11a, `c79ab2c`).
+- `apps/web/app/guide/onboarding/_components/skills-input.tsx` — chip input with Enter/comma to add, X to remove, 80-char cap, 20-skill cap, case-insensitive dedupe.
+- `apps/web/app/guide/onboarding/_components/languages-picker.tsx` — 6-checkbox grid driven by `specialistLanguages`.
+- `apps/web/app/guide/onboarding/actions.ts` — zod extended with `bio`/`photoUrl`/`skills`/`languages`; submit replaces the capability rows after the profile upsert. New `loadSpecialistCapabilities` server action for the page.
+- `apps/web/app/(admin)/admin/specialists/page.tsx` — admin verification queue (PR-11b, `abdb135`): `getAdminPageAuthContext` gate, `DataTable` with full name / tier badges / regions / RNAAT / rate / verification badge / flip control. Stat cards for total, verification, tier split. Bio + capability counts in the row.
+- `apps/web/app/(admin)/admin/specialists/actions.ts` — `flipVerification` server action with admin re-check + zod-parse + `revalidatePath` on success.
+- `apps/web/app/(admin)/admin/specialists/_components/flip-verification-form.tsx` — client form, single button (Verify/Unverify), `useTransition` for pending state, "Unverify" disabled for tier-4 rows (DB CHECK mirror).
+
+Tests added in this phase: 7 region-ids round-trip, 6 region-picker, 9 specialists (list/verify/tier-4 guard), 7 capabilities (read + 4 diff paths), 7 skills-input, 6 languages-picker — total 42 new tests (all green; 534/534 baseline).
+
+### Phase 1f — Observability Foundation ✅ Complete (2026-07-04)
+
+Error monitoring and build-time perf budget. Both env-gated so dev / preview / CI without secrets still ship clean.
+
+- `@sentry/nextjs` direct dep in `apps/web` (v8, Turbopack-friendly). `sentry.client.config.ts` + `sentry.server.config.ts` + `sentry.edge.config.ts` — all three init only when `SENTRY_DSN` (or `NEXT_PUBLIC_SENTRY_DSN`) is set. `next.config.ts` wraps with `withSentryConfig` only when `SENTRY_DSN` is set, otherwise ships the raw config. `silent: !SENTRY_DSN` + `dryRun: !SENTRY_AUTH_TOKEN` keep the build log clean. Replays on error only (sample 1.0); session replays disabled to keep ingest volume low.
+- `@sentry/node` direct dep in `apps/workers`. `src/sentry.ts` — `initSentry()` (module-load side effect, no-op when DSN absent), `withSentry(label, fn)` (span-wrap a job), `captureException(err)` (try/catch boundary). The web app imports from `@repo/workers/plan` (a separate subpath) so the SDK never initializes in a Next.js process. (`31f82f4`)
+- `scripts/perf-budget.mjs` — walks `apps/web/.next`, reports total + sampled-gzipped size + top 10. `pnpm qa:perf-budget`. Turbo `quality` task (`^build` → script). Report-only by default; `PERF_BUDGET_KB=…` enforces, `PERF_BUDGET_FAIL=1` fails CI. Current build reads 77.7 MB raw / 8.7 MB gzipped (sampled). The gzipped estimate samples JS/CSS/HTML/JSON/SVG/WOFF2 only (skips source maps and already-compressed assets) so it's a fair wire-weight proxy. (`0ca35d1`)
+- PostHog is intentionally not installed. The `tryCapture` + `WebVitalsReporter` shims already exist and stay no-op until a destination is wired. Decision Log #10.
+
 Future migrations (separate sign-off):
 - Replace `@repo/maps` CinematicMap + ProviderMap with `MapLibreSpatialEngine` + WorkspaceCanvas (Trip pages)
 - Swap `InMemoryTelemetryService` for a Supabase Realtime adapter
@@ -193,12 +247,17 @@ Goal: bring hosted Supabase to parity with local; eliminates the spec's Phase 1 
 
 | # | Task | Source |
 |---|---|---|
+| 2.0 | **PITR backup** (do not skip) per `docs/ops/backup-restore.md` | hosted |
 | 2.1 | Apply `202605011600_create_user_roles_and_ownership.sql` (adds `owner_user_id`) | local migration |
 | 2.2 | Apply `202605011700_create_rls_policies_and_grants.sql` | local migration |
 | 2.3 | Apply `202605011800_add_indexes_constraints_trip_transaction.sql` | local migration |
 | 2.4 | Apply `202605020230_create_payment_webhook_events.sql` | local migration |
 | 2.5 | Apply `20260504010324_admin_audit_trail.sql` | local migration |
 | 2.6 | Apply `202607022000_enable_postgis_pgvector_and_places_embeddings.sql` (adds PostGIS + pgvector + places extension columns + GIST/HNSW indexes) | local migration |
+| 2.6a | `set maintenance_work_mem='2GB'; VACUUM ANALYZE public.places;` then apply `202607032300_migrate_places_embedding_to_halfvec.sql` (HNSW halfvec migration; idempotent, skips on pgvector <0.7.0) | local migration |
+| 2.6b | Apply `202607040000_add_places_osm_id.sql` (partial-unique `osm_id` for ingest upsert) | local migration |
+| 2.6c | Apply `202607040100_create_place_adjustment_log.sql` (specialist audit log for the self-healing ranking loop, Phase 6) | local migration |
+| 2.6d | Apply `202607040200_create_specialist_capabilities.sql` (skills, languages, bio, photo for specialist onboarding) | local migration |
 | 2.7 | Apply `202607022100_create_user_geolocation_logs.sql`, `202607022110_create_specialist_profiles.sql`, `202607022120_alter_chat_threads_add_service_level.sql`, `202607022130_alter_chat_messages_add_metadata.sql`, `202607022140_create_guide_dispatches.sql` (spec-v4 schema additions) | local migrations |
 | 2.8 | Verify `public.reviewer_auth_links` and `public.user_profiles` exist | hosted |
 | 2.9 | Enable **Leaked Password Protection** in Supabase Auth dashboard | hosted |
@@ -206,6 +265,8 @@ Goal: bring hosted Supabase to parity with local; eliminates the spec's Phase 1 
 | 2.11 | Verify RLS actively constrains user-facing reads (per `docs/ops/launch.md` §3 smoke test) | hosted |
 
 **Exit criteria**: every line in `docs/ops/launch.md` §1 checked; outsider test user cannot read another user's trip.
+
+> Migration ordering matters. The five `2026070400*` migrations are additive and safe to apply in any order after 2.6, but apply them as a batch so the verification queue, the audit log, and the halfvec HNSW all land together.
 
 ### Phase 3 — Hosted Worker Runner (decision made: Upstash QStash)
 
@@ -312,16 +373,19 @@ Reactivation triggers documented in `docs/spec-refined-2026.md` §5.
 - **`docs/ops/backup-restore.md`** — PITR / disaster recovery.
 - **`docs/ops/incidents.md`** — incident response runbook.
 - **`docs/ops/deploy-rollback.md`** — deployment + rollback.
-- **`docs/error-monitoring.md`** — error monitoring approach.
+- **`docs/error-monitoring.md`** — error monitoring approach. Sentry wiring lives in `apps/web/sentry.{client,server,edge}.config.ts` and `apps/workers/src/sentry.ts`.
 - **`docs/audit/phase-0-cinematic-redesign.md`** — Phase 0 audit evidence.
+- **`scripts/perf-budget.mjs`** — build-time perf budget lint.
 - **`README.md`** — quick start.
 
 ---
 
 ## 7. Open Questions (need user call)
 
-1. **Phase 2 Supabase credentials** — confirm access pattern: local-only dry-run first, then staged apply, then hosted?
+1. **Phase 2 Supabase credentials** — confirm access pattern: local-only dry-run first, then staged apply, then hosted? (the hosted apply now includes 2.6a halfvec + 2.6b osm_id + 2.6c place_adjustment_log + 2.6d specialist_capabilities)
 2. **`apps/mobile/` scope** — definitively deferred per refined spec, or scaffold-abandoned?
 3. **Tier 3 reactivation metrics** — PM-owned; what's the break-even threshold for Tier 1+2?
-4. **Tailwind version audit** — current package.json has no Tailwind pin; verify v3 vs v4 baseline.
-5. **Vercel AI SDK migration timing** — wire in Phase 4 (live providers) or earlier in Phase 7 (Tier 1)?
+4. **Vercel AI SDK migration timing** — wire in Phase 4 (live providers) or earlier in Phase 7 (Tier 1)?
+5. **Perf budget threshold** — what's a real `PERF_BUDGET_KB` for the production Vercel deploy? (the script is ready; the number is a product call)
+6. **#49 cinematic-hero broken tokens + #73 TripCard cta+href** — both deferred to a design call; do they ship before launch or after?
+7. **PR-11d specialist availability calendar** — is this in the launch window, or a post-launch retention feature? (plan says post-launch)
