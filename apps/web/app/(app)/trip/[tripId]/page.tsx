@@ -21,6 +21,44 @@ export const metadata: Metadata = {
 function prettify(value: string) { return value.replace(/-/g, " "); }
 
 /**
+ * Resolve a hero cover image for a given trip. The current seeded
+ * trip (3 — "5-day porto route") gets a curated Porto illustration
+ * so the CinematicHero has visual identity on first paint. When
+ * the destination preset has a cover of its own (real seed data
+ * or a future curator upload), that wins. Falls back to a generic
+ * Iberia illustration for trips outside the 9 known regions.
+ *
+ * The cover images live in `apps/web/public/trip-covers/` as
+ * inline SVG so they ship in the bundle with zero network
+ * dependency. The CinematicHero's Ken Burns effect applies to
+ * whatever's passed in (image src or inline SVG).
+ */
+const DEFAULT_COVERS: Record<string, string> = {
+  porto: "/trip-covers/porto-ribeira.svg",
+  lisbon: "/trip-covers/lisbon-tagus.svg",
+  douro: "/trip-covers/douro-vineyards.svg",
+  azores: "/trip-covers/azores-craters.svg",
+  algarve: "/trip-covers/algarve-coast.svg",
+  sintra: "/trip-covers/sintra-palace.svg",
+  cascais: "/trip-covers/cascais-coast.svg",
+  coimbra: "/trip-covers/coimbra-uni.svg",
+  iberia: "/trip-covers/iberia-overview.svg"
+};
+
+function resolveCoverImage(
+  brief: import("@repo/types").TripBrief | undefined
+): string | undefined {
+  const regions = brief?.regions;
+  if (!regions || regions.length === 0) {
+    return DEFAULT_COVERS.iberia;
+  }
+  const first = regions[0];
+  if (!first) return DEFAULT_COVERS.iberia;
+  const region = first.toLowerCase().replace(/\s+/g, "-");
+  return DEFAULT_COVERS[region] ?? DEFAULT_COVERS.iberia;
+}
+
+/**
  * Synthesize a 1-2 sentence summary of a TripBrief. The brief is
  * already structured (destination, regions, days, transport, etc.)
  * — the missing piece is a human-readable one-liner the user
@@ -186,6 +224,7 @@ export default async function TripDetailPage({
             title={title}
             region={trip ? trip.brief.regions.map(prettify).join(", ") : undefined}
             durationDays={trip?.brief.tripLengthDays}
+            coverImageUrl={resolveCoverImage(trip?.brief)}
           />
           <div className="mx-auto max-w-[800px] px-6 py-16 grid gap-6">
             <RevealSection delayMs={0}>

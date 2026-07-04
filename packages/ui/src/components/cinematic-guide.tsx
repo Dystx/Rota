@@ -115,7 +115,16 @@ export function GuideProgress({ chapters, sticky = true, className }: GuideProgr
     <div
       className={cn(
         "z-50 pointer-events-none p-4",
-        sticky ? "sticky top-[var(--spacing-section)] md:top-1/2 md:-translate-y-1/2 float-right mr-[var(--spacing-gutter)]" : "",
+        // `fixed` (not `float-right` + `sticky`) so the chapter
+        // nav anchors to the viewport's right edge regardless
+        // of how short the surrounding content is. The previous
+        // `float-right` made the nav drift into the middle of
+        // the viewport on chapters with little content (the
+        // trip page's CinematicHero + brief card), because
+        // float positions relative to the content flow.
+        sticky
+          ? "fixed top-1/2 right-3 md:right-6 -translate-y-1/2"
+          : "",
         className
       )}
     >
