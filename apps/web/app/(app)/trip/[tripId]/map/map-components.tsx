@@ -3,26 +3,20 @@
 /**
  * Map components for the `/trip/[tripId]/map` route.
  *
- * Phase 1e migration: this file used to wrap a Mapbox-era
- * `<ProviderMap>` (from `@repo/maps`) with a `<RouteMap>` facade
- * that chose between the live provider and the `@repo/ui`
- * schematic `RouteMap` based on `isMapProviderEnabled()`. The
- * spatial engine has no equivalent provider-vs-schematic split —
- * the canvas renders from CARTO open tiles and falls back to the
- * schematic only when the trip itself is missing.
+ * Phase 1e migration (complete): the legacy Mapbox-era
+ * `<ProviderMap>` and `<CinematicMap>` from `@repo/maps` were
+ * absorbed into the spatial engine. `<RouteMap>` below now
+ * reads trip data via `useTripRoute(tripId)` and renders a
+ * `<WorkspaceCanvas>` from `@repo/spatial-engine` when the route
+ * is non-null. When `useTripRoute` returns `null` (no trip,
+ * loading, error) we fall back to the `@repo/ui` schematic
+ * `RouteMap` so the panel + warnings still have a host to
+ * render into.
  *
- * What changed:
- *   - `<RouteMap>` now reads trip data via `useTripRoute(tripId)`
- *     and renders a `<WorkspaceCanvas>` from `@repo/spatial-engine`
- *     when the route is non-null. When `useTripRoute` returns
- *     `null` (no trip, loading, error) we fall back to the
- *     `@repo/ui` schematic `RouteMap` so the panel + warnings
- *     still have a host to render into.
- *   - `<PrewarmLink>` is gone. MapLibre doesn't need a
- *     prewarm(); the day-pill `<Link>` is now a plain `next/link`.
- *   - The schematic fallback keeps the same `data-testid`
- *     (`schematic-map-fallback`) so existing visual tests still
- *     pass.
+ * The schematic fallback keeps the same `data-testid`
+ * (`schematic-map-fallback`) so existing visual tests still
+ * pass. See `packages/spatial-engine/README.md § 10` for the
+ * full migration history.
  */
 
 import * as React from "react";
