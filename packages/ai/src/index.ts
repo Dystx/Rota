@@ -40,6 +40,71 @@ function startHour(dayIndex: number, stopIndex: number) {
   return String(9 + stopIndex * 3 + (dayIndex === 1 ? 0 : 1)).padStart(2, "0");
 }
 
+/**
+ * Region centroids used by the deterministic itinerary
+ * generator. Each stop in a day falls within the day's
+ * region, so the centroid is a "good enough" coordinate
+ * for the map to highlight + the camera to fly to.
+ *
+ * Coordinates come from the canonical Portugal regions in
+ * `packages/types/src/trip-brief.ts`; the values are the
+ * visual centroid of each region's main tourism area, not
+ * the geographic centroid. They're picked so the map's
+ * default zoom (14) lands on the most useful part of the
+ * region.
+ *
+ * When a region's centroid is unknown (an editor-added
+ * region the centroid map doesn't know about yet), the
+ * provider falls back to the Iberian centroid at
+ * `[-8.165, 39.55]` (the same default the `useMapStore`
+ * ships with). The `superRefine` on `TripStopSchema`
+ * accepts this — the coordinates are optional in the
+ * schema — and the filmstrip's no-coord guard treats
+ * undefined coordinates as a no-op.
+ */
+const IBERIAN_CENTROID: readonly [number, number] = [-8.165, 39.55] as const;
+
+const REGION_CENTROIDS: Readonly<Record<string, readonly [number, number]>> = {
+  "lisbon": [-9.1393, 38.7223],
+  "sintra": [-9.3905, 38.7972],
+  "cascais": [-9.4215, 38.6979],
+  "porto": [-8.6291, 41.1579],
+  "douro-valley": [-7.7793, 41.1419],
+  "algarve": [-8.3006, 37.1387],
+  "alentejo": [-7.9135, 38.5667],
+  "azores": [-25.6751, 37.7412],
+  "madeira": [-16.9241, 32.6669]
+} as const;
+
+/**
+ * Per-stop offsets layered on top of the region centroid.
+ *
+ * The 3 stops in a day (neighborhood walk, lunch, scenic
+ * reset) need visually distinct points so the filmstrip's
+ * active-stop highlight + camera fly-to are meaningful
+ * (otherwise every card on a day flies the camera to the
+ * same point). The offsets are ~0.005° which is ~555m at
+ * Portugal's latitude — a plausible walking distance
+ * between morning / lunch / afternoon anchors.
+ *
+ * The array is cycled (`offset % length`) so a future
+ * 4-or-5-stop day layout doesn't fall off the end. The
+ * offsets are deterministic; same `stopIndex` always
+ * yields the same offset, so the same brief yields the
+ * same itinerary (the provider stays pure).
+ */
+const STOP_OFFSETS: readonly (readonly [number, number])[] = [
+  [-0.005, 0.005],
+  [0, 0],
+  [0.005, -0.005]
+] as const;
+
+function coordsForStop(region: string, stopIndex: number): readonly [number, number] {
+  const [cLng, cLat] = REGION_CENTROIDS[region] ?? IBERIAN_CENTROID;
+  const [dLng, dLat] = STOP_OFFSETS[stopIndex % STOP_OFFSETS.length]!;
+  return [cLng + dLng, cLat + dLat];
+}
+
 function buildMissingInfo(brief: TripBrief): TripQuestion[] {
   const questions: TripQuestion[] = [];
 
@@ -118,7 +183,11 @@ class DeterministicItineraryGenerator implements ItineraryGenerator {
             reason: `Anchors the day around ${tripBrief.interests[0]?.replace(/-/g, " ") ?? "local character"} without rushing the first hours.`,
             region: region.replace(/-/g, " "),
             startTime: `${startHour(dayIndex, 0)}:00`,
-            warning: dayIndex === 2 ? "Shift later if weather is rough in the morning." : undefined
+            warning: dayIndex === 2 ? "Shift later if weather is rough in the morning." : undefined,
+            ...(() => {
+              const [lng, lat] = coordsForStop(region, 0);
+              return { lng, lat };
+            })()
           },
           {
             endTime: `${startHour(dayIndex, 1)}:30`,
@@ -127,7 +196,11 @@ class DeterministicItineraryGenerator implements ItineraryGenerator {
             reason: `Balances ${tripBrief.pace} pacing with a stronger food moment and time to linger.`,
             region: region.replace(/-/g, " "),
             startTime: `${startHour(dayIndex, 1)}:00`,
-            warning: tripBrief.avoidances.includes("late-nights") ? "Keep dinner early if evenings should stay light." : undefined
+            warning: tripBrief.avoidances.includes("late-nights") ? "Keep dinner early if evenings should stay light." : undefined,
+            ...(() => {
+              const [lng, lat] = coordsForStop(region, 1);
+              return { lng, lat };
+            })()
           },
           {
             endTime: `${startHour(dayIndex, 2)}:15`,
@@ -135,7 +208,11 @@ class DeterministicItineraryGenerator implements ItineraryGenerator {
             placeName: `${region.replace(/-/g, " ")} scenic reset`,
             reason: "Adds breathing room and keeps the route from feeling like a checklist.",
             region: region.replace(/-/g, " "),
-            startTime: `${startHour(dayIndex, 2)}:00`
+            startTime: `${startHour(dayIndex, 2)}:00`,
+            ...(() => {
+              const [lng, lat] = coordsForStop(region, 2);
+              return { lng, lat };
+            })()
           }
         ]
       };

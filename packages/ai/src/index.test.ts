@@ -52,4 +52,57 @@ describe("generateItineraryFromBrief", () => {
     ]);
     expect(itinerary.days[0]?.stops[0]?.startTime).toBe("09:00");
   });
+
+  it("emits lng/lat on every stop from the region centroid map", async () => {
+    const itinerary = await generateItineraryFromBrief(tripBrief);
+
+    // Every stop must carry a non-null lng/lat pair in
+    // valid range. The brief cycles ["douro-valley",
+    // "porto"] across 3 days, so every day picks a region
+    // we know the centroid for.
+    for (const day of itinerary.days) {
+      for (const stop of day.stops) {
+        expect(typeof stop.lng).toBe("number");
+        expect(typeof stop.lat).toBe("number");
+        expect(stop.lng).toBeGreaterThanOrEqual(-180);
+        expect(stop.lng).toBeLessThanOrEqual(180);
+        expect(stop.lat).toBeGreaterThanOrEqual(-90);
+        expect(stop.lat).toBeLessThanOrEqual(90);
+      }
+    }
+
+    // Day 1's region is `douro-valley` (regions[0]).
+    // Stop 1 is the centroid (no offset), so the middle
+    // stop should land at the canonical centroid.
+    const day1 = itinerary.days[0]!;
+    expect(day1.stops[1]?.lng).toBeCloseTo(-7.7793, 3);
+    expect(day1.stops[1]?.lat).toBeCloseTo(41.1419, 3);
+  });
+
+  it("fans out stops within a day so the filmstrip highlight is visually distinct", async () => {
+    const itinerary = await generateItineraryFromBrief(tripBrief);
+
+    // On day 1 (region: douro-valley), the 3 stops should
+    // have 3 distinct (lng, lat) pairs — the per-stop
+    // offset rotates through [-0.005, 0], [+0.005, 0] of
+    // the centroid. The middle stop is the centroid
+    // itself; the first and third stops are offset by
+    // ±0.005° in opposite directions.
+    const day1 = itinerary.days[0]!;
+    const day1Lngs = day1.stops.map((s) => s.lng);
+    const day1Lats = day1.stops.map((s) => s.lat);
+
+    // All three lngs are distinct (the offsets are
+    // -0.005, 0, +0.005 — all different).
+    expect(new Set(day1Lngs).size).toBe(3);
+    // All three lats are distinct.
+    expect(new Set(day1Lats).size).toBe(3);
+
+    // The offsets are within ±0.01° of the centroid
+    // (the STOP_OFFSETS array's largest component is 0.005).
+    for (const stop of day1.stops) {
+      expect(Math.abs(stop.lng! - (-7.7793))).toBeLessThanOrEqual(0.01);
+      expect(Math.abs(stop.lat! - 41.1419)).toBeLessThanOrEqual(0.01);
+    }
+  });
 });
