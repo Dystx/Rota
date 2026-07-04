@@ -12,6 +12,7 @@ import { getTripCommerceState } from "@/lib/trip-commerce";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { CinematicHero } from "./_components/cinematic-hero";
 import CinematicMapSection from "./_components/cinematic-map-section";
+import { StopFilmstrip, type FilmstripStop } from "./_components/stop-filmstrip";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false }
@@ -22,7 +23,10 @@ function prettify(value: string) { return value.replace(/-/g, " "); }
 type GeneratedItinerary = Awaited<ReturnType<typeof generateItineraryFromBrief>>;
 type ItineraryDay = GeneratedItinerary["days"][number];
 type ItineraryStop = ItineraryDay["stops"][number];
-type PreviewStop = Pick<ItineraryStop, "startTime" | "placeName">;
+type PreviewStop = Pick<
+  ItineraryStop,
+  "startTime" | "placeName" | "lng" | "lat"
+>;
 type DisplayStop = ItineraryStop | PreviewStop | string;
 type DisplayDay = Pick<ItineraryDay, "dayIndex" | "theme" | "summary" | "warnings"> & {
   stops: DisplayStop[];
@@ -109,6 +113,43 @@ export default async function TripDetailPage({
     { id: "next-step", label: "Next Step" }
   ];
 
+  // Flatten the day/stop tree into the filmstrip's stop list.
+  // The filmstrip shows the first day's stops under "Today's Stops";
+  // the vertical ItineraryTimeline below still shows the full week.
+  const firstDay = timelineDaysRaw[0];
+  const filmstripStops: FilmstripStop[] = firstDay
+    ? firstDay.stops.map((stop, idx) => {
+        const time = (
+          typeof stop === "string" ? stop.split(" ")[0] : stop.startTime
+        ) ?? "00:00";
+        const place =
+          typeof stop === "string"
+            ? stop.split(" ").slice(1).join(" ")
+            : stop.placeName;
+        // The deterministic itinerary provider now emits
+        // `lng`/`lat` on every stop (see `REGION_CENTROIDS` in
+        // `packages/ai/src/index.ts`). When the stop has both
+        // fields, project them into the `[lng, lat]` tuple the
+        // filmstrip's `FilmstripStopForMap.coordinates` expects.
+        // The filmstrip's onClick guard treats missing
+        // coordinates as a no-op, so legacy stops without
+        // coords render correctly.
+        const coordinates =
+          typeof stop === "string" || stop.lng === undefined || stop.lat === undefined
+            ? undefined
+            : ([stop.lng, stop.lat] as const);
+        return {
+          id: `day-${firstDay.dayIndex}-stop-${idx}`,
+          dayIndex: firstDay.dayIndex,
+          startTime: time,
+          placeName: place,
+          description: firstDay.summary,
+          imageSeed: `trip-${tripId}-stop-${idx}`,
+          coordinates
+        };
+      })
+    : [];
+
   return (
     <PageShell variant="app">
       <CinematicGuide>
@@ -162,13 +203,22 @@ export default async function TripDetailPage({
 
         <GuideChapter id="route" className="p-0 relative min-h-[60vh]">
           {itinerary?.days && (
-            <CinematicMapSection 
-              days={itinerary.days} 
-              tripId={tripId} 
-              reducedMotion={false} 
+            <CinematicMapSection
+              days={itinerary.days}
+              tripId={tripId}
+              reducedMotion={false}
+              filmstripStops={filmstripStops}
             />
           )}
         </GuideChapter>
+
+        {filmstripStops.length > 0 && (
+          <section className="py-12 md:py-16 bg-surface-container-low/40 border-t border-olive-light/10">
+            <div className="mx-auto max-w-[1400px]">
+              <StopFilmstrip stops={filmstripStops} />
+            </div>
+          </section>
+        )}
 
         <GuideChapter id="itinerary" className="py-12 md:py-24">
           <div className="mx-auto max-w-[800px]">
@@ -232,7 +282,21 @@ export default async function TripDetailPage({
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-center border-b border-current/20 pb-3 last:border-b-0 last:pb-0 gap-4">
-      <span className="text-[12px] font-semibold uppercase tracking-[0.1em] opacity-60">{label}</span>
+      {/*
+        SummaryRow is used in two contexts that need contrast in
+        opposite directions:
+          1. The Brief card (light surface, dark text inherited)
+          2. The Unlock & Delivery card (dark ink surface, light
+             paper text inherited)
+        `opacity-60` originally read as #707e76 on the Brief card
+        (4.17:1, just under WCAG AA) but passed on the Unlock card
+        (paper at 60% on dark ink). Bumping to `opacity-75` keeps
+        the inherited text color so the design adapts to whichever
+        card it's in, while pushing the Brief side to ~6.5:1
+        (WCAG AAA). The Unlock side lands at ~7:1 — still well
+        above 4.5:1.
+      */}
+      <span className="text-[12px] font-semibold uppercase tracking-[0.1em] opacity-75">{label}</span>
       <span className="text-sm font-medium text-right">{value}</span>
     </div>
   );
