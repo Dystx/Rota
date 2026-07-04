@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Portugal coast at golden hour">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0DAA0"/>
+      <stop offset="0.35" stop-color="#E5B570"/>
+      <stop offset="0.7" stop-color="#A87038"/>
+      <stop offset="1" stop-color="#3A2510"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.78" cy="0.4" r="0.18">
+      <stop offset="0" stop-color="#FFE9B5" stop-opacity="1"/>
+      <stop offset="0.4" stop-color="#F5C77A" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#F5C77A" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cliff" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5A4530"/>
+      <stop offset="1" stop-color="#2A1A12"/>
+    </linearGradient>
+    <linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3A4A5A"/>
+      <stop offset="0.5" stop-color="#1A2A3A"/>
+      <stop offset="1" stop-color="#0A1520"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0">
+      <feTurbulence baseFrequency="0.7" numOctaves="2" seed="11"/>
+      <feColorMatrix values="0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.06 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <!-- Sky: golden-hour gradient -->
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <!-- Sun glow -->
+  <rect width="1920" height="1080" fill="url(#sun)"/>
+  <!-- Distant headland silhouette -->
+  <path d="M0 540 L300 480 L600 500 L900 460 L1100 470 L1280 440 L1500 460 L1700 430 L1920 450 L1920 600 L0 600 Z" fill="#3A2A1A" opacity="0.55"/>
+  <path d="M0 570 L240 540 L480 555 L720 520 L960 545 L1200 510 L1440 535 L1680 510 L1920 530 L1920 600 L0 600 Z" fill="#1F1408" opacity="0.7"/>
+  <!-- Foreground cliff on the left -->
+  <g fill="url(#cliff)">
+    <path d="M0 540 L0 800 L260 800 L260 660 L340 600 L380 540 Z"/>
+    <path d="M0 700 L120 700 L120 740 L0 740 Z" opacity="0.85"/>
+    <path d="M180 720 L240 720 L240 760 L180 760 Z" opacity="0.7"/>
+  </g>
+  <!-- Smaller mid-ground headland -->
+  <g fill="url(#cliff)">
+    <path d="M520 560 L520 720 L760 720 L760 640 L820 580 L840 560 Z" opacity="0.9"/>
+  </g>
+  <!-- Ocean -->
+  <rect y="720" width="1920" height="360" fill="url(#ocean)"/>
+  <!-- Sun reflection on water -->
+  <g fill="#FFE9B5" opacity="0.4">
+    <ellipse cx="1500" cy="780" rx="280" ry="20"/>
+    <ellipse cx="1500" cy="820" rx="240" ry="14"/>
+    <ellipse cx="1500" cy="860" rx="200" ry="10"/>
+    <ellipse cx="1500" cy="900" rx="160" ry="8"/>
+    <ellipse cx="1500" cy="940" rx="120" ry="6"/>
+    <ellipse cx="1500" cy="980" rx="80" ry="4"/>
+  </g>
+  <!-- Water ripples -->
+  <g fill="#A87038" opacity="0.18">
+    <rect y="760" width="1920" height="2"/>
+    <rect y="820" width="1920" height="1.5"/>
+    <rect y="880" width="1920" height="2"/>
+    <rect y="950" width="1920" height="1.5"/>
+  </g>
+  <!-- Subtle film grain -->
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.5"/>
+</svg>
