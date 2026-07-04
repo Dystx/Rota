@@ -5,7 +5,9 @@ import { buildEmailPreview } from "@repo/emails";
 import { getCheckoutPlan } from "@repo/payments";
 import { ArchiveLayout, Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { BehaviorConsentToggle } from "./_components/behavior-consent-toggle";
+import { signOutAction } from "./_actions/sign-out";
 
 export const metadata: Metadata = {
   title: "My Account",
@@ -26,6 +28,9 @@ function formatDate(value: string) {
 }
 
 export default async function AccountPage() {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   let trips = [] as Awaited<ReturnType<typeof listTripDrafts>>;
   let infoMessage = "";
   const unlockPlan = getCheckoutPlan("paid-trip");
@@ -51,6 +56,46 @@ export default async function AccountPage() {
         description: "Access your drafted routes, unlock final itineraries, and request human review."
       }}
     >
+      {/* Phase C.5: profile section. Shows the signed-in user's
+          email + a sign-out form. The placeholder "Preferences"
+          paragraph is gone; this section is the real content. */}
+      <Card data-testid="account-profile" className="col-span-full flex flex-col bg-white/70">
+        <CardHeader className="pb-2">
+          <CardTitle>Profile</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-1 flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="grid gap-1">
+            <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
+              Signed in as
+            </p>
+            <p
+              data-testid="account-profile-email"
+              className="font-body-md text-body-md text-primary break-all"
+            >
+              {user?.email ?? "Anonymous session"}
+            </p>
+            {user?.id ? (
+              <p className="font-mono-micro text-mono-micro text-on-surface-variant break-all">
+                ID · {user.id}
+              </p>
+            ) : null}
+          </div>
+          <form action={signOutAction} className="md:self-end">
+            <Button
+              type="submit"
+              variant="ghost"
+              data-testid="account-sign-out"
+              className="text-on-surface-variant hover:text-primary"
+            >
+              <span aria-hidden className="material-symbols-outlined text-[16px] mr-1.5">
+                logout
+              </span>
+              Sign out
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
       {infoMessage ? (
         <Card className="col-span-full bg-white/70">
           <CardContent className="pt-6">
@@ -153,7 +198,7 @@ export default async function AccountPage() {
         </CardHeader>
         <CardContent className="flex flex-1 flex-col gap-4">
           <p className="rota-muted text-sm leading-relaxed">
-            Account settings and personal travel preferences will appear here. Manage your notification settings and saved defaults.
+            Personalization preferences for your itineraries.
           </p>
           <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
             <BehaviorConsentToggle />
