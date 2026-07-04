@@ -9,6 +9,7 @@ import {
   ItineraryTimeline, TimelineDay
 } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
+import { resolveCoverImage } from "@/lib/trip-cover";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { CinematicHero } from "./_components/cinematic-hero";
 import CinematicMapSection from "./_components/cinematic-map-section";
@@ -33,30 +34,6 @@ function prettify(value: string) { return value.replace(/-/g, " "); }
  * dependency. The CinematicHero's Ken Burns effect applies to
  * whatever's passed in (image src or inline SVG).
  */
-const DEFAULT_COVERS: Record<string, string> = {
-  porto: "/trip-covers/porto-ribeira.svg",
-  lisbon: "/trip-covers/lisbon-tagus.svg",
-  douro: "/trip-covers/douro-vineyards.svg",
-  azores: "/trip-covers/azores-craters.svg",
-  algarve: "/trip-covers/algarve-coast.svg",
-  sintra: "/trip-covers/sintra-palace.svg",
-  cascais: "/trip-covers/cascais-coast.svg",
-  coimbra: "/trip-covers/coimbra-uni.svg",
-  iberia: "/trip-covers/iberia-overview.svg"
-};
-
-function resolveCoverImage(
-  brief: import("@repo/types").TripBrief | undefined
-): string | undefined {
-  const regions = brief?.regions;
-  if (!regions || regions.length === 0) {
-    return DEFAULT_COVERS.iberia;
-  }
-  const first = regions[0];
-  if (!first) return DEFAULT_COVERS.iberia;
-  const region = first.toLowerCase().replace(/\s+/g, "-");
-  return DEFAULT_COVERS[region] ?? DEFAULT_COVERS.iberia;
-}
 
 /**
  * Synthesize a 1-2 sentence summary of a TripBrief. The brief is

@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import type { TripDraftListItem } from "@repo/db";
+import { ItineraryExportDrawer } from "./itinerary-export-drawer";
 
 /**
  * ItinerarySearch — small client island for the /itineraries page.
@@ -12,6 +12,11 @@ import type { TripDraftListItem } from "@repo/db";
  * in the same card layout the page used before. Renders nothing
  * when the filter excludes everything (with a clear-empty hint).
  *
+ * Clicking a card opens the export drawer (Stitch 1.7) with
+ * PDF / Calendar / Share options. The drawer is the primary
+ * action surface for a saved trip; navigating to the full
+ * trip page happens from inside the drawer.
+ *
  * Why client-side filter: the page is RSC-streamed from Supabase;
  * pushing the filter through the server would require a router
  * round-trip on every keystroke. With 24 rows max the in-memory
@@ -20,6 +25,7 @@ import type { TripDraftListItem } from "@repo/db";
 export function ItinerarySearch({ trips }: { trips: TripDraftListItem[] }) {
   const [query, setQuery] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<"all" | "draft" | "paid" | "in_review" | "reviewed">("all");
+  const [selectedTrip, setSelectedTrip] = React.useState<TripDraftListItem | null>(null);
 
   const visible = React.useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -108,14 +114,19 @@ export function ItinerarySearch({ trips }: { trips: TripDraftListItem[] }) {
           </p>
         </div>
       ) : (
-        <ul role="list" className="grid grid-cols-1 md:grid-cols-3 gap-gutter list-none p-0 m-0">
+        <ul role="list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter list-none p-0 m-0">
           {visible.map((trip) => (
             <li key={trip.id}>
-              <ItineraryCard trip={trip} />
+              <ItineraryCard trip={trip} onSelect={setSelectedTrip} />
             </li>
           ))}
         </ul>
       )}
+
+      <ItineraryExportDrawer
+        trip={selectedTrip}
+        onClose={() => setSelectedTrip(null)}
+      />
     </>
   );
 }
@@ -127,7 +138,13 @@ const STATUS_TONE: Record<string, string> = {
   reviewed: "bg-emerald-100 text-emerald-800"
 };
 
-function ItineraryCard({ trip }: { trip: TripDraftListItem }) {
+function ItineraryCard({
+  trip,
+  onSelect,
+}: {
+  trip: TripDraftListItem;
+  onSelect: (trip: TripDraftListItem) => void;
+}) {
   const statusTone = STATUS_TONE[trip.status] ?? "bg-olive-light/20 text-olive-dark";
   const subtitle = [
     trip.brief?.destinationCountry,
@@ -136,10 +153,12 @@ function ItineraryCard({ trip }: { trip: TripDraftListItem }) {
     .filter(Boolean)
     .join(" · ");
   return (
-    <Link
-      href={`/trip/${trip.id}`}
+    <button
+      type="button"
+      onClick={() => onSelect(trip)}
       data-testid={`itinerary-card-${trip.id}`}
-      className="block bg-glass-light backdrop-blur-md rounded-xl border border-white/20 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+      aria-label={`Open export options for ${trip.title || "trip"}`}
+      className="group block w-full text-left bg-glass-light backdrop-blur-md rounded-xl border border-white/20 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
     >
       <div className="flex items-center justify-between mb-2">
         <span
@@ -159,10 +178,11 @@ function ItineraryCard({ trip }: { trip: TripDraftListItem }) {
           {subtitle}
         </p>
       )}
-      <span className="inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-dark hover:underline">
-        Open trip
+      <span className="inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-dark group-hover:underline">
+        <span className="material-symbols-outlined text-[16px]">ios_share</span>
+        Export &amp; share
         <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
       </span>
-    </Link>
+    </button>
   );
 }
