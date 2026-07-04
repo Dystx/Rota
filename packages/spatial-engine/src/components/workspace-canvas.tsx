@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import type { Map as MapLibreMap } from "maplibre-gl";
 import { useReducedMotion } from "@repo/ui";
 import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createWorkspaceEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
@@ -111,6 +112,16 @@ export interface WorkspaceCanvasProps {
    * code path either way.
    */
   projection?: "globe" | "mercator";
+  /**
+   * Fired once after the engine mounts, with the live MapLibre map
+   * handle. Consumers use this to register a "stops" source with
+   * the cross-page `useMapStore` (the high-frequency Zustand→MapLibre
+   * path; see `apps/web/store/useMapStore.ts`).
+   *
+   * Fires exactly once per mount. If the engine is unmounted before
+   * the mount promise resolves, the callback does NOT fire.
+   */
+  onMapReady?: (map: MapLibreMap) => void;
 }
 
 const DEFAULT_HOME_CENTER: readonly [number, number] = [-8.6291, 41.1579];
@@ -143,7 +154,8 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       onStopClick,
       terrain,
       fog,
-      projection
+      projection,
+      onMapReady
     },
     ref
   ) {
@@ -238,11 +250,22 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
             engine.unmount();
             return;
           }
+          // Fire onMapReady once, with the live MapLibre handle. This
+          // is the hook consumers use to register a "stops" source
+          // with useMapStore. Fires after the `cancelled` short-
+          // circuit so a mount-then-unmount race doesn't leak the
+          // callback to a page that's already gone.
+          const map = engine.getRenderer();
+          if (map && onMapReady) {
+            onMapReady(map);
+          }
+
           const unsubscribe = engine.getTelemetry().subscribe("trips", () => undefined);
 
           // Same moveend / click forwarding as GlobeWorkspace so the
           // Zustand store stays in lock-step with what the user sees.
-          const map = engine.getRenderer();
+          // `map` is already declared above (for the onMapReady
+          // callback); reuse it here.
           const detachViewport = map && onViewportChange
             ? (() => {
                 const handler = () => {

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import type { Map as MapLibreMap } from "maplibre-gl";
 import { useReducedMotion } from "@repo/ui";
 import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createDiscoveryEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
@@ -123,6 +124,16 @@ export interface GlobeWorkspaceProps {
    * in the spatial-engine fixtures; map ids to slugs in the consumer.
    */
   onStopClick?: (stopId: string, coordinates: readonly [number, number]) => void;
+  /**
+   * Fired once after the engine mounts, with the live MapLibre map
+   * handle. Consumers use this to register a "stops" source with
+   * the cross-page `useMapStore` (the high-frequency Zustand→MapLibre
+   * path; see `apps/web/store/useMapStore.ts`).
+   *
+   * Fires exactly once per mount. If the engine is unmounted before
+   * the mount promise resolves, the callback does NOT fire.
+   */
+  onMapReady?: (map: MapLibreMap) => void;
 }
 
 const DEFAULT_HOME_CENTER: readonly [number, number] = [-8.2245, 39.3999];
@@ -151,6 +162,7 @@ export function GlobeWorkspace({
   testId = "globe-workspace",
   onViewportChange,
   onStopClick,
+  onMapReady,
   projection
 }: GlobeWorkspaceProps): React.ReactElement {
   // If `initialFocus` is set, it wins and the intro choreography is
@@ -203,6 +215,17 @@ export function GlobeWorkspace({
           engine.unmount();
           return;
         }
+        // Fire onMapReady once, with the live MapLibre handle. This
+        // is the hook consumers use to register a "stops" source with
+        // useMapStore (the high-frequency Zustand→MapLibre path).
+        // Fires after the `cancelled` short-circuit so a
+        // mount-then-unmount race doesn't leak the callback to a
+        // page that's already gone.
+        const map = engine.getRenderer();
+        if (map && onMapReady) {
+          onMapReady(map);
+        }
+
         const unsubscribe = engine.getTelemetry().subscribe("travelers", () => {
           // Phase 1: the AmbientPulseLayer receives the seeded collection
           // on subscribe; phase 2 will wire update fan-out to all layers
@@ -212,7 +235,8 @@ export function GlobeWorkspace({
         // Forward the live viewport to the consumer (e.g. Zustand store)
         // so cross-page surfaces mirror what the user is actually looking
         // at. Each `moveend` (pan, zoom, rotate) snapshots the renderer.
-        const map = engine.getRenderer();
+        // `map` is already declared above (line 223) for the
+        // onMapReady callback; reuse it here.
         const detachViewport = map && onViewportChange
           ? (() => {
               const handler = () => {
