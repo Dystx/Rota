@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@repo/ai", "@repo/config", "@repo/db", "@repo/routing", "@repo/ui", "@repo/types", "@repo/workers"],
@@ -16,4 +17,23 @@ const nextConfig: NextConfig = {
   }
 };
 
-export default nextConfig;
+// `withSentryConfig` is a no-op in the absence of
+// `SENTRY_DSN` / `SENTRY_AUTH_TOKEN` (the SDK detects the
+// missing DSN at the config files). `silent: !SENTRY_DSN`
+// keeps the build log clean in dev/preview; `dryRun`
+// skips the Sentry CLI source-map upload step when the
+// auth token is missing.
+const sentryBuildOptions = {
+  silent: !process.env.SENTRY_DSN,
+  hideSourceMaps: true,
+  disableLogger: true,
+  dryRun: !process.env.SENTRY_AUTH_TOKEN,
+  // Turbopack-friendly: the @sentry/nextjs build plugin
+  // walks the .next output to inject the SDK; the v8
+  // SDK supports Next.js 15+ and works with Turbopack.
+  widenClientFileUpload: true
+} as Parameters<typeof withSentryConfig>[1];
+
+export default process.env.SENTRY_DSN
+  ? withSentryConfig(nextConfig, sentryBuildOptions)
+  : nextConfig;

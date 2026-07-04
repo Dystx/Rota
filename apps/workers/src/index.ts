@@ -15,6 +15,14 @@ import {
   tryCapture,
   type MonitoringProvider
 } from "@repo/monitoring";
+import { initSentry, captureException } from "./sentry";
+
+// Initialize Sentry at module load. The SDK is a no-op
+// when SENTRY_DSN is unset, so dev / CI without secrets
+// still boot cleanly. The web app never imports this
+// barrel (it imports from `@repo/workers/plan` instead),
+// so the SDK never initializes in a Next.js process.
+initSentry();
 
 // Re-export the pure worker-plan builder from its own module so
 // internal Node callers (this barrel, the workers process) keep
