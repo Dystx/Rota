@@ -35,7 +35,7 @@ export function DestinationBento() {
     }
   };
   return (
-    <section className="max-w-7xl mx-auto px-container-padding-lg py-section-gap relative -mt-32 z-20">
+    <section className="max-w-7xl mx-auto px-container-padding-lg py-section-gap relative -mt-16 z-20">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[250px]">
         {/* Bento Item 1: Lisbon (Large) */}
         <Link
