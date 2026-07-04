@@ -41,11 +41,14 @@ const PORTUGAL_CENTER = { lng: -8.165, lat: 39.55 };
 export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
   const [projection, setProjection] = React.useState<HeroProjection>(initialProjection);
 
-  // Wire the visible map surface back to the cross-page Zustand store.
-  // The store is read by the bento grid (selection -> fly-to) and the
-  // workspace filmstrip (active stop). Subscribers here stay stable
-  // across renders — no need to memoise the handlers.
-  const setViewport = useMapStore((state) => state.setViewport);
+  // Wire the visible map surface back to the cross-page Zustand
+  // store. The store is read by the bento grid (selection -> fly-to)
+  // and the workspace filmstrip (active stop). Subscribers here stay
+  // stable across renders — no need to memoise the handlers.
+  //
+  // (Prior to 2026-07-04 this also wired `setViewport`; the
+  // store's `viewport` was removed as dead code — the
+  // spatial-engine still owns the live camera state.)
   const selectStop = useMapStore((state) => state.selectStop);
 
   // Render a SINGLE GlobeWorkspace for both projection modes and let
@@ -73,7 +76,6 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
         testId="hero-globe"
         initialCenter={[PORTUGAL_CENTER.lng, PORTUGAL_CENTER.lat]}
         initialZoom={3.4}
-        onViewportChange={setViewport}
         onStopClick={(id, coords) => selectStop(id, coords)}
         projection={projection}
       />

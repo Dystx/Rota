@@ -11,14 +11,15 @@ const GlobeWorkspace = dynamic(
 );
 
 export function DiscoveryGlobe() {
-  const setViewport = useMapStore((state) => state.setViewport);
+  // (Prior to 2026-07-04 this also wired `setViewport`; the
+  // store's `viewport` was removed as dead code — the
+  // spatial-engine still owns the live camera state.)
   const selectStop = useMapStore((state) => state.selectStop);
   return (
     <GlobeWorkspace
       theme="dark"
       className="h-[640px] w-full overflow-hidden rounded-[32px] border border-olive-dark/10 shadow-[0_24px_60px_rgba(7,17,19,0.06)]"
       testId="explore-globe"
-      onViewportChange={setViewport}
       onStopClick={(id, coords) => selectStop(id, coords)}
     />
   );

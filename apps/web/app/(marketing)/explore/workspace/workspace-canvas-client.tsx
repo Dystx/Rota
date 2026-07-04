@@ -39,7 +39,9 @@ function WorkspaceCanvasInner() {
   const focusSlug = params.get("focus");
   const preset = getDestinationPreset(focusSlug);
 
-  const setViewport = useMapStore((state) => state.setViewport);
+  // (Prior to 2026-07-04 this also wired `setViewport`; the
+  // store's `viewport` was removed as dead code — the
+  // spatial-engine still owns the live camera state.)
   const selectStop = useMapStore((state) => state.selectStop);
   const setSourceData = useMapStore((state) => state.setSourceData);
   const activeStopId = useMapStore((state) => state.activeStopId);
@@ -90,7 +92,6 @@ function WorkspaceCanvasInner() {
         className="h-full w-full"
         testId="explore-workspace-canvas"
         initialFocus={preset?.camera}
-        onViewportChange={setViewport}
         onStopClick={(id, coords) => selectStop(id, coords)}
         onMapReady={(map) => {
           // Register the "stops" source once; the store's

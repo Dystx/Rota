@@ -42,6 +42,13 @@ import {
 import WorkspaceTripCanvas, {
   type WorkspaceTripCanvasHandle
 } from "./workspace-trip-canvas";
+import {
+  useFilmstripSourceSync,
+  type FilmstripStopForMap
+} from "@/lib/hooks/useFilmstripSourceSync";
+import {
+  useTargetCoordinatesCameraSync
+} from "@/lib/hooks/useTargetCoordinatesCameraSync";
 
 type ChapterActivationSource = "scroll" | "click" | "keyboard" | "deep-link";
 
@@ -90,6 +97,16 @@ interface CinematicMapSectionProps {
   days: TripDay[];
   tripId: string;
   reducedMotion: boolean;
+  /**
+   * Optional filmstrip stops. When provided, the section subscribes
+   * to `useMapStore.activeStopId` and pushes a single-point
+   * GeoJSON feature collection to the map's `stops` source so
+   * clicking a filmstrip card highlights the corresponding point.
+   * The hook is a no-op when the stops have no coordinates — the
+   * wiring is in place for when stop coordinates land in the
+   * trip brief / itinerary data shape.
+   */
+  filmstripStops?: readonly FilmstripStopForMap[];
 }
 
 /**
@@ -101,13 +118,22 @@ interface CinematicMapSectionProps {
 export default function CinematicMapSection({
   days,
   tripId,
-  reducedMotion
+  reducedMotion,
+  filmstripStops
 }: CinematicMapSectionProps) {
   // Hooks must be called unconditionally (React rules)
   const chapters = React.useMemo<ChapterCameraTarget[]>(
     () => stopsToChapters(days),
     [days]
   );
+
+  // Wire the filmstrip's `useMapStore.activeStopId` to the map's
+  // `stops` GeoJSON source. Subscribes via the high-frequency
+  // Zustand path so the highlight tracks the click without
+  // triggering React re-renders. No-op when stops have no
+  // coordinates (the trip brief data shape doesn't carry them
+  // today; the hook will activate the moment coordinates land).
+  useFilmstripSourceSync(filmstripStops ?? []);
   const sectionRef = React.useRef<HTMLDivElement>(null);
   const reducedMotionPreference = useReducedMotion();
   const effectiveReducedMotion = reducedMotion || reducedMotionPreference;
@@ -241,6 +267,13 @@ export default function CinematicMapSection({
       void handle.flyTo({ chapter: activeChapter });
     }
   }, [activeChapterId, chapters, effectiveReducedMotion]);
+
+  // Bridge `useMapStore.targetCoordinates` (set by the bento
+  // destination grid on the home page and by filmstrip card
+  // clicks on this page) into a camera flight. The
+  // race-safety + sentinel guards live in the hook so they
+  // can be unit-tested in isolation.
+  useTargetCoordinatesCameraSync(() => canvasRef.current);
 
   const scrollToChapter = React.useCallback(
     (chapterIndex: number, source: "click" | "keyboard"): void => {

@@ -52,11 +52,20 @@ export type ChapterChangeSource = "scroll" | "click" | "keyboard" | "deep-link";
  * `WorkspaceTripCanvasHandle` — the imperative surface the section
  * uses to drive the camera. `flyTo` matches the Mapbox-era name;
  * `jumpTo` is the instant variant the section uses when the user
- * has `prefers-reduced-motion: reduce` enabled.
+ * has `prefers-reduced-motion: reduce` enabled. `flyToPoint` is
+ * the single-coordinate variant the section calls in response
+ * to `useMapStore.targetCoordinates` updates (bento / filmstrip
+ * clicks).
  */
 export interface WorkspaceTripCanvasHandle {
   flyTo: (target: { chapter: ChapterCameraTarget }) => Promise<void>;
   jumpTo: (target: { chapter: ChapterCameraTarget }) => void;
+  flyToPoint: (target: {
+    lng: number;
+    lat: number;
+    zoom?: number;
+    duration?: number;
+  }) => Promise<void>;
 }
 
 const WorkspaceCanvas = dynamic(
@@ -142,6 +151,22 @@ export const WorkspaceTripCanvas = React.forwardRef<
         handle.jumpTo({
           ...chapterToCameraTarget(chapter),
           duration: 0
+        });
+      },
+      /**
+       * Fly the camera to a single point. Used by the
+       * `useMapStore.targetCoordinates` consumer in
+       * `CinematicMapSection` to bridge bento + filmstrip clicks
+       * into a camera flight. Default zoom 14 is the "identify the
+       * point" sweet spot for trip stops; callers can override.
+       */
+      flyToPoint: async ({ lng, lat, zoom, duration }) => {
+        const handle = canvasRef.current;
+        if (!handle) return;
+        await handle.flyTo({
+          center: [lng, lat],
+          zoom: zoom ?? 14,
+          duration: duration ?? effectiveDuration ?? 1800
         });
       }
     }),

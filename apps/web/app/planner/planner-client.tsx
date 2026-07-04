@@ -47,6 +47,31 @@ const FOLLOW_UP_ANSWERS: Record<string, string[]> = {
   pace: ["calm", "balanced", "full"]
 };
 
+/**
+ * Binary question variant (1.3 reference parity).
+ *
+ * The reference shows a "Will you rent a car?" focal card with two large
+ * icon-led tiles. When a follow-up question has exactly two options and
+ * both map to a Material Symbol, we render the dual-tile layout instead
+ * of the chip group.
+ */
+const BINARY_OPTION_ICONS: Record<string, string> = {
+  // Mobility
+  "Yes, airport pickup": "car_rental",
+  "Yes, I'll rent a car": "car_rental",
+  "Rent a car": "car_rental",
+  "No, transit & walking": "directions_transit",
+  "No, public transit": "directions_transit",
+  "Public transit": "directions_transit",
+  // Fallback labels for the chip set's binary pairs
+  "calm": "self_care",
+  "full": "local_fire_department"
+};
+
+function isBinaryQuestion(options: readonly string[]): boolean {
+  return options.length === 2 && options.every((o) => o in BINARY_OPTION_ICONS);
+}
+
 export function PlannerClient() {
   const router = useRouter();
   const [flow, setFlow] = useState<FlowState>({ kind: "idle" });
@@ -303,6 +328,18 @@ function FollowUpPanel({
         {questions.map((q) => {
           const current = answers[q.id] ?? "";
           const suggestions = FOLLOW_UP_ANSWERS[q.field] ?? q.options;
+          // Binary variant: 1.3 Smart Logistical Cards (dual-tile)
+          if (isBinaryQuestion(suggestions)) {
+            return (
+              <BinaryQuestionCard
+                key={q.id}
+                question={q}
+                options={suggestions}
+                current={current}
+                onSelect={(opt) => onChange({ ...answers, [q.id]: opt })}
+              />
+            );
+          }
           const selectedIndex = suggestions.findIndex((s) => s === current);
           const activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
           return (
@@ -362,6 +399,99 @@ function FollowUpPanel({
         </Button>
       </div>
     </div>
+  );
+}
+
+/**
+ * BinaryQuestionCard — 1.3 reference: dual-tile focal card.
+ *
+ * Two large icon-led tiles. The selected tile gets the ochre-light
+ * border, the unselected tile keeps the olive-light/10 border. A
+ * check_circle indicator appears in the top-right of the selected tile.
+ * Keyboard navigation: arrow keys move focus, Enter selects.
+ */
+function BinaryQuestionCard({
+  question,
+  options,
+  current,
+  onSelect
+}: {
+  question: PromptFollowUpQuestion;
+  options: readonly string[];
+  current: string;
+  onSelect: (option: string) => void;
+}): ReactNode {
+  const activeIndex = Math.max(0, options.findIndex((o) => o === current));
+  return (
+    <fieldset className="space-y-2">
+      <legend className="font-label-ui text-label-ui font-semibold text-linen-dark">
+        {question.label}
+      </legend>
+      <p className="font-body-md text-body-md text-linen-dark/80">{question.question}</p>
+      <div
+        role="radiogroup"
+        aria-label={question.label}
+        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+            e.preventDefault();
+            onSelect(options[(activeIndex + 1) % options.length]!);
+          } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+            e.preventDefault();
+            onSelect(options[(activeIndex - 1 + options.length) % options.length]!);
+          }
+        }}
+      >
+        {options.map((opt, index) => {
+          const selected = current === opt;
+          const icon = BINARY_OPTION_ICONS[opt] ?? "help";
+          return (
+            <button
+              key={opt}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              tabIndex={index === activeIndex ? 0 : -1}
+              onClick={() => onSelect(opt)}
+              className={
+                "group relative flex flex-col items-center justify-center p-5 rounded-lg border transition-all duration-300 overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light " +
+                (selected
+                  ? "bg-surface-container-lowest/95 border-ochre-light text-primary"
+                  : "bg-surface-container-lowest/80 border-olive-light/10 text-linen-dark hover:border-ochre-light hover:bg-surface-container-lowest")
+              }
+            >
+              <span
+                aria-hidden="true"
+                className={
+                  "absolute inset-0 bg-ochre-light/5 transition-opacity " +
+                  (selected ? "opacity-100" : "opacity-0 group-hover:opacity-100")
+                }
+              />
+              <span
+                className={
+                  "material-symbols-outlined text-3xl mb-2 transition-colors " +
+                  (selected ? "text-ochre-dark" : "text-olive-dark group-hover:text-ochre-dark")
+                }
+              >
+                {icon}
+              </span>
+              <span className="font-label-ui text-label-ui text-center mb-0.5">
+                {opt}
+              </span>
+              <span
+                aria-hidden="true"
+                className={
+                  "absolute top-2 right-2 material-symbols-outlined text-ochre-dark transition-opacity " +
+                  (selected ? "opacity-100" : "opacity-0")
+                }
+              >
+                check_circle
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }
 

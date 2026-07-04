@@ -32,7 +32,7 @@ export default function HomePage() {
 
       <main className="flex-1" id="main-content">
         {/* Hero Section (Cinematic Gate with Spatial Engine canopy) */}
-        <section className="relative h-[819px] min-h-[600px] w-full flex flex-col justify-center items-center overflow-hidden">
+        <section className="relative h-[560px] min-h-[480px] md:h-[819px] md:min-h-[600px] w-full flex flex-col justify-center items-center overflow-hidden">
           {/* Interactive 3D/2D map canopy — replaces the static sunset
               image so the executive summary's "Discovery Experience"
               directive (immersive interactive globe at app launch) is
@@ -43,15 +43,15 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-b from-primary/55 via-primary/15 to-background/95 z-[1] pointer-events-none" />
 
           {/* Hero Content */}
-          <div className="relative z-10 w-full max-w-4xl mx-auto px-container-padding-lg text-center flex flex-col items-center">
-            <h1 className="font-display text-display text-linen-dark mb-section-gap tracking-tight drop-shadow-2xl">
+          <div className="relative z-10 w-full max-w-4xl mx-auto px-container-padding-sm md:px-container-padding-lg text-center flex flex-col items-center">
+            <h1 className="font-display-mobile text-display-mobile md:font-display md:text-display text-linen-dark mb-section-gap tracking-tight drop-shadow-2xl">
               Discover <span className="italic text-ochre-light">Intentionally.</span>
             </h1>
 
             {/* Central Search Bar (The Wizard) */}
             <div className="w-full max-w-3xl bg-glass-light backdrop-blur-[24px] border border-white/40 rounded-xl p-card-padding shadow-2xl flex flex-col items-center">
               <div className="w-full flex items-center justify-between border-b border-olive-light/20 pb-4 mb-4">
-                <span className="font-headline-lg text-headline-lg text-primary text-center w-full">
+                <span className="font-headline-sm text-headline-sm md:font-headline-lg md:text-headline-lg text-primary text-center w-full">
                   We are visiting{" "}
                   <span className="text-ochre-dark border-b-2 border-ochre-dark/30 cursor-text">
                     Portugal
@@ -65,7 +65,7 @@ export default function HomePage() {
               </div>
               <Link
                 href="/planner"
-                className="bg-olive-light text-on-primary font-label-ui text-label-ui px-8 py-3 rounded-full hover:bg-olive-dark transition-all duration-200 shadow-md flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                className="bg-olive-light text-on-primary font-label-ui text-label-ui px-6 py-2.5 md:px-8 md:py-3 rounded-full hover:bg-olive-dark transition-all duration-200 shadow-md flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
                 Begin Journey{" "}
                 <span className="material-symbols-outlined text-[16px] motion-safe:group-hover:translate-x-1 motion-safe:transition-transform" aria-hidden="true">
