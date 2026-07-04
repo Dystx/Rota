@@ -42,6 +42,9 @@ export default function ConsoleMessagesPage() {
   const [activeId, setActiveId] = useState<string>(CONVERSATIONS[0]!.id);
   const [draft, setDraft] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  // Conversation-list search query. The search input's `value` is
+  // bound to this; the filtered list is derived in the render.
+  const [search, setSearch] = useState("");
   // Track Realtime connection to chat_messages. Feature-flagged so
   // SSR / no-Supabase environments keep the hardcoded board.
   const [isLive, setIsLive] = useState(false);
@@ -153,13 +156,26 @@ export default function ConsoleMessagesPage() {
                 </span>
                 <input
                   type="search"
-                  placeholder="Search…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by name, region, or last message…"
+                  data-testid="conversations-search"
                   className="w-full font-body-md text-body-md pl-10 pr-4 py-2 rounded-lg bg-white/60 border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light"
                 />
               </label>
             </div>
             <ul className="flex-1 overflow-y-auto">
-              {CONVERSATIONS.map((conversation) => {
+              {CONVERSATIONS
+                .filter((conversation) => {
+                  const q = search.trim().toLowerCase();
+                  if (!q) return true;
+                  return (
+                    conversation.name.toLowerCase().includes(q) ||
+                    conversation.region.toLowerCase().includes(q) ||
+                    conversation.lastMessage.toLowerCase().includes(q)
+                  );
+                })
+                .map((conversation) => {
                 const isSelected = conversation.id === activeId;
                 return (
                 <li key={conversation.id}>
