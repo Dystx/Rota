@@ -186,7 +186,6 @@ export function HeroSearchWizard() {
           }}
           testId="hero-chip-days"
         />
-        ...
       </span>
 
       <Link
