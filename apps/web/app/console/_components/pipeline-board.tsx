@@ -1,9 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { KanbanCard } from "./kanban-card";
 import { KanbanLane } from "./kanban-lane";
+import { RelativeTime } from "./relative-time";
 
 /**
  * A single trip-shaped row surfaced on the Operations Pipeline board.
@@ -86,8 +97,15 @@ function statusToBadge(slaHours: number | null, updatedAt: string | null, status
     };
   }
   if (updatedAt && status === "in_revision") {
-    const minutes = Math.max(1, Math.round((Date.now() - Date.parse(updatedAt)) / 60_000));
-    return { label: `Updated ${minutes}m ago`, tone: "ochre-dark" as const };
+    // PR-14b: live "Updated Xm ago" badge. The label is a JSX node so
+    // the parent component (KanbanCard) renders a <time> that ticks
+    // every minute on the client. SSR and first client render use the
+    // same value (RelativeTime's useState initializer), so there's no
+    // hydration mismatch on slow loads.
+    return {
+      label: <RelativeTime iso={updatedAt} className="font-mono-micro text-mono-micro" />,
+      tone: "ochre-dark" as const
+    };
   }
   return undefined;
 }
@@ -170,35 +188,128 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
     items: items.filter((item) => item.status === status)
   }));
 
+  // PR-14b: drag-and-drop between lanes. Visual + local-state only — the
+  // server action that persists the stage change is out of scope for
+  // this PR (see PR-9.4 in docs/roadmap.md). The PointerSensor activation
+  // constraint of 6px prevents accidental drags on click.
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor)
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+    const itemId = String(active.id);
+    const newStatus = over.id as PipelineItem["status"];
+    if (!STATUS_ORDER.includes(newStatus)) return;
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId && item.status !== newStatus
+          ? { ...item, status: newStatus }
+          : item
+      )
+    );
+  };
+
+  return (
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <div
+        className="flex-1 flex gap-gutter overflow-x-auto pb-4 rounded-xl"
+        data-realtime={isLive ? "live" : "fallback"}
+        data-testid="pipeline-board"
+      >
+        {lanes.map((lane) => (
+          <DroppableLane
+            key={lane.status}
+            id={lane.status}
+            title={lane.title}
+            count={lane.items.length}
+            dot={lane.dot}
+          >
+            {lane.items.length === 0 ? (
+              <p className="text-xs text-on-surface-variant/60 italic px-3 py-4">No items in this lane.</p>
+            ) : (
+              lane.items.map((item) => (
+                <DraggableCard
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  body={item.body}
+                  clientName={item.clientName}
+                  badge={statusToBadge(item.slaHours, item.updatedAt, item.status)}
+                  avatar={{ initials: initialsFor(item.clientName), alt: `${item.clientName} initials` }}
+                />
+              ))
+            )}
+          </DroppableLane>
+        ))}
+      </div>
+    </DndContext>
+  );
+}
+
+function DraggableCard({
+  id,
+  title,
+  body,
+  clientName,
+  badge,
+  avatar
+}: {
+  id: string;
+  title: string;
+  body: string;
+  clientName: string;
+  badge: { label: React.ReactNode; tone: "error" | "ochre" | "ochre-dark" } | undefined;
+  avatar: { initials: string; alt: string };
+}) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({ id });
+  // dnd-kit's transform comes in pixels; apply it directly so the card
+  // follows the cursor with no transition lag.
+  const style: React.CSSProperties | undefined = transform
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
+    : undefined;
   return (
     <div
-      className="flex-1 flex gap-gutter overflow-x-auto pb-4 rounded-xl"
-      data-realtime={isLive ? "live" : "fallback"}
-      data-testid="pipeline-board"
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className={isDragging ? "opacity-60 cursor-grabbing" : "cursor-grab"}
     >
-      {lanes.map((lane) => (
-        <KanbanLane
-          key={lane.status}
-          title={lane.title}
-          count={lane.items.length}
-          dot={lane.dot}
-        >
-          {lane.items.length === 0 ? (
-            <p className="text-xs text-on-surface-variant/60 italic px-3 py-4">No items in this lane.</p>
-          ) : (
-            lane.items.map((item) => (
-              <KanbanCard
-                key={item.id}
-                title={item.title}
-                body={item.body}
-                clientName={item.clientName}
-                badge={statusToBadge(item.slaHours, item.updatedAt, item.status)}
-                avatar={{ initials: initialsFor(item.clientName), alt: `${item.clientName} initials` }}
-              />
-            ))
-          )}
-        </KanbanLane>
-      ))}
+      <KanbanCard
+        title={title}
+        body={body}
+        clientName={clientName}
+        badge={badge}
+        avatar={avatar}
+      />
+    </div>
+  );
+}
+
+function DroppableLane({
+  id,
+  children,
+  ...laneProps
+}: {
+  id: PipelineItem["status"];
+  children: React.ReactNode;
+  title: string;
+  count: number;
+  dot: "secondary" | "ochre" | "surface-tint";
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`rounded-xl transition-shadow ${
+        isOver ? "ring-2 ring-ochre-light shadow-md" : ""
+      }`}
+    >
+      <KanbanLane {...laneProps}>{children}</KanbanLane>
     </div>
   );
 }

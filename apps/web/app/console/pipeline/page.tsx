@@ -1,4 +1,3 @@
-import { ConsoleNav } from "../_components/console-nav";
 import { SiteFooter } from "../../_components/site-footer";
 import { PipelineBoard } from "../_components/pipeline-board";
 
@@ -8,7 +7,6 @@ const AMBIENT_PATTERN =
 export default function ConsolePipelinePage() {
   return (
     <>
-      <ConsoleNav />
       <div className="min-h-screen flex flex-col bg-background">
         <main id="main-content" className="flex-1 md:ml-64 p-container-padding-lg max-h-screen overflow-hidden flex flex-col">
           <header className="mb-section-gap flex flex-col gap-4 md:flex-row md:items-end md:justify-between shrink-0">

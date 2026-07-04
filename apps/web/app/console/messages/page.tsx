@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, type ChangeEvent, type DragEvent } from "react";
-import { ConsoleNav } from "../_components/console-nav";
 import { SiteFooter } from "../../_components/site-footer";
 import { SnippetCard } from "../_components/snippet-card";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
@@ -112,7 +111,6 @@ export default function ConsoleMessagesPage() {
 
   return (
     <>
-      <ConsoleNav />
       <div className="min-h-screen flex flex-col bg-background relative">
         <div
           aria-hidden

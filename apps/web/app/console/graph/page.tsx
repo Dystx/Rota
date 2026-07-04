@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ConsoleNav } from "../_components/console-nav";
 import { SiteFooter } from "../../_components/site-footer";
 
 interface TreeNode {
@@ -89,7 +88,6 @@ export default function ConsoleGraphPage() {
 
   return (
     <>
-      <ConsoleNav />
       <div className="min-h-screen flex flex-col bg-[#050806] text-linen-dark relative z-10 md:ml-64">
         <header className="h-16 border-b border-white/5 flex items-center justify-between px-container-padding-lg shrink-0 bg-black/40 backdrop-blur-md">
           <nav

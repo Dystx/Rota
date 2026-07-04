@@ -1,4 +1,3 @@
-import { ConsoleNav } from "../_components/console-nav";
 import { SiteFooter } from "../../_components/site-footer";
 import { ClientAnchorCard } from "../_components/client-anchor-card";
 import { TimelineItem } from "../_components/timeline-item";
@@ -10,7 +9,6 @@ const AMBIENT_PATTERN =
 export default function ConsoleWorkspacePage() {
   return (
     <>
-      <ConsoleNav />
       <div
         className="min-h-screen flex flex-col bg-background relative"
         style={{ backgroundImage: AMBIENT_PATTERN }}

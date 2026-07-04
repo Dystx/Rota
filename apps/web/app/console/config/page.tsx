@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ConsoleNav } from "../_components/console-nav";
 import { SiteFooter } from "../../_components/site-footer";
 import { PromptMultiplier } from "../_components/prompt-multiplier";
 
@@ -12,7 +11,6 @@ export default function ConsoleConfigPage() {
 
   return (
     <>
-      <ConsoleNav />
       <div className="min-h-screen flex flex-col bg-background relative">
         <main id="main-content" className="flex-1 md:ml-64 p-container-padding-lg relative z-10">
           <div className="max-w-[1440px] mx-auto min-h-screen relative z-10 flex flex-col">

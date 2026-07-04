@@ -8,7 +8,7 @@ export interface KanbanCardProps {
   title: string;
   body: string;
   clientName: string;
-  badge?: { label: string; tone: KanbanBadgeTone };
+  badge?: { label: ReactNode; tone: KanbanBadgeTone };
   indicator?: ReactNode;
   avatar?: { src?: string; initials?: string; alt: string };
   accent?: "ochre";

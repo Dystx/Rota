@@ -1,4 +1,3 @@
-import { ConsoleNav } from "../_components/console-nav";
 import { SiteFooter } from "../../_components/site-footer";
 import { KpiCard } from "../_components/kpi-card";
 import { VolumeChart } from "../_components/volume-chart";
@@ -40,7 +39,6 @@ const REGIONS = [
 export default function ConsoleMetricsPage() {
   return (
     <>
-      <ConsoleNav />
       <div className="min-h-screen flex flex-col bg-background relative">
         <main id="main-content" className="flex-1 md:ml-64 p-container-padding-lg max-w-7xl mx-auto w-full flex flex-col gap-section-gap relative z-10">
           <header className="mb-4">
