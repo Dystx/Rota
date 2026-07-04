@@ -35,6 +35,12 @@ export interface PipelineItem {
 interface PipelineBoardProps {
   /** Server-rendered fallback when Supabase is unreachable or USE_REALTIME is off. */
   initialItems?: PipelineItem[];
+  /** Free-text query from the page header search input.
+   *  Filters by title, body, and clientName (case-insensitive). */
+  query?: string;
+  /** Status filter from the page header filter button.
+   *  "all" shows every lane; a specific status hides the others. */
+  statusFilter?: "all" | PipelineItem["status"];
 }
 
 const FALLBACK_ITEMS: PipelineItem[] = [
@@ -110,7 +116,11 @@ function statusToBadge(slaHours: number | null, updatedAt: string | null, status
   return undefined;
 }
 
-export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardProps) {
+export function PipelineBoard({
+  initialItems = FALLBACK_ITEMS,
+  query = "",
+  statusFilter = "all"
+}: PipelineBoardProps) {
   const [items, setItems] = useState<PipelineItem[]>(initialItems);
   // Track presence of the realtime subscription so the UI can show
   // a small "live" indicator when the channel is connected.
@@ -199,10 +209,28 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
     };
   }, []);
 
+  // Stitch 1.4 / Phase D: the page header search + filter drive
+  // which lanes and which cards surface. Filtering is intentionally
+  // cheap (in-memory) — the demo dataset is tiny and the same
+  // pattern scales to a few hundred items without virtualization.
+  const trimmedQuery = query.trim().toLowerCase();
+  const matchesQuery = (item: PipelineItem) => {
+    if (!trimmedQuery) return true;
+    return (
+      item.title.toLowerCase().includes(trimmedQuery) ||
+      item.body.toLowerCase().includes(trimmedQuery) ||
+      item.clientName.toLowerCase().includes(trimmedQuery)
+    );
+  };
   const lanes = STATUS_ORDER.map((status) => ({
     status,
     ...STATUS_LABELS[status],
-    items: items.filter((item) => item.status === status)
+    items: items.filter(
+      (item) =>
+        item.status === status &&
+        matchesQuery(item) &&
+        (statusFilter === "all" || statusFilter === status)
+    )
   }));
 
   // PR-14b: drag-and-drop between lanes. Visual + local-state only — the
@@ -353,7 +381,12 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
           ) : null}
         </div>
         <div className="flex-1 flex gap-gutter overflow-x-auto pb-4 rounded-xl">
-          {lanes.map((lane) => (
+          {/* Phase D: hide lanes that are filtered out (rather than
+              rendering them empty) so the operator's focus stays
+              on the active column when statusFilter !== "all". */}
+          {lanes
+            .filter((lane) => statusFilter === "all" || lane.status === statusFilter)
+            .map((lane) => (
             <DroppableLane
               key={lane.status}
               id={lane.status}

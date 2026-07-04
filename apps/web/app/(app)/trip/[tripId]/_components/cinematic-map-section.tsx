@@ -49,6 +49,7 @@ import {
 import {
   useTargetCoordinatesCameraSync
 } from "@/lib/hooks/useTargetCoordinatesCameraSync";
+import { useMapStore } from "@/store/useMapStore";
 
 type ChapterActivationSource = "scroll" | "click" | "keyboard" | "deep-link";
 
@@ -274,6 +275,38 @@ export default function CinematicMapSection({
   // race-safety + sentinel guards live in the hook so they
   // can be unit-tested in isolation.
   useTargetCoordinatesCameraSync(() => canvasRef.current);
+
+  // Stitch 1.4 — pace & tone drive a camera settle so the
+  // workspace canvas visually reacts to the segmented control.
+  // Active zooms in +0.6, Relaxed zooms out -0.6 (clamped by
+  // MapLibre). Hidden Gems tilts the camera 35° (more 3D),
+  // Classics flattens to 0°. The flight uses the active
+  // chapter's center so the camera doesn't drift toward the
+  // origin when the user scrolls. Suppressed under
+  // `reducedMotion` — matching the workspace-canvas-client
+  // pattern.
+  const paceTone = useMapStore((s) => s.paceTone);
+  const paceToneChapter = React.useMemo(
+    () => chapters.find((c) => c.id === activeChapterId) ?? chapters[0],
+    [chapters, activeChapterId]
+  );
+  React.useEffect(() => {
+    if (effectiveReducedMotion) return;
+    if (!paceToneChapter) return;
+    const handle = canvasRef.current;
+    if (!handle) return;
+    const zoomOffset = paceTone.pace === "Active" ? 0.6 : -0.6;
+    const targetPitch = paceTone.tone === "Hidden Gems" ? 35 : 0;
+    void handle.flyTo({
+      chapter: {
+        id: paceToneChapter.id,
+        center: paceToneChapter.center,
+        zoom: paceToneChapter.zoom + zoomOffset,
+        pitch: targetPitch,
+        duration: 800
+      }
+    });
+  }, [paceTone, effectiveReducedMotion, paceToneChapter]);
 
   const scrollToChapter = React.useCallback(
     (chapterIndex: number, source: "click" | "keyboard"): void => {
