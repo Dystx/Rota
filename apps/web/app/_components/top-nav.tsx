@@ -58,17 +58,17 @@ export function TopNav() {
           >
             Plan a Trip
           </Link>
-          <button
-            type="button"
-            aria-label="Traveler profile"
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full overflow-hidden border border-white/20 shadow-sm flex items-center justify-center scale-95 active:opacity-80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+          <Link
+            href="/account"
+            aria-label="Traveler profile — open account"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full overflow-hidden border border-white/20 shadow-sm flex items-center justify-center scale-95 hover:scale-100 active:opacity-80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             <img
               alt=""
               className="w-10 h-10 object-cover"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJnCG5lbmqYcEas2Nf4z5hZZPtjVXDRq2TGeX3XdS4r7JVq4OGrFc0rdoTDxgd0_-MXbB4YPoDQGFjWbrRxYGdAgBQKu6_PeaXiwP6ZEx3gBpaqg-Dq7X86ueESI1-bNfV3znqVQyVKMm4FeLnC5BdGm9U1YH_9xnm1nJzp95YcKIclkYAqs6-lFU5bCBsbu10S71THbosiO6wWD4r4a4Fl0LhpERaj1ORLotenFT3_2dyOL8qp8D4BUWyVxfNVchZ9FakGOE-9f4x"
             />
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
