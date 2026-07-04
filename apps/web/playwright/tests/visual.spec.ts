@@ -4,9 +4,24 @@ import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createAdminStorageState } from "../fixtures/admin-auth";
 
 const marketingRoutes = ["/", "/portugal", "/how-it-works", "/pricing", "/human-review"];
-const travelerRoutes = ["/trip/new", "/trip/3", "/trip/3/map", "/trip/3/export", "/account"];
+const travelerRoutes = [
+  "/trip/new",
+  "/trip/3",
+  "/trip/3/map",
+  "/trip/3/export",
+  "/account",
+  "/itineraries",
+  "/planner",
+  "/checkout"
+];
 const reviewerRoutes = ["/reviewer/queue", "/reviewer/profile", "/reviewer/history"];
-const adminRoutes = ["/admin/places", "/admin/analytics"];
+const adminRoutes = [
+  "/admin/places",
+  "/admin/analytics",
+  "/console/pipeline",
+  "/console/workspace",
+  "/console/messages"
+];
 
 const disableAnimations = async (page: any) => {
   await page.addStyleTag({
