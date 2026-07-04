@@ -302,6 +302,31 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
         data-realtime={isLive ? "live" : "fallback"}
         data-testid="pipeline-board"
       >
+        {/* UX Pass 2: live/demo data indicator. Surfaces whether
+            the board is showing real Supabase data (live) or the
+            fallback fixtures (demo). Without this, the operator
+            can't tell whether their drag is being persisted. */}
+        <div
+          data-testid="pipeline-data-source"
+          aria-live="polite"
+          className={
+            isLive
+              ? "px-3 py-1.5 rounded-md bg-olive-light/15 border border-olive-light/40 text-olive-dark font-mono-technical text-[11px] flex items-center gap-2 self-start"
+              : "px-3 py-1.5 rounded-md bg-ochre-light/15 border border-ochre-light/40 text-ochre-dark font-mono-technical text-[11px] flex items-center gap-2 self-start"
+          }
+        >
+          <span
+            aria-hidden
+            className={`w-2 h-2 rounded-full ${
+              isLive ? "bg-olive-light animate-pulse" : "bg-ochre-dark"
+            }`}
+          />
+          <span>
+            {isLive
+              ? "Live · connected to Supabase"
+              : "Demo data · set NEXT_PUBLIC_USE_REALTIME_PIPELINE=true to connect"}
+          </span>
+        </div>
         {/* UX Pass 1: inline toast above the board. `aria-live`
             so screen readers announce the outcome. `role="alert"`
             on the failure variant for assertive announcement. */}
