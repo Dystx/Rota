@@ -329,6 +329,54 @@ export async function listTripDrafts(limit = 12, options?: DataClientOptions): P
     }));
 }
 
+/**
+ * Fetch the trip drafts OWNED BY a specific user. The base
+ * `listTripDrafts` returns every row visible under the current
+ * data client's RLS context; the /itineraries page needs a
+ * per-user list, so this helper adds an explicit
+ * `.eq("owner_user_id", userId)` filter. Calls land under
+ * RLS regardless (the service-role bypass doesn't override the
+ * WHERE — it just relaxes the row-level filter), so a traveler
+ * who has a non-null owner_user_id will only see their own rows.
+ *
+ * If the user has no `userId` (signed-out / traveler persona
+ * without an owner_user_id on their rows), the page falls back
+ * to `listTripDrafts()` so the page is never empty during
+ * the early-product "show me what the seed looks like" beat.
+ */
+export async function getTripsForUser(
+  userId: string | null | undefined,
+  limit = 24,
+  options?: DataClientOptions
+): Promise<TripDraftListItem[]> {
+  if (!userId) {
+    return listTripDrafts(limit, options);
+  }
+  const { data, error } = await selectTripsQuery(options)
+    .eq("owner_user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) {
+    throw new Error(error.message);
+  }
+  const rows = (data as RawTripRow[] | null) ?? [];
+  return rows
+    .map((row) => parseTripRow(row))
+    .filter((row): row is TripDraftDetail => row !== null)
+    .map(({ brief, createdAt, hasHumanReview, id, isPaid, status, title, tripBriefStatus, visibility, ownerUserId }) => ({
+      brief,
+      createdAt,
+      hasHumanReview,
+      id,
+      isPaid,
+      ownerUserId,
+      status,
+      title,
+      tripBriefStatus,
+      visibility
+    }));
+}
+
 export {
   SpecialistProfileInputSchema,
   getSpecialistCapabilities,
