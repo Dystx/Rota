@@ -6,7 +6,7 @@
  * `partners` (Tier 4) — see migration
  * 202607022110_create_specialist_profiles.sql.
  *
- * Two operations:
+ * Three operations:
  *
  *  - `getSpecialistProfileByUserId(userId, options?)` —
  *    reads the current user's row (or null if the user
@@ -17,12 +17,20 @@
  *    admin flips that flag after KYC + license check
  *    (the spec mandates a 48h SLA on this review).
  *
- * The DB has a CHECK constraint
- * `specialist_profiles_tier4_requires_license` that
- * rejects tier_4_licensed_guide rows without an RNAAT
- * license number. The application layer mirrors this
- * check in the server action for a friendlier error;
- * the DB is the backstop.
+ *  - `listSpecialists(limit?, options?)` — admin-only
+ *    listing for the verification queue.
+ *
+ *  - `setSpecialistVerified(specialistId, verified, options?)` —
+ *    admin-only flag flip with an application-layer guard
+ *    against the `specialist_profiles_tier4_must_be_verified`
+ *    CHECK constraint (a tier 4 row cannot drop
+ *    `is_verified` to false).
+ *
+ * The DB has two CHECK constraints
+ * (`specialist_profiles_tier4_requires_license`,
+ * `specialist_profiles_tier4_must_be_verified`) that backstop
+ * the application-layer checks; the friendly error path lives
+ * in the server actions.
  */
 
 import { z } from "zod";
@@ -66,6 +74,9 @@ type RawSpecialistRow = {
   created_at: string;
 };
 
+const SELECT_COLUMNS =
+  "id,user_id,full_name,regions_covered,tier_3_on_call,tier_4_licensed_guide,rnaat_license_number,is_verified,hourly_rate,created_at" as const;
+
 function parseSpecialistRow(row: RawSpecialistRow): SpecialistProfile {
   return {
     id: row.id,
@@ -87,9 +98,7 @@ export async function getSpecialistProfileByUserId(
 ): Promise<SpecialistProfile | null> {
   const { data, error } = await resolveDataClient(options)
     .from("specialist_profiles")
-    .select(
-      "id,user_id,full_name,regions_covered,tier_3_on_call,tier_4_licensed_guide,rnaat_license_number,is_verified,hourly_rate,created_at"
-    )
+    .select(SELECT_COLUMNS)
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -130,9 +139,86 @@ export async function upsertSpecialistProfile(
       },
       { onConflict: "user_id" }
     )
-    .select(
-      "id,user_id,full_name,regions_covered,tier_3_on_call,tier_4_licensed_guide,rnaat_license_number,is_verified,hourly_rate,created_at"
-    )
+    .select(SELECT_COLUMNS)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  if (!data) return null;
+  return parseSpecialistRow(data as RawSpecialistRow);
+}
+
+/** Admin: list every specialist, newest first. */
+export async function listSpecialists(
+  limit = 100,
+  options?: DataClientOptions
+): Promise<SpecialistProfile[]> {
+  const { data, error } = await resolveDataClient(options)
+    .from("specialist_profiles")
+    .select(SELECT_COLUMNS)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return ((data as RawSpecialistRow[] | null) ?? []).map((row) =>
+    parseSpecialistRow(row)
+  );
+}
+
+/**
+ * Admin: flip `is_verified` for one specialist.
+ *
+ * Application-layer guard: a tier-4 row cannot drop
+ * `is_verified` to false. The DB CHECK
+ * `specialist_profiles_tier4_must_be_verified` is the
+ * backstop; we surface the friendlier error first.
+ *
+ * Returns the updated row, or `null` if no row was
+ * affected (specialist not found).
+ */
+export async function setSpecialistVerified(
+  specialistId: string,
+  verified: boolean,
+  options?: DataClientOptions
+): Promise<SpecialistProfile | null> {
+  // Pre-flight read so we can fail with a friendly message
+  // before the DB CHECK rejects the write.
+  const current = await getSpecialistProfileById(specialistId, options);
+  if (!current) {
+    return null;
+  }
+  if (current.tier4LicensedGuide && !verified) {
+    throw new Error(
+      "Cannot unverify a Tier 4 specialist. Drop the Tier 4 flag from the profile first or set hourlyRate/license to 0 via /api/admin."
+    );
+  }
+
+  const { data, error } = await resolveDataClient(options)
+    .from("specialist_profiles")
+    .update({ is_verified: verified })
+    .eq("id", specialistId)
+    .select(SELECT_COLUMNS)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  if (!data) return null;
+  return parseSpecialistRow(data as RawSpecialistRow);
+}
+
+async function getSpecialistProfileById(
+  id: string,
+  options?: DataClientOptions
+): Promise<SpecialistProfile | null> {
+  const { data, error } = await resolveDataClient(options)
+    .from("specialist_profiles")
+    .select(SELECT_COLUMNS)
+    .eq("id", id)
     .maybeSingle();
 
   if (error) {
