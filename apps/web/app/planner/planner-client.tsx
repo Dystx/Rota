@@ -72,11 +72,28 @@ function isBinaryQuestion(options: readonly string[]): boolean {
   return options.length === 2 && options.every((o) => o in BINARY_OPTION_ICONS);
 }
 
-export function PlannerClient() {
+export interface PlannerInitialState {
+  /**
+   * Prefilled text in the PromptComposer. The home hero's "Begin
+   * Journey" CTA sends `?destination=<slug>&days=<int>`; the planner
+   * page synthesizes a starter prompt from those values and passes
+   * it down so the user lands in the wizard with something
+   * editable rather than a blank input.
+   */
+  promptValue?: string;
+  /** Days the URL supplied, so the follow-up panel can pre-check. */
+  initialDays?: number;
+  /** Destination slug the URL supplied, e.g. "portugal", "lisbon". */
+  initialDestination?: string;
+}
+
+export function PlannerClient({ initial }: { initial?: PlannerInitialState } = {}) {
   const router = useRouter();
   const [flow, setFlow] = useState<FlowState>({ kind: "idle" });
-  const [promptValue, setPromptValue] = useState("");
-  const [followUpAnswers, setFollowUpAnswers] = useState<Record<string, string>>({});
+  const [promptValue, setPromptValue] = useState(initial?.promptValue ?? "");
+  const [followUpAnswers, setFollowUpAnswers] = useState<Record<string, string>>(
+    initial?.initialDays ? { duration: `${initial.initialDays} days` } : {}
+  );
   const [pending, startTransition] = useTransition();
   const reducedMotion = useReducedMotion();
 
