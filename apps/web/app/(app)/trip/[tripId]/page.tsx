@@ -13,6 +13,7 @@ import { resolveCoverImage } from "@/lib/trip-cover";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { CinematicHero } from "./_components/cinematic-hero";
 import CinematicMapSection from "./_components/cinematic-map-section";
+import { PaceToneControl } from "./_components/pace-tone-control";
 import { StopFilmstrip, type FilmstripStop } from "./_components/stop-filmstrip";
 
 export const metadata: Metadata = {
@@ -241,6 +242,15 @@ export default async function TripDetailPage({
                   {summarizeBrief(trip?.brief)}
                 </p>
 
+                {/* Stitch 1.4 — pace & tone segmented control. Lives
+                    in the workspace store (not local state) so the
+                    map camera can react without prop-drilling. The
+                    screen-reader announcement below keeps pace/tone
+                    changes verbalized for keyboard users. */}
+                <div className="pt-2 border-t border-[var(--color-border)]">
+                  <PaceToneControl />
+                </div>
+
                 <div className="grid gap-4 text-sm">
                   <SummaryRow label="Country" value={trip?.brief.destinationCountry ?? "Portugal"} />
                   <SummaryRow label="Regions" value={trip ? trip.brief.regions.map(prettify).join(", ") : "—"} />
@@ -248,6 +258,35 @@ export default async function TripDetailPage({
                   <SummaryRow label="Transport" value={trip ? prettify(trip.brief.transportMode) : "—"} />
                   <SummaryRow label="Status" value={trip?.status ?? "Draft"} />
                   <SummaryRow label="Access" value={tripCommerceState.accessLabel} />
+                </div>
+
+                {/* Stitch 1.4 — floating action buttons in the
+                    brief card header. The real implementation is
+                    inline here (not a separate component) because
+                    the URLs are page-scoped and the buttons reuse
+                    the existing /trip/[id]/export route. */}
+                <div
+                  data-testid="trip-brief-actions"
+                  className="flex flex-wrap gap-2 pt-4 border-t border-[var(--color-border)]"
+                >
+                  <Link
+                    href={`/trip/${tripId}/export`}
+                    data-testid="trip-brief-share"
+                    aria-label="Open export and share panel"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 text-primary border border-olive-light/40 font-label-ui text-label-ui hover:bg-olive-light/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                  >
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">ios_share</span>
+                    Share
+                  </Link>
+                  <Link
+                    href={`/trip/${tripId}/export`}
+                    data-testid="trip-brief-download"
+                    aria-label="Download this trip"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-olive-light text-on-primary font-label-ui text-label-ui hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                  >
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">download</span>
+                    Download
+                  </Link>
                 </div>
 
                 {tripCommerceState.canRequestReview ? (

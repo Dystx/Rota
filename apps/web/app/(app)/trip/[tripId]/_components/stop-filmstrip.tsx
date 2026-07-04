@@ -202,6 +202,25 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
             </button>
           );
         })}
+        {/* Stitch 1.4 — "Add Stop" card at the end of the filmstrip.
+            Dashed border, + icon, links to the planner so the user
+            can extend the trip. The card is decorative (the planner
+            has its own form for adding stops); it surfaces the
+            affordance and the visual rhythm of the row. */}
+        <a
+          href="/planner"
+          data-testid="stop-card-add"
+          aria-label="Add a new stop to this trip"
+          className="text-left min-w-[300px] w-[300px] rounded-xl border-2 border-dashed border-olive-light/60 bg-white/30 hover:bg-white/50 hover:border-olive-dark/60 transition-colors flex flex-col items-center justify-center gap-2 text-olive-dark snap-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+        >
+          <span
+            aria-hidden="true"
+            className="w-12 h-12 rounded-full border-2 border-olive-light/60 flex items-center justify-center"
+          >
+            <span className="material-symbols-outlined text-[24px]">add</span>
+          </span>
+          <span className="font-label-ui text-label-ui">Add Stop</span>
+        </a>
       </div>
     </section>
   );

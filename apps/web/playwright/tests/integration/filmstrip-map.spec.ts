@@ -39,8 +39,10 @@ test.describe("Filmstrip → Map → Camera (Trip Page)", () => {
     // Three stops on day 1 (Douro) — the deterministic provider always
     // emits exactly 3 stops per day. Order in the DOM matches the
     // emission order, so `nth(0|1|2)` corresponds to the first/second/
-    // third stop in the itinerary.
-    const cards = page.locator('[data-testid^="stop-card-"]');
+    // third stop in the itinerary. The 4th card is the
+    // Stitch 1.4 "Add Stop" affordance (testid="stop-card-add"),
+    // which we exclude by anchoring on day-N-stop-N ids.
+    const cards = page.locator('[data-testid^="stop-card-day-"]');
     await expect(cards).toHaveCount(3);
 
     // On page load, no stop is selected — the camera sits on the day's
@@ -88,7 +90,7 @@ test.describe("Filmstrip → Map → Camera (Trip Page)", () => {
     await filmstrip.scrollIntoViewIfNeeded();
     await expect(filmstrip).toBeVisible({ timeout: 10_000 });
 
-    const cards = page.locator('[data-testid^="stop-card-"]');
+    const cards = page.locator('[data-testid^="stop-card-day-"]');
     await expect(cards).toHaveCount(3);
 
     // Every card should be enabled. The deterministic itinerary
