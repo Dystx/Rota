@@ -45,26 +45,15 @@ export function FlipVerificationForm({
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <form
-        action={() => handle(!isVerified)}
-        className="flex items-center gap-2"
+      <Button
+        type="button"
+        variant={isVerified ? "ghost" : "primary"}
+        disabled={isPending || (isVerified && tier4LicensedGuide)}
+        onClick={() => handle(!isVerified)}
+        data-testid={`admin-specialists-flip-${specialistId}`}
       >
-        <input type="hidden" name="specialistId" value={specialistId} />
-        <input
-          type="hidden"
-          name="verified"
-          value={isVerified ? "false" : "true"}
-        />
-        <Button
-          type="button"
-          variant={isVerified ? "ghost" : "primary"}
-          disabled={isPending || (isVerified && tier4LicensedGuide)}
-          onClick={() => handle(!isVerified)}
-          data-testid={`admin-specialists-flip-${specialistId}`}
-        >
-          {isPending ? "Saving…" : isVerified ? "Unverify" : "Verify"}
-        </Button>
-      </form>
+        {isPending ? "Saving…" : isVerified ? "Unverify" : "Verify"}
+      </Button>
       {error ? (
         <p
           className="text-xs text-error"
