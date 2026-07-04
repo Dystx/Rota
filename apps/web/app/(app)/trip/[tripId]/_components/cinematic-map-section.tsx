@@ -290,9 +290,19 @@ export default function CinematicMapSection({
     () => chapters.find((c) => c.id === activeChapterId) ?? chapters[0],
     [chapters, activeChapterId]
   );
+  // Suppress the camera flight on the first mount — the workspace
+  // canvas client has the same trade-off but the trip page lands
+  // here on chapter scroll-in, where the user can see the flight.
+  // We only fire the effect on subsequent pace/tone changes that
+  // match a user click.
+  const isFirstPaceToneRef = React.useRef(true);
   React.useEffect(() => {
     if (effectiveReducedMotion) return;
     if (!paceToneChapter) return;
+    if (isFirstPaceToneRef.current) {
+      isFirstPaceToneRef.current = false;
+      return;
+    }
     const handle = canvasRef.current;
     if (!handle) return;
     const zoomOffset = paceTone.pace === "Active" ? 0.6 : -0.6;
