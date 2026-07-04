@@ -7,32 +7,32 @@ import { create } from "zustand";
  *
  * Thin client-state layer that lets cross-page consumers (home bento,
  * workspace filmstrip, hero globe, /explore page) keep their selected
- * destination / viewport / day in lock-step without prop-drilling or
- * URL hacks. Sits ON TOP of the SpatialEngine — never replaces it.
+ * destination / stop in lock-step without prop-drilling or URL hacks.
+ * Sits ON TOP of the SpatialEngine — never replaces it.
  *
- *   - `viewport`     — synced from the live MapLibre `moveend` event
- *   - `activeStopId` — driven by bento / filmstrip / map feature clicks
- *   - `activeDay`    — drives the spatial-engine day-filter (future work)
+ *   - `activeStopId`     — driven by bento / filmstrip / map feature clicks
  *   - `targetCoordinates` — programmatic fly-to target consumed by the
  *                          workspace via `useEffect`
- *   - `setSourceData` — direct mutation path that bypasses React for
- *                       high-frequency MapLibre source updates
- *                       (PR-8). The active map registers its source
- *                       via `registerMapSource()` on mount; the store
- *                       calls `setData(featureCollection)` on it
- *                       whenever the subscribed slice changes.
+ *   - `setSourceData`     — direct mutation path that bypasses React for
+ *                          high-frequency MapLibre source updates
+ *                          (PR-8). The active map registers its source
+ *                          via `registerMapSource()` on mount; the store
+ *                          calls `setData(featureCollection)` on it
+ *                          whenever the subscribed slice changes.
  *
  * This store intentionally does NOT know about InMemoryTelemetryService
  * or any backend stream; it only coordinates UI surface state.
+ *
+ * Note: prior versions of this store also exposed `viewport` (a
+ * `ViewportState` mirror of the live MapLibre camera) and `activeDay`
+ * (a day-index for the spatial-engine day-filter). Both were
+ * write-only — `setViewport` was called by the home hero + workspace
+ * canvas, but no consumer ever read the resulting state; `setActiveDay`
+ * had no callers at all. They were removed on 2026-07-04. The
+ * spatial-engine still owns the live viewport via its own internal
+ * store; consumers that need a "synced viewport" should ask the
+ * engine via a handle, not this Zustand store.
  */
-
-export interface ViewportState {
-  /** [longitude, latitude] per MapLibre convention. */
-  center: readonly [number, number];
-  zoom: number;
-  pitch: number;
-  bearing: number;
-}
 
 /** Minimal subset of a MapLibre `GeoJSONSource` we call
  *  `setData` on. Using a structural type (rather than
@@ -43,18 +43,10 @@ export interface GeoJSONSourceLike {
 }
 
 export interface MapStore {
-  // Viewport — synced from map.on('moveend')
-  viewport: ViewportState;
-  setViewport: (next: Partial<ViewportState>) => void;
-
   // Active stop — driven by bento card click, filmstrip card click, map feature click
   activeStopId: string | null;
   selectStop: (stopId: string, coordinates: readonly [number, number]) => void;
   clearActiveStop: () => void;
-
-  // Active day — drives the spatial-engine's day-filter expression (future work)
-  activeDay: number | null;
-  setActiveDay: (day: number | null) => void;
 
   // Programmatic fly-to target — components set this; the workspace consumes it via useEffect
   targetCoordinates: readonly [number, number] | null;
@@ -69,13 +61,6 @@ export interface MapStore {
    *  registered. */
   setSourceData: (featureCollection: GeoJSON.FeatureCollection) => void;
 }
-
-/**
- * Iberian centroid (just west of Lisbon) used to seed both projections.
- * Matches `PORTUGAL_CENTER` in hero-map.tsx so the home page and the
- * Zustand store start the camera in the same place.
- */
-const DEFAULT_CENTER: readonly [number, number] = [-8.165, 39.55];
 
 /**
  * Module-level registry of MapLibre sources keyed by their owning
@@ -126,23 +111,11 @@ export function registerMapSource(
 }
 
 export const useMapStore = create<MapStore>((set) => ({
-  viewport: {
-    center: DEFAULT_CENTER,
-    zoom: 3.4,
-    pitch: 0,
-    bearing: 0
-  },
-  setViewport: (next) =>
-    set((state) => ({ viewport: { ...state.viewport, ...next } })),
-
   activeStopId: null,
   selectStop: (stopId, coordinates) =>
     set({ activeStopId: stopId, targetCoordinates: coordinates }),
   clearActiveStop: () =>
     set({ activeStopId: null, targetCoordinates: null }),
-
-  activeDay: null,
-  setActiveDay: (day) => set({ activeDay: day }),
 
   targetCoordinates: null,
   setTargetCoordinates: (coords) => set({ targetCoordinates: coords }),
@@ -157,9 +130,35 @@ export const useMapStore = create<MapStore>((set) => ({
     // ref). When the page unmounts cleanly, the unmount
     // effect calls `registerMapSource(container, null)` and
     // activeKey is cleared in the same call.
+    //
+    // Dev-mode warning: silently dropping source updates is
+    // a real footgun (the map stops highlighting and the dev
+    // doesn't know why). Log once per source so a console
+    // scroll surfaces the root cause immediately.
     if (activeKey) {
       const source = sourcesByContainer.get(activeKey as HTMLElement);
       source?.setData(featureCollection);
+    } else if (
+      typeof process !== "undefined" &&
+      process.env.NODE_ENV !== "production"
+    ) {
+      // Use a module-level flag so a stream of `setSourceData`
+      // calls during SSR or pre-mount doesn't flood the
+      // console. One warning per session is enough.
+      warnOnce(
+        "useMapStore.setSourceData called with no registered source. " +
+          "Did you forget to call registerMapSource(container, source) on mount?"
+      );
     }
   }
 }));
+
+/** Module-level flag so the dev-mode warning fires at most
+ *  once per session. */
+let warnedSourceDataNoSource = false;
+function warnOnce(message: string): void {
+  if (warnedSourceDataNoSource) return;
+  warnedSourceDataNoSource = true;
+  // eslint-disable-next-line no-console -- dev-mode surface for a silent footgun
+  console.warn(message);
+}

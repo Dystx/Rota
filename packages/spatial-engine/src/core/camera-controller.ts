@@ -27,6 +27,34 @@ export interface CameraControllerOptions {
 }
 
 /**
+ * Antimeridian is the longitudinal seam at ±180° where the 3D globe wraps.
+ * High pitch values (tilted views) at this seam cause sharp edge-cut rendering
+ * and frame-rate drops. The lifecycle spec (Phase 6) names this constraint.
+ *
+ * Threshold: longitude within 1° of the seam. We clamp pitch to 0 (top-down)
+ * in that band so the renderer can short-circuit tile frustum culling.
+ */
+const ANTIMERIDIAN_LON_EPSILON = 1.0;
+
+export function isNearAntimeridian(lng: number): boolean {
+  return Math.abs(Math.abs(lng) - 180) < ANTIMERIDIAN_LON_EPSILON;
+}
+
+/**
+ * Returns a pitch value clamped to 0 when `center` is near the antimeridian;
+ * otherwise returns the requested pitch unchanged. Undefined pitch (caller
+ * didn't request one) is passed through so the executor's default applies.
+ */
+export function clampPitchForAntimeridian(
+  center: readonly [number, number] | undefined,
+  pitch: number | undefined
+): number | undefined {
+  if (pitch === undefined) return undefined;
+  if (center && isNearAntimeridian(center[0])) return 0;
+  return pitch;
+}
+
+/**
  * Adapter-agnostic CameraController. The renderer-specific code passes a
  * thin `CameraExecutor` that proxies to the underlying map (e.g. MapLibre).
  *
@@ -46,7 +74,7 @@ export class SpatialCameraController implements CameraController {
     const animOptions = {
       center: target.center ? ([target.center[0], target.center[1]] as [number, number]) : undefined,
       zoom: target.zoom,
-      pitch: target.pitch,
+      pitch: clampPitchForAntimeridian(target.center, target.pitch),
       bearing: target.bearing,
       duration
     };

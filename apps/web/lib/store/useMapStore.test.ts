@@ -24,8 +24,7 @@ describe("useMapStore — setSourceData + registerMapSource", () => {
   beforeEach(() => {
     useMapStore.setState({
       activeStopId: null,
-      targetCoordinates: null,
-      activeDay: null
+      targetCoordinates: null
     });
     // Clear all known registrations so each test starts clean.
     // (WeakMap keys are container objects held by the test; the
@@ -191,12 +190,5 @@ describe("useMapStore — setSourceData + registerMapSource", () => {
     useMapStore.getState().clearActiveStop();
     expect(useMapStore.getState().activeStopId).toBeNull();
     expect(useMapStore.getState().targetCoordinates).toBeNull();
-  });
-
-  it("setActiveDay sets and clears", () => {
-    useMapStore.getState().setActiveDay(2);
-    expect(useMapStore.getState().activeDay).toBe(2);
-    useMapStore.getState().setActiveDay(null);
-    expect(useMapStore.getState().activeDay).toBeNull();
   });
 });
