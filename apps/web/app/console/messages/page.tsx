@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useMemo,
   useState,
   useTransition,
   type ChangeEvent,
@@ -44,6 +45,23 @@ const CONVERSATIONS: Conversation[] = [
   },
 ];
 
+/**
+ * Phase 7.1: format a chat-message ISO timestamp for the
+ * bubble footer. Falls back to the raw string if the date
+ * is unparseable, which keeps the UI informative on bad
+ * data rather than showing "Invalid Date".
+ */
+function formatChatTimestamp(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  // Locale-agnostic: 12-hour HH:MM AM/PM.
+  return date.toLocaleString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  });
+}
+
 export default function ConsoleMessagesPage() {
   const [activeId, setActiveId] = useState<string>(CONVERSATIONS[0]!.id);
   const [draft, setDraft] = useState("");
@@ -80,6 +98,21 @@ export default function ConsoleMessagesPage() {
   const [sentMessages, setSentMessages] = useState<
     Array<{ id: string; body: string; createdAt: string }>
   >([]);
+  // Loaded chat-message history for the active conversation.
+  // Phase 7: read from /api/console/chat-messages on mount + when
+  // activeId changes. Renders the operator's and traveler's
+  // bubbles above the composer.
+  const [messages, setMessages] = useState<
+    Array<{
+      id: string;
+      conversationId: string;
+      authorRole: "operator" | "traveler";
+      body: string;
+      createdAt: string;
+    }>
+  >([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [messagesError, setMessagesError] = useState<string | null>(null);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_USE_REALTIME_MESSAGES !== "true") return;
@@ -99,11 +132,30 @@ export default function ConsoleMessagesPage() {
         async (payload) => {
           if (cancelled) return;
           setIncomingCount((n) => n + 1);
-          // Run the AI triage classifier on every inbound message.
-          // The server action falls back to keywordTriage() if
-          // USE_LLM is off or OPENAI_API_KEY is missing.
+          // Push the new row into the message list so the thread
+          // updates live (Phase 7.1). The insert is from a
+          // different session — our own optimistic insert goes
+          // through `sentMessages` and merges on the render side.
           const row = (payload.new ?? {}) as Record<string, unknown>;
+          const id = typeof row.id === "string" ? row.id : null;
+          const conversationId =
+            typeof row.conversation_id === "string" ? row.conversation_id : null;
           const body = typeof row.body === "string" ? row.body : "";
+          const authorRole =
+            row.author_role === "operator" || row.author_role === "traveler"
+              ? row.author_role
+              : "traveler";
+          const createdAt =
+            typeof row.created_at === "string" ? row.created_at : new Date().toISOString();
+          if (id && conversationId) {
+            setMessages((current) => {
+              if (current.some((m) => m.id === id)) return current;
+              return [
+                ...current,
+                { id, conversationId, authorRole, body, createdAt }
+              ];
+            });
+          }
           if (body) {
             try {
               const result = await triageInboundMessage({ message: body });
@@ -126,6 +178,52 @@ export default function ConsoleMessagesPage() {
     };
   }, []);
 
+  // Phase 7.1: load the chat-message history for the active
+  // conversation. Triggers on `activeId` change so switching
+  // conversations refetches. The Realtime subscription above
+  // keeps the list in sync with new inserts from any session.
+  useEffect(() => {
+    let cancelled = false;
+    setMessagesLoading(true);
+    setMessagesError(null);
+    void (async () => {
+      try {
+        const response = await fetch(
+          `/api/console/chat-messages?conversationId=${encodeURIComponent(activeId)}`
+        );
+        const data = (await response.json()) as {
+          ok?: boolean;
+          messages?: Array<{
+            id: string;
+            conversationId: string;
+            authorRole: "operator" | "traveler";
+            body: string;
+            createdAt: string;
+          }>;
+          error?: string;
+        };
+        if (cancelled) return;
+        if (!response.ok || !data.ok) {
+          setMessagesError(data.error ?? `HTTP ${response.status}`);
+          setMessages([]);
+          return;
+        }
+        setMessages(data.messages ?? []);
+      } catch (error) {
+        if (cancelled) return;
+        setMessagesError(
+          error instanceof Error ? error.message : "Network error"
+        );
+        setMessages([]);
+      } finally {
+        if (!cancelled) setMessagesLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeId]);
+
   const activeConversation =
     CONVERSATIONS.find((c) => c.id === activeId) ?? CONVERSATIONS[0]!;
 
@@ -139,6 +237,26 @@ export default function ConsoleMessagesPage() {
       );
     }
   };
+
+  // Phase 7.1: merge the server-loaded messages with the
+  // operator's optimistic inserts. `sentMessages` is keyed by
+  // the row id returned from the API (so dedupe is by id);
+  // `messages` is the canonical list. Anything in `sentMessages`
+  // not yet in `messages` (race between fetch and the
+  // optimistic insert) is appended.
+  const visibleMessages = useMemo(() => {
+    const knownIds = new Set(messages.map((m) => m.id));
+    const optimistic = sentMessages
+      .filter((m) => !knownIds.has(m.id))
+      .map((m) => ({
+        id: m.id,
+        conversationId: activeId,
+        authorRole: "operator" as const,
+        body: m.body,
+        createdAt: m.createdAt
+      }));
+    return [...messages, ...optimistic];
+  }, [messages, sentMessages, activeId]);
 
   return (
     <>
@@ -339,91 +457,87 @@ export default function ConsoleMessagesPage() {
               </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-              <div className="flex justify-center">
-                <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant bg-surface-container-lowest/60 px-3 py-1 rounded-full">
-                  Today
-                </span>
-              </div>
-
-              <div className="flex justify-end">
-                <div className="max-w-[70%] bg-primary-container text-on-primary-container rounded-2xl rounded-tr-sm p-4 shadow-sm">
-                  <p className="font-body-md text-body-md">
-                    Good morning, Eleanor. I&apos;ve been looking into the
-                    accommodations for your time in Kyoto. The ryokan in
-                    Higashiyama has confirmed availability for your dates.
-                  </p>
-                  <span className="block font-mono-micro text-mono-micro uppercase tracking-wider opacity-70 mt-2">
-                    10:15 AM
+            <div
+              data-testid="chat-thread"
+              className="flex-1 overflow-y-auto p-6 flex flex-col gap-6"
+            >
+              {messagesLoading && messages.length === 0 ? (
+                <div className="flex justify-center" data-testid="chat-thread-loading">
+                  <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant bg-surface-container-lowest/60 px-3 py-1 rounded-full">
+                    Loading…
                   </span>
                 </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <img
-                  src={activeConversation.avatarSrc}
-                  alt=""
-                  width={32}
-                  height={32}
-                  className="w-8 h-8 rounded-full object-cover shrink-0"
-                />
-                <div className="max-w-[70%] bg-surface text-on-surface rounded-2xl rounded-tl-sm p-4 border border-olive-light/10 shadow-sm">
-                  <p className="font-body-md text-body-md">
-                    That sounds wonderful! I was also reading about a
-                    traditional tea ceremony experience. Is there one you
-                    recommend nearby?
-                  </p>
-                  <span className="block font-mono-micro text-mono-micro uppercase tracking-wider text-on-surface-variant mt-2">
-                    10:30 AM
+              ) : null}
+              {messagesError && messages.length === 0 ? (
+                <div
+                  data-testid="chat-thread-error"
+                  role="alert"
+                  className="font-body-md text-body-md text-red-700 bg-red-50 border border-red-200 rounded-lg p-3"
+                >
+                  {messagesError}
+                </div>
+              ) : null}
+              {!messagesLoading && !messagesError && messages.length === 0 ? (
+                <div
+                  data-testid="chat-thread-empty"
+                  className="flex flex-col items-center justify-center text-center py-12 gap-2"
+                >
+                  <span
+                    aria-hidden
+                    className="material-symbols-outlined text-4xl text-on-surface-variant"
+                  >
+                    forum
                   </span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <img
-                  src={activeConversation.avatarSrc}
-                  alt=""
-                  width={32}
-                  height={32}
-                  className="w-8 h-8 rounded-full object-cover shrink-0 opacity-0"
-                />
-                <div className="max-w-[70%] bg-surface text-on-surface rounded-2xl rounded-tl-sm p-4 border border-olive-light/10 shadow-sm">
-                  <p className="font-body-md text-body-md">
-                    I&apos;d love to add that tea ceremony to the itinerary if
-                    possible.
+                  <p className="font-headline-sm text-headline-sm text-primary">
+                    No messages yet
                   </p>
-                  <span className="block font-mono-micro text-mono-micro uppercase tracking-wider text-on-surface-variant mt-2">
-                    10:42 AM
-                  </span>
+                  <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
+                    Send the first message below to start the conversation with
+                    {" "}
+                    {activeConversation.name}.
+                  </p>
                 </div>
-              </div>
-
-              <div className="flex items-start gap-3 opacity-50">
-                <img
-                  src={activeConversation.avatarSrc}
-                  alt=""
-                  width={32}
-                  height={32}
-                  className="w-8 h-8 rounded-full object-cover shrink-0"
-                />
-                <div className="bg-surface border border-olive-light/10 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1">
-                  <span
-                    aria-hidden
-                    className="w-2 h-2 rounded-full bg-on-surface-variant animate-bounce"
-                    style={{ animationDelay: "0ms" }}
-                  />
-                  <span
-                    aria-hidden
-                    className="w-2 h-2 rounded-full bg-on-surface-variant animate-bounce"
-                    style={{ animationDelay: "120ms" }}
-                  />
-                  <span
-                    aria-hidden
-                    className="w-2 h-2 rounded-full bg-on-surface-variant animate-bounce"
-                    style={{ animationDelay: "240ms" }}
-                  />
-                </div>
-              </div>
+              ) : null}
+              {visibleMessages.map((message) =>
+                message.authorRole === "operator" ? (
+                  <div
+                    key={message.id}
+                    data-testid="chat-message-operator"
+                    className="flex justify-end"
+                  >
+                    <div className="max-w-[70%] bg-primary-container text-on-primary-container rounded-2xl rounded-tr-sm p-4 shadow-sm">
+                      <p className="font-body-md text-body-md whitespace-pre-wrap break-words">
+                        {message.body}
+                      </p>
+                      <span className="block font-mono-micro text-mono-micro uppercase tracking-wider opacity-70 mt-2">
+                        {formatChatTimestamp(message.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    key={message.id}
+                    data-testid="chat-message-traveler"
+                    className="flex items-start gap-3"
+                  >
+                    <img
+                      src={activeConversation.avatarSrc}
+                      alt=""
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 rounded-full object-cover shrink-0"
+                    />
+                    <div className="max-w-[70%] bg-surface text-on-surface rounded-2xl rounded-tl-sm p-4 border border-olive-light/10 shadow-sm">
+                      <p className="font-body-md text-body-md whitespace-pre-wrap break-words">
+                        {message.body}
+                      </p>
+                      <span className="block font-mono-micro text-mono-micro uppercase tracking-wider text-on-surface-variant mt-2">
+                        {formatChatTimestamp(message.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                )
+              )}
             </div>
 
             <div className="p-4 bg-white/60 backdrop-blur-md border-t border-olive-light/10 shrink-0">
