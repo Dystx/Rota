@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Lisbon & the Tagus River at sunset">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F2C5A0"/>
+      <stop offset="0.4" stop-color="#E08860"/>
+      <stop offset="0.85" stop-color="#5A2A2E"/>
+      <stop offset="1" stop-color="#1D2A23"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3F2734"/>
+      <stop offset="1" stop-color="#1A1115"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0">
+      <feTurbulence baseFrequency="0.85" numOctaves="2" seed="5"/>
+      <feColorMatrix values="0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.08 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="640" fill="url(#sky)"/>
+  <path d="M0 480 L240 440 L480 460 L720 410 L960 430 L1200 400 L1440 420 L1680 410 L1920 430 L1920 540 L0 540 Z" fill="#3F2734" opacity="0.6"/>
+  <path d="M0 510 L240 480 L480 495 L720 470 L960 485 L1200 460 L1440 480 L1680 465 L1920 480 L1920 540 L0 540 Z" fill="#2A1A22" opacity="0.7"/>
+  <g fill="#1A1115">
+    <path d="M0 540 L0 600 L80 600 L80 580 L100 580 L100 600 L160 600 L160 590 L180 590 L180 600 L260 600 L260 575 L290 575 L290 600 L360 600 L360 595 L390 595 L390 600 L460 600 L460 580 L500 580 L500 600 L560 600 L560 590 L600 590 L600 600 L680 600 L680 570 L720 570 L720 600 L780 600 L780 580 L820 580 L820 600 L880 600 L880 595 L910 595 L910 600 L980 600 L980 575 L1020 575 L1020 600 L1080 600 L1080 590 L1120 590 L1120 600 L1180 600 L1180 580 L1220 580 L1220 600 L1280 600 L1280 595 L1320 595 L1320 600 L1380 600 L1380 570 L1420 570 L1420 600 L1480 600 L1480 585 L1520 585 L1520 600 L1580 600 L1580 590 L1620 590 L1620 600 L1680 600 L1680 580 L1720 580 L1720 600 L1780 600 L1780 595 L1820 595 L1820 600 L1920 600 L1920 540 Z"/>
+    <rect x="900" y="430" width="36" height="170"/>
+    <polygon points="918,420 936,430 936,440 900,440 900,430"/>
+    <circle cx="918" cy="410" r="14"/>
+    <polygon points="904,406 932,406 918,388"/>
+  </g>
+  <rect y="600" width="1920" height="480" fill="url(#water)"/>
+  <g fill="#E08860" opacity="0.18">
+    <rect y="640" width="1920" height="2"/>
+    <rect y="680" width="1920" height="1.5"/>
+    <rect y="730" width="1920" height="2.5"/>
+    <rect y="780" width="1920" height="1.5"/>
+    <rect y="840" width="1920" height="2"/>
+    <rect y="910" width="1920" height="1.5"/>
+  </g>
+  <g fill="#1A1115">
+    <path d="M700 760 Q760 740 820 760 L800 780 L720 780 Z"/>
+    <rect x="755" y="740" width="2" height="20"/>
+    <rect x="755" y="728" width="40" height="14"/>
+  </g>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.6"/>
+</svg>

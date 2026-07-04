@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Douro Valley vineyards in autumn light">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F2D49A"/>
+      <stop offset="0.4" stop-color="#C49A4E"/>
+      <stop offset="0.85" stop-color="#5A3320"/>
+      <stop offset="1" stop-color="#1D2A23"/>
+    </linearGradient>
+    <linearGradient id="hill1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7A4A28"/>
+      <stop offset="1" stop-color="#3F2316"/>
+    </linearGradient>
+    <linearGradient id="hill2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5A3320"/>
+      <stop offset="1" stop-color="#2A1A12"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0">
+      <feTurbulence baseFrequency="0.85" numOctaves="2" seed="7"/>
+      <feColorMatrix values="0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.08 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="640" fill="url(#sky)"/>
+  <path d="M0 460 L240 380 L480 410 L720 320 L960 360 L1200 290 L1440 340 L1680 300 L1920 360 L1920 540 L0 540 Z" fill="url(#hill1)" opacity="0.85"/>
+  <path d="M0 500 L240 460 L480 480 L720 430 L960 460 L1200 410 L1440 450 L1680 420 L1920 460 L1920 540 L0 540 Z" fill="url(#hill2)" opacity="0.95"/>
+  <g stroke="#C49A4E" stroke-width="2" opacity="0.6" fill="none">
+    <path d="M0 480 Q480 460 960 470 T1920 460"/>
+    <path d="M0 500 Q480 480 960 490 T1920 480"/>
+    <path d="M0 520 Q480 500 960 510 T1920 500"/>
+  </g>
+  <g fill="#1D2A23">
+    <path d="M0 540 L0 600 L120 600 L120 580 L140 580 L140 600 L240 600 L240 590 L260 590 L260 600 L360 600 L360 575 L390 575 L390 600 L480 600 L480 595 L510 595 L510 600 L600 600 L600 580 L640 580 L640 600 L720 600 L720 570 L760 570 L760 600 L840 600 L840 580 L880 580 L880 600 L960 600 L960 595 L990 595 L990 600 L1080 600 L1080 575 L1120 575 L1120 600 L1200 600 L1200 590 L1240 590 L1240 600 L1320 600 L1320 580 L1360 580 L1360 600 L1440 600 L1440 595 L1480 595 L1480 600 L1560 600 L1560 570 L1600 570 L1600 600 L1680 600 L1680 580 L1720 580 L1720 600 L1800 600 L1800 595 L1840 595 L1840 600 L1920 600 L1920 540 Z"/>
+  </g>
+  <rect y="600" width="1920" height="480" fill="#3F2316"/>
+  <g fill="#C49A4E" opacity="0.18">
+    <rect y="640" width="1920" height="2"/>
+    <rect y="680" width="1920" height="1.5"/>
+    <rect y="730" width="1920" height="2.5"/>
+    <rect y="780" width="1920" height="1.5"/>
+    <rect y="840" width="1920" height="2"/>
+    <rect y="910" width="1920" height="1.5"/>
+  </g>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.6"/>
+</svg>

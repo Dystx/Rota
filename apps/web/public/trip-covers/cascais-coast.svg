@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Cascais Atlantic cliffs">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8DCC4"/>
+      <stop offset="0.4" stop-color="#B8A88C"/>
+      <stop offset="0.85" stop-color="#5A6B7A"/>
+      <stop offset="1" stop-color="#2A3A4A"/>
+    </linearGradient>
+    <linearGradient id="cliff" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#A89578"/>
+      <stop offset="1" stop-color="#5A4530"/>
+    </linearGradient>
+    <linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3A5A6A"/>
+      <stop offset="1" stop-color="#1A2A38"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0">
+      <feTurbulence baseFrequency="0.85" numOctaves="2" seed="13"/>
+      <feColorMatrix values="0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.08 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="500" fill="url(#sky)"/>
+  <path d="M0 460 L240 440 L480 450 L720 420 L960 440 L1200 410 L1440 430 L1680 420 L1920 440 L1920 540 L0 540 Z" fill="#5A6B7A" opacity="0.5"/>
+  <g fill="url(#cliff)">
+    <path d="M0 540 L0 720 L320 720 L320 600 L420 540 Z"/>
+    <path d="M600 540 L600 700 L960 700 L960 580 L1080 540 Z"/>
+    <path d="M1200 540 L1200 720 L1500 720 L1500 600 L1620 540 Z"/>
+    <path d="M1700 540 L1700 700 L1920 700 L1920 540 Z"/>
+  </g>
+  <rect y="700" width="1920" height="380" fill="url(#ocean)"/>
+  <g fill="#E8DCC4" opacity="0.15">
+    <rect y="730" width="1920" height="2"/>
+    <rect y="780" width="1920" height="1.5"/>
+    <rect y="830" width="1920" height="2.5"/>
+    <rect y="890" width="1920" height="1.5"/>
+    <rect y="950" width="1920" height="2"/>
+  </g>
+  <g fill="#FFFFFF" opacity="0.7">
+    <path d="M0 700 Q480 690 960 700 T1920 700 L1920 720 L0 720 Z"/>
+  </g>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.6"/>
+</svg>

@@ -26,16 +26,6 @@ interface WorkspaceShellProps {
   stops: WorkspaceStop[];
 }
 
-interface PaceToneState {
-  pace: "Relaxed" | "Active";
-  tone: "Hidden Gems" | "Classics";
-}
-
-const DEFAULT_PACE_TONE: PaceToneState = {
-  pace: "Relaxed",
-  tone: "Hidden Gems"
-};
-
 /**
  * WorkspaceShell — overlays for mock 1.4 (Dynamic Workspace / Itinerary).
  * Floats three surfaces above the full-bleed map:
@@ -43,11 +33,13 @@ const DEFAULT_PACE_TONE: PaceToneState = {
  *   - top-right: vertical column of share / download icon buttons
  *   - bottom:   horizontal filmstrip of stop cards + add-stop tile
  *
- * The refinement pills use local state (no remote wiring) so the
- * selected/unslected visual stays in sync with the mock.
+ * The refinement pills read + write the shared Zustand store
+ * (Phase 4.1) so the map's active camera reacts to the user's
+ * choice: `pace` adjusts zoom, `tone` adjusts pitch.
  */
 export function WorkspaceShell({ stops }: WorkspaceShellProps) {
-  const [paceTone, setPaceTone] = React.useState<PaceToneState>(DEFAULT_PACE_TONE);
+  const paceTone = useMapStore((state) => state.paceTone);
+  const setPaceTone = useMapStore((state) => state.setPaceTone);
   const selectStop = useMapStore((state) => state.selectStop);
 
   // Build a label → coordinates map from the route fixture so a filmstrip
@@ -109,13 +101,13 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
           <div className="flex flex-wrap gap-2">
             <Pill
               selected={paceTone.pace === "Relaxed"}
-              onClick={() => setPaceTone((s) => ({ ...s, pace: "Relaxed" }))}
+              onClick={() => setPaceTone({ ...paceTone, pace: "Relaxed" })}
             >
               Relaxed
             </Pill>
             <Pill
               selected={paceTone.pace === "Active"}
-              onClick={() => setPaceTone((s) => ({ ...s, pace: "Active" }))}
+              onClick={() => setPaceTone({ ...paceTone, pace: "Active" })}
             >
               Active
             </Pill>
@@ -123,13 +115,13 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
           <div className="flex flex-wrap gap-2">
             <Pill
               selected={paceTone.tone === "Hidden Gems"}
-              onClick={() => setPaceTone((s) => ({ ...s, tone: "Hidden Gems" }))}
+              onClick={() => setPaceTone({ ...paceTone, tone: "Hidden Gems" })}
             >
               Hidden Gems
             </Pill>
             <Pill
               selected={paceTone.tone === "Classics"}
-              onClick={() => setPaceTone((s) => ({ ...s, tone: "Classics" }))}
+              onClick={() => setPaceTone({ ...paceTone, tone: "Classics" })}
             >
               Classics
             </Pill>

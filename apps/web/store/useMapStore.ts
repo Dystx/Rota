@@ -52,6 +52,14 @@ export interface MapStore {
   targetCoordinates: readonly [number, number] | null;
   setTargetCoordinates: (coords: readonly [number, number] | null) => void;
 
+  // Refinement-pill state (mock 1.4 / Phase 4.1). The pace and
+  // tone pills in the workspace panel set these; the active map
+  // camera reacts to changes via a useEffect. We keep them
+  // here (not in the workspace-shell's local state) so the
+  // canvas sibling can subscribe.
+  paceTone: { pace: "Relaxed" | "Active"; tone: "Hidden Gems" | "Classics" };
+  setPaceTone: (next: MapStore["paceTone"]) => void;
+
   /** Direct MapLibre source mutation. Bypasses React for
    *  high-frequency map updates (PR-8: prevent main-thread
    *  layout jank by isolating interactions). The active
@@ -119,6 +127,9 @@ export const useMapStore = create<MapStore>((set) => ({
 
   targetCoordinates: null,
   setTargetCoordinates: (coords) => set({ targetCoordinates: coords }),
+
+  paceTone: { pace: "Relaxed", tone: "Hidden Gems" },
+  setPaceTone: (next) => set({ paceTone: next }),
 
   setSourceData: (featureCollection) => {
     // No-op when no map is mounted. Avoids throwing during

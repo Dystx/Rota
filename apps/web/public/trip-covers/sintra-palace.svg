@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Sintra Palace in mist">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D8D4D0"/>
+      <stop offset="0.5" stop-color="#9AA5A0"/>
+      <stop offset="1" stop-color="#3A4540"/>
+    </linearGradient>
+    <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9AA5A0" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#3A4540" stop-opacity="0.95"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0">
+      <feTurbulence baseFrequency="0.85" numOctaves="2" seed="11"/>
+      <feColorMatrix values="0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.08 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="640" fill="url(#sky)"/>
+  <path d="M0 440 L240 380 L480 410 L720 350 L960 380 L1200 320 L1440 360 L1680 330 L1920 380 L1920 540 L0 540 Z" fill="#5A6A60" opacity="0.7"/>
+  <path d="M0 490 L240 450 L480 470 L720 430 L960 460 L1200 420 L1440 450 L1680 430 L1920 460 L1920 540 L0 540 Z" fill="#3A4540" opacity="0.85"/>
+  <rect y="440" width="1920" height="160" fill="url(#mist)"/>
+  <g fill="#1D2520">
+    <rect x="200" y="500" width="200" height="100"/>
+    <polygon points="200,500 400,500 380,470 220,470"/>
+    <rect x="240" y="520" width="20" height="40" fill="#3A4540"/>
+    <rect x="280" y="520" width="20" height="40" fill="#3A4540"/>
+    <rect x="320" y="520" width="20" height="40" fill="#3A4540"/>
+    <rect x="500" y="480" width="160" height="120"/>
+    <polygon points="500,480 660,480 640,450 520,450"/>
+    <rect x="540" y="510" width="20" height="40" fill="#3A4540"/>
+    <rect x="580" y="510" width="20" height="40" fill="#3A4540"/>
+    <rect x="600" y="510" width="20" height="40" fill="#3A4540"/>
+    <rect x="900" y="470" width="220" height="130"/>
+    <polygon points="900,470 1120,470 1100,430 920,430"/>
+    <rect x="940" y="510" width="20" height="50" fill="#3A4540"/>
+    <rect x="980" y="510" width="20" height="50" fill="#3A4540"/>
+    <rect x="1020" y="510" width="20" height="50" fill="#3A4540"/>
+    <rect x="1060" y="510" width="20" height="50" fill="#3A4540"/>
+    <rect x="1300" y="490" width="180" height="110"/>
+    <polygon points="1300,490 1480,490 1460,460 1320,460"/>
+    <rect x="1500" y="500" width="180" height="100"/>
+    <polygon points="1500,500 1680,500 1660,470 1520,470"/>
+  </g>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.6"/>
+</svg>

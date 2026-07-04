@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Algarve golden cliffs and turquoise water">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0DAA0"/>
+      <stop offset="0.4" stop-color="#E5B570"/>
+      <stop offset="0.85" stop-color="#7A4A20"/>
+      <stop offset="1" stop-color="#3A2510"/>
+    </linearGradient>
+    <linearGradient id="cliff" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E5B570"/>
+      <stop offset="0.5" stop-color="#A87038"/>
+      <stop offset="1" stop-color="#5A3A18"/>
+    </linearGradient>
+    <linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A8A8A"/>
+      <stop offset="0.5" stop-color="#1A5A6A"/>
+      <stop offset="1" stop-color="#0A2A38"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0">
+      <feTurbulence baseFrequency="0.85" numOctaves="2" seed="17"/>
+      <feColorMatrix values="0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.08 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="500" fill="url(#sky)"/>
+  <path d="M0 460 L240 440 L480 450 L720 420 L960 440 L1200 410 L1440 430 L1680 420 L1920 440 L1920 540 L0 540 Z" fill="#A87038" opacity="0.5"/>
+  <g fill="url(#cliff)">
+    <path d="M0 540 L0 680 L260 680 L260 600 L340 540 Z"/>
+    <path d="M400 540 L400 700 L720 700 L720 580 L820 540 Z"/>
+    <path d="M880 540 L880 680 L1180 680 L1180 600 L1280 540 Z"/>
+    <path d="M1320 540 L1320 700 L1640 700 L1640 580 L1740 540 Z"/>
+    <path d="M1780 540 L1780 680 L1920 680 L1920 540 Z"/>
+  </g>
+  <rect y="680" width="1920" height="400" fill="url(#ocean)"/>
+  <g fill="#E5B570" opacity="0.2">
+    <rect y="710" width="1920" height="2"/>
+    <rect y="760" width="1920" height="1.5"/>
+    <rect y="810" width="1920" height="2.5"/>
+    <rect y="870" width="1920" height="1.5"/>
+    <rect y="930" width="1920" height="2"/>
+  </g>
+  <g fill="#FFFFFF" opacity="0.5">
+    <path d="M0 680 Q480 670 960 680 T1920 680 L1920 700 L0 700 Z"/>
+  </g>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.6"/>
+</svg>

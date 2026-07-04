@@ -1,9 +1,11 @@
+import * as React from "react";
 import { Metadata } from "next";
 import Link from "next/link";
 import { TopNav } from "../../../_components/top-nav";
 import { SiteFooter } from "../../../_components/site-footer";
 import { WorkspaceCanvasClient } from "./workspace-canvas-client";
-import { fixtureRouteSummary } from "@repo/spatial-engine";
+import { WorkspaceShell } from "./workspace-shell";
+import { fixtureRouteCollection, fixtureRouteSummary } from "@repo/spatial-engine";
 
 export const metadata: Metadata = {
   title: "Trip Workspace | Rumia Spatial Engine",
@@ -16,6 +18,33 @@ export const metadata: Metadata = {
 
 export default function WorkspaceDemoPage() {
   const stops = fixtureRouteSummary();
+  // Phase 4.1: build the workspace-shell's stop list from the
+  // same route fixture the engine renders. This keeps the
+  // filmstrip and the on-map markers in sync without a remote
+  // trip query — the page is still a demo of the spatial engine
+  // surface, not a real trip.
+  const shellStops = React.useMemo(() => {
+    const collection = fixtureRouteCollection();
+    return collection.features
+      .filter((feature) => feature.geometry.type === "Point")
+      .map((feature, index) => {
+        const props = (feature.properties ?? {}) as Record<string, unknown>;
+        const [lng, lat] = feature.geometry.coordinates as [number, number];
+        const label = typeof props.label === "string" ? props.label : `Stop ${index + 1}`;
+        const note = typeof props.note === "string" ? props.note : "";
+        const hours = [9, 12, 15];
+        const minutes = [0, 30, 0];
+        const timeIndex = index % 3;
+        const time = `${String(hours[timeIndex]).padStart(2, "0")}:${String(minutes[timeIndex]).padStart(2, "0")}`;
+        return {
+          order: index + 1,
+          label,
+          note,
+          scheduledTime: time,
+          coordinates: [lng, lat] as const
+        };
+      });
+  }, []);
 
   return (
     <>
@@ -36,7 +65,10 @@ export default function WorkspaceDemoPage() {
             </p>
           </header>
 
-          <WorkspaceCanvasClient />
+          <div className="relative">
+            <WorkspaceCanvasClient />
+            <WorkspaceShell stops={shellStops} />
+          </div>
 
           <section className="grid gap-8 md:grid-cols-[1.5fr_1fr] items-start">
             <article className="rounded-2xl border border-olive-dark/10 bg-linen-dark/70 p-card-padding">

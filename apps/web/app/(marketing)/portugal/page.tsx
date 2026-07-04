@@ -14,39 +14,57 @@ export const metadata: Metadata = {
 const regions = [
   {
     name: "Porto & The North",
-    caption: "Historic cellars, dramatic river valleys, and deeply rooted culinary traditions."
+    caption: "Historic cellars, dramatic river valleys, and deeply rooted culinary traditions.",
+    cover: "/trip-covers/porto-ribeira.svg",
+    coverAlt: "Porto Ribeira at golden hour"
   },
   {
     name: "Douro Valley",
-    caption: "Terraced vineyards, premium wine estates, and scenic river navigation."
+    caption: "Terraced vineyards, premium wine estates, and scenic river navigation.",
+    cover: "/trip-covers/douro-vineyards.svg",
+    coverAlt: "Douro Valley vineyards in autumn"
   },
   {
     name: "Lisbon & Surroundings",
-    caption: "Seven hills of culture, vibrant neighborhoods, and coastal escapes."
+    caption: "Seven hills of culture, vibrant neighborhoods, and coastal escapes.",
+    cover: "/trip-covers/lisbon-tagus.svg",
+    coverAlt: "Lisbon and the Tagus River at sunset"
   },
   {
     name: "Sintra",
-    caption: "Palaces, misty microclimates, and romantic 19th-century architecture."
+    caption: "Palaces, misty microclimates, and romantic 19th-century architecture.",
+    cover: "/trip-covers/sintra-palace.svg",
+    coverAlt: "Sintra palace in morning mist"
   },
   {
     name: "Cascais",
-    caption: "Refined coastal living, dramatic cliffs, and ocean-front dining."
+    caption: "Refined coastal living, dramatic cliffs, and ocean-front dining.",
+    cover: "/trip-covers/cascais-coast.svg",
+    coverAlt: "Cascais Atlantic cliffs"
   },
   {
     name: "Alentejo",
-    caption: "Vast plains, cork forests, dark skies, and slow-paced living."
+    caption: "Vast plains, cork forests, dark skies, and slow-paced living.",
+    cover: "/trip-covers/alentejo-plains.svg",
+    coverAlt: "Alentejo plains with cork oaks"
   },
   {
     name: "Algarve",
-    caption: "Golden cliffs, hidden coves, and world-class coastal hiking."
+    caption: "Golden cliffs, hidden coves, and world-class coastal hiking.",
+    cover: "/trip-covers/algarve-coast.svg",
+    coverAlt: "Algarve golden cliffs"
   },
   {
     name: "Coimbra",
-    caption: "Ancient university heritage, fado music, and deep history."
+    caption: "Ancient university heritage, fado music, and deep history.",
+    cover: "/trip-covers/coimbra-uni.svg",
+    coverAlt: "Coimbra University at golden hour"
   },
   {
     name: "Aveiro",
-    caption: "Canals, colorful moliceiro boats, and art nouveau architecture."
+    caption: "Canals, colorful moliceiro boats, and art nouveau architecture.",
+    cover: "/trip-covers/aveiro-canals.svg",
+    coverAlt: "Aveiro art nouveau canal with moliceiro boat"
   }
 ];
 
@@ -75,6 +93,8 @@ export default function PortugalPage() {
                 title={region.name}
                 caption={region.caption}
                 href="/planner"
+                coverImage={region.cover}
+                coverAlt={region.coverAlt}
                 cta={<span className="text-[13px] font-medium text-olive-light">Start your prompt →</span>}
               />
             </li>

@@ -13,6 +13,14 @@ export interface TripCardProps {
   cta?: ReactNode;
   tone?: "default" | "highlight";
   testid?: string;
+  /**
+   * Optional cover image rendered as a 16:9 panel at the top
+   * of the card. Phase 4.2: the Portugal page uses this to
+   * show a stylized landscape per region (e.g. the Douro's
+   * terraced vineyards, the Algarve's golden cliffs).
+   */
+  coverImage?: string;
+  coverAlt?: string;
 }
 
 export function TripCard({
@@ -24,15 +32,28 @@ export function TripCard({
   cta,
   tone = "default",
   testid,
+  coverImage,
+  coverAlt
 }: TripCardProps) {
   return (
     <Card
       data-testid={testid}
       className={cn(
-        "flex flex-col rounded-[20px] transition-all hover:bg-white/80",
+        "flex flex-col overflow-hidden rounded-[20px] transition-all hover:bg-white/80",
         tone === "highlight" ? "border-[#181c1c] shadow-md" : "bg-white/70"
       )}
     >
+      {coverImage ? (
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-olive-dark/10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={coverImage}
+            alt={coverAlt ?? ""}
+            className="absolute inset-0 h-full w-full object-cover"
+            data-testid={testid ? `${testid}-cover` : undefined}
+          />
+        </div>
+      ) : null}
       <CardHeader className="p-4 md:p-5 pb-2 md:pb-2">
         <div className="flex items-start justify-between gap-4">
           <div className="grid gap-2">

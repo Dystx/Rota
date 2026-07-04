@@ -45,6 +45,28 @@ function WorkspaceCanvasInner() {
   const selectStop = useMapStore((state) => state.selectStop);
   const setSourceData = useMapStore((state) => state.setSourceData);
   const activeStopId = useMapStore((state) => state.activeStopId);
+  // Phase 4.1: the workspace-shell refinement pills live in
+  // the shared store so this sibling canvas can react to them.
+  // `mapHandle` is captured from `onMapReady` and reused by the
+  // effect below; without a ref we'd have to re-query the source
+  // on every pace/tone change. We also stash the initial camera
+  // (read from the active preset if any) so the effect flies
+  // back to a known baseline rather than stacking offsets.
+  const paceTone = useMapStore((state) => state.paceTone);
+  const mapHandleRef = React.useRef<{
+    flyTo: (options: {
+      zoom?: number;
+      pitch?: number;
+      bearing?: number;
+      center?: readonly [number, number];
+      duration?: number;
+    }) => void;
+  } | null>(null);
+  const initialCameraRef = React.useRef<{
+    center: readonly [number, number];
+    zoom: number;
+    pitch: number;
+  } | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   // If the bento card hydrated the Zustand store before the navigation
@@ -81,6 +103,27 @@ function WorkspaceCanvasInner() {
     });
   });
 
+  // Phase 4.1: react to refinement-pill changes. Pace adjusts
+  // zoom on top of the preset's baseline (Active zooms in,
+  // Relaxed zooms out). Tone swaps pitch between the two
+  // camera idioms (Hidden Gems = angled, Classics = bird's eye).
+  // We fly to baseline + offset rather than to a relative
+  // delta so the camera state stays predictable even after
+  // the user has clicked filmstrip cards or bento tiles.
+  React.useEffect(() => {
+    const map = mapHandleRef.current;
+    const baseline = initialCameraRef.current;
+    if (!map || !baseline) return;
+    const zoomOffset = paceTone.pace === "Active" ? 0.6 : -0.6;
+    const targetPitch = paceTone.tone === "Hidden Gems" ? 35 : 0;
+    map.flyTo({
+      center: baseline.center,
+      zoom: baseline.zoom + zoomOffset,
+      pitch: targetPitch,
+      duration: 800
+    });
+  }, [paceTone]);
+
   return (
     <div
       ref={containerRef}
@@ -104,6 +147,20 @@ function WorkspaceCanvasInner() {
           if (stopsSource && containerRef.current) {
             registerMapSource(containerRef.current, stopsSource);
           }
+          // Phase 4.1: stash the map handle and the baseline
+          // camera so the pace/tone effect can fly back to a
+          // predictable position. We prefer the preset's camera
+          // (the URL-driven initial focus) but fall back to the
+          // map's current state when no preset is set.
+          mapHandleRef.current = map as unknown as typeof mapHandleRef.current;
+          const baselineCenter = (preset?.camera?.center ?? [0, 0]) as readonly [number, number];
+          const baselineZoom = preset?.camera?.zoom ?? map.getZoom();
+          const baselinePitch = preset?.camera?.pitch ?? map.getPitch();
+          initialCameraRef.current = {
+            center: baselineCenter,
+            zoom: baselineZoom,
+            pitch: baselinePitch
+          };
         }}
       />
     </div>

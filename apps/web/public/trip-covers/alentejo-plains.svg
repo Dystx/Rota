@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Alentejo plains and cork oaks at golden hour">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0DCB0"/>
+      <stop offset="0.4" stop-color="#D8A868"/>
+      <stop offset="0.85" stop-color="#7A5028"/>
+      <stop offset="1" stop-color="#3A2510"/>
+    </linearGradient>
+    <linearGradient id="plains" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B89060"/>
+      <stop offset="0.5" stop-color="#8A6840"/>
+      <stop offset="1" stop-color="#5A4020"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0">
+      <feTurbulence baseFrequency="0.85" numOctaves="2" seed="29"/>
+      <feColorMatrix values="0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.08 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="500" fill="url(#sky)"/>
+  <path d="M0 460 Q480 440 960 450 T1920 440 L1920 540 L0 540 Z" fill="url(#plains)"/>
+  <g fill="#3A2510" opacity="0.85">
+    <ellipse cx="200" cy="450" rx="40" ry="20"/>
+    <rect x="195" y="450" width="10" height="40"/>
+    <ellipse cx="280" cy="460" rx="35" ry="18"/>
+    <rect x="276" y="460" width="8" height="35"/>
+    <ellipse cx="380" cy="450" rx="42" ry="22"/>
+    <rect x="375" y="450" width="10" height="45"/>
+    <ellipse cx="500" cy="465" rx="38" ry="19"/>
+    <rect x="496" y="465" width="8" height="40"/>
+    <ellipse cx="620" cy="455" rx="40" ry="20"/>
+    <rect x="616" y="455" width="8" height="42"/>
+    <ellipse cx="760" cy="460" rx="42" ry="22"/>
+    <rect x="756" y="460" width="8" height="45"/>
+    <ellipse cx="900" cy="450" rx="38" ry="19"/>
+    <rect x="896" y="450" width="8" height="40"/>
+    <ellipse cx="1040" cy="465" rx="40" ry="20"/>
+    <rect x="1036" y="465" width="8" height="42"/>
+    <ellipse cx="1200" cy="455" rx="42" ry="22"/>
+    <rect x="1196" y="455" width="8" height="45"/>
+    <ellipse cx="1360" cy="460" rx="38" ry="19"/>
+    <rect x="1356" y="460" width="8" height="40"/>
+    <ellipse cx="1500" cy="450" rx="40" ry="20"/>
+    <rect x="1496" y="450" width="8" height="42"/>
+    <ellipse cx="1640" cy="465" rx="42" ry="22"/>
+    <rect x="1636" y="465" width="8" height="45"/>
+    <ellipse cx="1780" cy="455" rx="38" ry="19"/>
+    <rect x="1776" y="455" width="8" height="40"/>
+  </g>
+  <path d="M0 540 L0 700 L240 700 L240 600 L320 540 Z" fill="#5A4020"/>
+  <path d="M400 540 L400 700 L720 700 L720 580 L820 540 Z" fill="#5A4020"/>
+  <path d="M900 540 L900 700 L1200 700 L1200 600 L1280 540 Z" fill="#5A4020"/>
+  <path d="M1380 540 L1380 700 L1640 700 L1640 580 L1740 540 Z" fill="#5A4020"/>
+  <path d="M1820 540 L1820 700 L1920 700 L1920 540 Z" fill="#5A4020"/>
+  <rect y="700" width="1920" height="380" fill="#3A2510"/>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.6"/>
+</svg>

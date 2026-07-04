@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Coimbra University at golden hour">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0D5A0"/>
+      <stop offset="0.4" stop-color="#D89858"/>
+      <stop offset="0.85" stop-color="#6A3A20"/>
+      <stop offset="1" stop-color="#2A1810"/>
+    </linearGradient>
+    <linearGradient id="mondego" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5A4030"/>
+      <stop offset="1" stop-color="#2A1A14"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0">
+      <feTurbulence baseFrequency="0.85" numOctaves="2" seed="19"/>
+      <feColorMatrix values="0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.08 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="500" fill="url(#sky)"/>
+  <path d="M0 440 L240 420 L480 430 L720 400 L960 420 L1200 390 L1440 410 L1680 400 L1920 420 L1920 540 L0 540 Z" fill="#5A3A20" opacity="0.6"/>
+  <g fill="#1F1208">
+    <rect x="200" y="470" width="320" height="70"/>
+    <polygon points="200,470 520,470 500,440 220,440"/>
+    <rect x="240" y="500" width="20" height="30" fill="#3A2510"/>
+    <rect x="290" y="500" width="20" height="30" fill="#3A2510"/>
+    <rect x="340" y="500" width="20" height="30" fill="#3A2510"/>
+    <rect x="390" y="500" width="20" height="30" fill="#3A2510"/>
+    <rect x="440" y="500" width="20" height="30" fill="#3A2510"/>
+    <rect x="700" y="430" width="120" height="110"/>
+    <polygon points="700,430 820,430 810,400 710,400"/>
+    <rect x="720" y="470" width="14" height="60" fill="#3A2510"/>
+    <rect x="745" y="470" width="14" height="60" fill="#3A2510"/>
+    <rect x="770" y="470" width="14" height="60" fill="#3A2510"/>
+    <rect x="795" y="470" width="14" height="60" fill="#3A2510"/>
+    <rect x="900" y="450" width="240" height="90"/>
+    <polygon points="900,450 1140,450 1120,420 920,420"/>
+    <rect x="930" y="490" width="20" height="40" fill="#3A2510"/>
+    <rect x="970" y="490" width="20" height="40" fill="#3A2510"/>
+    <rect x="1010" y="490" width="20" height="40" fill="#3A2510"/>
+    <rect x="1050" y="490" width="20" height="40" fill="#3A2510"/>
+    <rect x="1090" y="490" width="20" height="40" fill="#3A2510"/>
+    <rect x="1280" y="460" width="180" height="80"/>
+    <polygon points="1280,460 1460,460 1440,430 1300,430"/>
+    <rect x="1300" y="490" width="20" height="40" fill="#3A2510"/>
+    <rect x="1340" y="490" width="20" height="40" fill="#3A2510"/>
+    <rect x="1380" y="490" width="20" height="40" fill="#3A2510"/>
+    <rect x="1420" y="490" width="20" height="40" fill="#3A2510"/>
+    <rect x="1600" y="475" width="200" height="65"/>
+    <polygon points="1600,475 1800,475 1780,445 1620,445"/>
+  </g>
+  <rect y="540" width="1920" height="540" fill="url(#mondego)"/>
+  <g fill="#D89858" opacity="0.15">
+    <rect y="580" width="1920" height="2"/>
+    <rect y="640" width="1920" height="1.5"/>
+    <rect y="700" width="1920" height="2.5"/>
+    <rect y="780" width="1920" height="1.5"/>
+    <rect y="860" width="1920" height="2"/>
+    <rect y="940" width="1920" height="1.5"/>
+  </g>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.6"/>
+</svg>
