@@ -137,6 +137,49 @@ describe("useMapStore — setSourceData + registerMapSource", () => {
     registerMapSource(containerActive, null);
   });
 
+  it("drives the high-frequency Zustand→MapLibre source path on activeStopId change", () => {
+    // Integration with `useMapSourceSync`: simulate the pattern used
+    // by apps/web/app/(marketing)/explore/workspace/workspace-canvas-client.tsx:
+    //  - registerMapSource(container, source) on mount
+    //  - call setSourceData(featureCollection) on every activeStopId
+    //    change (here driven directly via the store to keep the
+    //    test framework-light; useMapSourceSync is a thin wrapper
+    //    around the same store call).
+    //  - the source sees every setData call.
+    const container = fakeContainer("stops-source");
+    const source = makeStubSource();
+    registerMapSource(container, source);
+
+    const fc1: GeoJSON.FeatureCollection = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: { stopId: "lx-alfama" },
+          geometry: { type: "Point", coordinates: [-9.13, 38.71] }
+        }
+      ]
+    };
+    const fc2: GeoJSON.FeatureCollection = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: { stopId: "porto-ribeira" },
+          geometry: { type: "Point", coordinates: [-8.63, 41.15] }
+        }
+      ]
+    };
+    useMapStore.getState().setSourceData(fc1);
+    useMapStore.getState().setSourceData(fc2);
+    useMapStore.getState().setSourceData({ type: "FeatureCollection", features: [] });
+
+    expect(source.calls).toEqual([fc1, fc2, { type: "FeatureCollection", features: [] }]);
+
+    // Cleanup
+    registerMapSource(container, null);
+  });
+
   it("selectStop sets activeStopId + targetCoordinates", () => {
     useMapStore.getState().selectStop("lx-alfama", [-9.13, 38.71]);
     expect(useMapStore.getState().activeStopId).toBe("lx-alfama");
