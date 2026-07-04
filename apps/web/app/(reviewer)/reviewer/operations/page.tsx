@@ -1,4 +1,4 @@
-import { buildWorkerPlan } from "@repo/workers";
+import { buildWorkerPlan } from "@repo/workers/plan";
 import { buildEmailPreview } from "@repo/emails";
 import { listCheckoutPlans } from "@repo/payments";
 import { isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
