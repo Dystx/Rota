@@ -39,7 +39,16 @@ export type AiStop = {
 export type RawAiVsEditablePanelProps = {
   stops: readonly AiStop[];
   onEdit?: (stopId: string, editedReason: string) => void;
+  /** Swap a stop for a hidden gem. Consumer should call
+   *  `recordSpecialistSwap` from `@repo/db` with
+   *  `reason: "swap_for_hidden_gem"` to record the action in
+   *  `public.place_adjustment_log` and decrement `places.quality`
+   *  by 1. See `packages/db/src/places.ts:287`. */
   onSwapForHiddenGem?: (stopId: string) => void;
+  /** Mark a stop as a logistics bottleneck. Consumer should call
+   *  `recordSpecialistSwap` from `@repo/db` with
+   *  `reason: "fix_logistics_bottleneck"`. Same audit + decrement
+   *  as onSwapForHiddenGem. */
   onFixLogisticsBottleneck?: (stopId: string) => void;
   /** When true, render a "Loading…" placeholder
    *  instead of the panel. */
