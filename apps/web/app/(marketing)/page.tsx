@@ -45,33 +45,26 @@ export default function HomePage() {
           {/* Top-only directional scrim: keeps the headline + wizard
               readable without darkening the lower 2/3 of the map.
               Bottom fades to fully transparent so the Iberian
-              peninsula reads through. */}
+              peninsula reads through. Lighter than the previous
+              (60% → 40% at the top) so the map dominates the
+              composition. */}
           <div
-            className="absolute inset-x-0 top-0 h-3/4 bg-gradient-to-b from-primary/65 via-primary/35 to-transparent z-[1] pointer-events-none"
+            className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-primary/40 via-primary/15 to-transparent z-[1] pointer-events-none"
             aria-hidden="true"
           />
 
           {/* Hero Content — anchored in the upper third. The map is
-              visible in the lower 2/3 with no overlay. */}
-          <div className="relative z-10 w-full max-w-4xl mx-auto px-container-padding-sm md:px-container-padding-lg pt-8 md:pt-12 flex flex-col items-center text-center">
-            <h1 className="font-display-mobile text-display-mobile md:font-display md:text-display text-linen-dark mb-4 md:mb-6 tracking-tight drop-shadow-2xl">
+              visible in the lower 2/3 with no overlay. The intent
+              card itself is now lighter (handled inside the wizard)
+              so the map is the visual hero, not the form. */}
+          <div className="relative z-10 w-full max-w-3xl mx-auto px-container-padding-sm md:px-container-padding-lg pt-6 md:pt-10 flex flex-col items-center text-center">
+            <h1 className="font-display-mobile text-display-mobile md:font-display md:text-display text-linen-dark mb-3 md:mb-4 tracking-tight drop-shadow-2xl">
               Discover <span className="italic text-ochre-light">Intentionally.</span>
             </h1>
 
-            {/* Central Search Bar (interactive wizard) */}
+            {/* Central Search Bar (interactive wizard) — slimmed
+                in the wizard component to free the map below. */}
             <HeroSearchWizard />
-
-            {/* Subtle hint that the underlined spans are clickable.
-                Keeps the hero quiet while still telling the user the
-                map will react. */}
-            <p className="mt-3 font-mono-micro text-mono-micro uppercase tracking-widest text-linen-dark/60 drop-shadow-md">
-              <span className="inline-flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
-                  touch_app
-                </span>
-                Tap a place or the wizard to focus the map
-              </span>
-            </p>
           </div>
         </section>
 

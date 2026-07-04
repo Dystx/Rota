@@ -149,71 +149,69 @@ export function HeroSearchWizard() {
   );
 
   return (
-    <div className="w-full max-w-3xl bg-glass-light backdrop-blur-[24px] border border-white/40 rounded-xl p-card-padding shadow-2xl flex flex-col items-center">
-      <div className="w-full flex items-center justify-between border-b border-olive-light/20 pb-4 mb-4">
-        <span className="font-headline-sm text-headline-sm md:font-headline-lg md:text-headline-lg text-primary text-center w-full flex flex-wrap items-center justify-center gap-x-2">
-          We are visiting{" "}
-          <LocationChip
-            value={location}
-            isEditing={editingLocation}
-            draft={draftLocation}
-            onDraftChange={setDraftLocation}
-            onCommit={commitLocation}
-            onEdit={() => {
-              setEditingLocation(true);
-              setDraftLocation(location);
-            }}
-            onCancel={() => {
-              setEditingLocation(false);
-              setDraftLocation(location);
-            }}
-            active={activeStopId === "portugal" || ["lisbon", "porto", "douro", "sintra", "cascais", "coimbra", "algarve", "azores"].includes(activeStopId ?? "")}
-            testId="hero-chip-portugal"
-          />{" "}
-          for{" "}
-          <DaysChip
-            value={days}
-            isEditing={editingDays}
-            draft={draftDays}
-            onDraftChange={setDraftDays}
-            onCommit={commitDays}
-            onEdit={() => {
-              setEditingDays(true);
-              setDraftDays(String(days));
-            }}
-            onCancel={() => {
-              setEditingDays(false);
-              setDraftDays(String(days));
-            }}
-            testId="hero-chip-days"
-          />
-          ...
-        </span>
-      </div>
-
-      {/* Live hint — appears briefly when the typed value didn't
-          resolve to a fly-to destination. Kept short to stay out
-          of the way of the map underneath. */}
-      {hint && (
-        <div
-          data-testid="hero-wizard-hint"
-          role="status"
-          className="mb-3 px-3 py-1.5 rounded-md bg-ochre-light/20 border border-ochre-light/40 text-ochre-dark font-mono-technical text-[11px] text-center max-w-prose"
-        >
-          {hint}
-        </div>
-      )}
+    <div className="relative w-full max-w-2xl bg-glass-light/85 backdrop-blur-md border border-white/30 rounded-full px-4 py-2.5 md:px-5 md:py-3 shadow-md flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+      <span className="font-body-md text-body-md md:font-headline-sm md:text-headline-sm text-primary text-center flex flex-wrap items-center justify-center gap-x-1.5">
+        We are visiting{" "}
+        <LocationChip
+          value={location}
+          isEditing={editingLocation}
+          draft={draftLocation}
+          onDraftChange={setDraftLocation}
+          onCommit={commitLocation}
+          onEdit={() => {
+            setEditingLocation(true);
+            setDraftLocation(location);
+          }}
+          onCancel={() => {
+            setEditingLocation(false);
+            setDraftLocation(location);
+          }}
+          active={activeStopId === "portugal" || ["lisbon", "porto", "douro", "sintra", "cascais", "coimbra", "algarve", "azores"].includes(activeStopId ?? "")}
+          testId="hero-chip-portugal"
+        />{" "}
+        for{" "}
+        <DaysChip
+          value={days}
+          isEditing={editingDays}
+          draft={draftDays}
+          onDraftChange={setDraftDays}
+          onCommit={commitDays}
+          onEdit={() => {
+            setEditingDays(true);
+            setDraftDays(String(days));
+          }}
+          onCancel={() => {
+            setEditingDays(false);
+            setDraftDays(String(days));
+          }}
+          testId="hero-chip-days"
+        />
+        ...
+      </span>
 
       <Link
         href={plannerHref}
         data-testid="hero-begin-journey"
-        className="bg-olive-light text-on-primary font-label-ui text-label-ui px-6 py-2.5 md:px-8 md:py-3 rounded-full hover:bg-olive-dark transition-all duration-200 shadow-md flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+        className="bg-olive-light text-on-primary font-label-ui text-label-ui px-4 py-1.5 md:px-5 md:py-2 rounded-full hover:bg-olive-dark transition-all duration-200 shadow-sm flex items-center gap-1.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
       >
-        Begin Journey{" "}
-        <span className="material-symbols-outlined text-[16px] motion-safe:group-hover:translate-x-1 motion-safe:transition-transform" aria-hidden="true">
+        Begin{" "}
+        <span className="material-symbols-outlined text-[14px] motion-safe:group-hover:translate-x-1 motion-safe:transition-transform" aria-hidden="true">
           arrow_forward
         </span>
       </Link>
+
+      {/* Live hint — appears briefly when the typed value didn't
+          resolve to a fly-to destination. Positioned absolutely
+          below the pill so it never grows the card. */}
+      {hint && (
+        <div
+          data-testid="hero-wizard-hint"
+          role="status"
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 rounded-md bg-ochre-light/20 border border-ochre-light/40 text-ochre-dark font-mono-technical text-[11px] text-center max-w-prose shadow-sm whitespace-nowrap"
+        >
+          {hint}
+        </div>
+      )}
     </div>
   );
 }
