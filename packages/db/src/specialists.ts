@@ -43,7 +43,14 @@ export const SpecialistProfileInputSchema = z.object({
   tier3OnCall: z.boolean().default(false),
   tier4LicensedGuide: z.boolean().default(false),
   rnaatLicenseNumber: z.string().max(100).nullable().optional(),
-  hourlyRate: z.number().min(0).max(9999.99).default(0)
+  hourlyRate: z.number().min(0).max(9999.99).default(0),
+  bio: z.string().max(2000).nullable().optional(),
+  photoUrl: z
+    .string()
+    .max(2000)
+    .url("Photo URL must be a valid URL")
+    .nullable()
+    .optional()
 });
 
 export type SpecialistProfileInput = z.infer<typeof SpecialistProfileInputSchema>;
@@ -58,6 +65,8 @@ export interface SpecialistProfile {
   rnaatLicenseNumber: string | null;
   isVerified: boolean;
   hourlyRate: number;
+  bio: string | null;
+  photoUrl: string | null;
   createdAt: string;
 }
 
@@ -71,11 +80,13 @@ type RawSpecialistRow = {
   rnaat_license_number: string | null;
   is_verified: boolean;
   hourly_rate: number;
+  bio: string | null;
+  photo_url: string | null;
   created_at: string;
 };
 
 const SELECT_COLUMNS =
-  "id,user_id,full_name,regions_covered,tier_3_on_call,tier_4_licensed_guide,rnaat_license_number,is_verified,hourly_rate,created_at" as const;
+  "id,user_id,full_name,regions_covered,tier_3_on_call,tier_4_licensed_guide,rnaat_license_number,is_verified,hourly_rate,bio,photo_url,created_at" as const;
 
 function parseSpecialistRow(row: RawSpecialistRow): SpecialistProfile {
   return {
@@ -88,6 +99,8 @@ function parseSpecialistRow(row: RawSpecialistRow): SpecialistProfile {
     rnaatLicenseNumber: row.rnaat_license_number,
     isVerified: row.is_verified,
     hourlyRate: Number(row.hourly_rate),
+    bio: row.bio ?? null,
+    photoUrl: row.photo_url ?? null,
     createdAt: row.created_at
   };
 }
@@ -135,6 +148,8 @@ export async function upsertSpecialistProfile(
           ? input.rnaatLicenseNumber ?? null
           : null,
         hourly_rate: input.hourlyRate,
+        bio: input.bio ?? null,
+        photo_url: input.photoUrl ?? null,
         is_verified: false
       },
       { onConflict: "user_id" }
@@ -226,4 +241,111 @@ async function getSpecialistProfileById(
   }
   if (!data) return null;
   return parseSpecialistRow(data as RawSpecialistRow);
+}
+
+/* ------------------------------------------------------------------ *
+ *  Capabilities (skills + languages)                                 *
+ * ------------------------------------------------------------------ */
+
+export type CapabilityType = "skill" | "language";
+
+export interface SpecialistCapabilities {
+  skills: readonly string[];
+  languages: readonly string[];
+}
+
+/**
+ * Read every capability row for one specialist and bucket
+ * by type. The admin queue uses the joined shape to
+ * render both lists in a single round-trip; the
+ * onboarding form uses the same helper to seed the
+ * chip input + language grid.
+ */
+export async function getSpecialistCapabilities(
+  specialistId: string,
+  options?: DataClientOptions
+): Promise<SpecialistCapabilities> {
+  const { data, error } = await resolveDataClient(options)
+    .from("specialist_capabilities")
+    .select("type,value")
+    .eq("specialist_id", specialistId)
+    .order("type", { ascending: true })
+    .order("value", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const skills: string[] = [];
+  const languages: string[] = [];
+  for (const row of (data as Array<{ type: string; value: string }> | null) ??
+    []) {
+    if (row.type === "skill") skills.push(row.value);
+    else if (row.type === "language") languages.push(row.value);
+  }
+  return { skills, languages };
+}
+
+/**
+ * Replace-all semantics for one capability type. Deletes
+ * rows that are no longer in `values` and inserts rows
+ * for new values. Empty `values` deletes every row of
+ * that type for the specialist.
+ */
+export async function setSpecialistCapabilities(
+  specialistId: string,
+  type: CapabilityType,
+  values: readonly string[],
+  options?: DataClientOptions
+): Promise<void> {
+  const client = resolveDataClient(options);
+  // Fetch current values so the delete is precise.
+  const { data: current, error: readError } = await client
+    .from("specialist_capabilities")
+    .select("value")
+    .eq("specialist_id", specialistId)
+    .eq("type", type);
+  if (readError) {
+    throw new Error(readError.message);
+  }
+  const currentValues = new Set(
+    ((current as Array<{ value: string }> | null) ?? []).map((r) => r.value)
+  );
+  const nextValues = new Set(values);
+
+  const toDelete = [...currentValues].filter((v) => !nextValues.has(v));
+  const toInsert = [...nextValues].filter((v) => !currentValues.has(v));
+
+  if (toDelete.length > 0) {
+    // Supabase Postgrest doesn't have a clean
+    // in/not-in filter in a single call; we delete by
+    // value list using a per-value loop. For typical
+    // counts (1-10 skills, 1-6 languages) the round-trip
+    // cost is trivial.
+    for (const value of toDelete) {
+      const { error: deleteError } = await client
+        .from("specialist_capabilities")
+        .delete()
+        .eq("specialist_id", specialistId)
+        .eq("type", type)
+        .eq("value", value);
+      if (deleteError) {
+        throw new Error(deleteError.message);
+      }
+    }
+  }
+
+  if (toInsert.length > 0) {
+    const rows = toInsert.map((value) => ({
+      specialist_id: specialistId,
+      type,
+      value
+    }));
+    const { error: insertError } = await client
+      .from("specialist_capabilities")
+      .insert(rows);
+    if (insertError) {
+      throw new Error(insertError.message);
+    }
+  }
 }

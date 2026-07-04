@@ -331,10 +331,14 @@ export async function listTripDrafts(limit = 12, options?: DataClientOptions): P
 
 export {
   SpecialistProfileInputSchema,
+  getSpecialistCapabilities,
   getSpecialistProfileByUserId,
   listSpecialists,
+  setSpecialistCapabilities,
   setSpecialistVerified,
   upsertSpecialistProfile,
+  type CapabilityType,
+  type SpecialistCapabilities,
   type SpecialistProfile,
   type SpecialistProfileInput
 } from "./specialists";

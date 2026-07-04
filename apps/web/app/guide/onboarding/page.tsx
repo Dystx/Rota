@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUserId } from "@/lib/supabase/server";
 import { getSpecialistProfileByUserId } from "@repo/db";
 import { GuideOnboardingForm } from "./_components/guide-onboarding-form";
+import { loadSpecialistCapabilities } from "./actions";
 
 /**
  * Specialist onboarding page. The unified
@@ -31,6 +32,12 @@ export default async function GuideOnboardingPage() {
   }
 
   const existing = await getSpecialistProfileByUserId(userId);
+  // Capabilities (skills + languages) live in a
+  // separate table. Only load them when the specialist
+  // row exists; for a new user the form starts empty.
+  const initialCapabilities = existing
+    ? await loadSpecialistCapabilities()
+    : { skills: [], languages: [] };
 
   return (
     <main className="rota-page rota-page-pad">
@@ -48,6 +55,7 @@ export default async function GuideOnboardingPage() {
       </header>
       <GuideOnboardingForm
         initialProfile={existing}
+        initialCapabilities={initialCapabilities}
         userId={userId}
       />
     </main>

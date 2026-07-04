@@ -2,16 +2,21 @@
 
 /**
  * Specialist onboarding server action. Upserts the
- * current user's `specialist_profiles` row. Validates
- * the tier-4 license constraint at the application
- * layer (the DB has a CHECK constraint that catches
- * the same case as a backstop).
+ * current user's `specialist_profiles` row and replaces
+ * the specialist_capabilities rows for skills and
+ * languages. Validates the tier-4 license constraint at
+ * the application layer (the DB has a CHECK constraint
+ * that catches the same case as a backstop).
  */
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUserId } from "@/lib/supabase/server";
-import { upsertSpecialistProfile } from "@repo/db";
+import {
+  getSpecialistCapabilities,
+  setSpecialistCapabilities,
+  upsertSpecialistProfile
+} from "@repo/db";
 
 const ProfileInputSchema = z
   .object({
@@ -33,7 +38,26 @@ const ProfileInputSchema = z
       .number()
       .min(0)
       .max(9999.99)
-      .default(0)
+      .default(0),
+    bio: z
+      .string()
+      .max(2000, "Bio must be 2000 characters or fewer")
+      .nullable()
+      .optional(),
+    photoUrl: z
+      .string()
+      .url("Photo URL must be a valid URL")
+      .max(2000, "Photo URL must be 2000 characters or fewer")
+      .nullable()
+      .optional()
+      .or(z.literal("")),
+    skills: z
+      .array(z.string().min(1).max(80))
+      .max(20, "Pick at most 20 skills")
+      .default([]),
+    languages: z
+      .array(z.string().min(1).max(5))
+      .default([])
   })
   .refine(
     (input) =>
@@ -48,6 +72,18 @@ const ProfileInputSchema = z
     {
       message: "Tier 4 requires an RNAAT license number",
       path: ["rnaatLicenseNumber"]
+    }
+  )
+  .refine(
+    (input) => {
+      // Application-layer mirror of the DB CHECK on
+      // specialist_capabilities.value when type='language'.
+      const allowed = ["pt", "en", "es", "fr", "it", "de"];
+      return input.languages.every((l) => allowed.includes(l));
+    },
+    {
+      message: "Language must be one of pt, en, es, fr, it, de",
+      path: ["languages"]
     }
   );
 
@@ -75,6 +111,7 @@ export async function submitSpecialistProfile(
   }
 
   try {
+    // 1. Upsert the profile (carries bio + photo_url).
     const result = await upsertSpecialistProfile(userId, {
       fullName: parsed.data.fullName,
       regionsCovered: parsed.data.regionsCovered,
@@ -84,8 +121,26 @@ export async function submitSpecialistProfile(
         parsed.data.tier4LicensedGuide
           ? parsed.data.rnaatLicenseNumber ?? null
           : null,
-      hourlyRate: parsed.data.hourlyRate
+      hourlyRate: parsed.data.hourlyRate,
+      bio: parsed.data.bio?.length ? parsed.data.bio : null,
+      photoUrl:
+        parsed.data.photoUrl && parsed.data.photoUrl.length > 0
+          ? parsed.data.photoUrl
+          : null
     });
+
+    // 2. Replace the capabilities rows (skills + languages)
+    //    if the profile upsert returned a row id. The
+    //    onboarding flow is "always upsert the user_id" so
+    //    `result.id` is the new specialist row's primary key.
+    if (result?.id) {
+      await setSpecialistCapabilities(result.id, "skill", parsed.data.skills);
+      await setSpecialistCapabilities(
+        result.id,
+        "language",
+        parsed.data.languages
+      );
+    }
 
     revalidatePath("/guide/onboarding");
     revalidatePath("/admin/specialists");
@@ -94,4 +149,22 @@ export async function submitSpecialistProfile(
     const message = err instanceof Error ? err.message : "Unknown error";
     return { kind: "error", message };
   }
+}
+
+/**
+ * Server-side read of the current specialist's
+ * capabilities. Used by the page (server component)
+ * to seed the form state.
+ */
+export async function loadSpecialistCapabilities(): Promise<{
+  skills: readonly string[];
+  languages: readonly string[];
+}> {
+  const userId = await getCurrentUserId();
+  if (!userId) return { skills: [], languages: [] };
+  const { getSpecialistProfileByUserId } = await import("@repo/db");
+  const profile = await getSpecialistProfileByUserId(userId);
+  if (!profile) return { skills: [], languages: [] };
+  const caps = await getSpecialistCapabilities(profile.id);
+  return { skills: caps.skills, languages: caps.languages };
 }

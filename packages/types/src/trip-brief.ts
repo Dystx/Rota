@@ -16,6 +16,35 @@ export const destinationCountries = [
   "greece"
 ] as const;
 
+/**
+ * Specialist spoken-language enum. Mirrored by the DB
+ * CHECK constraint on `specialist_capabilities.value`
+ * (when `type = 'language'`) and by the admin and
+ * onboarding form pickers. Keep in sync with the
+ * migration; the round-trip test in
+ * `apps/web/app/guide/onboarding/_components/languages-picker.test.tsx`
+ * (and the DB test) catches drift.
+ */
+export const specialistLanguages = [
+  "pt",
+  "en",
+  "es",
+  "fr",
+  "it",
+  "de"
+] as const;
+
+export type SpecialistLanguage = (typeof specialistLanguages)[number];
+
+export const specialistLanguageLabels: Record<SpecialistLanguage, string> = {
+  pt: "Portuguese",
+  en: "English",
+  es: "Spanish",
+  fr: "French",
+  it: "Italian",
+  de: "German"
+};
+
 export const portugalRegions = [
   "porto",
   "douro-valley",

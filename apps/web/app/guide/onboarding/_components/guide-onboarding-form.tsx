@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import { submitSpecialistProfile, type ProfileInput } from "../actions";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
 import { RegionPicker } from "./region-picker";
+import { SkillsInput } from "./skills-input";
+import { LanguagesPicker } from "./languages-picker";
 
 /** Profile shape read from the server component. The
  *  server reads via `getSpecialistProfileByUserId`;
@@ -17,14 +19,29 @@ export type SpecialistProfile = {
   rnaatLicenseNumber: string | null;
   isVerified: boolean;
   hourlyRate: number;
+  bio: string | null;
+  photoUrl: string | null;
+};
+
+/** Capabilities seeded by the page (server component)
+ *  via `loadSpecialistCapabilities`. `null` for new
+ *  specialists. */
+export type InitialCapabilities = {
+  skills: readonly string[];
+  languages: readonly string[];
 };
 
 type Props = {
   userId: string;
   initialProfile: SpecialistProfile | null;
+  initialCapabilities: InitialCapabilities;
 };
 
-export function GuideOnboardingForm({ userId, initialProfile }: Props) {
+export function GuideOnboardingForm({
+  userId,
+  initialProfile,
+  initialCapabilities
+}: Props) {
   const [fullName, setFullName] = useState(initialProfile?.fullName ?? "");
   // The form stores synthetic region UUIDs (see
   // `packages/types/src/region-ids.ts`). The RegionPicker
@@ -45,6 +62,14 @@ export function GuideOnboardingForm({ userId, initialProfile }: Props) {
   const [hourlyRate, setHourlyRate] = useState(
     initialProfile?.hourlyRate ?? 0
   );
+  const [bio, setBio] = useState(initialProfile?.bio ?? "");
+  const [photoUrl, setPhotoUrl] = useState(initialProfile?.photoUrl ?? "");
+  const [skills, setSkills] = useState<string[]>(
+    () => [...initialCapabilities.skills]
+  );
+  const [languages, setLanguages] = useState<string[]>(
+    () => [...initialCapabilities.languages]
+  );
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -60,7 +85,11 @@ export function GuideOnboardingForm({ userId, initialProfile }: Props) {
       tier3OnCall,
       tier4LicensedGuide,
       rnaatLicenseNumber: rnaatLicenseNumber.length > 0 ? rnaatLicenseNumber : null,
-      hourlyRate
+      hourlyRate,
+      bio: bio.length > 0 ? bio : null,
+      photoUrl: photoUrl.length > 0 ? photoUrl : "",
+      skills,
+      languages
     };
 
     startTransition(async () => {
@@ -116,6 +145,58 @@ export function GuideOnboardingForm({ userId, initialProfile }: Props) {
               Tier 3 specialists are billed via subscription; the
               rate here is informational. Tier 4 dispatch uses this
               rate.
+            </span>
+          </label>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-white/70">
+        <CardHeader>
+          <CardTitle>About you</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <SkillsInput
+            value={skills}
+            onChange={setSkills}
+            disabled={isPending}
+          />
+          <LanguagesPicker
+            value={languages}
+            onChange={setLanguages}
+            disabled={isPending}
+          />
+          <label className="grid gap-1.5">
+            <span className="text-sm font-medium text-foreground">
+              Short bio
+            </span>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              maxLength={2000}
+              rows={4}
+              placeholder="A few sentences about your background, specialties, and how you work with travelers."
+              className="rounded-lg border border-[var(--color-border)] bg-white/80 px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+              data-testid="guide-onboarding-bio"
+            />
+            <span className="text-xs text-[var(--color-muted-foreground)]">
+              Shown on your public profile. 2000 character ceiling.
+            </span>
+          </label>
+          <label className="grid gap-1.5">
+            <span className="text-sm font-medium text-foreground">
+              Photo URL
+            </span>
+            <input
+              type="url"
+              value={photoUrl}
+              onChange={(e) => setPhotoUrl(e.target.value)}
+              maxLength={2000}
+              placeholder="https://example.com/portrait.jpg"
+              className="rounded-lg border border-[var(--color-border)] bg-white/80 px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+              data-testid="guide-onboarding-photo-url"
+            />
+            <span className="text-xs text-[var(--color-muted-foreground)]">
+              A public image URL. We don&apos;t host uploads yet.
             </span>
           </label>
         </CardContent>
