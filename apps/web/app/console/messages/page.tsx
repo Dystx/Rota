@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -113,6 +114,22 @@ export default function ConsoleMessagesPage() {
   >([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [messagesError, setMessagesError] = useState<string | null>(null);
+  // Phase 7.2: itinerary-event history for the active
+  // conversation. Drives the "Recent pushes" section in the
+  // right-side Update Timeline panel so the operator can see
+  // what they've already pushed (and what other operators
+  // have pushed from the same conversation).
+  const [recentEvents, setRecentEvents] = useState<
+    Array<{
+      id: string;
+      eventType: "activity" | "accommodation" | "transfer" | "dining";
+      title: string;
+      eventDate: string;
+      eventTime: string;
+      createdAt: string;
+    }>
+  >([]);
+  const [recentEventsLoading, setRecentEventsLoading] = useState(false);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_USE_REALTIME_MESSAGES !== "true") return;
@@ -223,6 +240,47 @@ export default function ConsoleMessagesPage() {
       cancelled = true;
     };
   }, [activeId]);
+
+  // Phase 7.2: load the recent itinerary events for the active
+  // conversation. The push form reuses this list by calling
+  // `loadRecentEvents()` after a successful submit (no need to
+  // switch conversations).
+  const loadRecentEvents = useCallback(
+    async (conversationId: string) => {
+      setRecentEventsLoading(true);
+      try {
+        const response = await fetch(
+          `/api/console/itinerary-events?conversationId=${encodeURIComponent(conversationId)}`
+        );
+        const data = (await response.json()) as {
+          ok?: boolean;
+          events?: Array<{
+            id: string;
+            eventType: "activity" | "accommodation" | "transfer" | "dining";
+            title: string;
+            eventDate: string;
+            eventTime: string;
+            createdAt: string;
+          }>;
+          error?: string;
+        };
+        if (!response.ok || !data.ok) {
+          setRecentEvents([]);
+          return;
+        }
+        setRecentEvents(data.events ?? []);
+      } catch {
+        setRecentEvents([]);
+      } finally {
+        setRecentEventsLoading(false);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    void loadRecentEvents(activeId);
+  }, [activeId, loadRecentEvents]);
 
   const activeConversation =
     CONVERSATIONS.find((c) => c.id === activeId) ?? CONVERSATIONS[0]!;
@@ -818,6 +876,9 @@ export default function ConsoleMessagesPage() {
                           return;
                         }
                         setTimelineStatus({ kind: "ok", id: data.id });
+                        // Refresh the Recent pushes list so the new
+                        // event appears at the top (Phase 7.2).
+                        void loadRecentEvents(activeConversation.id);
                         // Reset non-required fields so the operator can
                         // push a second event without first clearing the
                         // first one. Date and time are reset to a
@@ -936,6 +997,59 @@ export default function ConsoleMessagesPage() {
                     </p>
                   ) : null}
                 </form>
+
+                <div
+                  data-testid="recent-pushes"
+                  className="border-t border-white/10 pt-4 mt-2"
+                >
+                  <h4 className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-2 flex items-center gap-2">
+                    <span aria-hidden className="material-symbols-outlined text-[14px]">
+                      history
+                    </span>
+                    Recent pushes
+                  </h4>
+                  {recentEventsLoading && recentEvents.length === 0 ? (
+                    <p
+                      data-testid="recent-pushes-loading"
+                      className="font-body-sm text-body-sm text-on-primary/60 italic"
+                    >
+                      Loading…
+                    </p>
+                  ) : null}
+                  {!recentEventsLoading && recentEvents.length === 0 ? (
+                    <p
+                      data-testid="recent-pushes-empty"
+                      className="font-body-sm text-body-sm text-on-primary/60 italic"
+                    >
+                      Nothing pushed yet. The form above is the only way to
+                      log an event for this conversation.
+                    </p>
+                  ) : null}
+                  <ul
+                    data-testid="recent-pushes-list"
+                    className="flex flex-col gap-2"
+                  >
+                    {recentEvents.map((event) => (
+                      <li
+                        key={event.id}
+                        data-testid="recent-push-item"
+                        className="rounded-lg bg-white/5 border border-white/10 p-3"
+                      >
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light">
+                            {event.eventType}
+                          </span>
+                          <span className="font-mono-technical text-mono-technical text-on-primary/60">
+                            {event.eventDate} · {event.eventTime}
+                          </span>
+                        </div>
+                        <p className="font-body-md text-body-md text-on-primary">
+                          {event.title}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </section>
           </aside>
