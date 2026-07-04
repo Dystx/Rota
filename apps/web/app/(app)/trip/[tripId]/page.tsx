@@ -20,6 +20,31 @@ export const metadata: Metadata = {
 
 function prettify(value: string) { return value.replace(/-/g, " "); }
 
+/**
+ * Synthesize a 1-2 sentence summary of a TripBrief. The brief is
+ * already structured (destination, regions, days, transport, etc.)
+ * — the missing piece is a human-readable one-liner the user
+ * reads at a glance. Pulls from the fields most users care about
+ * and falls back gracefully when any are missing.
+ */
+function summarizeBrief(brief: import("@repo/types").TripBrief | undefined): string {
+  if (!brief) {
+    return "Your itinerary is being drafted. Once the brief is confirmed, the AI will produce day-by-day stops and a route.";
+  }
+  const days = brief.tripLengthDays;
+  const country = brief.destinationCountry || "Portugal";
+  const region = brief.regions?.[0] ? prettify(brief.regions[0]) : null;
+  const transport = brief.transportMode ? prettify(brief.transportMode) : null;
+  const interests = brief.interests?.length
+    ? brief.interests.map(prettify).join(", ")
+    : null;
+
+  const place = [region, country].filter(Boolean).join(", ");
+  const moves = transport ? `${days}-day ${transport} itinerary through ${place}` : `${days}-day itinerary through ${place}`;
+  const flavor = interests ? ` — focusing on ${interests}.` : ".";
+  return `A ${moves}${flavor}`;
+}
+
 type GeneratedItinerary = Awaited<ReturnType<typeof generateItineraryFromBrief>>;
 type ItineraryDay = GeneratedItinerary["days"][number];
 type ItineraryStop = ItineraryDay["stops"][number];
@@ -164,8 +189,42 @@ export default async function TripDetailPage({
           />
           <div className="mx-auto max-w-[800px] px-6 py-16 grid gap-6">
             <RevealSection delayMs={0}>
-              <div className="grid gap-6 rounded-[24px] border border-[var(--color-border)] bg-white/60 p-8 shadow-sm backdrop-blur-xl">
-                <h3 className="font-[family-name:var(--font-rota-display)] text-2xl text-[var(--color-foreground)]">The Brief</h3>
+              <div
+                data-testid="trip-brief-card"
+                className="grid gap-6 rounded-[24px] border border-[var(--color-border)] bg-white/60 p-8 shadow-sm backdrop-blur-xl"
+              >
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div>
+                    <p className="font-mono-micro text-mono-micro text-olive-light uppercase tracking-widest mb-1">
+                      Overview
+                    </p>
+                    <h3 className="font-[family-name:var(--font-rota-display)] text-2xl text-[var(--color-foreground)]">
+                      {trip?.title ?? title}
+                    </h3>
+                  </div>
+                  {trip ? (
+                    <Link
+                      href="#route"
+                      data-testid="trip-brief-view-route"
+                      className="inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-2 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                    >
+                      View Route
+                      <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                    </Link>
+                  ) : null}
+                </div>
+
+                {/* 1-2 sentence synthesized summary. Falls back to a
+                    generic "coming soon" line if the brief is missing
+                    the fields the synthesizer reads. The synthesizer
+                    is intentionally lightweight — it doesn't reach
+                    for the AI provider; the brief is already
+                    structured and the only thing missing is a
+                    human-readable summary. */}
+                <p className="font-body-md text-body-md text-on-surface-variant">
+                  {summarizeBrief(trip?.brief)}
+                </p>
+
                 <div className="grid gap-4 text-sm">
                   <SummaryRow label="Country" value={trip?.brief.destinationCountry ?? "Portugal"} />
                   <SummaryRow label="Regions" value={trip ? trip.brief.regions.map(prettify).join(", ") : "—"} />
@@ -174,6 +233,26 @@ export default async function TripDetailPage({
                   <SummaryRow label="Status" value={trip?.status ?? "Draft"} />
                   <SummaryRow label="Access" value={tripCommerceState.accessLabel} />
                 </div>
+
+                {tripCommerceState.canRequestReview ? (
+                  <form
+                    action={`/api/trips/${tripId}/review`}
+                    method="post"
+                    className="pt-4 border-t border-[var(--color-border)]"
+                  >
+                    <input type="hidden" name="intent" value="request" />
+                    <input type="hidden" name="target" value="trip" />
+                    <Button
+                      type="submit"
+                      data-testid="trip-brief-request-polish"
+                      variant="ghost"
+                      className="border border-olive-light text-olive-dark hover:bg-olive-light/10"
+                    >
+                      <span className="material-symbols-outlined text-[16px] mr-1">support_agent</span>
+                      Request Polish — async chat with a specialist
+                    </Button>
+                  </form>
+                ) : null}
               </div>
             </RevealSection>
           </div>
@@ -255,15 +334,22 @@ export default async function TripDetailPage({
              <p className="text-xl md:text-2xl text-[var(--color-cream)] max-w-2xl">Confirm your unlocking plan or request an expert human review to perfect these details.</p>
              <div className="flex flex-wrap justify-center gap-4 mt-4">
                {tripCommerceState.canUnlock ? (
-                 <form action={`/api/trips/${tripId}/unlock`} method="post">
-                   <Button type="submit" className="bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90 text-lg px-8 py-3 h-auto">Unlock Trip</Button>
-                 </form>
+                 // The "Unlock Trip" CTA used to POST directly to the
+                 // unlock API, which skipped the checkout surface
+                 // and bypassed the tier comparison. Now we route
+                 // through `/checkout?trip=<id>` so the user sees
+                 // the Core AI vs Hybrid Specialist Review split
+                 // and picks a tier explicitly. The checkout page
+                 // posts the chosen tier back to the unlock API.
+                 <Button asChild className="bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90 text-lg px-8 py-3 h-auto">
+                   <Link href={`/checkout?trip=${tripId}`}>Unlock Trip</Link>
+                 </Button>
                ) : tripCommerceState.canExport ? (
                  <Button asChild className="bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90 text-lg px-8 py-3 h-auto">
                    <Link href={`/trip/${tripId}/export`}>Export Options</Link>
                  </Button>
                ) : null}
-               
+
                {tripCommerceState.canRequestReview ? (
                  <form action={`/api/trips/${tripId}/review`} method="post">
                    <input type="hidden" name="intent" value="request" />
