@@ -115,6 +115,23 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
   // Track presence of the realtime subscription so the UI can show
   // a small "live" indicator when the channel is connected.
   const [isLive, setIsLive] = useState(false);
+  // UX Pass 1: ids currently being persisted. The card renders
+  // a subtle "saving" state while the POST is in flight, and
+  // a success/error toast appears once the request settles.
+  const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
+  const [toast, setToast] = useState<
+    | { kind: "ok"; message: string }
+    | { kind: "error"; message: string }
+    | null
+  >(null);
+
+  // Auto-dismiss the toast after 4s. A short window keeps the
+  // board clean; the operator can re-trigger by trying again.
+  useEffect(() => {
+    if (!toast) return;
+    const handle = window.setTimeout(() => setToast(null), 4000);
+    return () => window.clearTimeout(handle);
+  }, [toast]);
 
   useEffect(() => {
     // Feature flag: only opt into Realtime when explicitly enabled.
@@ -210,6 +227,9 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
     const previous = items.find((item) => item.id === itemId);
     if (!previous || previous.status === newStatus) return;
 
+    const previousLabel = STATUS_LABELS[previous.status].title;
+    const nextLabel = STATUS_LABELS[newStatus].title;
+
     setItems((prev) =>
       prev.map((item) =>
         item.id === itemId ? { ...item, status: newStatus } : item
@@ -217,8 +237,21 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
     );
 
     // Skip persistence for fallback items: their ids start with
-    // "fallback-" and don't exist in the `trips` table.
-    if (itemId.startsWith("fallback-")) return;
+    // "fallback-" and don't exist in the `trips` table. Still
+    // surface a success toast so the operator gets feedback.
+    if (itemId.startsWith("fallback-")) {
+      setToast({
+        kind: "ok",
+        message: `Moved to ${nextLabel} (demo data — not persisted).`
+      });
+      return;
+    }
+
+    setSavingIds((prev) => {
+      const next = new Set(prev);
+      next.add(itemId);
+      return next;
+    });
 
     void fetch("/api/console/pipeline/move", {
       method: "POST",
@@ -233,6 +266,12 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
           throw new Error(data.error ?? `HTTP ${response.status}`);
         }
       })
+      .then(() => {
+        setToast({
+          kind: "ok",
+          message: `Moved to ${nextLabel}.`
+        });
+      })
       .catch((error: unknown) => {
         // Roll back the optimistic update on failure.
         // eslint-disable-next-line no-console
@@ -242,41 +281,85 @@ export function PipelineBoard({ initialItems = FALLBACK_ITEMS }: PipelineBoardPr
             item.id === itemId ? { ...item, status: previous.status } : item
           )
         );
+        setToast({
+          kind: "error",
+          message: `Couldn't save move to ${nextLabel} — reverted to ${previousLabel}.`
+        });
+      })
+      .finally(() => {
+        setSavingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(itemId);
+          return next;
+        });
       });
   };
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div
-        className="flex-1 flex gap-gutter overflow-x-auto pb-4 rounded-xl"
+        className="flex-1 flex flex-col gap-3"
         data-realtime={isLive ? "live" : "fallback"}
         data-testid="pipeline-board"
       >
-        {lanes.map((lane) => (
-          <DroppableLane
-            key={lane.status}
-            id={lane.status}
-            title={lane.title}
-            count={lane.items.length}
-            dot={lane.dot}
-          >
-            {lane.items.length === 0 ? (
-              <p className="text-xs text-on-surface-variant/60 italic px-3 py-4">No items in this lane.</p>
-            ) : (
-              lane.items.map((item) => (
-                <DraggableCard
-                  key={item.id}
-                  id={item.id}
-                  title={item.title}
-                  body={item.body}
-                  clientName={item.clientName}
-                  badge={statusToBadge(item.slaHours, item.updatedAt, item.status)}
-                  avatar={{ initials: initialsFor(item.clientName), alt: `${item.clientName} initials` }}
-                />
-              ))
-            )}
-          </DroppableLane>
-        ))}
+        {/* UX Pass 1: inline toast above the board. `aria-live`
+            so screen readers announce the outcome. `role="alert"`
+            on the failure variant for assertive announcement. */}
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          className="px-1 min-h-[1.75rem] flex items-center"
+          data-testid="pipeline-toast"
+        >
+          {toast ? (
+            <div
+              role={toast.kind === "error" ? "alert" : "status"}
+              className={
+                toast.kind === "error"
+                  ? "px-3 py-1.5 rounded-md bg-red-50 border border-red-200 text-red-800 font-mono-technical text-[12px] flex items-center gap-2"
+                  : "px-3 py-1.5 rounded-md bg-olive-light/15 border border-olive-light/40 text-olive-dark font-mono-technical text-[12px] flex items-center gap-2"
+              }
+            >
+              <span aria-hidden className="material-symbols-outlined text-[14px]">
+                {toast.kind === "error" ? "error" : "check_circle"}
+              </span>
+              <span>{toast.message}</span>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex-1 flex gap-gutter overflow-x-auto pb-4 rounded-xl">
+          {lanes.map((lane) => (
+            <DroppableLane
+              key={lane.status}
+              id={lane.status}
+              title={lane.title}
+              count={lane.items.length}
+              dot={lane.dot}
+            >
+              {lane.items.length === 0 ? (
+                <p
+                  data-testid="lane-empty"
+                  className="text-xs text-on-surface-variant/60 italic px-3 py-4"
+                >
+                  No items in this lane.
+                </p>
+              ) : (
+                lane.items.map((item) => (
+                  <DraggableCard
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    body={item.body}
+                    clientName={item.clientName}
+                    badge={statusToBadge(item.slaHours, item.updatedAt, item.status)}
+                    avatar={{ initials: initialsFor(item.clientName), alt: `${item.clientName} initials` }}
+                    saving={savingIds.has(item.id)}
+                  />
+                ))
+              )}
+            </DroppableLane>
+          ))}
+        </div>
       </div>
     </DndContext>
   );
@@ -288,7 +371,8 @@ function DraggableCard({
   body,
   clientName,
   badge,
-  avatar
+  avatar,
+  saving
 }: {
   id: string;
   title: string;
@@ -296,6 +380,7 @@ function DraggableCard({
   clientName: string;
   badge: { label: React.ReactNode; tone: "error" | "ochre" | "ochre-dark" } | undefined;
   avatar: { initials: string; alt: string };
+  saving?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id });
@@ -310,7 +395,9 @@ function DraggableCard({
       style={style}
       {...listeners}
       {...attributes}
-      className={isDragging ? "opacity-60 cursor-grabbing" : "cursor-grab"}
+      className={`relative ${isDragging ? "opacity-60 cursor-grabbing" : "cursor-grab"}`}
+      data-testid="pipeline-card"
+      data-saving={saving ? "true" : "false"}
     >
       <KanbanCard
         title={title}
@@ -319,6 +406,19 @@ function DraggableCard({
         badge={badge}
         avatar={avatar}
       />
+      {saving ? (
+        <span
+          aria-live="polite"
+          data-testid="pipeline-card-saving"
+          className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ochre-light/20 border border-ochre-light/50 text-ochre-dark font-mono-technical text-[10px] uppercase tracking-widest"
+        >
+          <span
+            aria-hidden
+            className="w-2 h-2 rounded-full bg-ochre-dark animate-pulse"
+          />
+          Saving
+        </span>
+      ) : null}
     </div>
   );
 }
