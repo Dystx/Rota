@@ -197,7 +197,7 @@ export function PlannerSingleScreen({
               aria-label="Travel window"
               placeholder="May"
               data-testid="planner-window"
-              className="!w-24 md:!w-40 !inline-block !px-2 md:!px-3 !py-0.5 md:!py-1 !text-2xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !placeholder:text-ochre-light/50 !text-ochre-light"
+              className="!w-24 md:!w-40 !inline-block !px-2 md:!px-3 !py-0.5 md:!py-1 !text-2xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !placeholder:text-ochre-light !text-ochre-light"
             />
             <span>.</span>
           </h1>

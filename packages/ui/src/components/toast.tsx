@@ -36,6 +36,15 @@ type Listener = (toasts: ToastState[]) => void;
 
 const listeners = new Set<Listener>();
 let toasts: ToastState[] = [];
+/**
+ * Module-level empty array used as the SSR snapshot. React's
+ * `useSyncExternalStore` requires `getServerSnapshot` to return
+ * a STABLE reference — a fresh `[]` on each call triggers the
+ * "result of getServerSnapshot should be cached to avoid an
+ * infinite loop" warning and surfaces as a Next.js dev-tools
+ * "1 Issue" badge on every page that imports this module.
+ */
+const EMPTY_TOASTS: ToastState[] = [];
 
 function emit() {
   for (const l of listeners) l(toasts);
@@ -78,7 +87,7 @@ export function useToasts(): ToastState[] {
       return () => listeners.delete(cb);
     },
     () => toasts,
-    () => []
+    () => EMPTY_TOASTS
   );
 }
 

@@ -60,9 +60,12 @@ export default function HomePage() {
 
           {/* Top-only directional scrim — keeps the headline
               readable without darkening the lower portion of
-              the map. The 3D globe is fully visible below. */}
+              the map. The 3D globe is fully visible below. On
+              mobile the value-prop subtitle wraps to 3 lines
+              and falls into the globe area, so the scrim is
+              taller (h-1/2) and slightly stronger there. */}
           <div
-            className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-primary/60 via-primary/20 to-transparent z-[1] pointer-events-none"
+            className="absolute inset-x-0 top-0 h-1/2 md:h-1/3 bg-gradient-to-b from-primary/80 via-primary/40 to-transparent z-[1] pointer-events-none"
             aria-hidden="true"
           />
 
@@ -83,7 +86,7 @@ export default function HomePage() {
             </h1>
             <p
               data-testid="home-value-prop"
-              className="font-body-lg md:font-body-xl text-body-lg md:text-body-xl text-linen-dark/90 max-w-2xl drop-shadow-md"
+              className="font-body-lg md:font-body-xl text-body-lg md:text-body-xl text-linen-dark/90 max-w-2xl drop-shadow-md md:drop-shadow-none px-4 py-2 md:px-0 md:py-0 rounded-full md:rounded-none bg-primary/30 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none"
             >
               AI-crafted Portugal itineraries with cinematic detail. Tell us where, when, and how you travel — we handle the rest.
             </p>

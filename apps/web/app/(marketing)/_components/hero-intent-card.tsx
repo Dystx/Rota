@@ -79,12 +79,12 @@ function resolveDestinationSlug(raw: string): string {
  * white card.
  */
 const INLINE_FIELD_BASE =
-  "inline-block px-2 py-0.5 md:px-3 md:py-1 bg-[var(--color-foreground)] rounded-md border-b-2 border-[var(--color-accent)] focus:border-[var(--color-accent)] focus:bg-[var(--color-primary)] focus:outline-none text-[var(--color-accent-light)] text-center align-baseline mx-0.5 md:mx-1 transition-colors placeholder:text-[var(--color-accent-light)]/50";
+  "inline-block px-2 py-0.5 md:px-3 md:py-1 bg-[var(--color-foreground)] rounded-md border-b-2 border-[var(--color-accent)] focus:border-[var(--color-accent)] focus:bg-[var(--color-primary)] focus:outline-none text-[var(--color-accent-light)] text-center align-baseline mx-0.5 md:mx-1 transition-colors placeholder:text-[var(--color-accent-light)]";
 
 const INLINE_FIELD_SIZES = {
-  destination: "w-28 md:w-40",
-  days: "w-12 md:w-16",
-  window: "w-24 md:w-32",
+  destination: "!w-28 md:!w-40",
+  days: "!w-12 md:!w-16",
+  window: "!w-24 md:!w-32",
 } as const;
 
 export function HeroIntentCard() {

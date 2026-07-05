@@ -116,7 +116,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-olive-dark/80 via-olive-dark/20 to-transparent" />
               <div
-                className={`absolute inset-0 p-card-padding flex flex-col justify-end ${card.contentClass}`}
+                className={`absolute inset-0 p-card-padding flex flex-col justify-end ${card.contentClass} z-20`}
               >
                 <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-2 bg-olive-dark/50 inline-block w-max px-2 py-1 rounded backdrop-blur-sm">
                   {card.region}
@@ -128,25 +128,31 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                   {card.caption}
                 </p>
                 {mode === "plan" ? (
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <span
+                  <div className="mt-3 flex flex-wrap items-center gap-2 relative z-30">
+                    <Link
+                      href={planHref}
+                      aria-label={`Plan this trip to ${card.label}`}
+                      onClick={(event) => event.stopPropagation()}
                       data-testid={`bento-cta-plan-${card.slug}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-ochre-light text-ochre-dark font-label-ui text-label-ui shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-ochre-light text-ochre-dark font-label-ui text-label-ui shadow-sm hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
                     >
                       Plan this trip
                       <span aria-hidden className="material-symbols-outlined text-[16px]">
                         arrow_forward
                       </span>
-                    </span>
-                    <span
+                    </Link>
+                    <Link
+                      href={mapHref}
+                      aria-label={`View ${card.label} on the map`}
+                      onClick={(event) => event.stopPropagation()}
                       data-testid={`bento-cta-map-${card.slug}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-ochre-light font-label-ui text-label-ui backdrop-blur-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/30 text-ochre-light font-label-ui text-label-ui backdrop-blur-sm hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
                     >
                       View on map
                       <span aria-hidden className="material-symbols-outlined text-[16px]">
                         map
                       </span>
-                    </span>
+                    </Link>
                   </div>
                 ) : (
                   <span className="mt-3 inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-light opacity-0 motion-safe:group-hover:opacity-100 transition-opacity">
@@ -177,17 +183,6 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                   aria-label={`Plan this trip to ${card.label}`}
                   className="absolute inset-0 z-10 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
                 />
-                <Link
-                  href={mapHref}
-                  aria-label={`View ${card.label} on the map`}
-                  onClick={(event) => event.stopPropagation()}
-                  className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-black/40 text-ochre-light font-mono-micro text-mono-micro uppercase tracking-widest opacity-90 hover:opacity-100 hover:bg-black/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-                >
-                  <span aria-hidden className="material-symbols-outlined text-[14px]">
-                    map
-                  </span>
-                  Map
-                </Link>
                 {cardBody}
               </div>
             );

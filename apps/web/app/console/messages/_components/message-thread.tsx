@@ -232,13 +232,51 @@ export function MessageThread({
           </div>
         ) : null}
         {messagesError && messages.length === 0 ? (
-          <div
-            data-testid="chat-thread-error"
-            role="alert"
-            className="font-body-md text-body-md text-red-700 bg-red-50 border border-red-200 rounded-lg p-3"
-          >
-            {messagesError}
-          </div>
+          messagesError.toLowerCase().includes("forbidden") ? (
+            // Auth-gated surface — show a friendly sign-in prompt
+            // rather than the raw "Forbidden: unauthenticated"
+            // string. The /console/* routes are operator-only and
+            // anyone landing here without a session is a real
+            // user who needs a clear next step.
+            <div
+              data-testid="chat-thread-forbidden"
+              role="status"
+              className="flex flex-col items-center justify-center text-center py-16 px-6 gap-4 rounded-2xl border border-olive-light/30 bg-white/60 backdrop-blur"
+            >
+              <span
+                aria-hidden
+                className="material-symbols-outlined text-[40px] text-ochre-light"
+              >
+                lock
+              </span>
+              <div className="flex flex-col gap-1.5 max-w-sm">
+                <h2 className="font-display text-xl text-foreground">
+                  Operator sign-in required
+                </h2>
+                <p className="font-body text-sm text-foreground/70 leading-relaxed">
+                  The messaging hub is for the Rumia team. Sign in with
+                  your operator account to load today&apos;s conversations.
+                </p>
+              </div>
+              <a
+                href="/sign-in?next=/console/messages"
+                className="inline-flex items-center gap-2 bg-ink text-cream font-medium text-sm px-5 py-2.5 rounded-full hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+              >
+                Sign in
+                <span aria-hidden className="material-symbols-outlined text-[16px]">
+                  arrow_forward
+                </span>
+              </a>
+            </div>
+          ) : (
+            <div
+              data-testid="chat-thread-error"
+              role="alert"
+              className="font-body-md text-body-md text-red-700 bg-red-50 border border-red-200 rounded-lg p-3"
+            >
+              {messagesError}
+            </div>
+          )
         ) : null}
         {!messagesLoading && !messagesError && messages.length === 0 ? (
           <div
