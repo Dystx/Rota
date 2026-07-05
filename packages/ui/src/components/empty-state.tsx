@@ -2,8 +2,12 @@ import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 
 interface EmptyStateProps {
-  /** Material Symbols icon name (e.g. "explore", "map", "inbox"). */
-  icon?: string;
+  /** Either a Material Symbols icon name (e.g. "explore", "map",
+   *  "inbox") or a custom ReactNode (for callers that want to
+   *  pass their own SVG/markup). Strings go through the
+   *  material-symbols-outlined font; nodes are rendered as-is
+   *  inside the icon container. */
+  icon?: string | ReactNode;
   /** Primary heading — kept short ("No itineraries yet"). */
   title: string;
   /** One sentence of supporting copy. */
@@ -15,6 +19,15 @@ interface EmptyStateProps {
   /** Visual size — `default` for list pages, `hero` for empty
    *  first-visit states that need to fill the viewport. */
   size?: "default" | "hero";
+  /**
+   * Visual context the empty state lives in. `table` renders a
+   * compact card inside a Card body (admin tables, reviewer
+   * queue), `compact` is a small inline notice, `form` is a
+   * 2-up layout beside a form, `map` is full-bleed for empty
+   * map areas, `cinematic` is the large first-visit state.
+   * `default` and `hero` map to the equivalent named `size`.
+   */
+  variant?: "default" | "hero" | "table" | "compact" | "form" | "map" | "cinematic";
   className?: string;
 }
 
@@ -37,15 +50,27 @@ export function EmptyState({
   action,
   secondaryAction,
   size = "default",
+  variant,
   className
 }: EmptyStateProps) {
-  const isHero = size === "hero";
+  // Backward-compat: `variant` predates `size`; map the legacy
+  // names to the new size + container treatment.
+  const resolvedSize: "default" | "hero" =
+    size === "hero" || variant === "hero" || variant === "cinematic" || variant === "map"
+      ? "hero"
+      : "default";
+  const containerClass =
+    variant === "table" || variant === "compact" || variant === "form"
+      ? "rounded-2xl border border-olive-light/20 bg-white/60 backdrop-blur-sm p-8 text-center"
+      : undefined;
+  const isHero = resolvedSize === "hero";
   return (
     <div
       role="status"
       aria-live="polite"
       className={cn(
         "flex flex-col items-center justify-center text-center",
+        containerClass,
         isHero
           ? "min-h-[60vh] gap-6 px-6 py-16"
           : "gap-3 px-4 py-12 rounded-2xl border border-dashed border-olive-light/30 bg-white/30",
@@ -59,12 +84,16 @@ export function EmptyState({
           isHero ? "w-16 h-16 mb-2" : "w-12 h-12"
         )}
       >
-        <span
-          className="material-symbols-outlined"
-          style={{ fontSize: isHero ? 32 : 24 }}
-        >
-          {icon}
-        </span>
+        {typeof icon === "string" ? (
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: isHero ? 32 : 24 }}
+          >
+            {icon}
+          </span>
+        ) : (
+          icon
+        )}
       </div>
       <h2
         className={cn(
