@@ -87,7 +87,7 @@ export default function ConsoleMetricsPage() {
               <VolumeChart weekly={[...WEEKLY_BARS]} />
             </div>
 
-            <section className="glass-card rounded-xl p-card-padding flex flex-col gap-2">
+            <section className="glass-card rounded-xl p-card-padding flex flex-col gap-2 min-w-0 overflow-hidden">
               <h3 className="font-headline-sm text-headline-sm text-primary mb-2">
                 Regional Performance
               </h3>
@@ -95,21 +95,21 @@ export default function ConsoleMetricsPage() {
                 {REGIONS.map((region) => (
                   <li
                     key={region.name}
-                    className="flex items-center justify-between p-3 rounded-lg border border-transparent hover:border-outline/10 hover:bg-surface-variant/50 cursor-pointer focus-within:ring-2 focus-within:ring-ochre-light"
+                    className="flex items-center justify-between gap-2 p-3 rounded-lg border border-transparent hover:border-outline/10 hover:bg-surface-variant/50 cursor-pointer focus-within:ring-2 focus-within:ring-ochre-light min-w-0"
                   >
-                    <div className="flex flex-col">
-                      <span className="font-label-ui text-label-ui text-primary">
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-label-ui text-label-ui text-primary truncate">
                         {region.name}
                       </span>
-                      <span className="font-mono-technical text-mono-technical text-on-surface-variant">
+                      <span className="font-mono-technical text-mono-technical text-on-surface-variant truncate">
                         {region.active}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-headline-sm text-headline-sm text-primary">
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="font-label-ui text-label-ui text-primary">
                         {region.share}
                       </span>
-                      <span className={`font-label-ui text-label-ui ${region.deltaTone}`}>
+                      <span className={`font-mono-technical text-mono-technical ${region.deltaTone}`}>
                         {region.delta}
                       </span>
                     </div>

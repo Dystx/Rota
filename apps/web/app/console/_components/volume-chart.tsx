@@ -30,7 +30,7 @@ export function VolumeChart({ weekly }: VolumeChartProps) {
   const data = range === "weekly" ? weekly : weekly;
 
   return (
-    <section className="glass-card rounded-xl p-card-padding flex flex-col min-h-[400px]">
+    <section className="glass-card rounded-xl p-card-padding flex flex-col">
       <header className="flex items-center justify-between mb-6 shrink-0">
         <h3 className="font-headline-sm text-headline-sm text-primary">
           Volume Trends
@@ -62,38 +62,53 @@ export function VolumeChart({ weekly }: VolumeChartProps) {
           </button>
         </div>
       </header>
-      <div className="flex-1 rounded-lg border border-outline/10 bg-white/30 flex items-end p-4 gap-2 relative min-h-[260px]">
-        {data.map((bar, index) => (
-          <div
-            key={bar.label}
-            className="flex-1 flex flex-col items-stretch justify-end gap-2 h-full"
-          >
-            <div
-              className="relative w-full"
-              style={{ height: bar.height }}
-            >
+      {/* Chart layout: a flex row of bars aligned to the bottom.
+          Each bar is a flex column with the bar fill (explicit height
+          from the data) and the day label below it. The previous
+          version used `h-full` + percentage heights on the bar
+          fills, but percentage heights inside a flex child don't
+          resolve when the parent has no explicit height — the bars
+          collapsed to zero. Using `flex-1` on the bar wrapper
+          (so the wrapper takes the full column height) and an
+          explicit pixel height on the fill (computed from the data
+          ratio × the known chart height) is reliable. */}
+      <div className="rounded-lg border border-outline/10 bg-white/30 p-4">
+        <div className="flex items-end gap-2 h-[240px]">
+          {data.map((bar, index) => {
+            const ratio = parseInt(bar.height, 10) / 100;
+            const fillHeight = Math.round(240 * ratio);
+            return (
               <div
-                role="img"
-                aria-label={`${bar.label} ${bar.height} of weekly volume${
-                  bar.peak ? " — peak" : ""
-                }`}
-                className={`absolute inset-x-0 bottom-0 rounded-t-md ${bar.fill} ${
-                  hovered === index ? "opacity-90" : ""
-                } transition-opacity`}
+                key={bar.label}
+                className="flex-1 flex flex-col items-center justify-end h-full relative"
                 onMouseEnter={() => setHovered(index)}
                 onMouseLeave={() => setHovered(null)}
-              />
-              {bar.peak && hovered === index ? (
-                <span className="absolute -top-7 left-1/2 -translate-x-1/2 font-mono-micro text-mono-micro uppercase tracking-widest bg-primary text-on-primary px-2 py-1 rounded">
-                  Peak
+              >
+                <div
+                  role="img"
+                  aria-label={`${bar.label} ${bar.height} of weekly volume${
+                    bar.peak ? " — peak" : ""
+                  }`}
+                  className={`w-full rounded-t-md ${bar.fill} ${
+                    hovered === index ? "opacity-90" : ""
+                  } transition-opacity`}
+                  style={{ height: `${fillHeight}px` }}
+                />
+                {bar.peak && hovered === index ? (
+                  <span className="absolute top-2 left-1/2 -translate-x-1/2 font-mono-micro text-mono-micro uppercase tracking-widest bg-primary text-on-primary px-2 py-1 rounded whitespace-nowrap">
+                    Peak
+                  </span>
+                ) : null}
+                <span className="font-mono-technical text-mono-technical text-on-surface-variant text-center mt-2 absolute -bottom-6 left-0 right-0">
+                  {bar.label}
                 </span>
-              ) : null}
-            </div>
-            <span className="font-mono-technical text-mono-technical text-on-surface-variant text-center">
-              {bar.label}
-            </span>
-          </div>
-        ))}
+              </div>
+            );
+          })}
+        </div>
+        {/* Spacer to account for the absolutely-positioned labels
+            below the bar row. */}
+        <div className="h-6" />
       </div>
     </section>
   );
