@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { signInWithMagicLinkAction } from "./_actions/sign-in";
+import { SignInForm } from "./_components/sign-in-form";
 import { SiteFooter } from "../_components/site-footer";
 
 export const metadata: Metadata = {
@@ -39,10 +39,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             </p>
           </div>
 
-          <form
-            action={signInWithMagicLinkAction}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl border border-olive-light/20 p-8 shadow-sm"
-          >
+          <SignInForm next={next} initialSent={sent} initialError={error} />
             <input type="hidden" name="next" value={next} />
 
             <label htmlFor="email" className="block text-sm font-medium text-ink mb-2">

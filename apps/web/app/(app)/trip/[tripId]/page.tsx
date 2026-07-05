@@ -4,7 +4,7 @@ import { generateItineraryFromBrief } from "@repo/ai";
 import { getTripDraftById } from "@repo/db";
 import { getCheckoutPlan } from "@repo/payments";
 import { 
-  Badge, Button, PageShell, RevealSection, StatPill, 
+  Badge, Breadcrumb, Button, PageShell, RevealSection, StatPill,
   CinematicGuide, GuideProgress, GuideChapter, CTASection,
   ItineraryTimeline, TimelineDay
 } from "@repo/ui";
@@ -201,6 +201,14 @@ export default async function TripDetailPage({
 
   return (
     <PageShell variant="app">
+      <div className="mx-auto max-w-[1100px] px-6 pt-6">
+        <Breadcrumb
+          items={[
+            { label: "Itineraries", href: "/itineraries" },
+            { label: title }
+          ]}
+        />
+      </div>
       <CinematicGuide>
         <GuideProgress chapters={chapters} />
 
