@@ -1,43 +1,50 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import {
+  Button,
+  Card,
+  CardContent,
+  EmptyState,
+  SectionHeading
+} from "@repo/ui";
 import { isPersistenceConfigError, listTripDrafts } from "@repo/db";
-import { buildEmailPreview } from "@repo/emails";
-import { getCheckoutPlan } from "@repo/payments";
-import { ArchiveLayout, Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
-import { getTripCommerceState } from "@/lib/trip-commerce";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { TopNav } from "../../_components/top-nav";
+import { SiteFooter } from "../../_components/site-footer";
+import { AccountTripCard } from "./_components/trip-card";
 import { BehaviorConsentToggle } from "./_components/behavior-consent-toggle";
 import { signOutAction } from "./_actions/sign-out";
 import { SignOutButton } from "./_components/sign-out-button";
 
 export const metadata: Metadata = {
   title: "My Account",
-  robots: {
-    index: false,
-    follow: false
-  }
+  robots: { index: false, follow: false }
 };
 
-function prettify(value: string) {
-  return value.replace(/-/g, " ");
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium"
-  }).format(new Date(value));
-}
-
+/**
+ * `/account` — the traveler's saved drafts and unlocked itineraries.
+ *
+ * Pre-rewrite: this page used `ArchiveLayout` → `PageShell` which
+ * renders a "Rumia | PORTUGAL TRAVEL CONCIERGE" sub-brand header
+ * with its own uppercase nav (HOME | TRIP BRIEF | REVIEWER | ADMIN).
+ * It felt like a separate app from the public surface (`/`,
+ * `/itineraries`, `/vault`, `/checkout`) which all use the
+ * shared `TopNav` + `SiteFooter` + the same `Card` / `Badge` /
+ * `Button` primitives.
+ *
+ * Post-rewrite: the page uses the shared `TopNav`, the shared
+ * `SectionHeading` + `Card` + `EmptyState` primitives, the shared
+ * spacing tokens (`pt-header-height`, `py-section-gap`,
+ * `px-container-padding-lg`, `p-card-padding`), and the shared
+ * `AccountTripCard` for the trips grid. The preferences section
+ * is a peer section with the same `max-w-6xl` width as the trips
+ * grid (the previous bespoke right rail is gone).
+ */
 export default async function AccountPage() {
   const { user } = await getCurrentUser();
 
-  let trips = [] as Awaited<ReturnType<typeof listTripDrafts>>;
+  let trips: Awaited<ReturnType<typeof listTripDrafts>> = [];
   let infoMessage = "";
-  const unlockPlan = getCheckoutPlan("paid-trip");
-  const reviewPlan = getCheckoutPlan("human-polish");
-  const exportEmailPreview = buildEmailPreview("export-ready", "Saved trip");
-
   try {
     trips = await listTripDrafts();
   } catch (error) {
@@ -49,154 +56,132 @@ export default async function AccountPage() {
   }
 
   return (
-    <ArchiveLayout
-      testid="account-header"
-      header={{
-        eyebrow: "Client Portal",
-        title: "Your Itineraries",
-        description: "Access your drafted routes, unlock final itineraries, and request human review."
-      }}
-    >
-      {/* Phase C.5: profile section. Shows the signed-in user's
-          email + a sign-out form. The placeholder "Preferences"
-          paragraph is gone; this section is the real content. */}
-      <Card data-testid="account-profile" className="col-span-full flex flex-col bg-white/70">
-        <CardHeader className="pb-2">
-          <CardTitle>Profile</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-1 flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="grid gap-1">
-            <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
-              Signed in as
-            </p>
-            <p
-              data-testid="account-profile-email"
-              className="font-body-md text-body-md text-primary break-all"
-            >
-              {user?.email ?? "Anonymous session"}
-            </p>
-            {user?.id ? (
-              <p className="font-mono-micro text-mono-micro text-on-surface-variant break-all">
-                ID · {user.id}
-              </p>
-            ) : null}
-          </div>
-          <SignOutButton
-            signOutAction={signOutAction}
-            className="md:self-end text-on-surface-variant hover:text-primary"
+    <div className="min-h-screen bg-background flex flex-col">
+      <TopNav />
+
+      <main
+        id="main-content"
+        className="flex-1 pt-header-height"
+        data-testid="account-header"
+      >
+        {/* Profile strip — one Card at the top of the page so the
+            traveler sees their session + a sign-out control as
+            soon as the page renders. `max-w-6xl` + shared padding
+            tokens keep the rhythm with the rest of the public
+            surface. */}
+        <section className="max-w-6xl mx-auto px-container-padding-lg py-section-gap">
+          <SectionHeading
+            eyebrow="Your account"
+            title="My trips"
+            description="Drafts, unlocked itineraries, and human-review status across every trip you've started."
+            h1
           />
-        </CardContent>
-      </Card>
-
-      {infoMessage ? (
-        <Card className="col-span-full bg-white/70">
-          <CardContent className="pt-6">
-            <p className="rota-muted text-sm">{infoMessage}</p>
-          </CardContent>
-        </Card>
-      ) : null}
-
-      <div data-testid="trip-list" className="contents">
-        {trips.length > 0 ? (
-          trips.map((trip) => {
-            const tripCommerceState = getTripCommerceState({
-              hasHumanReview: trip.hasHumanReview,
-              isPaid: trip.isPaid
-            });
-
-            return (
-              <Card key={trip.id} data-testid={`trip-item-${trip.id}`} className="flex flex-col bg-white/70 transition-all hover:bg-white/80">
-                <CardHeader className="pb-2">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="rota-kicker">Saved {formatDate(trip.createdAt)}</p>
-                      <CardTitle className="mt-1 font-[family-name:var(--font-rota-display)] text-xl text-[var(--color-foreground)]">
-                        {trip.title}
-                      </CardTitle>
-                    </div>
-                    <span className="shrink-0 rounded-full border border-[var(--color-border)] px-3 py-1 text-xs uppercase tracking-[0.14em] text-[var(--color-muted-foreground)]">
-                      {trip.status}
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex flex-1 flex-col gap-4">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge tone="soft">{tripCommerceState.accessLabel}</Badge>
-                    <Badge tone="soft">{tripCommerceState.reviewLabel}</Badge>
-                  </div>
-                  <p className="rota-muted text-sm leading-relaxed">
-                    {trip.brief.regions.map(prettify).join(", ")} · {trip.brief.tripLengthDays} days · {trip.brief.interests.map(prettify).join(", ")}
+          <Card
+            data-testid="account-profile"
+            className="mt-section-gap flex flex-col bg-white/80"
+          >
+            <CardContent className="flex flex-1 flex-col gap-3 p-card-padding md:flex-row md:items-center md:justify-between">
+              <div className="grid gap-1">
+                <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
+                  Signed in as
+                </p>
+                <p
+                  data-testid="account-profile-email"
+                  className="font-body-md text-body-md text-primary break-all"
+                >
+                  {user?.email ?? "Anonymous session"}
+                </p>
+                {user?.id ? (
+                  <p className="font-mono-micro text-mono-micro text-on-surface-variant break-all">
+                    ID · {user.id}
                   </p>
-                  <div className="mt-auto flex flex-wrap gap-3 pt-2">
-                    <Button asChild>
-                      <Link href={`/trip/${trip.id}`}>Open draft</Link>
-                    </Button>
-                    {tripCommerceState.canUnlock && (
-                      <form action={`/api/trips/${trip.id}/unlock`} method="post" className="inline-flex">
-                        <Button type="submit" variant="ghost">
-                          Checkout to unlock
-                        </Button>
-                      </form>
-                    )}
-                    {tripCommerceState.canExport && (
-                      <Button asChild variant="ghost">
-                        <Link href={`/trip/${trip.id}/export`}>Open exports</Link>
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
-        ) : (
-          <Card className="bg-white/70">
-            <CardContent className="pt-6">
-              <p className="rota-muted">Your saved drafts and unlocked itineraries will appear here once you create your first trip.</p>
+                ) : null}
+              </div>
+              <SignOutButton
+                signOutAction={signOutAction}
+                className="md:self-end"
+              />
             </CardContent>
           </Card>
-        )}
-      </div>
+        </section>
 
-      <Card data-testid="account-stats" className="flex flex-col bg-white/70">
-        <CardHeader>
-          <CardTitle>Deliverables & Upgrades</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-1 flex-col gap-4">
-          <p className="rota-muted text-sm leading-relaxed">Upgrade your drafts to unlock full daily routing, export features, and optional human concierge review.</p>
-          <div className="grid gap-3 xl:grid-cols-2">
-            <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-              <p className="rota-kicker">Unlock plan</p>
-              <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{unlockPlan.priceLabel}</p>
-              <p className="rota-muted mt-2 text-xs">{unlockPlan.fulfillment}</p>
-            </div>
-            <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-              <p className="rota-kicker">Concierge review</p>
-              <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{exportEmailPreview.subject}</p>
-              <p className="rota-muted mt-2 text-xs">{reviewPlan.priceLabel} review stays optional after unlock.</p>
-            </div>
-          </div>
-          <ul className="rota-stack-list mt-2 text-sm">
-            <li>Unlocked paid itineraries</li>
-            <li>Export history</li>
-            <li>Human review status</li>
-            <li>On-trip access later</li>
-          </ul>
-        </CardContent>
-      </Card>
+        {/* Trips grid — 3-up on desktop, 2-up on tablet, 1-up on
+            mobile. EmptyState replaces the previous bespoke "no
+            trips" paragraph so the IA, the icon, and the action
+            follow the same vocabulary as the rest of the app. */}
+        <section
+          className="max-w-6xl mx-auto px-container-padding-lg pb-section-gap"
+          aria-labelledby="trips-heading"
+        >
+          <h2
+            id="trips-heading"
+            className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-4"
+          >
+            Saved itineraries
+          </h2>
 
-      <Card data-testid="preferences-section" className="flex flex-col bg-white/70">
-        <CardHeader>
-          <CardTitle>Preferences</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-1 flex-col gap-4">
-          <p className="rota-muted text-sm leading-relaxed">
-            Personalization preferences for your itineraries.
-          </p>
-          <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-            <BehaviorConsentToggle />
-          </div>
-        </CardContent>
-      </Card>
-    </ArchiveLayout>
+          {infoMessage ? (
+            <Card className="mb-section-gap bg-white/70">
+              <CardContent className="p-card-padding">
+                <p className="font-body-md text-body-md text-on-surface-variant">
+                  {infoMessage}
+                </p>
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {trips.length > 0 ? (
+            <div
+              data-testid="trip-list"
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-section-gap"
+            >
+              {trips.map((trip) => (
+                <AccountTripCard key={trip.id} trip={trip} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              icon="luggage"
+              title="No trips yet"
+              description="Plan a trip first — your drafts and unlocked itineraries will appear here, with full delivery + export controls once you upgrade."
+              variant="default"
+              action={
+                <Button asChild>
+                  <Link href="/planner">Plan a trip</Link>
+                </Button>
+              }
+            />
+          )}
+        </section>
+
+        {/* Preferences — a peer section, not a side rail. Same
+            max-w-6xl so the rhythm matches the trips grid above. */}
+        <section
+          className="max-w-6xl mx-auto px-container-padding-lg pb-section-gap"
+          aria-labelledby="preferences-heading"
+        >
+          <h2
+            id="preferences-heading"
+            className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-4"
+          >
+            Preferences
+          </h2>
+          <Card
+            data-testid="preferences-section"
+            className="flex flex-col bg-white/80"
+          >
+            <CardContent className="flex flex-1 flex-col gap-4 p-card-padding">
+              <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Control what your itineraries remember about you. Off
+                by default — nothing is recorded until you opt in.
+              </p>
+              <BehaviorConsentToggle />
+            </CardContent>
+          </Card>
+        </section>
+      </main>
+
+      <SiteFooter />
+    </div>
   );
 }
