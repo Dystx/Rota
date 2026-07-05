@@ -127,7 +127,15 @@ export default async function TripDetailPage({
   const title = trip ? trip.title : "Generated route overview preview";
   const tripCommerceState = getTripCommerceState({ status: trip?.status, hasHumanReview: trip?.hasHumanReview, isPaid: trip?.isPaid });
   const checkoutPlan = getCheckoutPlan(tripCommerceState.canUnlock ? "paid-trip" : tripCommerceState.canRequestReview ? "human-polish" : "free-preview");
-  const timelineDaysRaw: DisplayDay[] = itinerary?.days ?? FALLBACK_PREVIEW_DAYS;
+  // Use the fallback preview when the trip exists but the AI hasn't
+  // generated stops yet (itinerary.days is null or empty). Without
+  // this guard, a half-built trip shows "0 Stops" in the stat pills
+  // and an empty timeline — confusing for the user who can see the
+  // trip title and duration but no day-by-day plan.
+  const timelineDaysRaw: DisplayDay[] = (itinerary?.days && itinerary.days.length > 0)
+    ? itinerary.days
+    : FALLBACK_PREVIEW_DAYS;
+  const usingFallbackItinerary = !itinerary?.days || itinerary.days.length === 0;
 
   const timelineDays: TimelineDay[] = timelineDaysRaw.map((day) => ({
     id: `day-${day.dayIndex}`,
