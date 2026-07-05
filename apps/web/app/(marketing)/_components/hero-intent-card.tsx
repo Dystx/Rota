@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { Button, Card, CardContent, Field, Input } from "@repo/ui";
 import { getDestinationPreset } from "@repo/spatial-engine";
 
 /**
@@ -11,19 +12,19 @@ import { getDestinationPreset } from "@repo/spatial-engine";
  * well with the map."
  *
  * Replaces the old `HeroQuickStart` search bar (which sat BELOW
- * the hero) with a single glass card that lives INSIDE the hero,
- * on top of the map. The card reads as natural language:
+ * the hero) with a single Card that lives INSIDE the hero, at
+ * the BOTTOM so the rotating globe stays fully visible above.
+ * The card reads as natural language:
  *
  *     We are visiting  [Portugal]  for  [7]  days in  [May].
  *
- * Each bracketed field is an inline editable input. There are no
- * "..." trailing dots (the old reference had "for 7 days..." with
- * ellipsis — we drop them for a cleaner sentence). Underneath the
- * sentence sits a single "Begin Journey" CTA.
+ * Each bracketed field is an inline editable `Input` from
+ * `@repo/ui` form-primitives. There are no "..." trailing dots.
+ * Underneath the sentence sits a single `Button` ("Begin
+ * Journey") — also from the shared UI kit.
  *
  * On submit we navigate to /planner with the values as query
- * params, so the planner can pre-fill its first step (or skip
- * straight to step 2 in the collapsed-wizard model).
+ * params, so the planner can pre-fill its first step.
  */
 const KNOWN_SLUGS = [
   "lisbon",
@@ -86,73 +87,89 @@ export function HeroIntentCard() {
     router.push(`/planner?${params.toString()}`);
   };
 
-  // Shared className for the inline editable fields. Dark
-  // olive pill background with light ochre text — high
-  // contrast against the white card. On focus the pill
-  // darkens so it's obvious which field is being edited.
-  const fieldClass =
-    "mx-1.5 px-3 py-1.5 bg-olive-dark rounded-md border-b-2 border-ochre-light focus:border-ochre-light focus:bg-primary focus:outline-none text-ochre-light font-display-mobile md:font-display text-2xl md:text-4xl text-center min-w-0 transition-colors placeholder:text-ochre-light/50";
-
   return (
-    <form
-      onSubmit={onBegin}
+    <Card
       data-testid="hero-intent-card"
-      // Higher-contrast glass: stronger backdrop-blur + white
-      // border at higher opacity so the card reads as a clear
-      // surface over the busy 3D map. The previous glass-light
-      // (border-white/40) was getting lost.
-      className="w-full max-w-3xl bg-white/90 backdrop-blur-2xl border-2 border-white/80 rounded-2xl p-card-padding md:p-8 shadow-2xl flex flex-col items-center gap-6"
+      className="w-full max-w-3xl shadow-[0_8px_32px_rgba(24,28,28,0.18)]"
     >
-      <label className="font-display-mobile md:font-display text-2xl md:text-4xl text-primary leading-tight text-center w-full">
-        We are visiting{" "}
-        <input
-          type="text"
-          value={destination}
-          onChange={(event) => setDestination(event.target.value)}
-          aria-label="Destination"
-          data-testid="hero-intent-destination"
-          className={`${fieldClass} w-36 md:w-44`}
-        />{" "}
-        for{" "}
-        <input
-          type="number"
-          inputMode="numeric"
-          min={1}
-          max={60}
-          value={days}
-          onChange={(event) => setDays(event.target.value)}
-          aria-label="Number of days"
-          data-testid="hero-intent-days"
-          className={`${fieldClass} w-16 md:w-20`}
-        />{" "}
-        days in{" "}
-        <input
-          type="text"
-          value={window}
-          onChange={(event) => setWindow(event.target.value)}
-          aria-label="Travel window"
-          placeholder="May"
-          data-testid="hero-intent-window"
-          className={`${fieldClass} w-32 md:w-40`}
-        />
-        .
-      </label>
-      <button
-        type="submit"
-        data-testid="hero-intent-submit"
-        // Larger, higher-contrast CTA. The previous olive-light
-        // button was getting lost against the white card; olive-dark
-        // gives it the presence a primary CTA needs.
-        className="bg-olive-dark text-on-primary font-label-ui text-label-ui px-10 py-4 rounded-full hover:bg-olive-light transition-all duration-200 shadow-lg flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 text-lg"
-      >
-        Begin Journey{" "}
-        <span
-          aria-hidden
-          className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform"
+      <CardContent className="p-6 md:p-8">
+        <form
+          onSubmit={onBegin}
+          className="flex flex-col items-center gap-6"
         >
-          arrow_forward
-        </span>
-      </button>
-    </form>
+          <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-3 text-center font-display-mobile md:font-display text-2xl md:text-4xl text-[var(--color-foreground)] leading-tight w-full">
+            <span>We are visiting</span>
+            <Field
+              label="Destination"
+              htmlFor="hero-intent-destination"
+              className="contents"
+            >
+              {(fieldProps) => (
+                <Input
+                  id={fieldProps.id}
+                  type="text"
+                  value={destination}
+                  onChange={(event) => setDestination(event.target.value)}
+                  aria-label="Destination"
+                  data-testid="hero-intent-destination"
+                  className="!w-40 md:!w-48 !inline-block !px-3 !py-1.5 !text-2xl md:!text-4xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/90 !text-[var(--color-ink)]"
+                />
+              )}
+            </Field>
+            <span>for</span>
+            <Field
+              label="Number of days"
+              htmlFor="hero-intent-days"
+              className="contents"
+            >
+              {(fieldProps) => (
+                <Input
+                  id={fieldProps.id}
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={60}
+                  value={days}
+                  onChange={(event) => setDays(event.target.value)}
+                  aria-label="Number of days"
+                  data-testid="hero-intent-days"
+                  className="!w-16 md:!w-20 !inline-block !px-3 !py-1.5 !text-2xl md:!text-4xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/90 !text-[var(--color-ink)]"
+                />
+              )}
+            </Field>
+            <span>days in</span>
+            <Field
+              label="Travel window"
+              htmlFor="hero-intent-window"
+              className="contents"
+            >
+              {(fieldProps) => (
+                <Input
+                  id={fieldProps.id}
+                  type="text"
+                  value={window}
+                  onChange={(event) => setWindow(event.target.value)}
+                  aria-label="Travel window"
+                  placeholder="May"
+                  data-testid="hero-intent-window"
+                  className="!w-32 md:!w-40 !inline-block !px-3 !py-1.5 !text-2xl md:!text-4xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/90 !placeholder:text-[var(--color-muted-foreground)] !text-[var(--color-ink)]"
+                />
+              )}
+            </Field>
+            <span>.</span>
+          </div>
+          <Button
+            type="submit"
+            data-testid="hero-intent-submit"
+            className="!px-10 !py-4 !text-lg shadow-[0_8px_24px_rgba(24,28,28,0.2)]"
+          >
+            Begin Journey
+            <span aria-hidden className="material-symbols-outlined !text-[20px] ml-1">
+              arrow_forward
+            </span>
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

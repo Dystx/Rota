@@ -2,21 +2,23 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { Button, ChipGroup, Field, Input } from "@repo/ui";
 import type { TransportChoice } from "./transport-step";
 import type { Vibe } from "./vibe-step";
 
 /**
  * PlannerSingleScreen — replaces the 5-step sequential wizard
- * with one screen of inline-editable fields.
+ * with one screen of inline-editable fields, using shared
+ * `@repo/ui` primitives.
  *
  * Layout (top to bottom):
  *
  *   "We are crafting a journey to [Portugal] for [7] days in [May]."
- *     — three inline-editable fields, ochre dashed underline.
+ *     — three inline `Field` + `Input` fields, ochre underline.
  *
- *   "Mobility" — two compact pill buttons (Car / Transit).
+ *   "Mobility" — `ChipGroup` (Car / Transit).
  *
- *   "Energy"   — three compact pill buttons (Calm / Balanced / Full).
+ *   "Energy"   — `ChipGroup` (Calm / Balanced / Full).
  *
  *   [ Synthesize Itinerary → ]
  *
@@ -24,12 +26,6 @@ import type { Vibe } from "./vibe-step";
  * chips, and synthesizes without navigating between screens.
  * URL state is preserved (destination + days on entry, all
  * fields on completion) so a refresh mid-flow resumes cleanly.
- *
- * This matches the reference's single-screen wizard pattern
- * ("We are crafting a journey to Portugal for 7 days in May.")
- * while keeping the current app's 4 question set (destination,
- * days, transport, vibe) so the AI synthesis prompt has the
- * same context.
  */
 export interface PlannerSingleScreenProps {
   initialDestination?: string;
@@ -59,6 +55,25 @@ function prettyDestination(slug: string): string {
   );
 }
 
+const MOBILITY_OPTIONS = [
+  {
+    value: "car",
+    label: "Car",
+    description: "Airport pickup",
+  },
+  {
+    value: "transit",
+    label: "Transit & walking",
+    description: "No rental",
+  },
+] as const;
+
+const ENERGY_OPTIONS = [
+  { value: "restorative", label: "Calm" },
+  { value: "balanced", label: "Balanced" },
+  { value: "high_energy", label: "Full" },
+] as const;
+
 export function PlannerSingleScreen({
   initialDestination = "Portugal",
   initialDays = 7,
@@ -72,7 +87,7 @@ export function PlannerSingleScreen({
   const [days, setDays] = React.useState(String(initialDays));
   const [window, setWindow] = React.useState(initialWindow);
   const [transport, setTransport] = React.useState<TransportChoice | "">(
-    initialTransport ?? ""
+    initialTransport
   );
   const [vibe, setVibe] = React.useState<Vibe>(initialVibe);
   const [pending, setPending] = React.useState(false);
@@ -104,23 +119,13 @@ export function PlannerSingleScreen({
     router.push(`/trip/new?prompt=${encodeURIComponent(prompt)}&days=${daysNum}`);
   };
 
-  // Shared className for the inline editable sentence fields.
-  // Higher-contrast inputs on the dark planner background: subtle
-  // white pill background, thick ochre underline, ochre text that
-  // reads as part of the sentence until you click it.
-  const sentenceField =
-    "mx-2 px-3 py-1 bg-white/10 rounded-md border-b-2 border-ochre-light focus:border-ochre-light focus:bg-white/25 focus:outline-none text-ochre-light font-display-mobile md:font-display text-3xl md:text-5xl text-center min-w-0 transition-colors";
-
   return (
     <main
       id="main-content"
       className="relative min-h-screen bg-primary text-linen-dark flex flex-col"
       data-testid="planner-single-screen"
     >
-      {/* Fixed top bar — Rumia wordmark + close (back to home).
-          The reference places a close X in the top-right; we use
-          the same pattern so the wizard feels like a modal layer
-          over the app. */}
+      {/* Fixed top bar — Rumia wordmark + close (back to home). */}
       <header className="fixed top-0 w-full z-50 px-container-padding-lg py-4 flex justify-between items-center">
         <span className="font-headline-sm text-headline-sm italic text-ochre-light">
           Rumia
@@ -142,7 +147,7 @@ export function PlannerSingleScreen({
         className="flex-grow flex items-center justify-center px-container-padding-sm md:px-container-padding-lg py-24"
       >
         <div className="max-w-4xl w-full flex flex-col gap-12">
-          {/* AI Intent Engine badge — mirrors the reference. */}
+          {/* AI Intent Engine badge. */}
           <div className="flex justify-center">
             <span className="inline-flex items-center gap-2 bg-glass-dark backdrop-blur-md border border-white/20 px-4 py-2 rounded-full">
               <span aria-hidden className="material-symbols-outlined text-[14px] text-ochre-light">
@@ -155,159 +160,147 @@ export function PlannerSingleScreen({
           </div>
 
           {/* Sentence with inline editable fields. */}
-          <h1 className="font-display-mobile md:font-display text-3xl md:text-5xl text-linen-dark leading-tight text-center">
-            <label>
-              We are crafting a journey to{" "}
-              <input
-                type="text"
-                value={destination}
-                onChange={(event) => setDestination(event.target.value)}
-                aria-label="Destination"
-                data-testid="planner-destination"
-                className={`${sentenceField} w-40 md:w-56`}
-              />
-            </label>{" "}
-            <label>
-              for{" "}
-              <input
-                type="number"
-                inputMode="numeric"
-                min={1}
-                max={60}
-                value={days}
-                onChange={(event) => setDays(event.target.value)}
-                aria-label="Number of days"
-                data-testid="planner-days"
-                className={`${sentenceField} w-14 md:w-20`}
-              />{" "}
-              days in
-            </label>{" "}
-            <label>
-              <input
-                type="text"
-                value={window}
-                onChange={(event) => setWindow(event.target.value)}
-                aria-label="Travel window"
-                placeholder="May"
-                data-testid="planner-window"
-                className={`${sentenceField} w-32 md:w-40`}
-              />
-              .
-            </label>
+          <h1 className="font-display-mobile md:font-display text-3xl md:text-5xl text-linen-dark leading-tight text-center flex flex-wrap items-baseline justify-center gap-x-2 gap-y-3">
+            <span>We are crafting a journey to</span>
+            <Field
+              label="Destination"
+              htmlFor="planner-destination"
+              className="contents"
+            >
+              {(fieldProps) => (
+                <Input
+                  id={fieldProps.id}
+                  type="text"
+                  value={destination}
+                  onChange={(event) => setDestination(event.target.value)}
+                  aria-label="Destination"
+                  data-testid="planner-destination"
+                  className="!w-40 md:!w-56 !inline-block !text-3xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !text-ochre-light"
+                />
+              )}
+            </Field>
+            <span>for</span>
+            <Field
+              label="Number of days"
+              htmlFor="planner-days"
+              className="contents"
+            >
+              {(fieldProps) => (
+                <Input
+                  id={fieldProps.id}
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={60}
+                  value={days}
+                  onChange={(event) => setDays(event.target.value)}
+                  aria-label="Number of days"
+                  data-testid="planner-days"
+                  className="!w-14 md:!w-20 !inline-block !text-3xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !text-ochre-light"
+                />
+              )}
+            </Field>
+            <span>days in</span>
+            <Field
+              label="Travel window"
+              htmlFor="planner-window"
+              className="contents"
+            >
+              {(fieldProps) => (
+                <Input
+                  id={fieldProps.id}
+                  type="text"
+                  value={window}
+                  onChange={(event) => setWindow(event.target.value)}
+                  aria-label="Travel window"
+                  placeholder="May"
+                  data-testid="planner-window"
+                  className="!w-32 md:!w-40 !inline-block !text-3xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !placeholder:text-ochre-light/50 !text-ochre-light"
+                />
+              )}
+            </Field>
+            <span>.</span>
           </h1>
 
-          {/* Compact pill selectors for transport + vibe. Kept on
-              the same screen so the user can answer all questions
-              in one pass without navigating. */}
+          {/* Compact pill selectors for transport + vibe using the
+              shared `ChipGroup` primitive (WAI-ARIA radiogroup with
+              arrow-key navigation built in). */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <fieldset className="flex flex-col gap-3">
-              <legend className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light mb-2 text-sm">
-                Mobility
-              </legend>
-              <div className="flex flex-wrap gap-3">
-                <Pill
-                  label="Car"
-                  icon="car_rental"
-                  active={transport === "car"}
-                  onClick={() => setTransport("car")}
-                />
-                <Pill
-                  label="Transit & walking"
-                  icon="directions_transit"
-                  active={transport === "transit"}
-                  onClick={() => setTransport("transit")}
-                />
-              </div>
-            </fieldset>
+            <Field
+              label="Mobility"
+              htmlFor="planner-mobility"
+              className="contents"
+            >
+              {(fieldProps) => (
+                <div className="flex flex-col gap-3">
+                  <label
+                    htmlFor={fieldProps.id}
+                    className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm"
+                  >
+                    Mobility
+                  </label>
+                  <ChipGroup
+                    id={fieldProps.id}
+                    ariaLabel="Mobility"
+                    value={transport === "" ? null : transport}
+                    onChange={(next: "car" | "transit") => setTransport(next)}
+                    options={MOBILITY_OPTIONS.map((o) => ({
+                      value: o.value,
+                      label: o.label,
+                      description: o.description,
+                    }))}
+                  />
+                </div>
+              )}
+            </Field>
 
-            <fieldset className="flex flex-col gap-3">
-              <legend className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light mb-2 text-sm">
-                Energy
-              </legend>
-              <div className="flex flex-wrap gap-3">
-                <Pill
-                  label="Calm"
-                  active={vibe === "restorative"}
-                  onClick={() => setVibe("restorative")}
-                />
-                <Pill
-                  label="Balanced"
-                  active={vibe === "balanced"}
-                  onClick={() => setVibe("balanced")}
-                />
-                <Pill
-                  label="Full"
-                  active={vibe === "high_energy"}
-                  onClick={() => setVibe("high_energy")}
-                />
-              </div>
-            </fieldset>
+            <Field
+              label="Energy"
+              htmlFor="planner-energy"
+              className="contents"
+            >
+              {(fieldProps) => (
+                <div className="flex flex-col gap-3">
+                  <label
+                    htmlFor={fieldProps.id}
+                    className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm"
+                  >
+                    Energy
+                  </label>
+                  <ChipGroup
+                    id={fieldProps.id}
+                    ariaLabel="Energy"
+                    value={vibe}
+                    onChange={(next: Vibe) => setVibe(next)}
+                    options={ENERGY_OPTIONS.map((o) => ({
+                      value: o.value,
+                      label: o.label,
+                    }))}
+                  />
+                </div>
+              )}
+            </Field>
           </div>
 
           {/* Synthesize CTA. */}
           <div className="flex justify-end">
-            <button
+            <Button
               type="submit"
               disabled={!canSubmit}
               data-testid="planner-synthesize"
-              // Larger, higher-contrast CTA. The previous px-8 py-4
-              // was small for the primary action — the user said
-              // better visibility of all texts and UI overall.
-              className="bg-ochre-dark text-white font-label-ui text-label-ui px-10 py-5 rounded-lg shadow-lg hover:bg-ochre-light hover:text-primary transition-all flex items-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary text-lg"
+              className="!px-10 !py-5 !text-lg !bg-[var(--color-accent-dark)] !text-white shadow-[0_8px_24px_rgba(206,147,63,0.3)]"
             >
-              <span>{pending ? "Synthesizing…" : "Synthesize Itinerary"}</span>
+              {pending ? "Synthesizing…" : "Synthesize Itinerary"}
               <span
                 aria-hidden
-                className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform"
+                className="material-symbols-outlined !text-[20px] ml-1"
               >
                 arrow_forward
               </span>
-            </button>
+            </Button>
           </div>
         </div>
       </form>
     </main>
-  );
-}
-
-function Pill({
-  label,
-  icon,
-  active,
-  onClick,
-}: {
-  label: string;
-  icon?: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      // Larger pills with stronger contrast. The previous
-      // px-4 py-2 + text-label-ui was hard to read on the dark
-      // background. Bumped to px-5 py-3 + text-base and added
-      // a checkmark icon when active so the selection is
-      // unambiguous.
-      className={`inline-flex items-center gap-2 px-5 py-3 rounded-full border-2 transition-all font-label-ui text-label-ui ${
-        active
-          ? "border-ochre-light bg-ochre-light/20 text-ochre-light shadow-md"
-          : "border-white/30 bg-white/10 text-linen-dark/90 hover:border-white/50 hover:bg-white/15"
-      }`}
-    >
-      {icon ? (
-        <span aria-hidden className="material-symbols-outlined text-[20px]">
-          {icon}
-        </span>
-      ) : null}
-      <span>{label}</span>
-      {active ? (
-        <span aria-hidden className="material-symbols-outlined text-[18px]">
-          check_circle
-        </span>
-      ) : null}
-    </button>
   );
 }
