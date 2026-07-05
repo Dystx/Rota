@@ -108,7 +108,7 @@ export function HeroIntentCard() {
   return (
     <Card
       data-testid="hero-intent-card"
-      className="w-full max-w-3xl shadow-[0_8px_32px_rgba(24,28,28,0.18)]"
+      className="on-dark w-full max-w-3xl shadow-[0_8px_32px_rgba(24,28,28,0.18)]"
     >
       <CardContent className="p-6 md:p-8">
         <form

@@ -10,6 +10,31 @@ a {
   text-decoration: none;
 }
 
+/* ---- Text selection ----
+   The previous global `selection:bg-[var(--color-accent)]/30` in
+   PageShell + root body used the ochre accent at 30% opacity —
+   readable on cream surfaces, invisible on the dark hero
+   (the accent IS the dark family). The new rule uses
+   `--color-ochre-on-light` (a darker ochre, ~6.8:1 on cream)
+   for cream surfaces and a bright `ochre-light` with dark
+   text for any `.on-dark` subtree (hero card, planner form). */
+::selection {
+  background: var(--color-ochre-on-light);
+  color: #ffffff;
+}
+::-moz-selection {
+  background: var(--color-ochre-on-light);
+  color: #ffffff;
+}
+.on-dark ::selection {
+  background: var(--color-ochre-light);
+  color: var(--color-primary);
+}
+.on-dark ::-moz-selection {
+  background: var(--color-ochre-light);
+  color: var(--color-primary);
+}
+
 /* Shimmer sweep used by the Specialist Recommendation card.
    Triggered by the `group-hover:animate-shimmer` utility below so the
    gold accent band glides left-to-right only when the user hovers the card. */

@@ -122,7 +122,7 @@ export function PlannerSingleScreen({
   return (
     <main
       id="main-content"
-      className="relative min-h-screen bg-primary text-linen-dark flex flex-col"
+      className="on-dark relative min-h-screen bg-primary text-linen-dark flex flex-col"
       data-testid="planner-single-screen"
     >
       {/* Fixed top bar — Rumia wordmark + close (back to home). */}
