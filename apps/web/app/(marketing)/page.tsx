@@ -4,6 +4,7 @@ import { SiteFooter } from "../_components/site-footer";
 import { DestinationBento } from "../_components/destination-bento";
 import { HeroMap } from "./hero-map";
 import { HeroIntentCard } from "./_components/hero-intent-card";
+import { HowItWorks } from "./_components/how-it-works";
 
 export const metadata: Metadata = {
   title: "Discover Intentionally. | Rumia",
@@ -15,14 +16,17 @@ export const metadata: Metadata = {
 /**
  * Rumia landing page — Stitch 1.1 composition, 3D map adaptation.
  *
- * Four sections:
+ * Five sections:
  *  1. TopNav (fixed glass-morphism navigation)
  *  2. Hero (60vh mobile / 80vh desktop) — full-bleed 3D globe as
- *     the visual hero. The headline + an inline-editable intent
- *     card (destination / days / travel window) sit on a top
- *     scrim so the map is fully visible in the lower portion.
- *  3. DestinationBento with dual CTAs (Plan this trip / View on map)
- *  4. SiteFooter
+ *     the visual hero. The headline + value-proposition subtitle +
+ *     an inline-editable intent card (destination / days / travel
+ *     window) sit on a top scrim so the map is fully visible in
+ *     the lower portion.
+ *  3. HowItWorks — 3-step visual between hero and bento so a new
+ *     user understands the flow before they commit.
+ *  4. DestinationBento with dual CTAs (Plan this trip / View on map)
+ *  5. SiteFooter
  *
  * The 3D map fills the entire hero viewport. The headline +
  * intent card sit in a directional top-only scrim so the map
@@ -62,18 +66,27 @@ export default function HomePage() {
             aria-hidden="true"
           />
 
-          {/* Headline — anchored at the top of the hero so the
-              globe has room to spin below it. The user said
-              the globe was being hidden by the card; moving
-              the card to the bottom (below) keeps the globe
-              fully visible. */}
-          <div className="relative z-10 w-full max-w-4xl mx-auto px-container-padding-sm md:px-container-padding-lg pt-10 md:pt-16 flex flex-col items-center text-center">
+          {/* Headline + value proposition — anchored at the top
+              of the hero so the globe has room to spin below
+              it. The user said the globe was being hidden by
+              the card; moving the card to the bottom (below)
+              keeps the globe fully visible. A one-sentence
+              subtitle tells a new user what Rumia does — a
+              critical fix for the "what is this?" first
+              impression. */}
+          <div className="relative z-10 w-full max-w-4xl mx-auto px-container-padding-sm md:px-container-padding-lg pt-10 md:pt-16 flex flex-col items-center text-center gap-4">
             <h1
               data-testid="home-headline"
               className="font-display-mobile text-display-mobile md:font-display md:text-display text-linen-dark tracking-tight drop-shadow-2xl"
             >
               Discover <span className="italic text-ochre-light">Intentionally.</span>
             </h1>
+            <p
+              data-testid="home-value-prop"
+              className="font-body-lg md:font-body-xl text-body-lg md:text-body-xl text-linen-dark/90 max-w-2xl drop-shadow-md"
+            >
+              AI-crafted Portugal itineraries with cinematic detail. Tell us where, when, and how you travel — we handle the rest.
+            </p>
           </div>
 
           {/* Intent card — anchored at the BOTTOM of the hero
@@ -87,6 +100,7 @@ export default function HomePage() {
 
         {/* Discovery Bento Grid — dual CTAs (Stitch 1.1 + 1.3
             pattern: 1 click to plan, 1 click to explore). */}
+        <HowItWorks />
         <DestinationBento mode="plan" />
       </main>
 
