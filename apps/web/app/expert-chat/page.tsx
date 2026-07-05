@@ -134,9 +134,9 @@ export default function ExpertChatPage() {
           {/* Left Side: Visual Timeline */}
           <aside className="hidden lg:flex flex-col w-1/3 max-w-sm border-r border-olive-light/10 bg-surface-container-low/50 overflow-y-auto scrollbar-hide p-container-padding-lg">
             <div className="mb-section-gap">
-              <h2 className="font-headline-sm text-headline-sm text-primary mb-2">
+              <h1 className="font-headline-sm text-headline-sm text-primary mb-2">
                 Kyoto Autumn Retreat
-              </h2>
+              </h1>
               <div className="flex items-center gap-2 text-on-surface-variant font-mono-technical text-mono-technical">
                 <span className="material-symbols-outlined text-[16px]">
                   calendar_today

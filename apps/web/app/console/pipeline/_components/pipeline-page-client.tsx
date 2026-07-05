@@ -23,9 +23,9 @@ export function PipelinePageClient({ initialItems }: { initialItems?: PipelineIt
     <>
       <header className="mb-section-gap flex flex-col gap-4 md:flex-row md:items-end md:justify-between shrink-0">
         <div>
-          <h2 className="font-headline-lg text-headline-lg text-primary">
+          <h1 className="font-headline-lg text-headline-lg text-primary">
             Operations Pipeline
-          </h2>
+          </h1>
           <p className="font-body-md text-body-md text-on-surface-variant">
             Manage active itineraries and client communications.
           </p>

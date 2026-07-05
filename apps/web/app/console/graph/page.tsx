@@ -119,9 +119,9 @@ export default function ConsoleGraphPage() {
         <main id="main-content" className="flex-1 flex overflow-hidden">
           <aside className="w-1/3 min-w-[300px] border-r border-white/5 bg-black/20 flex flex-col">
             <header className="p-gutter border-b border-white/5 flex items-center justify-between shrink-0">
-              <h2 className="font-headline-sm text-headline-sm text-linen-dark uppercase tracking-wide">
+              <h1 className="font-headline-sm text-headline-sm text-linen-dark uppercase tracking-wide">
                 Graph Hierarchy
-              </h2>
+              </h1>
               <button
                 type="button"
                 aria-label="Filter tree"

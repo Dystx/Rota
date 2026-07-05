@@ -19,9 +19,9 @@ export default function ConsoleConfigPage() {
                 <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-2">
                   Environment: Production
                 </p>
-                <h2 className="font-headline-lg text-headline-lg text-primary">
+                <h1 className="font-headline-lg text-headline-lg text-primary">
                   System Variables
-                </h2>
+                </h1>
                 <p className="font-body-md text-body-md text-on-surface-variant mt-2 max-w-2xl">
                   Tune model prompt weights, routing multipliers, and transit
                   safety margins for the global planner engine.

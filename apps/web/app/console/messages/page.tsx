@@ -333,6 +333,7 @@ export default function ConsoleMessagesPage() {
         />
 
         <main id="main-content" className="relative z-10 flex-1 md:ml-64 h-screen flex gap-gutter p-container-padding-sm overflow-hidden">
+          <h1 className="sr-only">Messaging Hub</h1>
           {/* Column 1: Conversations */}
           <aside className="w-[320px] flex-shrink-0 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
             <header className="p-4 border-b border-olive-light/10 flex items-center justify-between shrink-0">

@@ -42,9 +42,9 @@ export default function ConsoleMetricsPage() {
       <div className="min-h-screen flex flex-col bg-background relative">
         <main id="main-content" className="flex-1 md:ml-64 p-container-padding-lg max-w-7xl mx-auto w-full flex flex-col gap-section-gap relative z-10">
           <header className="mb-4">
-            <h2 className="font-headline-lg text-headline-lg text-primary">
+            <h1 className="font-headline-lg text-headline-lg text-primary">
               Global Metrics Dashboard
-            </h2>
+            </h1>
             <p className="font-body-md text-body-md text-on-surface-variant">
               Admin health overview and real-time performance indicators.
             </p>

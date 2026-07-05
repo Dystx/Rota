@@ -28,7 +28,7 @@ import { loadSpecialistCapabilities } from "./actions";
 export default async function GuideOnboardingPage() {
   const userId = await getCurrentUserId();
   if (!userId) {
-    redirect("/login?next=/guide/onboarding");
+    redirect("/sign-in?next=/guide/onboarding");
   }
 
   const existing = await getSpecialistProfileByUserId(userId);

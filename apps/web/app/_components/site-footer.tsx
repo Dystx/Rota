@@ -29,7 +29,7 @@ export function SiteFooter() {
         Rumia
       </Link>
       <p className="font-label-ui text-label-ui text-olive-light text-center md:text-left">
-        © 2024 Rumia. All rights reserved. Intentional Humanism in Travel.
+        © {new Date().getFullYear()} Rumia. All rights reserved. Intentional Humanism in Travel.
       </p>
       <ul className="flex flex-wrap justify-center gap-6">
         {LEGAL_LINKS.map((link) => (

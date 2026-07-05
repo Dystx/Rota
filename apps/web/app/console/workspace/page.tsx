@@ -18,9 +18,9 @@ export default function ConsoleWorkspacePage() {
             <span className="font-mono-technical text-mono-technical bg-surface-container-high text-on-surface-variant px-2 py-1 rounded">
               TRP-8924-JP
             </span>
-            <h2 className="font-headline-sm text-headline-sm text-primary truncate">
+            <h1 className="font-headline-sm text-headline-sm text-primary truncate">
               Kyoto Autumn Residency
-            </h2>
+            </h1>
           </div>
           <div className="flex items-center gap-3">
             <span className="font-label-ui text-label-ui text-on-surface-variant flex items-center gap-2">
