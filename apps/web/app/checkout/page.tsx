@@ -71,13 +71,36 @@ export default async function CheckoutPage({
                     data-testid="checkout-trip-cover"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span
-                      aria-hidden
-                      className="material-symbols-outlined text-5xl text-olive-light/60"
+                  /* No-trip state: a compact illustration + CTA
+                     instead of a large gray box with a single
+                     icon. The illustration sits centered with a
+                     "Plan a trip" button below it so the user has
+                     a clear next step from the checkout surface. */
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
+                    <div className="w-14 h-14 rounded-full bg-olive-light/15 flex items-center justify-center">
+                      <span
+                        aria-hidden
+                        className="material-symbols-outlined text-3xl text-olive-dark"
+                      >
+                        travel_explore
+                      </span>
+                    </div>
+                    <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-olive-dark/80">
+                      No trip linked
+                    </p>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant max-w-xs">
+                      Plan a trip first and the cover + brief will appear here.
+                    </p>
+                    <Link
+                      href="/planner"
+                      data-testid="checkout-empty-cta"
+                      className="mt-1 inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-4 py-2 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                     >
-                      image
-                    </span>
+                      <span aria-hidden className="material-symbols-outlined text-[18px]">
+                        add_location_alt
+                      </span>
+                      Plan a trip
+                    </Link>
                   </div>
                 )}
               </div>

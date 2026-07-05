@@ -40,7 +40,7 @@ export default function ConsoleMetricsPage() {
   return (
     <>
       <div className="min-h-screen flex flex-col bg-background relative">
-        <main id="main-content" className="flex-1 md:ml-64 p-container-padding-lg max-w-7xl mx-auto w-full flex flex-col gap-section-gap relative z-10">
+        <main id="main-content" className="flex-1 md:ml-64 p-container-padding-lg max-w-full mx-auto w-full flex flex-col gap-section-gap relative z-10 overflow-x-hidden">
           <header className="mb-4">
             <h1 className="font-headline-lg text-headline-lg text-primary">
               Global Metrics Dashboard
@@ -82,13 +82,13 @@ export default function ConsoleMetricsPage() {
             />
           </section>
 
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
-            <div className="lg:col-span-2">
+          <section className="grid grid-cols-1 lg:grid-cols-3 gap-gutter min-w-0">
+            <div className="lg:col-span-2 min-w-0">
               <VolumeChart weekly={[...WEEKLY_BARS]} />
             </div>
 
             <section className="glass-card rounded-xl p-card-padding flex flex-col gap-2 min-w-0 overflow-hidden">
-              <h3 className="font-headline-sm text-headline-sm text-primary mb-2">
+              <h3 className="font-label-ui text-label-ui uppercase tracking-widest text-primary mb-2">
                 Regional Performance
               </h3>
               <ul className="flex flex-col gap-2">
