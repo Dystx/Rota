@@ -31,3 +31,4 @@ export * from "./components/page-transition";
 export * from "./components/breadcrumb";
 export * from "./components/toast";
 export * from "./components/empty-state";
+export * from "./components/back-to-top";

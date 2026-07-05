@@ -8,6 +8,7 @@ import { getTripCommerceState } from "@/lib/trip-commerce";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { BehaviorConsentToggle } from "./_components/behavior-consent-toggle";
 import { signOutAction } from "./_actions/sign-out";
+import { SignOutButton } from "./_components/sign-out-button";
 
 export const metadata: Metadata = {
   title: "My Account",
@@ -80,19 +81,10 @@ export default async function AccountPage() {
               </p>
             ) : null}
           </div>
-          <form action={signOutAction} className="md:self-end">
-            <Button
-              type="submit"
-              variant="ghost"
-              data-testid="account-sign-out"
-              className="text-on-surface-variant hover:text-primary"
-            >
-              <span aria-hidden className="material-symbols-outlined text-[16px] mr-1.5">
-                logout
-              </span>
-              Sign out
-            </Button>
-          </form>
+          <SignOutButton
+            signOutAction={signOutAction}
+            className="md:self-end text-on-surface-variant hover:text-primary"
+          />
         </CardContent>
       </Card>
 

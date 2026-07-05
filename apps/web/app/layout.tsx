@@ -3,7 +3,7 @@ import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "@repo/ui/styles.css";
 import "./globals.css";
 import { WebVitalsReporter } from "./web-vitals-reporter";
-import { MotionProvider, ToastViewport } from "@repo/ui";
+import { MotionProvider, ToastViewport, BackToTop } from "@repo/ui";
 import { RegisterServiceWorker } from "./_components/register-sw";
 
 const inter = Inter({
@@ -111,6 +111,7 @@ export default function RootLayout({
         <RegisterServiceWorker />
         <MotionProvider>{children}</MotionProvider>
         <ToastViewport />
+        <BackToTop />
       </body>
     </html>
   );
