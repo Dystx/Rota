@@ -120,7 +120,7 @@ export function HeroIntentCard() {
               doesn't render above the input — the sentence
               itself is the visual label. `aria-label` gives
               screen readers the field name. */}
-          <label className="font-display-mobile md:font-display text-xl md:text-3xl text-[var(--color-foreground)] leading-snug text-center w-full">
+          <label className="font-display-mobile md:font-display text-xl md:text-3xl text-[var(--color-foreground)] leading-snug text-center w-full text-balance">
             <span>We are visiting </span>
             <span className="sr-only">Destination</span>
             <Input

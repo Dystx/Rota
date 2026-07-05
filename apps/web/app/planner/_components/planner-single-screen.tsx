@@ -164,7 +164,7 @@ export function PlannerSingleScreen({
               doesn't render above the input — the sentence
               itself is the visual label. `aria-label` gives
               screen readers the field name. */}
-          <h1 className="font-display-mobile md:font-display text-2xl md:text-5xl text-linen-dark leading-snug text-center flex flex-wrap items-baseline justify-center gap-x-1 gap-y-2 md:gap-x-2 md:gap-y-3">
+          <h1 className="font-display-mobile md:font-display text-2xl md:text-5xl text-linen-dark leading-snug text-center flex flex-wrap items-baseline justify-center gap-x-1 gap-y-2 md:gap-x-2 md:gap-y-3 text-balance">
             <span>We are crafting a journey to </span>
             <span className="sr-only">Destination</span>
             <Input
