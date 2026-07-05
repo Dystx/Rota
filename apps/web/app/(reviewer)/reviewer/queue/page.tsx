@@ -4,7 +4,7 @@ import { filterActiveReviewerAssignments, isPersistenceConfigError, listReviewer
 import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatusPill } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
-import { RequireReviewerAuth } from "../_components/require-reviewer-auth";
+import { RequireReviewerAuth } from "../../_components/require-reviewer-auth";
 
 export const metadata: Metadata = {
   title: "Reviewer Queue",
