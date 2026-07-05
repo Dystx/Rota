@@ -14,54 +14,7 @@ import { SnippetCard } from "../_components/snippet-card";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { triageInboundMessage } from "../_components/message-triage";
 import type { TriageResult } from "@repo/ai";
-
-interface Conversation {
-  id: string;
-  name: string;
-  region: string;
-  lastMessage: string;
-  timestamp: string;
-  active: boolean;
-  avatarSrc: string;
-}
-
-const CONVERSATIONS: Conversation[] = [
-  {
-    id: "eleanor",
-    name: "Eleanor Vance",
-    region: "Kyoto, Japan",
-    lastMessage: "I’d love to add that tea ceremony to the itinerary.",
-    timestamp: "10:42 AM",
-    active: true,
-    avatarSrc: "https://i.pravatar.cc/40?img=5",
-  },
-  {
-    id: "hastings",
-    name: "The Hasting Family",
-    region: "Tuscany, Italy",
-    lastMessage: "Could you confirm the car transfer?",
-    timestamp: "Yesterday",
-    active: false,
-    avatarSrc: "https://i.pravatar.cc/40?img=11",
-  },
-];
-
-/**
- * Phase 7.1: format a chat-message ISO timestamp for the
- * bubble footer. Falls back to the raw string if the date
- * is unparseable, which keeps the UI informative on bad
- * data rather than showing "Invalid Date".
- */
-function formatChatTimestamp(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  // Locale-agnostic: 12-hour HH:MM AM/PM.
-  return date.toLocaleString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true
-  });
-}
+import { CONVERSATIONS, formatChatTimestamp, type Conversation } from "./_lib/conversations";
 
 export default function ConsoleMessagesPage() {
   const [activeId, setActiveId] = useState<string>(CONVERSATIONS[0]!.id);
