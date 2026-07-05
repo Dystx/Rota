@@ -1,6 +1,49 @@
 import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 
+/**
+ * Visual context the empty state lives in. Each variant maps to a
+ * distinct container treatment so the same component can carry
+ * "first-visit hero" (`default` / `cinematic` / `hero`), full-bleed
+ * map overlay (`map`), table-row separator (`table`), compact card
+ * (`compact`), and dashed form gap (`form`).
+ */
+type Variant =
+  | "default"
+  | "hero"
+  | "cinematic"
+  | "table"
+  | "compact"
+  | "form"
+  | "map";
+
+/**
+ * Per-variant container classes. The base `flex flex-col
+ * items-center justify-center text-center` is applied on top so
+ * every variant lays children out the same way.
+ */
+const VARIANT_CONTAINER: Record<Variant, string> = {
+  default: "min-h-[60vh] gap-6 px-6 py-16",
+  hero: "min-h-[60vh] gap-6 px-6 py-16",
+  cinematic: "min-h-[60vh] gap-6 px-6 py-16",
+  table: "border-b border-olive-light/20 py-4",
+  compact: "py-8 gap-3",
+  form: "rounded-2xl border border-dashed border-olive-light/30 bg-white/30 p-8 gap-3",
+  map: "absolute inset-0 gap-4",
+};
+
+/**
+ * Variants that use the large icon + display title. `map` is
+ * included because it's a full-bleed overlay — the larger mark
+ * reads better across the whole viewport.
+ */
+const HERO_VARIANTS: ReadonlySet<Variant> = new Set([
+  "default",
+  "hero",
+  "cinematic",
+  "map",
+]);
+
 interface EmptyStateProps {
   /** Either a Material Symbols icon name (e.g. "explore", "map",
    *  "inbox") or a custom ReactNode (for callers that want to
@@ -16,18 +59,14 @@ interface EmptyStateProps {
   action?: ReactNode;
   /** Optional secondary action next to the primary one. */
   secondaryAction?: ReactNode;
-  /** Visual size — `default` for list pages, `hero` for empty
-   *  first-visit states that need to fill the viewport. */
-  size?: "default" | "hero";
   /**
-   * Visual context the empty state lives in. `table` renders a
-   * compact card inside a Card body (admin tables, reviewer
-   * queue), `compact` is a small inline notice, `form` is a
-   * 2-up layout beside a form, `map` is full-bleed for empty
-   * map areas, `cinematic` is the large first-visit state.
-   * `default` and `hero` map to the equivalent named `size`.
+   * @deprecated Use `variant` instead. Kept for backward-compat:
+   * `size="hero"` maps to the `hero` variant; `size="default"`
+   * falls through to the default cinematic look.
    */
-  variant?: "default" | "hero" | "table" | "compact" | "form" | "map" | "cinematic";
+  size?: "default" | "hero";
+  /** Visual context — see `VARIANT_CONTAINER` above. */
+  variant?: Variant;
   className?: string;
 }
 
@@ -49,31 +88,25 @@ export function EmptyState({
   description,
   action,
   secondaryAction,
-  size = "default",
+  size,
   variant,
-  className
+  className,
 }: EmptyStateProps) {
-  // Backward-compat: `variant` predates `size`; map the legacy
-  // names to the new size + container treatment.
-  const resolvedSize: "default" | "hero" =
-    size === "hero" || variant === "hero" || variant === "cinematic" || variant === "map"
-      ? "hero"
-      : "default";
-  const containerClass =
-    variant === "table" || variant === "compact" || variant === "form"
-      ? "rounded-2xl border border-olive-light/20 bg-white/60 backdrop-blur-sm p-8 text-center"
-      : undefined;
-  const isHero = resolvedSize === "hero";
+  // Resolve the effective variant. Explicit `variant` wins; the
+  // deprecated `size="hero"` is honoured so legacy callers still
+  // get the hero treatment. Anything else falls through to the
+  // default cinematic look (min-h-[60vh]).
+  const resolved: Variant =
+    variant ??
+    (size === "hero" ? "hero" : "default");
+  const isHero = HERO_VARIANTS.has(resolved);
   return (
     <div
       role="status"
       aria-live="polite"
       className={cn(
         "flex flex-col items-center justify-center text-center",
-        containerClass,
-        isHero
-          ? "min-h-[60vh] gap-6 px-6 py-16"
-          : "gap-3 px-4 py-12 rounded-2xl border border-dashed border-olive-light/30 bg-white/30",
+        VARIANT_CONTAINER[resolved],
         className
       )}
     >
