@@ -159,127 +159,84 @@ export function PlannerSingleScreen({
             </span>
           </div>
 
-          {/* Sentence with inline editable fields. */}
-          <h1 className="font-display-mobile md:font-display text-3xl md:text-5xl text-linen-dark leading-tight text-center flex flex-wrap items-baseline justify-center gap-x-2 gap-y-3">
-            <span>We are crafting a journey to</span>
-            <Field
-              label="Destination"
-              htmlFor="planner-destination"
-              className="contents"
-            >
-              {(fieldProps) => (
-                <Input
-                  id={fieldProps.id}
-                  type="text"
-                  value={destination}
-                  onChange={(event) => setDestination(event.target.value)}
-                  aria-label="Destination"
-                  data-testid="planner-destination"
-                  className="!w-40 md:!w-56 !inline-block !text-3xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !text-ochre-light"
-                />
-              )}
-            </Field>
-            <span>for</span>
-            <Field
-              label="Number of days"
-              htmlFor="planner-days"
-              className="contents"
-            >
-              {(fieldProps) => (
-                <Input
-                  id={fieldProps.id}
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  max={60}
-                  value={days}
-                  onChange={(event) => setDays(event.target.value)}
-                  aria-label="Number of days"
-                  data-testid="planner-days"
-                  className="!w-14 md:!w-20 !inline-block !text-3xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !text-ochre-light"
-                />
-              )}
-            </Field>
-            <span>days in</span>
-            <Field
-              label="Travel window"
-              htmlFor="planner-window"
-              className="contents"
-            >
-              {(fieldProps) => (
-                <Input
-                  id={fieldProps.id}
-                  type="text"
-                  value={window}
-                  onChange={(event) => setWindow(event.target.value)}
-                  aria-label="Travel window"
-                  placeholder="May"
-                  data-testid="planner-window"
-                  className="!w-32 md:!w-40 !inline-block !text-3xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !placeholder:text-ochre-light/50 !text-ochre-light"
-                />
-              )}
-            </Field>
+          {/* Sentence with inline editable fields. Each field is
+              a raw <Input> (not wrapped in <Field>) so the label
+              doesn't render above the input — the sentence
+              itself is the visual label. `aria-label` gives
+              screen readers the field name. */}
+          <h1 className="font-display-mobile md:font-display text-2xl md:text-5xl text-linen-dark leading-snug text-center flex flex-wrap items-baseline justify-center gap-x-1 gap-y-2 md:gap-x-2 md:gap-y-3">
+            <span>We are crafting a journey to </span>
+            <span className="sr-only">Destination</span>
+            <Input
+              type="text"
+              value={destination}
+              onChange={(event) => setDestination(event.target.value)}
+              aria-label="Destination"
+              data-testid="planner-destination"
+              className="!w-32 md:!w-56 !inline-block !px-2 md:!px-3 !py-0.5 md:!py-1 !text-2xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !text-ochre-light"
+            />
+            <span> for </span>
+            <span className="sr-only">Number of days</span>
+            <Input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={60}
+              value={days}
+              onChange={(event) => setDays(event.target.value)}
+              aria-label="Number of days"
+              data-testid="planner-days"
+              className="!w-12 md:!w-20 !inline-block !px-2 md:!px-3 !py-0.5 md:!py-1 !text-2xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !text-ochre-light"
+            />
+            <span> days in </span>
+            <span className="sr-only">Travel window</span>
+            <Input
+              type="text"
+              value={window}
+              onChange={(event) => setWindow(event.target.value)}
+              aria-label="Travel window"
+              placeholder="May"
+              data-testid="planner-window"
+              className="!w-24 md:!w-40 !inline-block !px-2 md:!px-3 !py-0.5 md:!py-1 !text-2xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !placeholder:text-ochre-light/50 !text-ochre-light"
+            />
             <span>.</span>
           </h1>
 
           {/* Compact pill selectors for transport + vibe using the
               shared `ChipGroup` primitive (WAI-ARIA radiogroup with
-              arrow-key navigation built in). */}
+              arrow-key navigation built in). Labels are visible
+              above each group for clarity. */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Field
-              label="Mobility"
-              htmlFor="planner-mobility"
-              className="contents"
-            >
-              {(fieldProps) => (
-                <div className="flex flex-col gap-3">
-                  <label
-                    htmlFor={fieldProps.id}
-                    className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm"
-                  >
-                    Mobility
-                  </label>
-                  <ChipGroup
-                    id={fieldProps.id}
-                    ariaLabel="Mobility"
-                    value={transport === "" ? null : transport}
-                    onChange={(next: "car" | "transit") => setTransport(next)}
-                    options={MOBILITY_OPTIONS.map((o) => ({
-                      value: o.value,
-                      label: o.label,
-                      description: o.description,
-                    }))}
-                  />
-                </div>
-              )}
-            </Field>
+            <div className="flex flex-col gap-3">
+              <label className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm">
+                Mobility
+              </label>
+              <ChipGroup
+                ariaLabel="Mobility"
+                value={transport === "" ? null : transport}
+                onChange={(next: "car" | "transit") => setTransport(next)}
+                options={MOBILITY_OPTIONS.map((o) => ({
+                  value: o.value,
+                  label: o.label,
+                  description: o.description,
+                }))}
+              />
+            </div>
 
-            <Field
-              label="Energy"
-              htmlFor="planner-energy"
-              className="contents"
-            >
-              {(fieldProps) => (
-                <div className="flex flex-col gap-3">
-                  <label
-                    htmlFor={fieldProps.id}
-                    className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm"
-                  >
-                    Energy
-                  </label>
-                  <ChipGroup
-                    id={fieldProps.id}
-                    ariaLabel="Energy"
-                    value={vibe}
-                    onChange={(next: Vibe) => setVibe(next)}
-                    options={ENERGY_OPTIONS.map((o) => ({
-                      value: o.value,
-                      label: o.label,
-                    }))}
-                  />
-                </div>
-              )}
-            </Field>
+            <div className="flex flex-col gap-3">
+              <label className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm">
+                Energy
+              </label>
+              <ChipGroup
+                ariaLabel="Energy"
+                value={vibe}
+                onChange={(next: Vibe) => setVibe(next)}
+                options={ENERGY_OPTIONS.map((o) => ({
+                  value: o.value,
+                  label: o.label,
+                }))}
+              />
+            </div>
           </div>
 
           {/* Synthesize CTA. */}

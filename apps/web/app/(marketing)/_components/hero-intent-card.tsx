@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card, CardContent, Field, Input } from "@repo/ui";
+import { Button, Card, CardContent, Input } from "@repo/ui";
 import { getDestinationPreset } from "@repo/spatial-engine";
 
 /**
@@ -19,9 +19,11 @@ import { getDestinationPreset } from "@repo/spatial-engine";
  *     We are visiting  [Portugal]  for  [7]  days in  [May].
  *
  * Each bracketed field is an inline editable `Input` from
- * `@repo/ui` form-primitives. There are no "..." trailing dots.
- * Underneath the sentence sits a single `Button` ("Begin
- * Journey") — also from the shared UI kit.
+ * `@repo/ui`. Labels are visually hidden (sr-only) so the
+ * sentence flows naturally on mobile and desktop; screen
+ * readers get the field name via `aria-label`. Underneath the
+ * sentence sits a single `Button` ("Begin Journey") — also
+ * from the shared UI kit.
  *
  * On submit we navigate to /planner with the values as query
  * params, so the planner can pre-fill its first step.
@@ -69,6 +71,22 @@ function resolveDestinationSlug(raw: string): string {
   return lower.replace(/\s+/g, "-");
 }
 
+/**
+ * Shared inline-input className. Labels are sr-only so the
+ * sentence flows naturally; the visual sentence itself serves
+ * as the label. High-contrast ochre underline + olive-dark
+ * pill background so the inputs read clearly against the
+ * white card.
+ */
+const INLINE_FIELD_BASE =
+  "inline-block px-2 py-0.5 md:px-3 md:py-1 bg-[var(--color-foreground)] rounded-md border-b-2 border-[var(--color-accent)] focus:border-[var(--color-accent)] focus:bg-[var(--color-primary)] focus:outline-none text-[var(--color-accent-light)] text-center align-baseline mx-0.5 md:mx-1 transition-colors placeholder:text-[var(--color-accent-light)]/50";
+
+const INLINE_FIELD_SIZES = {
+  destination: "w-28 md:w-40",
+  days: "w-12 md:w-16",
+  window: "w-24 md:w-32",
+} as const;
+
 export function HeroIntentCard() {
   const router = useRouter();
   const [destination, setDestination] = React.useState("Portugal");
@@ -97,67 +115,48 @@ export function HeroIntentCard() {
           onSubmit={onBegin}
           className="flex flex-col items-center gap-6"
         >
-          <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-3 text-center font-display-mobile md:font-display text-2xl md:text-4xl text-[var(--color-foreground)] leading-tight w-full">
-            <span>We are visiting</span>
-            <Field
-              label="Destination"
-              htmlFor="hero-intent-destination"
-              className="contents"
-            >
-              {(fieldProps) => (
-                <Input
-                  id={fieldProps.id}
-                  type="text"
-                  value={destination}
-                  onChange={(event) => setDestination(event.target.value)}
-                  aria-label="Destination"
-                  data-testid="hero-intent-destination"
-                  className="!w-40 md:!w-48 !inline-block !px-3 !py-1.5 !text-2xl md:!text-4xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/90 !text-[var(--color-ink)]"
-                />
-              )}
-            </Field>
-            <span>for</span>
-            <Field
-              label="Number of days"
-              htmlFor="hero-intent-days"
-              className="contents"
-            >
-              {(fieldProps) => (
-                <Input
-                  id={fieldProps.id}
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  max={60}
-                  value={days}
-                  onChange={(event) => setDays(event.target.value)}
-                  aria-label="Number of days"
-                  data-testid="hero-intent-days"
-                  className="!w-16 md:!w-20 !inline-block !px-3 !py-1.5 !text-2xl md:!text-4xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/90 !text-[var(--color-ink)]"
-                />
-              )}
-            </Field>
-            <span>days in</span>
-            <Field
-              label="Travel window"
-              htmlFor="hero-intent-window"
-              className="contents"
-            >
-              {(fieldProps) => (
-                <Input
-                  id={fieldProps.id}
-                  type="text"
-                  value={window}
-                  onChange={(event) => setWindow(event.target.value)}
-                  aria-label="Travel window"
-                  placeholder="May"
-                  data-testid="hero-intent-window"
-                  className="!w-32 md:!w-40 !inline-block !px-3 !py-1.5 !text-2xl md:!text-4xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/90 !placeholder:text-[var(--color-muted-foreground)] !text-[var(--color-ink)]"
-                />
-              )}
-            </Field>
+          {/* Sentence with inline editable fields. Each field is
+              a raw <Input> (not wrapped in <Field>) so the label
+              doesn't render above the input — the sentence
+              itself is the visual label. `aria-label` gives
+              screen readers the field name. */}
+          <label className="font-display-mobile md:font-display text-xl md:text-3xl text-[var(--color-foreground)] leading-snug text-center w-full">
+            <span>We are visiting </span>
+            <span className="sr-only">Destination</span>
+            <Input
+              type="text"
+              value={destination}
+              onChange={(event) => setDestination(event.target.value)}
+              aria-label="Destination"
+              data-testid="hero-intent-destination"
+              className={`${INLINE_FIELD_BASE} ${INLINE_FIELD_SIZES.destination} !text-xl md:!text-3xl !font-display-mobile md:!font-display`}
+            />
+            <span> for </span>
+            <span className="sr-only">Number of days</span>
+            <Input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={60}
+              value={days}
+              onChange={(event) => setDays(event.target.value)}
+              aria-label="Number of days"
+              data-testid="hero-intent-days"
+              className={`${INLINE_FIELD_BASE} ${INLINE_FIELD_SIZES.days} !text-xl md:!text-3xl !font-display-mobile md:!font-display`}
+            />
+            <span> days in </span>
+            <span className="sr-only">Travel window</span>
+            <Input
+              type="text"
+              value={window}
+              onChange={(event) => setWindow(event.target.value)}
+              aria-label="Travel window"
+              placeholder="May"
+              data-testid="hero-intent-window"
+              className={`${INLINE_FIELD_BASE} ${INLINE_FIELD_SIZES.window} !text-xl md:!text-3xl !font-display-mobile md:!font-display`}
+            />
             <span>.</span>
-          </div>
+          </label>
           <Button
             type="submit"
             data-testid="hero-intent-submit"
