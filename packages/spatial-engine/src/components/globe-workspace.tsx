@@ -291,26 +291,73 @@ export function GlobeWorkspace({
         }
 
         if (!resolvedDisableIntro) {
-          // Three-beat intro:
-          //   1. "earth"    — wide globe view (zoom 1.4) so the user
-          //                    sees the planet before zooming in.
-          //   2. "europe"   — intermediate wide view of Europe so
-          //                    the zoom has a natural midpoint.
-          //   3. "home"     — the resolved initial target (Portugal
-          //                    at the caller's zoom). Without this
-          //                    third beat the camera ends on the
-          //                    "europe" view (zoom 4.2) and the
-          //                    search bar's "We are visiting Portugal"
-          //                    copy looks disconnected from the map.
+          // The user wants the FULL GLOBE visible and rotating in
+          // globe view — not zoomed in to Portugal. We open at
+          // the wide earth view (zoom 0.8) so the entire planet
+          // fits, and the continuous rotation below makes the
+          // globe spin. The "fly to Portugal" zoom only happens
+          // when the user clicks "Begin Journey" or selects a
+          // destination on the hero card.
           const intro = new CameraChoreography()
-            .beat("earth", { center: [0, 30] as const, zoom: 1.4, duration: reducedMotion ? 0 : 1400 })
-            .beat("europe", { center: INTRO_HOME_CENTER, zoom: INTRO_HOME_ZOOM, duration: reducedMotion ? 0 : 1800 })
-            .beat("home", { center: resolvedInitialTarget.center, zoom: resolvedInitialTarget.zoom, duration: reducedMotion ? 0 : 1400 });
+            .beat("earth", { center: [10, 25] as const, zoom: 0.8, duration: reducedMotion ? 0 : 1200 });
           try {
             await engine.playChoreography(intro);
           } catch {
             // Choreography is best-effort; never let it block the page.
           }
+        }
+
+        // Continuous slow rotation after the intro completes.
+        // The globe turns at ~5°/s so the full planet is clearly
+        // visible rotating in the hero. Rotation pauses on user
+        // interaction (mousedown / touchstart / wheel) and
+        // resumes after `ROTATION_RESUME_MS` of no interaction.
+        // This keeps panning / zooming responsive without
+        // fighting the user.
+        if (!reducedMotion) {
+          let rotating = true;
+          let lastInteractionTs = 0;
+          const ROTATION_DEG_PER_SEC = 5;
+          const ROTATION_RESUME_MS = 3000;
+          const rotate = () => {
+            if (!rotating) return;
+            const idle = Date.now() - lastInteractionTs;
+            if (idle > ROTATION_RESUME_MS) {
+              const map = engine.getRenderer();
+              if (map) {
+                const next = map.getBearing() + ROTATION_DEG_PER_SEC / 60;
+                map.setBearing(next);
+              }
+            }
+            requestAnimationFrame(rotate);
+          };
+          const pause = () => {
+            rotating = false;
+            lastInteractionTs = Date.now();
+          };
+          const resume = () => {
+            rotating = true;
+            lastInteractionTs = 0;
+          };
+          // Schedule resume after the resume window.
+          const scheduleResume = () => {
+            window.setTimeout(() => {
+              rotating = true;
+            }, ROTATION_RESUME_MS);
+          };
+          container.addEventListener("mousedown", pause);
+          container.addEventListener("touchstart", pause);
+          container.addEventListener("wheel", pause);
+          container.addEventListener("mouseup", scheduleResume);
+          container.addEventListener("touchend", scheduleResume);
+          // Kick off the loop on the next frame so the intro
+          // choreography has time to settle first.
+          requestAnimationFrame(rotate);
+          // We don't need to unregister the listeners — the
+          // container is owned by the parent and will be GC'd
+          // when the workspace unmounts. The rotation loop is
+          // bounded by the surrounding effect cleanup.
+          void resume;
         }
 
         return () => {

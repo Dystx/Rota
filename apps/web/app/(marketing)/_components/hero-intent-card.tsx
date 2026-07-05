@@ -86,19 +86,24 @@ export function HeroIntentCard() {
     router.push(`/planner?${params.toString()}`);
   };
 
-  // Shared className for the inline editable fields. Transparent
-  // background, ochre dashed underline, ochre text — they read
-  // as part of the sentence until you click them.
+  // Shared className for the inline editable fields. Dark
+  // olive pill background with light ochre text — high
+  // contrast against the white card. On focus the pill
+  // darkens so it's obvious which field is being edited.
   const fieldClass =
-    "mx-1 bg-transparent border-0 border-b-2 border-dashed border-ochre-light/50 focus:border-ochre-light focus:outline-none text-ochre-light font-headline-lg text-headline-lg text-center min-w-0";
+    "mx-1.5 px-3 py-1.5 bg-olive-dark rounded-md border-b-2 border-ochre-light focus:border-ochre-light focus:bg-primary focus:outline-none text-ochre-light font-display-mobile md:font-display text-2xl md:text-4xl text-center min-w-0 transition-colors placeholder:text-ochre-light/50";
 
   return (
     <form
       onSubmit={onBegin}
       data-testid="hero-intent-card"
-      className="w-full max-w-3xl bg-glass-light backdrop-blur-[24px] border border-white/40 rounded-xl p-card-padding md:p-6 shadow-2xl flex flex-col items-center gap-5"
+      // Higher-contrast glass: stronger backdrop-blur + white
+      // border at higher opacity so the card reads as a clear
+      // surface over the busy 3D map. The previous glass-light
+      // (border-white/40) was getting lost.
+      className="w-full max-w-3xl bg-white/90 backdrop-blur-2xl border-2 border-white/80 rounded-2xl p-card-padding md:p-8 shadow-2xl flex flex-col items-center gap-6"
     >
-      <label className="font-headline-lg text-headline-lg text-primary text-center w-full">
+      <label className="font-display-mobile md:font-display text-2xl md:text-4xl text-primary leading-tight text-center w-full">
         We are visiting{" "}
         <input
           type="text"
@@ -106,7 +111,7 @@ export function HeroIntentCard() {
           onChange={(event) => setDestination(event.target.value)}
           aria-label="Destination"
           data-testid="hero-intent-destination"
-          className={`${fieldClass} w-32`}
+          className={`${fieldClass} w-36 md:w-44`}
         />{" "}
         for{" "}
         <input
@@ -118,7 +123,7 @@ export function HeroIntentCard() {
           onChange={(event) => setDays(event.target.value)}
           aria-label="Number of days"
           data-testid="hero-intent-days"
-          className={`${fieldClass} w-14`}
+          className={`${fieldClass} w-16 md:w-20`}
         />{" "}
         days in{" "}
         <input
@@ -128,19 +133,22 @@ export function HeroIntentCard() {
           aria-label="Travel window"
           placeholder="May"
           data-testid="hero-intent-window"
-          className={`${fieldClass} w-28`}
+          className={`${fieldClass} w-32 md:w-40`}
         />
         .
       </label>
       <button
         type="submit"
         data-testid="hero-intent-submit"
-        className="bg-olive-light text-on-primary font-label-ui text-label-ui px-8 py-3 rounded-full hover:bg-olive-dark transition-all duration-200 shadow-md flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+        // Larger, higher-contrast CTA. The previous olive-light
+        // button was getting lost against the white card; olive-dark
+        // gives it the presence a primary CTA needs.
+        className="bg-olive-dark text-on-primary font-label-ui text-label-ui px-10 py-4 rounded-full hover:bg-olive-light transition-all duration-200 shadow-lg flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 text-lg"
       >
         Begin Journey{" "}
         <span
           aria-hidden
-          className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform"
+          className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform"
         >
           arrow_forward
         </span>

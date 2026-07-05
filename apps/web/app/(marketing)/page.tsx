@@ -38,11 +38,29 @@ export default function HomePage() {
         <section className="relative h-[60vh] min-h-[480px] md:h-[80vh] md:min-h-[640px] w-full flex flex-col justify-start items-center overflow-hidden bg-primary">
           <HeroMap initialProjection="globe" />
 
-          {/* Top-only directional scrim: keeps the headline + card
-              readable without darkening the lower portion of the
-              map. The 3D map is fully visible below the scrim. */}
+          {/* Decorative starfield + radial vignette behind the
+              hero — a subtle layer that adds depth without
+              competing with the map. The vignette draws the
+              eye to the center where the headline + card live;
+              the starfield gives the off-map area some texture
+              so the hero doesn't read as a flat rectangle. */}
           <div
-            className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-primary/55 via-primary/20 to-transparent z-[1] pointer-events-none"
+            aria-hidden
+            className="absolute inset-0 z-[1] pointer-events-none"
+            style={{
+              backgroundImage:
+                "radial-gradient(ellipse at 50% 0%, transparent 0%, rgba(12, 31, 22, 0.35) 65%, rgba(12, 31, 22, 0.7) 100%), radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 0.4%), radial-gradient(circle at 80% 60%, rgba(255, 255, 255, 0.06) 0%, transparent 0.4%)",
+              backgroundSize: "auto, 800px 800px, 800px 800px",
+            }}
+          />
+
+          {/* Stronger top scrim — the previous h-1/2 with 55%
+              opacity was leaving the headline half-readable against
+              the map. Now the full hero has a layered scrim: a
+              solid top-third fade for headline readability and a
+              gentler bottom-third for the map. */}
+          <div
+            className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-primary/70 via-primary/40 to-transparent z-[1] pointer-events-none"
             aria-hidden="true"
           />
 

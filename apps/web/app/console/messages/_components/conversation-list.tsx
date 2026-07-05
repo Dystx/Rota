@@ -104,11 +104,11 @@ export function ConversationList({
                   <div className="flex items-start gap-3">
                     <span
                       aria-hidden
-                      className="shrink-0 inline-flex flex-col items-center justify-center w-12 h-12 rounded-md text-on-primary font-mono-technical text-[10px] uppercase tracking-wider leading-tight"
+                      className="shrink-0 inline-flex flex-col items-center justify-center w-14 h-14 rounded-lg text-on-primary font-mono-technical text-[11px] uppercase tracking-wider leading-tight shadow-sm"
                       style={{ backgroundColor: day.accent }}
                     >
-                      <span className="text-[8px] opacity-80">{day.label.split(" ")[0]}</span>
-                      <span className="text-[10px] font-semibold">{day.date}</span>
+                      <span className="text-[9px] opacity-80">{day.label.split(" ")[0]}</span>
+                      <span className="text-[12px] font-bold">{day.date}</span>
                     </span>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-headline-sm text-headline-sm text-primary truncate">

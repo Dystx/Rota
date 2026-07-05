@@ -105,10 +105,11 @@ export function PlannerSingleScreen({
   };
 
   // Shared className for the inline editable sentence fields.
-  // Transparent background, ochre dashed underline, ochre text —
-  // they read as part of the sentence until you click them.
+  // Higher-contrast inputs on the dark planner background: subtle
+  // white pill background, thick ochre underline, ochre text that
+  // reads as part of the sentence until you click it.
   const sentenceField =
-    "bg-transparent border-0 border-b-2 border-dashed border-ochre-light/50 focus:border-ochre-light focus:outline-none text-ochre-light font-display-mobile md:font-display text-3xl md:text-5xl text-center min-w-0";
+    "mx-2 px-3 py-1 bg-white/10 rounded-md border-b-2 border-ochre-light focus:border-ochre-light focus:bg-white/25 focus:outline-none text-ochre-light font-display-mobile md:font-display text-3xl md:text-5xl text-center min-w-0 transition-colors";
 
   return (
     <main
@@ -200,10 +201,10 @@ export function PlannerSingleScreen({
               in one pass without navigating. */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <fieldset className="flex flex-col gap-3">
-              <legend className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-1">
+              <legend className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light mb-2 text-sm">
                 Mobility
               </legend>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-3">
                 <Pill
                   label="Car"
                   icon="car_rental"
@@ -220,10 +221,10 @@ export function PlannerSingleScreen({
             </fieldset>
 
             <fieldset className="flex flex-col gap-3">
-              <legend className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-1">
+              <legend className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light mb-2 text-sm">
                 Energy
               </legend>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-3">
                 <Pill
                   label="Calm"
                   active={vibe === "restorative"}
@@ -249,12 +250,15 @@ export function PlannerSingleScreen({
               type="submit"
               disabled={!canSubmit}
               data-testid="planner-synthesize"
-              className="bg-ochre-light text-primary font-label-ui text-label-ui px-8 py-4 rounded-lg shadow-sm hover:shadow-lg transition-all flex items-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+              // Larger, higher-contrast CTA. The previous px-8 py-4
+              // was small for the primary action — the user said
+              // better visibility of all texts and UI overall.
+              className="bg-ochre-dark text-white font-label-ui text-label-ui px-10 py-5 rounded-lg shadow-lg hover:bg-ochre-light hover:text-primary transition-all flex items-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary text-lg"
             >
               <span>{pending ? "Synthesizing…" : "Synthesize Itinerary"}</span>
               <span
                 aria-hidden
-                className="material-symbols-outlined group-hover:translate-x-1 transition-transform"
+                className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform"
               >
                 arrow_forward
               </span>
@@ -282,18 +286,28 @@ function Pill({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border transition-all font-label-ui text-label-ui ${
+      // Larger pills with stronger contrast. The previous
+      // px-4 py-2 + text-label-ui was hard to read on the dark
+      // background. Bumped to px-5 py-3 + text-base and added
+      // a checkmark icon when active so the selection is
+      // unambiguous.
+      className={`inline-flex items-center gap-2 px-5 py-3 rounded-full border-2 transition-all font-label-ui text-label-ui ${
         active
-          ? "border-ochre-light bg-ochre-light/15 text-ochre-light"
-          : "border-white/20 bg-white/5 text-linen-dark/80 hover:border-white/40"
+          ? "border-ochre-light bg-ochre-light/20 text-ochre-light shadow-md"
+          : "border-white/30 bg-white/10 text-linen-dark/90 hover:border-white/50 hover:bg-white/15"
       }`}
     >
       {icon ? (
-        <span aria-hidden className="material-symbols-outlined text-[18px]">
+        <span aria-hidden className="material-symbols-outlined text-[20px]">
           {icon}
         </span>
       ) : null}
-      {label}
+      <span>{label}</span>
+      {active ? (
+        <span aria-hidden className="material-symbols-outlined text-[18px]">
+          check_circle
+        </span>
+      ) : null}
     </button>
   );
 }

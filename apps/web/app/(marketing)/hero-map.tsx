@@ -169,8 +169,14 @@ function HeroGlobeWithSync({
       disableIntro
       className="absolute inset-0 h-full w-full"
       testId="hero-globe"
-      initialCenter={[...DEFAULT_HERO_FOCUS.center]}
-      initialZoom={DEFAULT_HERO_FOCUS.zoom}
+      // The user wants the FULL GLOBE visible and rotating in
+      // the hero — not zoomed in to Portugal. We start at
+      // EARTH_VIEW (zoom 0.8) so the entire planet fits, and
+      // the continuous rotation in GlobeWorkspace makes it
+      // spin. When the user clicks "Begin Journey" the camera
+      // flies to the home target.
+      initialCenter={[10, 25]}
+      initialZoom={0.8}
       onStopClick={onStopClick}
       projection={projection}
       onMapReady={(m) => {
