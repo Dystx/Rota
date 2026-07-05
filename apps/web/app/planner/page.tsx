@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { TopNav } from "../_components/top-nav";
 import { PlannerClient, type PlannerInitialState } from "./planner-client";
 
 export const metadata: Metadata = {
@@ -22,6 +21,12 @@ export const metadata: Metadata = {
  * Both pre-fill Step 1 (Where) and Step 2 (When) of the sequential
  * wizard. A user can change either during the wizard — the URL is
  * the source of truth only on entry.
+ *
+ * The page deliberately does NOT render TopNav: the sequential-step
+ * overlay is a full-screen cinematic experience with its own
+ * brand mark in the top-left. Showing the global nav on top of
+ * it created a double-branded look with the wordmark visible
+ * twice at the top of the viewport.
  */
 export default async function PlannerPage({
   searchParams
@@ -36,11 +41,6 @@ export default async function PlannerPage({
     initialDestination: destination
   };
 
-  return (
-    <>
-      <TopNav />
-      <PlannerClient initial={initial} />
-    </>
-  );
+  return <PlannerClient initial={initial} />;
 }
 

@@ -21,8 +21,8 @@ export function PageShell({
         <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[rgba(247,250,249,0.7)] backdrop-blur-2xl">
           <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-6 lg:px-12">
             <div className="flex items-center gap-4">
-              <p className="font-[family-name:var(--font-rota-display)] text-2xl text-[var(--color-foreground)]">
-                rumia.pt
+              <p className="font-[family-name:var(--font-rota-display)] text-2xl italic text-[var(--color-foreground)]">
+                Rumia
               </p>
               <div className="h-4 w-px bg-[var(--color-border)]" />
               <p className="text-[11px] uppercase tracking-[0.2em] font-medium text-[var(--color-muted-foreground)]">

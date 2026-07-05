@@ -202,7 +202,12 @@ function ProjectionToggle({
     <div
       role="tablist"
       aria-label="Map projection"
-      className="absolute right-6 top-6 z-20 inline-flex items-center gap-1 rounded-full border border-white/20 bg-glass-light/85 p-1 shadow-lg backdrop-blur-2xl"
+      // On mobile the hero headline ("Discover Intentionally.")
+      // sits in the upper third of the map, so a top-right toggle
+      // overlaps the heading. Anchor to the bottom-right on mobile
+      // and the top-right on desktop where the headline is offset
+      // by the larger hero height.
+      className="absolute bottom-4 right-4 z-20 inline-flex items-center gap-1 rounded-full border border-white/20 bg-glass-light/85 p-1 shadow-lg backdrop-blur-2xl md:bottom-auto md:right-6 md:top-6"
     >
       <ToggleButton
         label="3D Globe"
