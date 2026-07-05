@@ -76,3 +76,32 @@ a {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ---- Map / globe container ----
+   The MapLibre canvas is a black void before tiles load. This
+   gradient gives the empty container a designed surface so the
+   hero globe and the workspace map never read as a flat black
+   rectangle. The radial accents add the same "subtle depth
+   without competing with the map" treatment the hero already
+   uses. The grid pattern (--color-grid-pattern) is intentionally
+   faint — it's a fallback, not a feature. */
+[data-map-container] {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(206, 147, 63, 0.10), transparent 55%),
+    radial-gradient(ellipse at 70% 80%, rgba(60, 84, 71, 0.22), transparent 55%),
+    linear-gradient(180deg, var(--color-olive-dark) 0%, var(--color-primary) 100%);
+}
+[data-map-container]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--color-grid-pattern) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid-pattern) 1px, transparent 1px);
+  background-size: 48px 48px, 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  opacity: 0.35;
+  z-index: 0;
+}

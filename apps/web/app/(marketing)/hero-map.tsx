@@ -5,6 +5,27 @@ import * as React from "react";
 import { useMapStore } from "@/store/useMapStore";
 import { getDestinationPreset } from "@repo/spatial-engine";
 
+/**
+ * Structural type for the parts of a MapLibre Map we touch
+ * from the hero. The web app doesn't import `maplibre-gl`
+ * directly (it comes in via `@repo/spatial-engine`), so we
+ * type what we need locally instead of pulling the full
+ * `Map` type across the package boundary.
+ */
+interface HeroMapLibreLike {
+  getStyle: () => {
+    layers?: Array<{ id: string; type: string }>;
+  } | undefined;
+  setPaintProperty: (layerId: string, prop: string, value: unknown) => void;
+  on: (event: string, callback: () => void) => void;
+  flyTo: (opts: {
+    center: [number, number];
+    zoom?: number;
+    duration?: number;
+    essential?: boolean;
+  }) => void;
+}
+
 // MapLibre is browser-only — same SSR guard used on /explore.
 const GlobeWorkspace = dynamic(
   () => import("@repo/spatial-engine").then((mod) => mod.GlobeWorkspace),
@@ -84,7 +105,12 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
   const onStopClick = useMapStore((state) => state.selectStop);
 
   return (
-    <div className="absolute inset-0 z-0" data-testid="hero-map" data-projection={projection}>
+    <div
+      className="absolute inset-0 z-0"
+      data-testid="hero-map"
+      data-map-container=""
+      data-projection={projection}
+    >
       <HeroGlobeWithSync
         projection={projection}
         onStopClick={onStopClick}
@@ -118,7 +144,7 @@ function HeroGlobeWithSync({
   const setTargetCoordinates = useMapStore((state) => state.setTargetCoordinates);
   // Loose ref — the actual handle type is a MapLibre map from
   // inside the spatial engine; we only call `flyTo` on it.
-  const mapRef = React.useRef<{ flyTo: (opts: { center: [number, number]; zoom?: number; duration?: number; essential?: boolean }) => void } | null>(null);
+  const mapRef = React.useRef<HeroMapLibreLike | null>(null);
 
   // Track the target we last kicked off, so a stale `targetCoordinates
   // === null` cleanup doesn't fire mid-flight (the workspace camera-
@@ -182,6 +208,36 @@ function HeroGlobeWithSync({
       onMapReady={(m) => {
         // MapLibre's Map matches the structural type we use.
         mapRef.current = m as unknown as typeof mapRef.current;
+
+        // The base map style ships dark labels (ASIA / EUROPE /
+        // AFRICA) that disappear into the dark globe. Override the
+        // `text-color` paint property on every symbol layer to the
+        // ochre-light accent so the labels read on the hero. This
+        // runs on every `style.load` (initial mount + projection
+        // switch) so the override survives a 3D ↔ 2D toggle.
+        const overrideSymbolLabelColors = (map: HeroMapLibreLike) => {
+          const style = map.getStyle?.();
+          if (!style?.layers) return;
+          for (const layer of style.layers) {
+            if (layer.type !== "symbol") continue;
+            // text-color is the standard paint property on
+            // symbol layers; skip layers that don't have it.
+            try {
+              map.setPaintProperty(layer.id, "text-color", "#eab875");
+            } catch {
+              // Some symbol layers (e.g. icons) don't have
+              // text-color. Swallow the throw.
+            }
+          }
+        };
+        // `onMapReady` fires after the style has loaded once;
+        // re-apply on every subsequent style.load so the override
+        // survives a projection switch (the 2D ↔ 3D toggle
+        // triggers a style reload in some MapLibre versions).
+        const map = m as unknown as HeroMapLibreLike;
+        overrideSymbolLabelColors(map);
+        map.on("style.load", () => overrideSymbolLabelColors(map));
+
         // If a target arrived before the map mounted, fly to it now.
         const pending = useMapStore.getState().targetCoordinates;
         if (pending && (pending[0] !== 0 || pending[1] !== 0)) {
