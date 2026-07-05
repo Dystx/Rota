@@ -128,7 +128,7 @@ export function GuideProgress({ chapters, sticky = true, className }: GuideProgr
         className
       )}
     >
-      <nav className="hidden md:flex flex-col gap-3 pointer-events-auto rota-glass-panel rounded-[var(--radius-glass)] p-4">
+      <nav className="hidden lg:flex flex-col gap-3 pointer-events-auto rota-glass-panel rounded-[var(--radius-glass)] p-4">
         {chapters.map((chapter) => {
           const isActive = activeChapter === chapter.id;
           return (
