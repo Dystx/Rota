@@ -4,7 +4,7 @@ import { generateItineraryFromBrief } from "@repo/ai";
 import { getTripDraftById } from "@repo/db";
 import { getCheckoutPlan } from "@repo/payments";
 import { 
-  Badge, Breadcrumb, Button, PageShell, RevealSection, StatPill,
+  Badge, Breadcrumb, Button, EmptyState, PageShell, RevealSection, StatPill,
   CinematicGuide, GuideProgress, GuideChapter, CTASection,
   ItineraryTimeline, TimelineDay
 } from "@repo/ui";
@@ -346,18 +346,34 @@ export default async function TripDetailPage({
                 </div>
               </RevealSection>
             ) : (
-               <div className="text-center"><p className="text-lg text-[var(--color-muted-foreground)]">No pacing info available.</p></div>
+              <EmptyState
+                icon="route"
+                title="Route & pacing will appear here"
+                description="Once the brief is confirmed, the AI drafts a day-by-day route with confidence scores and a list of missing inputs. Until then, this section stays empty so we don't show guesswork."
+                variant="default"
+              />
             )}
           </div>
         </GuideChapter>
 
         <GuideChapter id="route" className="p-0 relative min-h-[60vh]">
-          {itinerary?.days && (
+          {itinerary?.days ? (
             <CinematicMapSection
               days={itinerary.days}
               tripId={tripId}
               reducedMotion={false}
               filmstripStops={filmstripStops}
+            />
+          ) : (
+            // No itinerary yet — show a friendly map-shaped empty
+            // state instead of a min-h-[60vh] gray void. Uses the
+            // `map` variant so the icon + copy fill the whole
+            // section evenly.
+            <EmptyState
+              icon="map"
+              title="The map will render once the route is drafted"
+              description="Day-by-day stops, filmstrip, and route arcs all live here. The map stays hidden until the AI has something concrete to draw."
+              variant="map"
             />
           )}
         </GuideChapter>

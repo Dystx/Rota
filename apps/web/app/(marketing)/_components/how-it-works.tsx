@@ -97,7 +97,11 @@ export function HowItWorks() {
             <h3 className="font-headline-md md:font-headline-lg text-headline-md md:text-headline-lg text-primary mb-3 leading-tight">
               {step.title}
             </h3>
-            <p className="font-body text-body text-on-surface-variant leading-relaxed">
+            {/* `min-h-[3.5rem]` keeps the body block at a fixed
+                2-3 line height so step 01 and step 03 don't read
+                shorter than step 02 (whose copy is slightly
+                longer). The cards stay visually balanced. */}
+            <p className="font-body text-body text-on-surface-variant leading-relaxed min-h-[3.5rem] md:min-h-[3.75rem]">
               {step.body}
             </p>
           </li>
