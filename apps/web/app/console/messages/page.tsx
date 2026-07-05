@@ -5,6 +5,7 @@ import { SiteFooter } from "../../_components/site-footer";
 import { ConversationList } from "./_components/conversation-list";
 import {
   MessageThread,
+  type ChatMessage,
   type SendMessageResult,
 } from "./_components/message-thread";
 import {
@@ -34,15 +35,7 @@ export default function ConsoleMessagesPage() {
   // Phase 7: read from /api/console/chat-messages on mount + when
   // activeId changes. Renders the operator's and traveler's
   // bubbles above the composer.
-  const [messages, setMessages] = useState<
-    Array<{
-      id: string;
-      conversationId: string;
-      authorRole: "operator" | "traveler";
-      body: string;
-      createdAt: string;
-    }>
-  >([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [messagesError, setMessagesError] = useState<string | null>(null);
   // Phase 7.2: itinerary-event history for the active
@@ -132,13 +125,7 @@ export default function ConsoleMessagesPage() {
         );
         const data = (await response.json()) as {
           ok?: boolean;
-          messages?: Array<{
-            id: string;
-            conversationId: string;
-            authorRole: "operator" | "traveler";
-            body: string;
-            createdAt: string;
-          }>;
+          messages?: ChatMessage[];
           error?: string;
         };
         if (cancelled) return;
