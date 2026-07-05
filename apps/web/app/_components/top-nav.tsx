@@ -11,7 +11,6 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/itineraries", label: "Itineraries" },
-  { href: "/expert-chat", label: "Expert Chat" },
   { href: "/vault", label: "Vault" }
 ];
 

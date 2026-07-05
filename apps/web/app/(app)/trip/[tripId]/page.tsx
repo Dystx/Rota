@@ -418,7 +418,7 @@ export default async function TripDetailPage({
         <GuideChapter id="next-step" className="p-0">
           <CTASection>
              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl md:text-5xl">Ready to proceed?</h2>
-             <p className="text-xl md:text-2xl text-[var(--color-cream)] max-w-2xl">Confirm your unlocking plan or request an expert human review to perfect these details.</p>
+             <p className="text-xl md:text-2xl text-[var(--color-cream)] max-w-2xl">Confirm your unlocking plan, chat with the destination specialist, or request an expert human review to perfect these details.</p>
              <div className="flex flex-wrap justify-center gap-4 mt-4">
                {tripCommerceState.canUnlock ? (
                  // The "Unlock Trip" CTA used to POST directly to the
@@ -436,6 +436,24 @@ export default async function TripDetailPage({
                    <Link href={`/trip/${tripId}/export`}>Export Options</Link>
                  </Button>
                ) : null}
+
+               {/* Expert chat is per-trip — the per-trip "Open
+                   expert chat" action lives here so the chat
+                   surface is reachable without a public nav
+                   link. The destination is the auth-gated
+                   /expert-chat?trip=<id> page. */}
+               <Button asChild variant="ghost" className="border border-[var(--color-paper)] text-[var(--color-paper)] hover:bg-white/10 text-lg px-8 py-3 h-auto">
+                 <Link href={`/expert-chat?trip=${tripId}`}>
+                   <span
+                     aria-hidden
+                     className="material-symbols-outlined text-[20px] mr-1"
+                     style={{ fontVariationSettings: "'FILL' 1" }}
+                   >
+                     forum
+                   </span>
+                   Open expert chat
+                 </Link>
+               </Button>
 
                {tripCommerceState.canRequestReview ? (
                  <form action={`/api/trips/${tripId}/review`} method="post">
