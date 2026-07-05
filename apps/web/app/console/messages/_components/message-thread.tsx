@@ -9,7 +9,7 @@ import {
   type FormEvent,
 } from "react";
 import type { TriageResult } from "@repo/ai";
-import { formatChatTimestamp, type Conversation } from "../_lib/conversations";
+import { formatChatTimestamp, type Day } from "../_lib/conversations";
 
 /**
  * Persisted chat row. Read-only on the client: the parent owns the
@@ -34,7 +34,7 @@ export type SendMessageResult =
   | { ok: false; error: string };
 
 interface MessageThreadProps {
-  activeConversation: Conversation;
+  activeDay: Day;
   messages: ReadonlyArray<ChatMessage>;
   messagesLoading: boolean;
   messagesError: string | null;
@@ -52,7 +52,7 @@ interface MessageThreadProps {
  * plus local UI state (draft, drag-over, submission status).
  */
 export function MessageThread({
-  activeConversation,
+  activeDay,
   messages,
   messagesLoading,
   messagesError,
@@ -86,13 +86,13 @@ export function MessageThread({
       .filter((m) => !knownIds.has(m.id))
       .map((m) => ({
         id: m.id,
-        conversationId: activeConversation.id,
+        conversationId: activeDay.id,
         authorRole: "operator" as const,
         body: m.body,
         createdAt: m.createdAt,
       }));
     return [...messages, ...optimistic];
-  }, [messages, sentMessages, activeConversation.id]);
+  }, [messages, sentMessages, activeDay.id]);
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -148,15 +148,15 @@ export function MessageThread({
       <header className="px-6 py-4 border-b border-olive-light/10 bg-white/40 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <img
-            src={activeConversation.avatarSrc.replace("40", "48")}
-            alt={`${activeConversation.name} avatar`}
+            src={activeDay.avatarSrc.replace("40", "48")}
+            alt={`${activeDay.name} avatar`}
             width={48}
             height={48}
             className="w-12 h-12 rounded-full object-cover"
           />
           <div>
             <h2 className="font-headline-sm text-headline-sm text-primary">
-              {activeConversation.name}
+              {activeDay.name}
             </h2>
             <div className="flex items-center gap-2 mt-0.5">
               <span
@@ -256,7 +256,7 @@ export function MessageThread({
             </p>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
               Send the first message below to start the conversation with{" "}
-              {activeConversation.name}.
+              {activeDay.name}.
             </p>
           </div>
         ) : null}
@@ -283,7 +283,7 @@ export function MessageThread({
               className="flex items-start gap-3"
             >
               <img
-                src={activeConversation.avatarSrc}
+                src={activeDay.avatarSrc}
                 alt=""
                 width={32}
                 height={32}

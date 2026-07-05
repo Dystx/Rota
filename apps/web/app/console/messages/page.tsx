@@ -17,10 +17,10 @@ import {
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { triageInboundMessage } from "../_components/message-triage";
 import type { TriageResult } from "@repo/ai";
-import { CONVERSATIONS } from "./_lib/conversations";
+import { DAYS } from "./_lib/conversations";
 
 export default function ConsoleMessagesPage() {
-  const [activeId, setActiveId] = useState<string>(CONVERSATIONS[0]!.id);
+  const [activeId, setActiveId] = useState<string>(DAYS[0]!.id);
   // Conversation-list search query. The search input's `value` is
   // bound to this; the filtered list is derived in the render.
   const [search, setSearch] = useState("");
@@ -184,8 +184,8 @@ export default function ConsoleMessagesPage() {
     void loadRecentEvents(activeId);
   }, [activeId, loadRecentEvents]);
 
-  const activeConversation =
-    CONVERSATIONS.find((c) => c.id === activeId) ?? CONVERSATIONS[0]!;
+  const activeDay =
+    DAYS.find((d) => d.id === activeId) ?? DAYS[0]!;
 
   // Phase 3.1: "Push to Timeline" submit callback. Network
   // concern lives in the page; the TriagePanel component handles
@@ -228,7 +228,7 @@ export default function ConsoleMessagesPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            conversationId: activeConversation.id,
+            conversationId: activeDay.id,
             body,
           }),
         });
@@ -250,7 +250,7 @@ export default function ConsoleMessagesPage() {
         };
       }
     },
-    [activeConversation.id]
+    [activeDay.id]
   );
 
   return (
@@ -271,9 +271,9 @@ export default function ConsoleMessagesPage() {
 
         <main id="main-content" className="relative z-10 flex-1 md:ml-64 h-screen flex gap-gutter p-container-padding-sm overflow-hidden">
           <h1 className="sr-only">Messaging Hub</h1>
-          {/* Column 1: Conversations */}
+          {/* Column 1: Itinerary Days */}
           <ConversationList
-            conversations={CONVERSATIONS}
+            days={DAYS}
             activeId={activeId}
             onSelect={(id) => {
               setActiveId(id);
@@ -288,7 +288,7 @@ export default function ConsoleMessagesPage() {
 
           {/* Column 2: Chat Terminal */}
           <MessageThread
-            activeConversation={activeConversation}
+            activeDay={activeDay}
             messages={messages}
             messagesLoading={messagesLoading}
             messagesError={messagesError}
@@ -300,7 +300,7 @@ export default function ConsoleMessagesPage() {
 
           {/* Column 3: Tools & Context */}
           <TriagePanel
-            activeConversation={activeConversation}
+            activeDay={activeDay}
             recentEvents={recentEvents}
             recentEventsLoading={recentEventsLoading}
             onRefreshRecent={loadRecentEvents}

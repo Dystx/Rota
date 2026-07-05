@@ -2,7 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import { SnippetCard } from "../../_components/snippet-card";
-import type { Conversation } from "../_lib/conversations";
+import type { Day } from "../_lib/conversations";
 
 /**
  * Pushed itinerary event as surfaced in the right-side timeline.
@@ -36,7 +36,7 @@ export type PushResult =
   | { ok: false; error: string };
 
 interface TriagePanelProps {
-  activeConversation: Conversation;
+  activeDay: Day;
   recentEvents: ReadonlyArray<ItineraryEvent>;
   recentEventsLoading: boolean;
   /** Called after a successful push so the parent can refetch. */
@@ -52,7 +52,7 @@ interface TriagePanelProps {
  * list.
  */
 export function TriagePanel({
-  activeConversation,
+  activeDay,
   recentEvents,
   recentEventsLoading,
   onRefreshRecent,
@@ -68,7 +68,7 @@ export function TriagePanel({
     const form = event.currentTarget;
     const formData = new FormData(form);
     const payload: PushPayload = {
-      conversationId: activeConversation.id,
+      conversationId: activeDay.id,
       eventType: (String(formData.get("eventType") ?? "activity")) as PushPayload["eventType"],
       title: String(formData.get("title") ?? "").trim(),
       eventDate: String(formData.get("eventDate") ?? ""),
@@ -94,7 +94,7 @@ export function TriagePanel({
       // Refresh the Recent pushes list so the new event appears
       // at the top. Reset non-required fields so the operator
       // can push a second event without first clearing the first.
-      onRefreshRecent(activeConversation.id);
+      onRefreshRecent(activeDay.id);
       form.reset();
     });
   }
@@ -173,7 +173,7 @@ export function TriagePanel({
         </header>
         <div className="p-4 flex-1 overflow-y-auto flex flex-col gap-4">
           <p className="font-body-md text-body-md text-on-primary/80">
-            Push a new event onto {activeConversation.name}&apos;s
+            Push a new event onto {activeDay.name}&apos;s
             itinerary. The change is logged and visible in the
             workspace.
           </p>

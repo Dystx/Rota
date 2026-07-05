@@ -1,49 +1,89 @@
 /**
  * Shared types + fixtures for the console /messages page.
  *
- * Extracted from the page component so the conversation data
- * and the `Conversation` type can be consumed by both the
- * page shell and the upcoming `<ConversationList>` /
- * `<MessageThread>` subcomponents without dragging 1067 lines
- * of JSX into every import.
+ * Extracted from the page component so the day data and the
+ * `Day` type can be consumed by both the page shell and the
+ * upcoming `<DayList>` / `<MessageThread>` subcomponents
+ * without dragging 1067 lines of JSX into every import.
  *
  * The fixtures are wireframe-quality (no real backend yet) —
  * they give the UI something to render with realistic shape
- * (avatar, region, timestamp, "last message" preview) so
- * the kanban + chat surfaces look right during design review.
- * When the realtime channel is wired up (Supabase
- * `conversation` + `message` tables) the data layer can
- * replace this fixture without touching the components.
+ * (date badge, title, summary) so the day-cards sidebar looks
+ * right during design review. The data model mirrors the
+ * reference's "Day 2 • Oct 13, Higashiyama Exploration"
+ * pattern: each day is a selectable card in the left rail
+ * that filters the chat thread in the center column.
+ *
+ * When the realtime channel is wired up (Supabase `itinerary`
+ * + `message` tables) the data layer can replace this fixture
+ * without touching the components.
  */
 
-export interface Conversation {
+export interface Day {
+  /** Stable id used as the active-day key. */
   id: string;
-  name: string;
-  region: string;
-  lastMessage: string;
-  timestamp: string;
+  /** Short day label, e.g. "Day 2". */
+  label: string;
+  /** Date pill, e.g. "Oct 13". */
+  date: string;
+  /** Headline describing the day's focus. */
+  title: string;
+  /** One-line summary shown in the card body. */
+  summary: string;
+  /** True for the first day so it boots selected. */
   active: boolean;
+  /** Optional accent stripe color (hex) for the date pill. */
+  accent: string;
+  /** Traveler name shown in the chat thread header. */
+  name: string;
+  /** Avatar URL shown in the chat thread header bubbles. */
   avatarSrc: string;
 }
 
-export const CONVERSATIONS: Conversation[] = [
+export const DAYS: Day[] = [
   {
-    id: "eleanor",
-    name: "Eleanor Vance",
-    region: "Kyoto, Japan",
-    lastMessage: "I\u2019d love to add that tea ceremony to the itinerary.",
-    timestamp: "10:42 AM",
+    id: "day-1",
+    label: "Day 1",
+    date: "Oct 12",
+    title: "Arrival in Kyoto",
+    summary: "Land at KIX, transfer to the ryokan, gentle walk in Gion.",
     active: true,
+    accent: "#2b3e34",
+    name: "Eleanor Vance",
     avatarSrc: "https://i.pravatar.cc/40?img=5"
   },
   {
-    id: "hastings",
-    name: "The Hasting Family",
-    region: "Tuscany, Italy",
-    lastMessage: "Could you confirm the car transfer?",
-    timestamp: "Yesterday",
+    id: "day-2",
+    label: "Day 2",
+    date: "Oct 13",
+    title: "Higashiyama Exploration",
+    summary: "Pre-dawn Kiyomizu-dera, Ryoan-ji at opening, tea ceremony.",
     active: false,
-    avatarSrc: "https://i.pravatar.cc/40?img=11"
+    accent: "#CE933F",
+    name: "Eleanor Vance",
+    avatarSrc: "https://i.pravatar.cc/40?img=5"
+  },
+  {
+    id: "day-3",
+    label: "Day 3",
+    date: "Oct 14",
+    title: "Arashiyama & Bamboo",
+    summary: "Early-morning bamboo grove, Tenryu-ji, river boat to Uji.",
+    active: false,
+    accent: "#4f6358",
+    name: "Eleanor Vance",
+    avatarSrc: "https://i.pravatar.cc/40?img=5"
+  },
+  {
+    id: "day-4",
+    label: "Day 4",
+    date: "Oct 15",
+    title: "Nishiki Market & Departure",
+    summary: "Last market run, craft stops, late checkout, KIX transfer.",
+    active: false,
+    accent: "#784d00",
+    name: "Eleanor Vance",
+    avatarSrc: "https://i.pravatar.cc/40?img=5"
   }
 ];
 
