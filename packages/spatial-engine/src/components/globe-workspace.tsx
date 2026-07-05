@@ -291,9 +291,21 @@ export function GlobeWorkspace({
         }
 
         if (!resolvedDisableIntro) {
+          // Three-beat intro:
+          //   1. "earth"    — wide globe view (zoom 1.4) so the user
+          //                    sees the planet before zooming in.
+          //   2. "europe"   — intermediate wide view of Europe so
+          //                    the zoom has a natural midpoint.
+          //   3. "home"     — the resolved initial target (Portugal
+          //                    at the caller's zoom). Without this
+          //                    third beat the camera ends on the
+          //                    "europe" view (zoom 4.2) and the
+          //                    search bar's "We are visiting Portugal"
+          //                    copy looks disconnected from the map.
           const intro = new CameraChoreography()
             .beat("earth", { center: [0, 30] as const, zoom: 1.4, duration: reducedMotion ? 0 : 1400 })
-            .beat("europe", { center: INTRO_HOME_CENTER, zoom: INTRO_HOME_ZOOM, duration: reducedMotion ? 0 : 1800 });
+            .beat("europe", { center: INTRO_HOME_CENTER, zoom: INTRO_HOME_ZOOM, duration: reducedMotion ? 0 : 1800 })
+            .beat("home", { center: resolvedInitialTarget.center, zoom: resolvedInitialTarget.zoom, duration: reducedMotion ? 0 : 1400 });
           try {
             await engine.playChoreography(intro);
           } catch {

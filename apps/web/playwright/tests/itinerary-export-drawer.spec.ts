@@ -50,6 +50,22 @@ test.describe("@smoke @itinerary-export-drawer itineraries export drawer (public
     await page.getByTestId("export-drawer-close").click();
     await expect(page.getByTestId("export-drawer")).toHaveAttribute("data-state", "closed");
   });
+
+  test("PDF action navigates to the auto-print view (?view=print&print=1)", async ({ page, context }) => {
+    await page.goto("/itineraries");
+    await page.locator('[data-testid^="itinerary-card-"]').first().click();
+
+    // PDF is the default option, so just clicking Execute opens the print view.
+    const popupPromise = context.waitForEvent("page");
+    await page.getByTestId("export-drawer-execute").click();
+    const popup = await popupPromise;
+    await popup.waitForLoadState("domcontentloaded");
+
+    expect(popup.url()).toContain("/export?view=print&print=1");
+
+    // The print view renders the print-now button as a manual fallback.
+    await expect(popup.getByTestId("print-now-button")).toBeVisible();
+  });
 });
 
 test.describe("@smoke @itinerary-export-drawer itineraries page (traveler persona)", () => {

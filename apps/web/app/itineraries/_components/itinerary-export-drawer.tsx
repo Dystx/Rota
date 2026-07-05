@@ -112,10 +112,17 @@ export function ItineraryExportDrawer({
     if (!trip) return;
     switch (selected) {
       case "pdf":
-        // Open the trip page in a new tab. The user can print from
-        // there with the browser's print dialog.
-        window.open(`/trip/${trip.id}`, "_blank", "noopener,noreferrer");
-        showToast("Opening trip — use Print to save as PDF.");
+        // Open the trip's print-friendly view in a new tab AND
+        // fire the browser print dialog immediately via ?print=1.
+        // That gives the user a true 1-click PDF flow: the system
+        // print dialog appears the moment the new tab loads, with
+        // "Save as PDF" as a destination.
+        window.open(
+          `/trip/${trip.id}/export?view=print&print=1`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+        showToast("Opening print dialog — choose Save as PDF.");
         break;
       case "calendar":
         downloadIcs(trip);

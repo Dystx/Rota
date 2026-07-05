@@ -131,6 +131,7 @@ export default function ExpertChatPage() {
           id="main-content"
           className="flex-1 flex overflow-hidden max-w-[1600px] mx-auto w-full"
         >
+          <h1 className="sr-only">Kyoto Autumn Retreat — Expert Chat</h1>
           {/* Left Side: Visual Timeline */}
           <aside className="hidden lg:flex flex-col w-1/3 max-w-sm border-r border-olive-light/10 bg-surface-container-low/50 overflow-y-auto scrollbar-hide p-container-padding-lg">
             <div className="mb-section-gap">

@@ -21,6 +21,7 @@ import { buildEmailPreview } from "@repo/emails";
 import { buildTripSharePath, listTripExportOptions } from "@/lib/trip-export";
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { PrintAutoTrigger } from "./_components/print-auto-trigger";
 
 function getFormatFromHref(href: string) {
   if (href.includes("view=print")) return "print";
@@ -28,10 +29,16 @@ function getFormatFromHref(href: string) {
   return match ? match[1] : "unknown";
 }
 
-function renderPrintView(title: string, tripId: string, itinerary: Awaited<ReturnType<typeof generateItineraryFromBrief>> | null) {
+function renderPrintView(
+  title: string,
+  tripId: string,
+  itinerary: Awaited<ReturnType<typeof generateItineraryFromBrief>> | null,
+  autoPrint: boolean
+) {
   return (
     <PageShell variant="app">
       <div data-testid="print-view" className="hidden" />
+      <PrintAutoTrigger auto={autoPrint} />
       <SectionHeading
         eyebrow={`Trip ${tripId}`}
         title={`${title} print view`}
@@ -48,6 +55,7 @@ function renderPrintView(title: string, tripId: string, itinerary: Awaited<Retur
               <Button asChild>
                 <Link href={`/trip/${tripId}/export`}>Back to export options</Link>
               </Button>
+              <PrintAutoTrigger auto={false} />
               <Button asChild variant="ghost">
                 <Link href={`/trip/${tripId}`}>Back to trip</Link>
               </Button>
@@ -83,10 +91,13 @@ export default async function TripExportPage({
   searchParams
 }: {
   params: Promise<{ tripId: string }>;
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; print?: string }>;
 }) {
   const { tripId } = await params;
-  const { view } = await searchParams;
+  const { view, print: printFlag } = await searchParams;
+  // `?print=1` opens the browser print dialog automatically so
+  // the 1-click PDF flow from the export drawer fires immediately.
+  const autoPrint = printFlag === "1";
   let trip = null;
   let itinerary = null;
   let infoMessage = "";
@@ -121,7 +132,7 @@ export default async function TripExportPage({
   }
 
   if (view === "print") {
-    return renderPrintView(trip?.title ?? "Trip export", tripId, itinerary);
+    return renderPrintView(trip?.title ?? "Trip export", tripId, itinerary, autoPrint);
   }
 
   const tripCommerceState = getTripCommerceState({
