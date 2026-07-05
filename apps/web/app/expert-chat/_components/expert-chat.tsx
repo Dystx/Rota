@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { toast } from "@repo/ui";
 import { TopNav } from "../../_components/top-nav";
 import { SiteFooter } from "../../_components/site-footer";
 
@@ -389,7 +390,15 @@ export function ExpertChat({ tripId: _tripId }: ExpertChatProps) {
                         <button
                           type="button"
                           data-testid="chat-recommendation-accept"
-                          onClick={() => setRecommendationStatus("added")}
+                          onClick={() => {
+                            setRecommendationStatus("added");
+                            // Real state change — the recommendation
+                            // is appended to the day plan. The in-page
+                            // "added" banner is the persistent signal;
+                            // the toast is the instant feedback that
+                            // confirms the click landed.
+                            toast.success("Added to your itinerary");
+                          }}
                           className="px-4 py-2 bg-ochre-light text-primary font-label-ui text-label-ui rounded-lg hover:bg-ochre-dark transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                         >
                           Add to Itinerary
