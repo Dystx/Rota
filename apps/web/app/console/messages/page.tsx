@@ -11,6 +11,7 @@ import {
 } from "react";
 import { SiteFooter } from "../../_components/site-footer";
 import { SnippetCard } from "../_components/snippet-card";
+import { ConversationList } from "./_components/conversation-list";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { triageInboundMessage } from "../_components/message-triage";
 import type { TriageResult } from "@repo/ai";
@@ -288,109 +289,19 @@ export default function ConsoleMessagesPage() {
         <main id="main-content" className="relative z-10 flex-1 md:ml-64 h-screen flex gap-gutter p-container-padding-sm overflow-hidden">
           <h1 className="sr-only">Messaging Hub</h1>
           {/* Column 1: Conversations */}
-          <aside className="w-[320px] flex-shrink-0 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
-            <header className="p-4 border-b border-olive-light/10 flex items-center justify-between shrink-0">
-              <h2 className="font-headline-sm text-headline-sm text-primary">
-                Active Threads
-              </h2>
-              <button
-                type="button"
-                aria-label="Filter conversations"
-                className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-              >
-                <span aria-hidden className="material-symbols-outlined">
-                  filter_list
-                </span>
-              </button>
-            </header>
-            <div className="p-3 border-b border-olive-light/10 bg-surface-container-lowest/50">
-              <label className="relative block">
-                <span className="sr-only">Search conversations</span>
-                <span
-                  aria-hidden
-                  className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
-                >
-                  search
-                </span>
-                <input
-                  type="search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by name, region, or last message…"
-                  data-testid="conversations-search"
-                  className="w-full font-body-md text-body-md pl-10 pr-4 py-2 rounded-lg bg-white/60 border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light"
-                />
-              </label>
-            </div>
-            <ul className="flex-1 overflow-y-auto">
-              {CONVERSATIONS
-                .filter((conversation) => {
-                  const q = search.trim().toLowerCase();
-                  if (!q) return true;
-                  return (
-                    conversation.name.toLowerCase().includes(q) ||
-                    conversation.region.toLowerCase().includes(q) ||
-                    conversation.lastMessage.toLowerCase().includes(q)
-                  );
-                })
-                .map((conversation) => {
-                const isSelected = conversation.id === activeId;
-                return (
-                <li key={conversation.id}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveId(conversation.id);
-                      // Reset the "new since you looked" counter
-                      // when the operator opens a conversation.
-                      setIncomingCount(0);
-                    }}
-                    aria-pressed={isSelected}
-                    className={`w-full text-left p-4 border-b border-olive-light/5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-1 ${
-                      isSelected
-                        ? "bg-surface-container border-l-4 border-ochre-light"
-                        : "hover:bg-white/40"
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="relative shrink-0">
-                        <img
-                          src={conversation.avatarSrc}
-                          alt={`${conversation.name} avatar`}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                        {conversation.active ? (
-                          <span
-                            aria-hidden
-                            className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-olive-light border-2 border-surface-container"
-                          />
-                        ) : null}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <h3 className="font-headline-sm text-headline-sm text-primary truncate">
-                            {conversation.name}
-                          </h3>
-                          <span className="font-mono-technical text-mono-technical text-on-surface-variant shrink-0">
-                            {conversation.timestamp}
-                          </span>
-                        </div>
-                        <span className="inline-block font-mono-micro text-mono-micro uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded mt-0.5">
-                          {conversation.region}
-                        </span>
-                        <p className="font-body-md text-body-md text-on-surface-variant truncate mt-1">
-                          {conversation.lastMessage}
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                </li>
-                );
-              })}
-            </ul>
-          </aside>
+          <ConversationList
+            conversations={CONVERSATIONS}
+            activeId={activeId}
+            onSelect={(id) => {
+              setActiveId(id);
+              // Reset the "new since you looked" counter
+              // when the operator opens a conversation.
+              setIncomingCount(0);
+            }}
+            search={search}
+            onSearchChange={setSearch}
+            incomingCount={incomingCount}
+          />
 
           {/* Column 2: Chat Terminal */}
           <section className="flex-1 min-w-0 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
