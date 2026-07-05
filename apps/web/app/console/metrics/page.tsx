@@ -40,7 +40,7 @@ export default function ConsoleMetricsPage() {
   return (
     <>
       <div className="min-h-screen flex flex-col bg-background relative">
-        <main id="main-content" className="flex-1 md:ml-64 p-container-padding-lg max-w-full mx-auto w-full flex flex-col gap-section-gap relative z-10 overflow-x-hidden">
+        <main id="main-content" className="flex-1 md:ml-64 p-container-padding-lg w-full flex flex-col gap-section-gap relative z-10 overflow-x-hidden">
           <header className="mb-4">
             <h1 className="font-headline-lg text-headline-lg text-primary">
               Global Metrics Dashboard
@@ -82,8 +82,8 @@ export default function ConsoleMetricsPage() {
             />
           </section>
 
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-gutter min-w-0">
-            <div className="lg:col-span-2 min-w-0">
+          <section className="grid grid-cols-1 lg:grid-cols-5 gap-gutter min-w-0">
+            <div className="lg:col-span-3 min-w-0">
               <VolumeChart weekly={[...WEEKLY_BARS]} />
             </div>
 
@@ -97,7 +97,7 @@ export default function ConsoleMetricsPage() {
                     key={region.name}
                     className="flex items-center justify-between gap-2 p-3 rounded-lg border border-transparent hover:border-outline/10 hover:bg-surface-variant/50 cursor-pointer focus-within:ring-2 focus-within:ring-ochre-light min-w-0"
                   >
-                    <div className="flex flex-col min-w-0">
+                    <div className="flex flex-col min-w-0 flex-1">
                       <span className="font-label-ui text-label-ui text-primary truncate">
                         {region.name}
                       </span>
@@ -105,7 +105,7 @@ export default function ConsoleMetricsPage() {
                         {region.active}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-col items-end shrink-0 gap-0.5">
                       <span className="font-label-ui text-label-ui text-primary">
                         {region.share}
                       </span>
