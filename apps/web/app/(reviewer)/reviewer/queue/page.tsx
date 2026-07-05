@@ -4,6 +4,7 @@ import { filterActiveReviewerAssignments, isPersistenceConfigError, listReviewer
 import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatusPill } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
+import { RequireReviewerAuth } from "../_components/require-reviewer-auth";
 
 export const metadata: Metadata = {
   title: "Reviewer Queue",
@@ -110,11 +111,7 @@ export default async function ReviewerQueuePage() {
           </CardContent>
         </Card>
       ) : notSignedIn ? (
-        <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
-          <CardContent className="p-0">
-            <EmptyState variant="table" title="Sign in required" description="Sign in with a linked reviewer account to load your active queue." />
-          </CardContent>
-        </Card>
+        <RequireReviewerAuth signedIn={false} noun="queue" />
       ) : processedTrips.length === 0 ? (
         <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="p-0">

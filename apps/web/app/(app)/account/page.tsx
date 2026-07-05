@@ -6,6 +6,7 @@ import { getCheckoutPlan } from "@repo/payments";
 import { ArchiveLayout, Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { BehaviorConsentToggle } from "./_components/behavior-consent-toggle";
 import { signOutAction } from "./_actions/sign-out";
 import { SignOutButton } from "./_components/sign-out-button";
@@ -29,8 +30,7 @@ function formatDate(value: string) {
 }
 
 export default async function AccountPage() {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getCurrentUser();
 
   let trips = [] as Awaited<ReturnType<typeof listTripDrafts>>;
   let infoMessage = "";

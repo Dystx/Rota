@@ -21,6 +21,7 @@ import { buildEmailPreview } from "@repo/emails";
 import { buildTripSharePath, listTripExportOptions } from "@/lib/trip-export";
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { PrintAutoTrigger } from "./_components/print-auto-trigger";
 
 function getFormatFromHref(href: string) {
@@ -102,8 +103,7 @@ export default async function TripExportPage({
   let itinerary = null;
   let infoMessage = "";
 
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getCurrentUser();
 
   try {
     trip = await getTripDraftById(tripId);

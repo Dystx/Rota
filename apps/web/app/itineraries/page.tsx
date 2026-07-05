@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { getTripsForUser } from "@repo/db";
 import { ItinerarySearch } from "./_components/itinerary-search";
 
@@ -17,8 +17,7 @@ import { ItinerarySearch } from "./_components/itinerary-search";
  * hardcoded "Kyoto Autumn Retreat" wireframe is gone.
  */
 export default async function ItinerariesPage() {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getCurrentUser();
   const userId = user?.id ?? null;
   const trips = await getTripsForUser(userId);
 

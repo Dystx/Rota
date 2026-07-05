@@ -1,6 +1,7 @@
 import { getReviewerById, isPersistenceConfigError } from "@repo/db";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState, ErrorState, PageShell, SectionHeading, StatPill } from "@repo/ui";
 import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
+import { RequireReviewerAuth } from "../../_components/require-reviewer-auth";
 
 export default async function ReviewerProfilePage() {
   let reviewer = null as Awaited<ReturnType<typeof getReviewerById>>;
@@ -50,11 +51,7 @@ export default async function ReviewerProfilePage() {
           </CardContent>
         </Card>
       ) : notSignedIn ? (
-        <Card className="mt-8 border-[var(--color-border)] shadow-sm bg-white/60">
-          <CardContent className="p-0">
-            <EmptyState variant="table" title="Sign in required" description="Sign in with a linked reviewer account to load your persisted profile." />
-          </CardContent>
-        </Card>
+        <RequireReviewerAuth signedIn={false} noun="profile" />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_1fr] xl:grid-cols-[0.9fr_1.1fr] mt-6">
           <Card data-testid="profile-card" className="min-w-0 break-words border-[var(--color-border)] shadow-sm bg-white/60">

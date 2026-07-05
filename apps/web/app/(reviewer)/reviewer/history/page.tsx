@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getReviewerById, isPersistenceConfigError, listReviewerAssignments } from "@repo/db";
 import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatPill, StatusPill } from "@repo/ui";
 import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
+import { RequireReviewerAuth } from "../../_components/require-reviewer-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -92,11 +93,7 @@ export default async function ReviewerHistoryPage() {
           </CardContent>
         </Card>
       ) : notSignedIn ? (
-        <Card className="mt-8 border-[var(--color-border)] shadow-sm bg-white/60">
-          <CardContent className="p-0">
-            <EmptyState variant="table" title="Sign in required" description="Sign in with a linked reviewer account to load your persisted history." />
-          </CardContent>
-        </Card>
+        <RequireReviewerAuth signedIn={false} noun="history" />
       ) : (
         <>
           <div data-testid="history-table" className="hidden md:block mt-8">

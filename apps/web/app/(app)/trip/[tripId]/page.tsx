@@ -11,6 +11,7 @@ import {
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { resolveCoverImage } from "@/lib/trip-cover";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { CinematicHero } from "./_components/cinematic-hero";
 import CinematicMapSection from "./_components/cinematic-map-section";
 import { PaceToneControl } from "./_components/pace-tone-control";
@@ -93,8 +94,7 @@ export default async function TripDetailPage({
   searchParams: Promise<{ review?: string; unlock?: string }>;
 }) {
   const { tripId } = await params;
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getCurrentUser();
   let trip = null;
   let itinerary: GeneratedItinerary | null = null;
 
