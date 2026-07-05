@@ -60,13 +60,29 @@ export function IntersectionObserverGate({
         if (entries.some((entry) => entry.isIntersecting)) {
           setIsIntersecting(true);
           observer.disconnect();
+          if (fallbackTimer !== null) window.clearTimeout(fallbackTimer);
         }
       },
       { rootMargin }
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+
+    // Fallback: if the observer doesn't fire within 1.5s (e.g. the
+    // user lands on the page with the section already above the
+    // fold, or Playwright's full-page screenshot scrolls past
+    // faster than the observer can fire), open the gate anyway.
+    // The observer + fallback are idempotent — whoever fires first
+    // wins, and the other is a no-op once `isIntersecting` is true.
+    const fallbackTimer = window.setTimeout(() => {
+      setIsIntersecting(true);
+      observer.disconnect();
+    }, 1500);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallbackTimer);
+    };
   }, [rootMargin]);
 
   if (isIntersecting) {

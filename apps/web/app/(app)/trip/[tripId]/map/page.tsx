@@ -119,8 +119,27 @@ export default async function TripMapPage({
             {infoMessage ? (
               <RevealSection delayMs={120}>
                 <Card>
-                  <CardContent className="pt-6">
-                    <p className="rota-muted text-sm">{infoMessage}</p>
+                  <CardContent className="pt-6 space-y-4">
+                    <div>
+                      <p className="font-medium text-foreground">Trip not found</p>
+                      <p className="rota-muted text-sm mt-1">
+                        We couldn&apos;t find a saved itinerary for trip <code className="font-mono text-xs bg-paper px-1.5 py-0.5 rounded">{tripId}</code>. It may have been deleted, or the link is wrong.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      <a
+                        href="/trip/new"
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-ink text-cream text-sm font-medium hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 transition-colors"
+                      >
+                        Plan a new trip
+                      </a>
+                      <a
+                        href="/"
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-olive-light/30 text-ink text-sm font-medium hover:bg-olive-light/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 transition-colors"
+                      >
+                        Back to home
+                      </a>
+                    </div>
                   </CardContent>
                 </Card>
               </RevealSection>

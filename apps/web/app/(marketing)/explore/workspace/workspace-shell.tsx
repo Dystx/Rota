@@ -51,7 +51,14 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
       if (feature.geometry.type !== "Point") continue;
       const label = (feature.properties as Record<string, unknown>)?.label;
       if (typeof label !== "string") continue;
-      const [lng, lat] = feature.geometry.coordinates as [number, number];
+      // Guard against null/undefined coordinates — some fixture
+      // points may be "label-only" markers that the engine renders
+      // without a spatial position. Indexing null[0] would throw
+      // "Cannot read properties of null (reading '0')".
+      const coords = feature.geometry.coordinates;
+      if (!Array.isArray(coords) || coords.length < 2) continue;
+      const [lng, lat] = coords as [number, number];
+      if (typeof lng !== "number" || typeof lat !== "number") continue;
       map.set(label.toLowerCase(), [lng, lat]);
     }
     return map;
