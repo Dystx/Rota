@@ -1,63 +1,95 @@
-import * as React from "react";
+import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 
-export type EmptyStateVariant = "cinematic" | "compact" | "table" | "form" | "map";
-
-export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: EmptyStateVariant;
+interface EmptyStateProps {
+  /** Material Symbols icon name (e.g. "explore", "map", "inbox"). */
+  icon?: string;
+  /** Primary heading — kept short ("No itineraries yet"). */
   title: string;
+  /** One sentence of supporting copy. */
   description?: string;
-  icon?: React.ReactNode;
-  action?: React.ReactNode;
+  /** Optional primary action (rendered as a styled button row). */
+  action?: ReactNode;
+  /** Optional secondary action next to the primary one. */
+  secondaryAction?: ReactNode;
+  /** Visual size — `default` for list pages, `hero` for empty
+   *  first-visit states that need to fill the viewport. */
+  size?: "default" | "hero";
+  className?: string;
 }
 
-export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
-  (
-    { variant = "cinematic", title, description, icon, action, className, ...props },
-    ref
-  ) => {
-    const baseClasses = "flex flex-col items-center justify-center text-center";
-
-    const variantClasses = {
-      cinematic: "min-h-[60vh] py-16 md:py-24 px-4 sm:px-8 max-w-2xl mx-auto",
-      compact: "py-8 px-4",
-      table: "py-16 px-4 bg-[rgba(255,255,255,0.4)] border-b border-[var(--color-border)]",
-      form: "py-12 px-4 border border-dashed border-[var(--color-border)] rounded-[var(--radius-glass)]",
-      map: "absolute inset-0 bg-[rgba(253,251,247,0.85)] backdrop-blur-sm z-10",
-    };
-
-    return (
+/**
+ * EmptyState — the contract every data-driven page uses when its
+ * list/fetch returns nothing. Centralises the icon + heading +
+ * description + action pattern so the visual treatment is
+ * consistent across /itineraries, /admin/places, /admin/regions,
+ * /admin/quality, /reviewer/queue, etc.
+ *
+ * Why this matters: an empty list with no guidance is the
+ * single biggest drop-off surface in a content app. Every empty
+ * state should answer "what do I do now?" — that's what the
+ * `action` slot is for.
+ */
+export function EmptyState({
+  icon = "inbox",
+  title,
+  description,
+  action,
+  secondaryAction,
+  size = "default",
+  className
+}: EmptyStateProps) {
+  const isHero = size === "hero";
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={cn(
+        "flex flex-col items-center justify-center text-center",
+        isHero
+          ? "min-h-[60vh] gap-6 px-6 py-16"
+          : "gap-3 px-4 py-12 rounded-2xl border border-dashed border-olive-light/30 bg-white/30",
+        className
+      )}
+    >
       <div
-        ref={ref}
-        className={cn(baseClasses, variantClasses[variant], className)}
-        {...props}
-      >
-        {icon && (
-          <div className={cn("mb-6 text-[var(--color-muted-foreground)]", variant === 'cinematic' ? 'scale-150 mb-8' : '')}>
-            {icon}
-          </div>
+        aria-hidden
+        className={cn(
+          "flex items-center justify-center rounded-full bg-olive-light/10 text-olive-light",
+          isHero ? "w-16 h-16 mb-2" : "w-12 h-12"
         )}
-        <h3
+      >
+        <span
+          className="material-symbols-outlined"
+          style={{ fontSize: isHero ? 32 : 24 }}
+        >
+          {icon}
+        </span>
+      </div>
+      <h2
+        className={cn(
+          "font-display text-ink",
+          isHero ? "text-3xl md:text-4xl" : "text-xl"
+        )}
+      >
+        {title}
+      </h2>
+      {description ? (
+        <p
           className={cn(
-            "text-[var(--color-foreground)]",
-            variant === "cinematic" ? "rota-heading mb-4" : "font-medium text-lg mb-2"
+            "text-ink-soft max-w-md mx-auto",
+            isHero ? "text-base" : "text-sm"
           )}
         >
-          {title}
-        </h3>
-        {description && (
-          <p
-            className={cn(
-              "text-[var(--color-muted-foreground)] max-w-md mx-auto",
-              variant === "cinematic" ? "text-lg" : "text-sm"
-            )}
-          >
-            {description}
-          </p>
-        )}
-        {action && <div className={cn("mt-8", variant === 'cinematic' ? 'mt-12' : '')}>{action}</div>}
-      </div>
-    );
-  }
-);
-EmptyState.displayName = "EmptyState";
+          {description}
+        </p>
+      ) : null}
+      {action || secondaryAction ? (
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+          {action}
+          {secondaryAction}
+        </div>
+      ) : null}
+    </div>
+  );
+}
