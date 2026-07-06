@@ -24,6 +24,7 @@ export * from "./core/types";
 export * from "./core/map-style-provider";
 export * from "./core/camera-controller";
 export * from "./core/telemetry-service";
+export { setupMapLibreErrorSuppression } from "./core/maplibre-error-suppression";
 
 export {
   createDiscoveryEngine,

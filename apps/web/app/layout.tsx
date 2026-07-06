@@ -5,6 +5,7 @@ import "./globals.css";
 import { WebVitalsReporter } from "./web-vitals-reporter";
 import { MotionProvider, ToastViewport, BackToTop } from "@repo/ui";
 import { RegisterServiceWorker } from "./_components/register-sw";
+import { MapLibreErrorSuppressor } from "./_components/maplibre-error-suppressor";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -109,6 +110,7 @@ export default function RootLayout({
         </a>
         <WebVitalsReporter />
         <RegisterServiceWorker />
+        <MapLibreErrorSuppressor />
         <MotionProvider>{children}</MotionProvider>
         <ToastViewport />
         <BackToTop />
