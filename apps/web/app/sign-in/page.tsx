@@ -30,7 +30,11 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   return (
     <div className="min-h-screen flex flex-col bg-paper">
       <TopNav />
-      <main id="main-content" className="flex-1 flex items-center justify-center px-6 py-16 pt-[112px]">
+      <main
+        id="main-content"
+        data-map-container=""
+        className="flex-1 flex items-center justify-center px-6 py-16 pt-[112px]"
+      >
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="font-display text-4xl text-ink mb-3">
@@ -38,6 +42,9 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             </h1>
             <p className="text-ink-soft text-base">
               We&apos;ll email you a one-time link. No password to remember.
+            </p>
+            <p className="mt-4 font-display text-sm italic text-ochre-dark/80 max-w-xs mx-auto">
+              &ldquo;The trip was crafted around our family pace — not the other way around.&rdquo;
             </p>
           </div>
 
