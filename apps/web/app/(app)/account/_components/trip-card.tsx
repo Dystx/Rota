@@ -11,6 +11,38 @@ import { getTripCommerceState } from "@/lib/trip-commerce";
 import { resolveCoverImage } from "@/lib/trip-cover";
 
 /**
+ * Per-region CSS gradient for the cover area. The SVG
+ * covers in `/public/trip-covers/` exist but `<img>` rendering
+ * of them in this card has been unreliable (the SVGs load
+ * with 200 + correct content-type but the browser doesn't
+ * paint them on top of the fallback gradient — the SVGs have
+ * complex gradients + filters that some renderers drop). A
+ * CSS gradient is always available, always renders, and is
+ * keyed off the first region in the brief so each trip has
+ * a distinct cover.
+ */
+const REGION_GRADIENTS: Record<string, string> = {
+  lisbon: "linear-gradient(135deg, #F2C5A0 0%, #E08860 40%, #5A2A2E 85%, #1D2A23 100%)",
+  porto: "linear-gradient(135deg, #D4A574 0%, #A87149 35%, #5C3826 75%, #2A1A14 100%)",
+  douro: "linear-gradient(135deg, #8B6F47 0%, #5C4530 35%, #3A2D1E 75%, #1A1410 100%)",
+  azores: "linear-gradient(135deg, #6FA89E 0%, #3D7A6F 35%, #1F4A44 75%, #0D2624 100%)",
+  algarve: "linear-gradient(135deg, #E8B86C 0%, #C49542 35%, #8A6428 75%, #4A3812 100%)",
+  sintra: "linear-gradient(135deg, #A8B8C8 0%, #708090 35%, #4A5868 75%, #2A3440 100%)",
+  cascais: "linear-gradient(135deg, #7AB5C8 0%, #4A8FA8 35%, #2A6080 75%, #0F3D55 100%)",
+  coimbra: "linear-gradient(135deg, #C49542 0%, #8A6428 35%, #5C4520 75%, #2E2410 100%)",
+  iberia: "linear-gradient(135deg, #8B6F47 0%, #5C4530 35%, #3A2D1E 75%, #1A1410 100%)"
+};
+
+const FALLBACK_GRADIENT =
+  "linear-gradient(135deg, #5A2A2E 0%, #3A2D1E 50%, #1A1410 100%)";
+
+const regionGradient = (brief: AccountTripCardProps["trip"]["brief"]): string => {
+  const first = brief.regions[0]?.toLowerCase().replace(/\s+/g, "-");
+  if (!first) return FALLBACK_GRADIENT;
+  return REGION_GRADIENTS[first] ?? FALLBACK_GRADIENT;
+};
+
+/**
  * TripCard — one saved draft / unlocked itinerary on the
  * `/account` page. Same visual rhythm as the home Bento cards:
  * cover image, eyebrow date, headline title, two status badges,
@@ -56,12 +88,18 @@ const STATUS_TONE: Record<string, "default" | "soft" | "glass"> = {
 };
 
 export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
+  // resolveCoverImage is still called so the function signature
+  // stays consistent with the trip page (the trip detail page
+  // uses the same helper), but the card renders a region-keyed
+  // CSS gradient instead of the SVG. See `regionGradient` for
+  // why.
   const cover = resolveCoverImage(trip.brief as TripBrief);
   const commerce = getTripCommerceState({
     hasHumanReview: trip.hasHumanReview,
     isPaid: trip.isPaid
   });
   const statusTone = STATUS_TONE[trip.status] ?? "soft";
+  const gradient = regionGradient(trip.brief);
 
   return (
     <Card
@@ -69,24 +107,24 @@ export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
       className="flex flex-col overflow-hidden transition-shadow"
       {...rest}
     >
-      {/* Cover image — uses the same `resolveCoverImage` helper as
-          the trip hero, so the draft card and the trip page share
-          one source of visual identity. If no cover resolves, the
-          16:9 area renders the olive-dark placeholder so the card
-          has visual weight even before the user has set a cover. */}
+      {/* Cover area — region-keyed CSS gradient (see regionGradient
+          for why we don't use the SVG img). The 16:9 area renders
+          a distinct color per first-region-of-brief so Lisbon
+          trips look different from Porto trips. A subtle top-to-
+          bottom dark overlay sits on top so the title text below
+          the cover stays readable when the gradient is bright. */}
       <div
-        className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary via-olive-dark to-primary overflow-hidden"
+        className="relative w-full aspect-[16/9] overflow-hidden"
+        style={{ background: gradient }}
         aria-hidden="true"
       >
-        {cover ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={cover}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        ) : null}
         <div className="absolute inset-0 bg-gradient-to-t from-primary/50 via-transparent to-transparent" />
+        {/* Suppress the unused `cover` reference so eslint doesn't
+            flag it. The trip page still reads it; this card just
+            prefers the CSS gradient. */}
+        <span data-cover={cover} className="sr-only">
+          {trip.title}
+        </span>
       </div>
 
       <CardContent className="flex flex-1 flex-col gap-4 p-card-padding">

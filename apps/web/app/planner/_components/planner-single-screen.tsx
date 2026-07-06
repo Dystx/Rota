@@ -209,10 +209,11 @@ export function PlannerSingleScreen({
 
           {/* Compact pill selectors for transport + vibe using the
               shared `ChipGroup` primitive (WAI-ARIA radiogroup with
-              arrow-key navigation built in). Labels are visible
-              above each group for clarity. */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="flex flex-col gap-3">
+              arrow-key navigation built in). The two groups sit
+              side-by-side, centered as a unit so the layout matches
+              the centered H1 above. On mobile they stack. */}
+          <div className="flex flex-col items-center gap-8 md:flex-row md:justify-center md:items-start md:gap-12">
+            <div className="flex flex-col gap-3 items-center md:items-start">
               <label className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm">
                 Mobility
               </label>
@@ -228,7 +229,7 @@ export function PlannerSingleScreen({
               />
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 items-center md:items-start">
               <label className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm">
                 Energy
               </label>
@@ -244,8 +245,9 @@ export function PlannerSingleScreen({
             </div>
           </div>
 
-          {/* Synthesize CTA. */}
-          <div className="flex justify-end">
+          {/* Synthesize CTA. Centered to match the H1 + selector
+              rhythm above. */}
+          <div className="flex justify-center">
             <Button
               type="submit"
               disabled={!canSubmit}

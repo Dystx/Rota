@@ -44,7 +44,7 @@ export function PageShell({
           </div>
         </header>
       )}
-      <main id="main-content" className={cn("mx-auto grid max-w-[1400px] gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24", bare && "pt-header-height")}>{children}</main>
+      <main id="main-content" className={cn("mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24", bare && "pt-header-height")}>{children}</main>
     </div>
   );
 }

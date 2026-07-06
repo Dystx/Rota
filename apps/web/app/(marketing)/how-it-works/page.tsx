@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { PageShell, SectionHeading, FeatureGrid, FeatureGridItem } from "@repo/ui";
+import { PageShell, SectionHeading } from "@repo/ui";
 import { TopNav } from "../../_components/top-nav";
 import { SiteFooter } from "../../_components/site-footer";
 
@@ -49,13 +49,22 @@ export default function HowItWorksPage() {
           description="A deliberate progression that takes the friction out of planning while maintaining high standards for local travel."
           h1={true}
         />
-        <FeatureGrid>
+        {/* 5-step flow rendered as a 1-up / 2-up / 5-up grid so all
+            steps sit on one row at desktop width. This avoids the
+            awkward 3+2 left-aligned bottom row that the shared
+            FeatureGrid (lg:grid-cols-3) produced for 5 items. */}
+        <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
           {flow.map((step) => (
-            <FeatureGridItem key={step.title} title={step.title}>
-              {step.description}
-            </FeatureGridItem>
+            <li key={step.title} className="flex flex-col gap-3">
+              <h3 className="font-[family-name:var(--font-rota-display)] text-xl font-medium tracking-tight text-[var(--color-foreground)]">
+                {step.title}
+              </h3>
+              <p className="text-base leading-relaxed text-[var(--color-muted-foreground)]">
+                {step.description}
+              </p>
+            </li>
           ))}
-        </FeatureGrid>
+        </ol>
       </PageShell>
       </main>
       <SiteFooter />

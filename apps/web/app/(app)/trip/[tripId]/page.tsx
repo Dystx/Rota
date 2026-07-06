@@ -4,7 +4,7 @@ import { generateItineraryFromBrief } from "@repo/ai";
 import { getTripDraftById } from "@repo/db";
 import { getCheckoutPlan } from "@repo/payments";
 import { 
-  Badge, Breadcrumb, Button, EmptyState, PageShell, RevealSection, StatPill,
+  Badge, Breadcrumb, Button, EmptyState, RevealSection, StatPill,
   CinematicGuide, GuideProgress, GuideChapter, CTASection,
   ItineraryTimeline, TimelineDay
 } from "@repo/ui";
@@ -12,6 +12,8 @@ import { getTripCommerceState } from "@/lib/trip-commerce";
 import { resolveCoverImage } from "@/lib/trip-cover";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { TopNav } from "../../../_components/top-nav";
+import { SiteFooter } from "../../../_components/site-footer";
 import { CinematicHero } from "./_components/cinematic-hero";
 import CinematicMapSection from "./_components/cinematic-map-section";
 import { PaceToneControl } from "./_components/pace-tone-control";
@@ -102,18 +104,22 @@ export default async function TripDetailPage({
     trip = await getTripDraftById(tripId);
     if (trip && trip.ownerUserId && (!user || user.id !== trip.ownerUserId)) {
       return (
-        <PageShell variant="app">
-          <div className="relative mb-12 lg:mb-24 overflow-hidden rounded-[24px] lg:rounded-[32px] px-6 py-16 text-center lg:px-12 lg:py-32">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(182,235,254,0.15),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(48,101,118,0.05),transparent_50%),linear-gradient(to_bottom,rgba(247,250,249,0),rgba(247,250,249,1))]"></div>
-            <div className="relative mx-auto grid max-w-3xl gap-6">
-              <h1 className="font-[family-name:var(--font-rota-display)] text-5xl text-[var(--color-foreground)]">Trip not found</h1>
-              <p className="mx-auto max-w-2xl font-[family-name:var(--font-inter)] text-lg text-[var(--color-muted-foreground)]">
-                This trip does not exist or you do not have permission to view it.
-              </p>
-              <div><Button asChild className="bg-foreground text-white hover:bg-ink-soft"><Link href="/account">Back to account</Link></Button></div>
+        <div className="min-h-screen flex flex-col bg-background">
+          <TopNav />
+          <main id="main-content" className="flex-1 pt-header-height">
+            <div className="relative mb-12 lg:mb-24 overflow-hidden rounded-[24px] lg:rounded-[32px] px-6 py-16 text-center lg:px-12 lg:py-32">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(182,235,254,0.15),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(48,101,118,0.05),transparent_50%),linear-gradient(to_bottom,rgba(247,250,249,0),rgba(247,250,249,1))]"></div>
+              <div className="relative mx-auto grid max-w-3xl gap-6">
+                <h1 className="font-[family-name:var(--font-rota-display)] text-5xl text-[var(--color-foreground)]">Trip not found</h1>
+                <p className="mx-auto max-w-2xl font-[family-name:var(--font-inter)] text-lg text-[var(--color-muted-foreground)]">
+                  This trip does not exist or you do not have permission to view it.
+                </p>
+                <div><Button asChild className="bg-foreground text-white hover:bg-ink-soft"><Link href="/account">Back to account</Link></Button></div>
+              </div>
             </div>
-          </div>
-        </PageShell>
+          </main>
+          <SiteFooter />
+        </div>
       );
     }
     if (trip) {
@@ -200,7 +206,9 @@ export default async function TripDetailPage({
     : [];
 
   return (
-    <PageShell variant="app">
+    <div className="min-h-screen flex flex-col bg-background">
+      <TopNav />
+      <main id="main-content" className="flex-1 pt-header-height">
       <div className="mx-auto max-w-[1100px] px-6 pt-6">
         <Breadcrumb
           items={[
@@ -466,7 +474,9 @@ export default async function TripDetailPage({
           </CTASection>
         </GuideChapter>
       </CinematicGuide>
-    </PageShell>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }
 
