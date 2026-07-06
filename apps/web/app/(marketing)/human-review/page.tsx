@@ -21,8 +21,12 @@ export default function HumanReviewPage() {
   const reviewEmail = buildEmailPreview("review-complete", "Porto & Douro / 5 days");
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-background">
       <TopNav />
+      <main
+        id="main-content"
+        className="flex-1 pt-header-height"
+      >
       <PageShell bare>
         <SectionHeading
           eyebrow="Trust layer"
@@ -79,7 +83,8 @@ export default function HumanReviewPage() {
           </div>
         </div>
       </PageShell>
+      </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }

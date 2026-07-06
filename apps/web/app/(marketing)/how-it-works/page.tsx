@@ -36,8 +36,12 @@ const flow = [
 
 export default function HowItWorksPage() {
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-background">
       <TopNav />
+      <main
+        id="main-content"
+        className="flex-1 pt-header-height"
+      >
       <PageShell bare>
         <SectionHeading
           eyebrow="The Journey"
@@ -53,7 +57,8 @@ export default function HowItWorksPage() {
           ))}
         </FeatureGrid>
       </PageShell>
+      </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }

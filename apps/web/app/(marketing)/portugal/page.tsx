@@ -74,8 +74,12 @@ function slugify(text: string) {
 
 export default function PortugalPage() {
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-background">
       <TopNav />
+      <main
+        id="main-content"
+        className="flex-1 pt-header-height"
+      >
       <ArchiveLayout
         bare
         testid="portugal-header"
@@ -101,7 +105,8 @@ export default function PortugalPage() {
           ))}
         </ul>
       </ArchiveLayout>
+      </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }
