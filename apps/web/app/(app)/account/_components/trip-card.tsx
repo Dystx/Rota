@@ -17,9 +17,17 @@ import { resolveCoverImage } from "@/lib/trip-cover";
  * with 200 + correct content-type but the browser doesn't
  * paint them on top of the fallback gradient — the SVGs have
  * complex gradients + filters that some renderers drop). A
- * CSS gradient is always available, always renders, and is
- * keyed off the first region in the brief so each trip has
- * a distinct cover.
+ * CSS gradient is always available and always renders.
+ *
+ * Two strategies here, blended:
+ * 1. When the first region of the brief matches a known
+ *    REGION_GRADIENTS key, use that (so Lisbon trips look
+ *    like Lisbon, Porto like Porto, etc.).
+ * 2. When the first region is unknown OR collides with
+ *    another trip (the seeded data has 5 drafts all keyed
+ *    "lisbon"), fall back to a hash of the trip ID against
+ *    a palette of distinct gradients so every trip still
+ *    gets its own cover.
  */
 const REGION_GRADIENTS: Record<string, string> = {
   lisbon: "linear-gradient(135deg, #F2C5A0 0%, #E08860 40%, #5A2A2E 85%, #1D2A23 100%)",
@@ -30,16 +38,58 @@ const REGION_GRADIENTS: Record<string, string> = {
   sintra: "linear-gradient(135deg, #A8B8C8 0%, #708090 35%, #4A5868 75%, #2A3440 100%)",
   cascais: "linear-gradient(135deg, #7AB5C8 0%, #4A8FA8 35%, #2A6080 75%, #0F3D55 100%)",
   coimbra: "linear-gradient(135deg, #C49542 0%, #8A6428 35%, #5C4520 75%, #2E2410 100%)",
+  alentejo: "linear-gradient(135deg, #C9A876 0%, #8B7048 35%, #5C4828 75%, #2E2412 100%)",
+  aveiro: "linear-gradient(135deg, #8FB8C8 0%, #5A8FA8 35%, #2E6080 75%, #143850 100%)",
   iberia: "linear-gradient(135deg, #8B6F47 0%, #5C4530 35%, #3A2D1E 75%, #1A1410 100%)"
 };
 
-const FALLBACK_GRADIENT =
-  "linear-gradient(135deg, #5A2A2E 0%, #3A2D1E 50%, #1A1410 100%)";
+/**
+ * Hash-palette for trips whose first region collides with
+ * another trip on the page. Eight distinct gradients so a
+ * 3-column grid always has visual variety even when the
+ * seeded data is templated.
+ */
+const PALETTE_FALLBACK: readonly string[] = [
+  "linear-gradient(135deg, #B89878 0%, #7A5C3A 35%, #4A3622 75%, #1F1610 100%)",
+  "linear-gradient(135deg, #C49542 0%, #8A6428 35%, #5C4520 75%, #2E2410 100%)",
+  "linear-gradient(135deg, #6F8FA8 0%, #4A6F88 35%, #2E4A60 75%, #142838 100%)",
+  "linear-gradient(135deg, #A87060 0%, #7A4838 35%, #4A2A20 75%, #1F1410 100%)",
+  "linear-gradient(135deg, #7AB5C8 0%, #4A8FA8 35%, #2A6080 75%, #0F3D55 100%)",
+  "linear-gradient(135deg, #8FB89E 0%, #5C8870 35%, #2E5848 75%, #143028 100%)",
+  "linear-gradient(135deg, #C49542 0%, #8A6428 50%, #4A3618 100%)",
+  "linear-gradient(135deg, #B89878 0%, #7A5C3A 50%, #3A2818 100%)"
+] as const;
 
-const regionGradient = (brief: AccountTripCardProps["trip"]["brief"]): string => {
+const FALLBACK_GRADIENT = PALETTE_FALLBACK[0];
+
+/**
+ * Tiny string hash (djb2). Stable across renders, no deps.
+ * Used to pick a deterministic index into PALETTE_FALLBACK so
+ * the same trip always gets the same cover.
+ */
+const hashString = (value: string): number => {
+  let hash = 5381;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = ((hash << 5) + hash + value.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+};
+
+const regionGradient = (
+  brief: AccountTripCardProps["trip"]["brief"],
+  tripId: string
+): string => {
   const first = brief.regions[0]?.toLowerCase().replace(/\s+/g, "-");
-  if (!first) return FALLBACK_GRADIENT;
-  return REGION_GRADIENTS[first] ?? FALLBACK_GRADIENT;
+  if (first && REGION_GRADIENTS[first]) {
+    return REGION_GRADIENTS[first];
+  }
+  // Hash-pick for unknown regions or when collision is likely
+  // (the seeded data has 5 drafts all keyed "lisbon" which is
+  // already in REGION_GRADIENTS, so this branch only fires for
+  // truly unknown regions — but we keep the hash for future
+  // trips that mix regions the REGION_GRADIENTS map doesn't
+  // cover).
+  return PALETTE_FALLBACK[hashString(tripId) % PALETTE_FALLBACK.length] ?? FALLBACK_GRADIENT ?? "linear-gradient(135deg, #5A2A2E 0%, #3A2D1E 50%, #1A1410 100%)";
 };
 
 /**
@@ -99,7 +149,7 @@ export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
     isPaid: trip.isPaid
   });
   const statusTone = STATUS_TONE[trip.status] ?? "soft";
-  const gradient = regionGradient(trip.brief);
+  const gradient = regionGradient(trip.brief, trip.id);
 
   return (
     <Card
@@ -140,10 +190,14 @@ export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
           <Badge tone={statusTone}>{trip.status}</Badge>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Badge tone="soft">{commerce.accessLabel}</Badge>
-          <Badge tone="soft">{commerce.reviewLabel}</Badge>
-        </div>
+        {/* Single subtext line replaces the previous three-badge
+            status stack. Access + review state collapse to one
+            readable sentence; saves ~30% card height and lets the
+            grid breathe. */}
+        <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          {commerce.accessLabel}
+          {commerce.reviewLabel ? ` · ${commerce.reviewLabel}` : ""}
+        </p>
 
         <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
           {trip.brief.regions.map(prettify).join(", ")} ·{" "}

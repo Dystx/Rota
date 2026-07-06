@@ -138,6 +138,51 @@ const STATUS_TONE: Record<string, string> = {
   reviewed: "bg-emerald-100 text-emerald-800"
 };
 
+/**
+ * Cover gradients — same palette as the account trip card so
+ * the two archive surfaces read as siblings. Unknown regions
+ * and id-collisions hash into a deterministic 8-colour
+ * fallback so a 3-column grid always has visual variety.
+ */
+const COVER_GRADIENTS: Record<string, string> = {
+  lisbon: "linear-gradient(135deg, #F2C5A0 0%, #E08860 40%, #5A2A2E 85%, #1D2A23 100%)",
+  porto: "linear-gradient(135deg, #D4A574 0%, #A87149 35%, #5C3826 75%, #2A1A14 100%)",
+  douro: "linear-gradient(135deg, #8B6F47 0%, #5C4530 35%, #3A2D1E 75%, #1A1410 100%)",
+  azores: "linear-gradient(135deg, #6FA89E 0%, #3D7A6F 35%, #1F4A44 75%, #0D2624 100%)",
+  algarve: "linear-gradient(135deg, #E8B86C 0%, #C49542 35%, #8A6428 75%, #4A3812 100%)",
+  sintra: "linear-gradient(135deg, #A8B8C8 0%, #708090 35%, #4A5868 75%, #2A3440 100%)",
+  cascais: "linear-gradient(135deg, #7AB5C8 0%, #4A8FA8 35%, #2A6080 75%, #0F3D55 100%)",
+  coimbra: "linear-gradient(135deg, #C49542 0%, #8A6428 35%, #5C4520 75%, #2E2410 100%)",
+  alentejo: "linear-gradient(135deg, #C9A876 0%, #8B7048 35%, #5C4828 75%, #2E2412 100%)",
+  aveiro: "linear-gradient(135deg, #8FB8C8 0%, #5A8FA8 35%, #2E6080 75%, #143850 100%)",
+  iberia: "linear-gradient(135deg, #8B6F47 0%, #5C4530 35%, #3A2D1E 75%, #1A1410 100%)"
+};
+
+const COVER_PALETTE: readonly string[] = [
+  "linear-gradient(135deg, #B89878 0%, #7A5C3A 35%, #4A3622 75%, #1F1610 100%)",
+  "linear-gradient(135deg, #C49542 0%, #8A6428 35%, #5C4520 75%, #2E2410 100%)",
+  "linear-gradient(135deg, #6F8FA8 0%, #4A6F88 35%, #2E4A60 75%, #142838 100%)",
+  "linear-gradient(135deg, #A87060 0%, #7A4838 35%, #4A2A20 75%, #1F1410 100%)",
+  "linear-gradient(135deg, #7AB5C8 0%, #4A8FA8 35%, #2A6080 75%, #0F3D55 100%)",
+  "linear-gradient(135deg, #8FB89E 0%, #5C8870 35%, #2E5848 75%, #143028 100%)",
+  "linear-gradient(135deg, #C49542 0%, #8A6428 50%, #4A3618 100%)",
+  "linear-gradient(135deg, #B89878 0%, #7A5C3A 50%, #3A2818 100%)"
+] as const;
+
+const hashString = (value: string): number => {
+  let hash = 5381;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = ((hash << 5) + hash + value.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+};
+
+const coverGradient = (trip: TripDraftListItem): string => {
+  const first = trip.brief?.regions?.[0]?.toLowerCase().replace(/\s+/g, "-");
+  if (first && COVER_GRADIENTS[first]) return COVER_GRADIENTS[first];
+  return COVER_PALETTE[hashString(trip.id) % COVER_PALETTE.length] ?? COVER_PALETTE[0] ?? "linear-gradient(135deg, #5A2A2E 0%, #3A2D1E 50%, #1A1410 100%)";
+};
+
 function ItineraryCard({
   trip,
   onSelect,
@@ -152,37 +197,47 @@ function ItineraryCard({
   ]
     .filter(Boolean)
     .join(" · ");
+  const gradient = coverGradient(trip);
   return (
     <button
       type="button"
       onClick={() => onSelect(trip)}
       data-testid={`itinerary-card-${trip.id}`}
       aria-label={`Open export options for ${trip.title || "trip"}`}
-      className="group block w-full text-left bg-glass-light backdrop-blur-md rounded-xl border border-white/20 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+      className="group block w-full text-left bg-glass-light backdrop-blur-md rounded-xl border border-white/20 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
     >
-      <div className="flex items-center justify-between mb-2">
+      {/* Cover area — region-keyed gradient. 16:9 ratio so the
+          card has a clear visual anchor and the grid doesn't
+          feel like a CMS list. A subtle top→bottom dark overlay
+          keeps the gradient's brighter zones from washing the
+          title out. */}
+      <div
+        className="relative w-full aspect-[16/9]"
+        style={{ background: gradient }}
+        aria-hidden="true"
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/50 via-transparent to-transparent" />
         <span
-          className={`font-mono-micro text-mono-micro uppercase tracking-widest px-2 py-0.5 rounded ${statusTone}`}
+          className={`absolute top-2.5 left-2.5 font-mono-micro text-mono-micro uppercase tracking-widest px-2 py-0.5 rounded ${statusTone}`}
         >
           {trip.status.replace("_", " ")}
         </span>
-        <span className="font-mono-micro text-mono-micro text-on-surface-variant/60">
-          {trip.id}
+      </div>
+      <div className="p-4">
+        <h3 className="font-headline-sm text-headline-sm text-primary mb-1">
+          {trip.title || "Untitled trip"}
+        </h3>
+        {subtitle && (
+          <p className="font-body-md text-body-md text-on-surface-variant mb-3">
+            {subtitle}
+          </p>
+        )}
+        <span className="inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-dark group-hover:underline">
+          <span className="material-symbols-outlined text-[16px]">ios_share</span>
+          Export &amp; share
+          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
         </span>
       </div>
-      <h3 className="font-headline-sm text-headline-sm text-primary mb-1">
-        {trip.title || "Untitled trip"}
-      </h3>
-      {subtitle && (
-        <p className="font-body-md text-body-md text-on-surface-variant mb-3">
-          {subtitle}
-        </p>
-      )}
-      <span className="inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-dark group-hover:underline">
-        <span className="material-symbols-outlined text-[16px]">ios_share</span>
-        Export &amp; share
-        <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-      </span>
     </button>
   );
 }
