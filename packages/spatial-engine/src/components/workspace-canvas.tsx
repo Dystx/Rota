@@ -406,7 +406,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
           >
             <div>
               <p className="font-headline-sm text-headline-sm mb-2">Workspace unavailable</p>
-              <p className="rota-muted">{mountError}</p>
+              <p className="text-on-surface-variant leading-loose">{mountError}</p>
             </div>
           </div>
         ) : null}
