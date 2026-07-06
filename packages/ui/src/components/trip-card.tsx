@@ -48,6 +48,35 @@ const gradientForCover = (coverImage: string): string => {
   return DEFAULT_COVER_GRADIENT;
 };
 
+/**
+ * 8-colour hash-picked palette for cards that don't pass a
+ * `coverImage`. Used by the Portugal page (which has 9 regions
+ * but stopped passing SVG covers after the lisbon-tagus.svg
+ * paint issue — see commit history). The hash is over the
+ * card title so the same trip always gets the same cover.
+ */
+const NO_IMAGE_PALETTE: readonly string[] = [
+  "linear-gradient(135deg, #B89878 0%, #7A5C3A 35%, #4A3622 75%, #1F1610 100%)",
+  "linear-gradient(135deg, #C49542 0%, #8A6428 35%, #5C4520 75%, #2E2410 100%)",
+  "linear-gradient(135deg, #6F8FA8 0%, #4A6F88 35%, #2E4A60 75%, #142838 100%)",
+  "linear-gradient(135deg, #A87060 0%, #7A4838 35%, #4A2A20 75%, #1F1410 100%)",
+  "linear-gradient(135deg, #7AB5C8 0%, #4A8FA8 35%, #2A6080 75%, #0F3D55 100%)",
+  "linear-gradient(135deg, #8FB89E 0%, #5C8870 35%, #2E5848 75%, #143028 100%)",
+  "linear-gradient(135deg, #C49542 0%, #8A6428 50%, #4A3618 100%)",
+  "linear-gradient(135deg, #B89878 0%, #7A5C3A 50%, #3A2818 100%)"
+] as const;
+
+const djb2 = (value: string): number => {
+  let hash = 5381;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = ((hash << 5) + hash + value.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+};
+
+const gradientForTitle = (title: string): string =>
+  NO_IMAGE_PALETTE[djb2(title) % NO_IMAGE_PALETTE.length] ?? NO_IMAGE_PALETTE[0] ?? DEFAULT_COVER_GRADIENT;
+
 export interface TripCardProps {
   icon?: ReactNode;
   title: string;
@@ -86,7 +115,7 @@ export function TripCard({
 }: TripCardProps) {
   const coverGradient = coverImage
     ? gradientForCover(coverImage)
-    : DEFAULT_COVER_GRADIENT;
+    : gradientForTitle(title);
   return (
     <Card
       data-testid={testid}
@@ -95,18 +124,18 @@ export function TripCard({
         tone === "highlight" ? "border-[#181c1c] shadow-md" : "bg-white/70"
       )}
     >
-      {coverImage ? (
-        <div
-          className="relative aspect-[16/9] w-full overflow-hidden"
-          style={{ background: coverGradient }}
-          data-testid={testid ? `${testid}-cover` : undefined}
-        >
-          {/* The <img> is rendered as a layer over the region
-              gradient. Some browsers drop the complex SVG paint
-              inside it (see comment on `gradientForCover`); when
-              that happens, the gradient below still gives the
-              card a distinct, region-appropriate color. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+      <div
+        className="relative aspect-[16/9] w-full overflow-hidden"
+        style={{ background: coverGradient }}
+        data-testid={testid ? `${testid}-cover` : undefined}
+      >
+        {/* The <img> is rendered as a layer over the region
+            gradient. Some browsers drop the complex SVG paint
+            inside it (see comment on `gradientForCover`); when
+            that happens, the gradient below still gives the
+            card a distinct, region-appropriate color. */}
+        {coverImage ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={coverImage}
             alt={coverAlt ?? ""}
@@ -114,8 +143,8 @@ export function TripCard({
             loading="eager"
             decoding="sync"
           />
-        </div>
-      ) : null}
+        ) : null}
+      </div>
       <CardHeader className="p-4 md:p-5 pb-2 md:pb-2">
         <div className="flex items-start justify-between gap-4">
           <div className="grid gap-2">
