@@ -14,7 +14,14 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "4mb"
     }
-  }
+  },
+  // Next.js 16 ships a built-in dev tools indicator (the floating
+  // "N" badge in the bottom-left of every page). It's a dev-only
+  // affordance but it ships in the dev build and clutters the UI
+  // during design review. Disabled in this repo so screenshots
+  // and Playwright captures show the real layout, not the
+  // developer's toolbar.
+  devIndicators: false
 };
 
 // `withSentryConfig` is a no-op in the absence of
