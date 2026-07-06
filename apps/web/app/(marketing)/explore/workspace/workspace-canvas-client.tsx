@@ -147,6 +147,46 @@ function WorkspaceCanvasInner() {
           if (stopsSource && containerRef.current) {
             registerMapSource(containerRef.current, stopsSource);
           }
+
+          // Soften the default Carto basemap labels. The
+          // raw style ships with dark, oversized country and
+          // region labels (PRINCIPALITY OF ASTURIAS,
+          // CANTABRIA, BASQUE COUNTRY, etc.) that dominate
+          // the canvas. Override text-color to the public
+          // ink token, add a cream halo for contrast against
+          // the dark fills, and pull text-size down a notch
+          // so the labels read as a map legend, not a poster.
+          // Re-applies on every `style.load` so a 2D↔3D
+          // projection switch (which reloads the style) keeps
+          // the override.
+          const style = map.getStyle();
+          const layers = style?.layers ?? [];
+          for (const layer of layers) {
+            if (layer.type !== "symbol") continue;
+            try {
+              if (layer.layout && "text-size" in layer.layout) {
+                map.setLayoutProperty(
+                  layer.id,
+                  "text-size",
+                  // Halve the default size for country/region
+                  // labels, leave smaller place-name labels
+                  // closer to their default.
+                  11
+                );
+              }
+              if ("text-color" in (layer.paint ?? {})) {
+                map.setPaintProperty(layer.id, "text-color", "#16281f");
+                map.setPaintProperty(layer.id, "text-halo-color", "#fdfaf3");
+                map.setPaintProperty(layer.id, "text-halo-width", 1.5);
+                map.setPaintProperty(layer.id, "text-halo-blur", 0.5);
+                map.setPaintProperty(layer.id, "text-opacity", 0.75);
+              }
+            } catch {
+              // Some symbol layers (icons, field markers)
+              // don't have text-color. Swallow the throw.
+            }
+          }
+
           // Phase 4.1: stash the map handle and the baseline
           // camera so the pace/tone effect can fly back to a
           // predictable position. We prefer the preset's camera
