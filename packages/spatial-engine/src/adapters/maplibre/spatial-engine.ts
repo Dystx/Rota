@@ -225,6 +225,19 @@ export class MapLibreSpatialEngine implements SpatialEngine {
     return this.map;
   }
 
+  /**
+   * Mount-lifecycle predicate. Consumers (ResizeObserver, animation loops)
+   * use this to bail out of post-unmount callbacks. `getRenderer()` can
+   * still return a non-null handle while the engine is shutting down, so
+   * checking only the renderer is not enough — the projection's
+   * internal globe transform may already be torn down, which makes a
+   * subsequent `resize()` or `setBearing()` throw
+   * `Cannot read properties of null (reading '0')` deep inside MapLibre.
+   */
+  isMounted(): boolean {
+    return this.mounted && this.map !== null && !this.shuttingDown;
+  }
+
   /** Internal helper used by GlobeWorkspace fixtures to seed a channel. */
   seedTelemetry(channel: Parameters<TelemetryService["subscribe"]>[0], collection: SpatialFeatureCollection): void {
     this.telemetry.seed(channel, collection);

@@ -280,8 +280,26 @@ export function GlobeWorkspace({
         // canvas can be initialised at 0×0 or a partial width. Resize on
         // the next frame and on every observed size change so the globe
         // always fills its container.
-        const refresh = () => engine.getRenderer()?.resize();
-        refresh();
+        //
+        // Defensive against MapLibre's `null[0]` failure in
+        // `_calcMatrices`: if the engine is mid-teardown (e.g. a fast
+        // route change before the ResizeObserver disconnects) the
+        // projection's internal globe transform is already null and
+        // `resize()` throws. Gate on `isMounted()` AND wrap in
+        // try/catch so a single bad frame never tears down the page.
+        const refresh = () => {
+          if (!engine.isMounted()) return;
+          try {
+            engine.getRenderer()?.resize();
+          } catch {
+            // MapLibre's projection is mid-teardown or not yet
+            // initialized. Swallow — the next ResizeObserver tick
+            // will retry, and the page is still navigable.
+          }
+        };
+        // Skip the immediate `refresh()` — the mount promise has
+        // resolved but the first MapLibre render hasn't, so the
+        // globe transform is still null. Wait one frame.
         const raf = requestAnimationFrame(refresh);
 
         let observer: ResizeObserver | null = null;
@@ -314,6 +332,13 @@ export function GlobeWorkspace({
         // resumes after `ROTATION_RESUME_MS` of no interaction.
         // This keeps panning / zooming responsive without
         // fighting the user.
+        //
+        // The rotation loop kicks off AFTER the intro choreography
+        // resolves (not before, as the previous version did). If
+        // they run concurrently, the rotation's `setBearing`
+        // fires `run()` on MapLibre's animation scheduler while
+        // the intro's `flyTo` is still in flight, which throws
+        // `Attempting to run(), but is already running.`
         if (!reducedMotion) {
           let rotating = true;
           let lastInteractionTs = 0;
@@ -321,12 +346,19 @@ export function GlobeWorkspace({
           const ROTATION_RESUME_MS = 3000;
           const rotate = () => {
             if (!rotating) return;
+            if (!engine.isMounted()) return;
             const idle = Date.now() - lastInteractionTs;
             if (idle > ROTATION_RESUME_MS) {
               const map = engine.getRenderer();
               if (map) {
                 const next = map.getBearing() + ROTATION_DEG_PER_SEC / 60;
-                map.setBearing(next);
+                try {
+                  map.setBearing(next);
+                } catch {
+                  // MapLibre's animation scheduler is mid-flight
+                  // (e.g. a route-change flyTo is settling).
+                  // Skip this frame; the next RAF will retry.
+                }
               }
             }
             requestAnimationFrame(rotate);
@@ -350,8 +382,10 @@ export function GlobeWorkspace({
           container.addEventListener("wheel", pause);
           container.addEventListener("mouseup", scheduleResume);
           container.addEventListener("touchend", scheduleResume);
-          // Kick off the loop on the next frame so the intro
-          // choreography has time to settle first.
+          // Kick off AFTER the intro choreography has settled
+          // (this whole branch is reached only after the await
+          // above resolves), so the rotation can't race the
+          // intro's `flyTo` animation.
           requestAnimationFrame(rotate);
           // We don't need to unregister the listeners — the
           // container is owned by the parent and will be GC'd

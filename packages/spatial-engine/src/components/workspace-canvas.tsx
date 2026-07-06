@@ -301,8 +301,25 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
               })()
             : () => undefined;
 
-          const refresh = () => engine.getRenderer()?.resize();
-          refresh();
+          // Same defensive pattern as GlobeWorkspace: gate on
+          // `isMounted()` and wrap in try/catch so a ResizeObserver
+          // tick that fires after the engine has been torn down
+          // (or before the first MapLibre render finishes) doesn't
+          // leak the `Cannot read properties of null (reading '0')`
+          // from the projection's `_calcMatrices` into the
+          // console.
+          const refresh = () => {
+            if (!engine.isMounted()) return;
+            try {
+              engine.getRenderer()?.resize();
+            } catch {
+              // MapLibre's projection is mid-teardown or not yet
+              // initialized. Swallow — the next ResizeObserver
+              // tick will retry.
+            }
+          };
+          // Skip the immediate `refresh()` — wait one frame so
+          // the first MapLibre render can complete.
           const raf = requestAnimationFrame(refresh);
 
           let observer: ResizeObserver | null = null;

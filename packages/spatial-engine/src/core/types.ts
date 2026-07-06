@@ -119,6 +119,23 @@ export interface SpatialEngine {
    * mounted yet. Resolves when the last beat has settled.
    */
   playChoreography(choreography: import("./camera-choreography").CameraChoreography): Promise<void>;
+  /**
+   * Renderer handle for advanced integrations (e.g. ResizeObserver in
+   * the GlobeWorkspace React component). Most consumers should use the
+   * abstract CameraController / TelemetryService instead. Returns null
+   * after unmount.
+   */
+  getRenderer(): unknown | null;
+  /**
+   * Mount-lifecycle predicate. `true` between a successful `mount()`
+   * and the start of `unmount()`. Consumers use this to gate
+   * post-unmount callbacks (ResizeObserver, animation loops) so they
+   * don't call into MapLibre after the projection's internal globe
+   * transform has been torn down — that path throws
+   * `Cannot read properties of null (reading '0')` deep inside
+   * `_calcMatrices`.
+   */
+  isMounted(): boolean;
   unmount(): void;
 }
 
