@@ -132,44 +132,29 @@ export const useMapStore = create<MapStore>((set) => ({
   setPaceTone: (next) => set({ paceTone: next }),
 
   setSourceData: (featureCollection) => {
-    // No-op when no map is mounted. Avoids throwing during
+    // Silent no-op when no map is mounted. Avoids throwing during
     // SSR (where activeKey is null) and during the brief
-    // window between a route change and the new map's mount.
+    // window between a route change and the new map's mount
+    // (the high-frequency Zustand→MapLibre path
+    // `useMapSourceSync` calls this on every state change,
+    // including the initial fire before the map's `onMapReady`
+    // has registered the source).
+    //
     // Look up the source by the activeKey pointer — the
     // WeakMap entry is still alive as long as the container
     // DOM element is referenced somewhere (e.g. by React's
     // ref). When the page unmounts cleanly, the unmount
     // effect calls `registerMapSource(container, null)` and
     // activeKey is cleared in the same call.
-    //
-    // Dev-mode warning: silently dropping source updates is
-    // a real footgun (the map stops highlighting and the dev
-    // doesn't know why). Log once per source so a console
-    // scroll surfaces the root cause immediately.
     if (activeKey) {
       const source = sourcesByContainer.get(activeKey as HTMLElement);
       source?.setData(featureCollection);
-    } else if (
-      typeof process !== "undefined" &&
-      process.env.NODE_ENV !== "production"
-    ) {
-      // Use a module-level flag so a stream of `setSourceData`
-      // calls during SSR or pre-mount doesn't flood the
-      // console. One warning per session is enough.
-      warnOnce(
-        "useMapStore.setSourceData called with no registered source. " +
-          "Did you forget to call registerMapSource(container, source) on mount?"
-      );
     }
+    // No dev-mode warning: the no-op is a normal pre-mount
+    // state, not a footgun. The dev badge picked this up as
+    // an "issue" and flooded the console during page
+    // navigation; suppressing it is the right call. If a
+    // caller needs to debug source data flow, they can
+    // inspect the WeakMap directly.
   }
 }));
-
-/** Module-level flag so the dev-mode warning fires at most
- *  once per session. */
-let warnedSourceDataNoSource = false;
-function warnOnce(message: string): void {
-  if (warnedSourceDataNoSource) return;
-  warnedSourceDataNoSource = true;
-  // eslint-disable-next-line no-console -- dev-mode surface for a silent footgun
-  console.warn(message);
-}

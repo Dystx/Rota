@@ -63,6 +63,24 @@ export function clampPitchForAntimeridian(
  */
 export class SpatialCameraController implements CameraController {
   private following = false;
+  /**
+   * Single-flight guard for `focus`. MapLibre's `flyTo` throws
+   * "Attempting to run(), but is already running." if a second
+   * `flyTo` lands while the previous animation is still
+   * settling. The choreography and the projection switch can
+   * both trigger `focus` back-to-back (intro choreography lands
+   * on `earth` → user clicks "Begin Journey" → focus flies to
+   * Portugal). Without this guard the second call lands
+   * mid-animation and MapLibre throws.
+   *
+   * We coalesce: if a `focus` is in flight, the second call's
+   * target replaces the first. When the first resolves, we
+   * immediately fire the pending target so the user's intent
+   * still lands. The "next" target is cleared after firing so
+   * a third call doesn't pile up.
+   */
+  private inflight: Promise<void> | null = null;
+  private pendingTarget: CameraTarget | null = null;
 
   constructor(
     private readonly executor: CameraExecutor,
@@ -70,6 +88,10 @@ export class SpatialCameraController implements CameraController {
   ) {}
 
   async focus(target: CameraTarget): Promise<void> {
+    if (this.inflight) {
+      this.pendingTarget = target;
+      return;
+    }
     const duration = this.options.reducedMotion ? 0 : (target.duration ?? 1200);
     const animOptions = {
       center: target.center ? ([target.center[0], target.center[1]] as [number, number]) : undefined,
@@ -83,7 +105,18 @@ export class SpatialCameraController implements CameraController {
       this.executor.jumpTo(animOptions);
       return;
     }
-    await this.executor.flyTo(animOptions);
+    this.inflight = this.executor.flyTo(animOptions).finally(() => {
+      this.inflight = null;
+      if (this.pendingTarget) {
+        const next = this.pendingTarget;
+        this.pendingTarget = null;
+        // Fire-and-forget — the caller doesn't await the
+        // pending fire, but it will resolve on the next
+        // microtask via the same `focus` path.
+        void this.focus(next);
+      }
+    });
+    await this.inflight;
   }
 
   async returnHome(): Promise<void> {
