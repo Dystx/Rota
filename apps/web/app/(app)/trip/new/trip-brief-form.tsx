@@ -240,7 +240,7 @@ export function TripBriefForm() {
       <Card className="rota-glass-panel shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle>Trip requirements</CardTitle>
-          <p className="rota-muted text-sm mt-2">
+          <p className="text-on-surface-variant leading-loose text-sm mt-2">
             Let's structure your raw ideas. Be as specific as you can—our engine handles the logistics.
           </p>
         </CardHeader>
@@ -441,7 +441,7 @@ export function TripBriefForm() {
             </div>
 
             <div className="flex items-center justify-between gap-4 border-t border-[var(--color-border)] pt-8 mt-4">
-              <p className="rota-muted text-sm font-medium" role="status" aria-live="polite">
+              <p className="text-on-surface-variant leading-loose text-sm font-medium" role="status" aria-live="polite">
                 {normalizeErrors(errors) > 0
                   ? `${normalizeErrors(errors)} field${normalizeErrors(errors) > 1 ? "s" : ""} need attention.`
                   : submitMessage || "Ready for audit."}

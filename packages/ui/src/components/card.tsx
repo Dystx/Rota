@@ -32,7 +32,7 @@ export function CardTitle({
   return (
     <Tag
       className={cn(
-        "font-[family-name:var(--font-rota-display)] text-3xl tracking-tight text-[var(--color-foreground)]",
+        "font-display text-3xl tracking-tight text-[var(--color-foreground)]",
         className
       )}
       {...props}

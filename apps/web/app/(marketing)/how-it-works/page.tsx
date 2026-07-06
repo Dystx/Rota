@@ -56,7 +56,7 @@ export default function HowItWorksPage() {
         <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
           {flow.map((step) => (
             <li key={step.title} className="flex flex-col gap-3">
-              <h3 className="font-[family-name:var(--font-rota-display)] text-xl font-medium tracking-tight text-[var(--color-foreground)]">
+              <h3 className="font-display text-xl font-medium tracking-tight text-[var(--color-foreground)]">
                 {step.title}
               </h3>
               <p className="text-base leading-relaxed text-[var(--color-muted-foreground)]">

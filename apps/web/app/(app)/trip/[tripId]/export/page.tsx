@@ -67,21 +67,21 @@ function renderPrintView(
             {itinerary ? (
               itinerary.days.map((day) => (
                 <div key={day.dayIndex} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                  <p className="rota-kicker">Day {day.dayIndex}</p>
+                  <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Day {day.dayIndex}</p>
                   <p className="mt-2 text-lg font-semibold text-[var(--color-foreground)]">{day.theme}</p>
-                  <p className="rota-muted mt-2 text-sm">{day.summary}</p>
+                  <p className="text-on-surface-variant leading-loose mt-2 text-sm">{day.summary}</p>
                   <div className="mt-4 grid gap-2">
                     {day.stops.map((stop) => (
                       <div key={`${stop.startTime}-${stop.placeName}`} className="rounded-[16px] border border-[var(--color-border)] bg-white p-3">
                         <p className="text-sm font-semibold text-[var(--color-foreground)]">{stop.startTime} · {stop.placeName}</p>
-                        <p className="rota-muted mt-1 text-sm">{stop.reason}</p>
+                        <p className="text-on-surface-variant leading-loose mt-1 text-sm">{stop.reason}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               ))
             ) : (
-              <p className="rota-muted text-sm">No itinerary is available yet for print export.</p>
+              <p className="text-on-surface-variant leading-loose text-sm">No itinerary is available yet for print export.</p>
             )}
           </CardContent>
         </Card>
@@ -172,18 +172,18 @@ export default async function TripExportPage({
         <GuideChapter id="overview" className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8" data-testid="trip-export-header">
             <RevealSection>
-              <p className="rota-kicker text-[var(--color-atlantic)]">Export center · Trip {tripId}</p>
-              <h1 className="mt-4 font-[family-name:var(--font-rota-display)] text-5xl tracking-tight text-[var(--color-foreground)] lg:text-6xl">
+              <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium text-[var(--color-atlantic)]">Export center · Trip {tripId}</p>
+              <h1 className="mt-4 font-display text-5xl tracking-tight text-[var(--color-foreground)] lg:text-6xl">
                 {heroTitle}
               </h1>
-              <p className="rota-muted mt-6 max-w-3xl text-xl leading-relaxed">{heroDescription}</p>
+              <p className="text-on-surface-variant leading-loose mt-6 max-w-3xl text-xl leading-relaxed">{heroDescription}</p>
             </RevealSection>
 
             {infoMessage ? (
               <RevealSection delayMs={120}>
                 <Card data-testid="info-message">
                   <CardContent className="pt-6">
-                    <p className="rota-muted text-sm">{infoMessage}</p>
+                    <p className="text-on-surface-variant leading-loose text-sm">{infoMessage}</p>
                   </CardContent>
                 </Card>
               </RevealSection>
@@ -194,8 +194,8 @@ export default async function TripExportPage({
         <GuideChapter id="formats" className="py-12 md:py-24">
           <div className="mx-auto max-w-[1100px] grid gap-8">
             <RevealSection>
-              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl text-[var(--color-foreground)]">Choose a format</h2>
-              <p className="rota-muted mt-4 max-w-2xl text-lg leading-relaxed">
+              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Choose a format</h2>
+              <p className="text-on-surface-variant leading-loose mt-4 max-w-2xl text-lg leading-relaxed">
                 Each format mirrors the same audited route. PDF, calendar, and markdown are gated until unlock; print is always safe to use.
               </p>
             </RevealSection>
@@ -218,8 +218,8 @@ export default async function TripExportPage({
         <GuideChapter id="delivery" className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8">
             <RevealSection>
-              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl text-[var(--color-foreground)]">Share &amp; delivery</h2>
-              <p className="rota-muted mt-4 max-w-2xl text-lg leading-relaxed">
+              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Share &amp; delivery</h2>
+              <p className="text-on-surface-variant leading-loose mt-4 max-w-2xl text-lg leading-relaxed">
                 Where the trip lives once it leaves the planner.
               </p>
             </RevealSection>
@@ -230,14 +230,14 @@ export default async function TripExportPage({
                 </CardHeader>
                 <CardContent className="grid gap-3">
                   <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                    <p className="rota-kicker">Share path</p>
+                    <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Share path</p>
                     <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{buildTripSharePath(tripId)}</p>
-                    <p className="rota-muted mt-2 text-sm">Share links stay tied to the saved trip route.</p>
+                    <p className="text-on-surface-variant leading-loose mt-2 text-sm">Share links stay tied to the saved trip route.</p>
                   </div>
                   <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
-                    <p className="rota-kicker">Delivery email</p>
+                    <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Delivery email</p>
                     <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{emailPreview.subject}</p>
-                    <p className="rota-muted mt-2 text-sm">{emailPreview.previewText}</p>
+                    <p className="text-on-surface-variant leading-loose mt-2 text-sm">{emailPreview.previewText}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -267,7 +267,7 @@ export default async function TripExportPage({
         <GuideChapter id="access" className="py-12 md:py-24 bg-[var(--color-ink)] text-[var(--color-paper)]">
           <div className="mx-auto max-w-[860px] grid gap-8">
             <RevealSection>
-              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl">Export access</h2>
+              <h2 className="font-display text-4xl">Export access</h2>
               <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--color-cream)]">
                 {tripCommerceState.canExport
                   ? "This trip is unlocked. PDF, calendar, markdown, and print exports are ready."
@@ -302,7 +302,7 @@ export default async function TripExportPage({
 
         <GuideChapter id="next-step" className="p-0">
           <CTASection>
-            <h2 className="font-[family-name:var(--font-rota-display)] text-4xl md:text-5xl">Send the trip onward</h2>
+            <h2 className="font-display text-4xl md:text-5xl">Send the trip onward</h2>
             <p className="text-xl text-[var(--color-cream)] max-w-2xl">
               Print directly, return to the guided trip, or unlock the full export bundle.
             </p>

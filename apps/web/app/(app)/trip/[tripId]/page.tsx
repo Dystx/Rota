@@ -110,7 +110,7 @@ export default async function TripDetailPage({
             <div className="relative mb-12 lg:mb-24 overflow-hidden rounded-[24px] lg:rounded-[32px] px-6 py-16 text-center lg:px-12 lg:py-32">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(182,235,254,0.15),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(48,101,118,0.05),transparent_50%),linear-gradient(to_bottom,rgba(247,250,249,0),rgba(247,250,249,1))]"></div>
               <div className="relative mx-auto grid max-w-3xl gap-6">
-                <h1 className="font-[family-name:var(--font-rota-display)] text-5xl text-[var(--color-foreground)]">Trip not found</h1>
+                <h1 className="font-display text-5xl text-[var(--color-foreground)]">Trip not found</h1>
                 <p className="mx-auto max-w-2xl font-[family-name:var(--font-inter)] text-lg text-[var(--color-muted-foreground)]">
                   This trip does not exist or you do not have permission to view it.
                 </p>
@@ -239,7 +239,7 @@ export default async function TripDetailPage({
                     <p className="font-mono-micro text-mono-micro text-olive-light uppercase tracking-widest mb-1">
                       Overview
                     </p>
-                    <h3 className="font-[family-name:var(--font-rota-display)] text-2xl text-[var(--color-foreground)]">
+                    <h3 className="font-display text-2xl text-[var(--color-foreground)]">
                       {trip?.title ?? title}
                     </h3>
                   </div>
@@ -343,7 +343,7 @@ export default async function TripDetailPage({
             {itinerary ? (
               <RevealSection>
                 <div className="grid gap-6 text-center">
-                  <h2 className="font-[family-name:var(--font-rota-display)] text-4xl text-[var(--color-foreground)]">Route & Pacing</h2>
+                  <h2 className="font-display text-4xl text-[var(--color-foreground)]">Route & Pacing</h2>
                   <p className="text-lg leading-[1.6] text-[var(--color-muted-foreground)] font-[family-name:var(--font-inter)] mx-auto max-w-2xl">
                     {itinerary.routeOverview}
                   </p>
@@ -396,7 +396,7 @@ export default async function TripDetailPage({
 
         <GuideChapter id="itinerary" className="py-12 md:py-24">
           <div className="mx-auto max-w-[800px]">
-            <h2 className="font-[family-name:var(--font-rota-display)] text-4xl text-[var(--color-foreground)] mb-12">Detailed Itinerary</h2>
+            <h2 className="font-display text-4xl text-[var(--color-foreground)] mb-12">Detailed Itinerary</h2>
             <ItineraryTimeline days={timelineDays} readOnly={false} />
           </div>
         </GuideChapter>
@@ -404,7 +404,7 @@ export default async function TripDetailPage({
         <GuideChapter id="unlock" className="py-12 md:py-24 bg-[var(--color-ink)] text-[var(--color-paper)]">
           <div className="mx-auto max-w-[800px] grid gap-12">
             <div className="text-center">
-              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl">Unlock & Delivery</h2>
+              <h2 className="font-display text-4xl">Unlock & Delivery</h2>
               <p className="mt-4 text-lg text-[var(--color-cream)]">Get full access to this curated route.</p>
             </div>
             
@@ -425,7 +425,7 @@ export default async function TripDetailPage({
 
         <GuideChapter id="next-step" className="p-0">
           <CTASection>
-             <h2 className="font-[family-name:var(--font-rota-display)] text-4xl md:text-5xl">Ready to proceed?</h2>
+             <h2 className="font-display text-4xl md:text-5xl">Ready to proceed?</h2>
              <p className="text-xl md:text-2xl text-[var(--color-cream)] max-w-2xl">Confirm your unlocking plan, chat with the destination specialist, or request an expert human review to perfect these details.</p>
              <div className="flex flex-wrap justify-center gap-4 mt-4">
                {tripCommerceState.canUnlock ? (

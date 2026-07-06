@@ -21,7 +21,7 @@ export function PageShell({
         <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[rgba(247,250,249,0.7)] backdrop-blur-2xl">
           <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-6 lg:px-12">
             <div className="flex items-center gap-4">
-              <p className="font-[family-name:var(--font-rota-display)] text-2xl italic text-[var(--color-foreground)]">
+              <p className="font-display text-2xl italic text-[var(--color-foreground)]">
                 Rumia
               </p>
               <div className="h-4 w-px bg-[var(--color-border)]" />
@@ -65,10 +65,10 @@ export function SectionHeading({
   const TitleTag = h1 ? "h1" : "h2";
   return (
     <div className={cn("grid gap-3", className)}>
-      <p className="rota-kicker">{eyebrow}</p>
+      <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">{eyebrow}</p>
       <div className="grid gap-3 lg:max-w-4xl">
-        <TitleTag className="rota-heading">{title}</TitleTag>
-        <p className="rota-muted text-lg">{description}</p>
+        <TitleTag className="font-display text-primary text-4xl md:text-5xl leading-tight tracking-tight">{title}</TitleTag>
+        <p className="text-on-surface-variant leading-loose text-lg">{description}</p>
       </div>
     </div>
   );
@@ -89,8 +89,8 @@ export function PlaceholderMap({ title = "Route map placeholder" }: { title?: st
     <div className="overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[linear-gradient(180deg,rgba(177,232,251,0.15),rgba(247,250,249,0.8))] p-6 shadow-[0_8px_32px_rgba(24,28,28,0.04)] backdrop-blur-xl">
       <div className="grid gap-6">
         <div>
-          <p className="rota-kicker">Map-first shell</p>
-          <h3 className="font-[family-name:var(--font-rota-display)] text-3xl text-[var(--color-foreground)]">
+          <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Map-first shell</p>
+          <h3 className="font-display text-3xl text-[var(--color-foreground)]">
             {title}
           </h3>
         </div>

@@ -34,7 +34,7 @@ export default function NewTripPage() {
           <h1 className="font-display text-display-mobile md:text-display text-foreground drop-shadow-2xl">
             Confirm your brief
           </h1>
-          <p className="rota-muted text-xl max-w-2xl mx-auto">
+          <p className="text-on-surface-variant leading-loose text-xl max-w-2xl mx-auto">
             Review and manually adjust the specifics of your trip. We use these structured details to craft a paced, realistic Portugal itinerary.
           </p>
         </div>
@@ -46,26 +46,26 @@ export default function NewTripPage() {
         <div className="grid gap-6 sticky top-32">
           <Card className="border-none shadow-none bg-transparent">
             <CardHeader className="px-0 pt-0">
-              <h3 className="font-[family-name:var(--font-rota-display)] text-2xl">Why we ask</h3>
+              <h3 className="font-display text-2xl">Why we ask</h3>
             </CardHeader>
             <CardContent className="px-0 grid gap-8">
               <div>
                 <p className="font-medium text-[var(--color-foreground)] mb-2">Pacing & Reality</p>
-                <p className="rota-muted text-sm">
+                <p className="text-on-surface-variant leading-loose text-sm">
                   Many travelers pack too much into a single day. By understanding your pace and transport preferences, we ensure you spend more time experiencing Portugal and less time in transit.
                 </p>
               </div>
 
               <div>
                 <p className="font-medium text-[var(--color-foreground)] mb-2">Local Nuance</p>
-                <p className="rota-muted text-sm">
+                <p className="text-on-surface-variant leading-loose text-sm">
                   We don't just match generic tags. We cross-reference your interests against regional realities—knowing which coastal towns have the best winter seafood or where to avoid summer crowds.
                 </p>
               </div>
 
               <div>
                 <p className="font-medium text-[var(--color-foreground)] mb-2">The Concierge Audit</p>
-                <p className="rota-muted text-sm">
+                <p className="text-on-surface-variant leading-loose text-sm">
                   Once submitted, your brief is audited by our routing engine. We look for logistical friction (like trying to see the Douro Valley as a half-day trip from Lisbon) and offer a polished, workable draft.
                 </p>
               </div>

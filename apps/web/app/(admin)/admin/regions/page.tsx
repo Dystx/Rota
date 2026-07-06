@@ -74,14 +74,14 @@ export default async function AdminRegionsPage() {
             <CardTitle>Next rollout concern</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="rota-muted text-sm">Keep region descriptions tightly tied to local character so country expansion stays curated instead of generic.</p>
+            <p className="text-on-surface-variant leading-loose text-sm">Keep region descriptions tightly tied to local character so country expansion stays curated instead of generic.</p>
           </CardContent>
         </Card>
       </div>
       {infoMessage ? (
         <Card>
           <CardContent className="pt-6">
-            <p className="rota-muted text-sm">{infoMessage}</p>
+            <p className="text-on-surface-variant leading-loose text-sm">{infoMessage}</p>
           </CardContent>
         </Card>
       ) : null}

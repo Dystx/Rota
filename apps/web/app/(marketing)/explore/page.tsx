@@ -25,7 +25,7 @@ export default function ExplorePage() {
             <h1 className="font-display text-display-mobile md:text-display text-primary leading-tight">
               A living atlas for <span className="italic text-ochre-dark">intentional</span> travel.
             </h1>
-            <p className="rota-muted text-lg max-w-2xl">
+            <p className="text-on-surface-variant leading-loose text-lg max-w-2xl">
               Built on MapLibre GL JS + CARTO vector tiles. Portugal-first today, world-ready
               tomorrow — every layer, camera move, and live data stream is provider-agnostic.
             </p>
@@ -41,7 +41,7 @@ export default function ExplorePage() {
               <h2 className="font-headline-sm text-headline-sm md:font-headline-lg md:text-headline-lg text-primary leading-tight">
                 MapLibre setProjection
               </h2>
-              <p className="rota-muted text-sm mt-2">
+              <p className="text-on-surface-variant leading-loose text-sm mt-2">
                 One call — <code className="font-mono-micro">{`map.setProjection({ type: "globe" })`}</code> —
                 turns the flat canvas into a smooth interactive orb with a soft fog halo.
               </p>
@@ -53,7 +53,7 @@ export default function ExplorePage() {
               <h2 className="font-headline-sm text-headline-sm md:font-headline-lg md:text-headline-lg text-primary leading-tight">
                 Batched setData()
               </h2>
-              <p className="rota-muted text-sm mt-2">
+              <p className="text-on-surface-variant leading-loose text-sm mt-2">
                 Updates coalesce per animation frame via
                 <code className="font-mono-micro"> requestAnimationFrame</code>-equivalent batching, so
                 hundreds of pins shift without GPU thrash.
@@ -66,7 +66,7 @@ export default function ExplorePage() {
               <h2 className="font-headline-sm text-headline-sm md:font-headline-lg md:text-headline-lg text-primary leading-tight">
                 Provider-agnostic
               </h2>
-              <p className="rota-muted text-sm mt-2">
+              <p className="text-on-surface-variant leading-loose text-sm mt-2">
                 Today: MapLibre. Tomorrow: deck.gl, CesiumJS, or a custom WebGL adapter — every layer
                 speaks the same SpatialLayer contract.
               </p>

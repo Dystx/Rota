@@ -134,7 +134,7 @@ export default async function ReviewerQueuePage() {
       {!errorMessage && !notSignedIn && processedTrips.length > 0 && (
         <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
         <CardHeader className="px-4 md:px-8 pt-6 md:pt-8 pb-4">
-          <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl">Assigned trips</CardTitle>
+          <CardTitle className="font-display text-2xl">Assigned trips</CardTitle>
         </CardHeader>
         <CardContent className="px-4 md:px-8 pb-6 md:pb-8">
           <div data-testid="queue-list" className="w-full">

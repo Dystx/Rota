@@ -112,11 +112,11 @@ export default async function TripMapPage({
         <GuideChapter id="overview" className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8" data-testid="trip-map-header">
             <RevealSection>
-              <p className="rota-kicker text-[var(--color-atlantic)]">Route audit · Trip {tripId}</p>
-              <h1 className="mt-4 font-[family-name:var(--font-rota-display)] text-5xl tracking-tight text-[var(--color-foreground)] lg:text-6xl">
+              <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium text-[var(--color-atlantic)]">Route audit · Trip {tripId}</p>
+              <h1 className="mt-4 font-display text-5xl tracking-tight text-[var(--color-foreground)] lg:text-6xl">
                 {heroTitle}
               </h1>
-              <p className="rota-muted mt-6 max-w-3xl text-xl leading-relaxed">{heroSummary}</p>
+              <p className="text-on-surface-variant leading-loose mt-6 max-w-3xl text-xl leading-relaxed">{heroSummary}</p>
             </RevealSection>
 
             {infoMessage ? (
@@ -125,7 +125,7 @@ export default async function TripMapPage({
                   <CardContent className="pt-6 space-y-4">
                     <div>
                       <p className="font-medium text-foreground">Trip not found</p>
-                      <p className="rota-muted text-sm mt-1">
+                      <p className="text-on-surface-variant leading-loose text-sm mt-1">
                         We couldn&apos;t find a saved itinerary for trip <code className="font-mono text-xs bg-paper px-1.5 py-0.5 rounded">{tripId}</code>. It may have been deleted, or the link is wrong.
                       </p>
                     </div>
@@ -161,7 +161,7 @@ export default async function TripMapPage({
         <GuideChapter id="pacing" className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-12">
             <RevealSection>
-              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl text-[var(--color-foreground)]">Why this pace fits you</h2>
+              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Why this pace fits you</h2>
             </RevealSection>
             <RevealSection delayMs={120}>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -170,7 +170,7 @@ export default async function TripMapPage({
                   "Show where human review or route validation still needs to tighten the plan."
                 ]).map((note) => (
                   <div key={note} className="rounded-[24px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.5)] p-6 shadow-sm">
-                    <p className="rota-muted leading-relaxed">{note}</p>
+                    <p className="text-on-surface-variant leading-loose leading-relaxed">{note}</p>
                   </div>
                 ))}
               </div>
@@ -210,11 +210,11 @@ export default async function TripMapPage({
                 <MapPanel position="right" className="w-[380px] p-6">
                   <div className="flex flex-col gap-6">
                     <div>
-                      <p className="rota-kicker mb-2">Day {activeDay?.dayIndex ?? 1} route</p>
-                      <h3 className="font-[family-name:var(--font-rota-display)] text-2xl text-[var(--color-foreground)]">
+                      <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium mb-2">Day {activeDay?.dayIndex ?? 1} route</p>
+                      <h3 className="font-display text-2xl text-[var(--color-foreground)]">
                         {activeDay ? `${activeDay.label} · ${activeDay.region}` : "Saved route preview"}
                       </h3>
-                      <p className="rota-muted mt-3 text-sm leading-relaxed">
+                      <p className="text-on-surface-variant leading-loose mt-3 text-sm leading-relaxed">
                         {activeItineraryDay?.summary ??
                           "Route validation appears once a saved trip brief generates itinerary data."}
                       </p>
@@ -255,17 +255,17 @@ export default async function TripMapPage({
 
                     {partnerOffers.length ? (
                       <div className="mt-4 flex flex-col gap-5 border-t border-[var(--color-border)] pt-6">
-                        <p className="rota-kicker">Booking sources</p>
+                        <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Booking sources</p>
                         {partnerOffers.map((partner) => (
                           <div key={partner.id} className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm transition-all hover:shadow-md">
                             <div className="flex flex-wrap items-center justify-between gap-3">
                               <div>
                                 <p className="text-sm font-semibold text-[var(--color-foreground)]">{partner.name}</p>
-                                <p className="rota-muted mt-1 text-[10px] uppercase tracking-wider">{partner.type || "Booking source"}</p>
+                                <p className="text-on-surface-variant leading-loose mt-1 text-[10px] uppercase tracking-wider">{partner.type || "Booking source"}</p>
                               </div>
                               {partner.isAffiliate ? <Badge tone="soft">Affiliate</Badge> : null}
                             </div>
-                            <p className="rota-muted mt-3 text-xs leading-relaxed">{partner.notes || "Useful for booking or comparing a stop on this route."}</p>
+                            <p className="text-on-surface-variant leading-loose mt-3 text-xs leading-relaxed">{partner.notes || "Useful for booking or comparing a stop on this route."}</p>
                             <div className="mt-4">
                               <Button asChild variant="ghost" className="h-8 w-full text-xs">
                                 <Link
@@ -296,8 +296,8 @@ export default async function TripMapPage({
         <GuideChapter id="warnings" className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8">
             <RevealSection>
-              <h2 className="font-[family-name:var(--font-rota-display)] text-4xl text-[var(--color-foreground)]">Route notes</h2>
-              <p className="rota-muted mt-4 text-lg leading-relaxed">
+              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Route notes</h2>
+              <p className="text-on-surface-variant leading-loose mt-4 text-lg leading-relaxed">
                 Items the route audit flagged for tightening. Reviewer polish addresses these directly.
               </p>
             </RevealSection>
@@ -305,7 +305,7 @@ export default async function TripMapPage({
               <div className="flex flex-col gap-3">
                 {warningList.length === 0 ? (
                   <div className="rounded-[24px] border border-[var(--color-border)] bg-white/60 p-6">
-                    <p className="rota-muted text-sm">No flagged notes for this route.</p>
+                    <p className="text-on-surface-variant leading-loose text-sm">No flagged notes for this route.</p>
                   </div>
                 ) : (
                   warningList.map((warning, index) => (
@@ -322,7 +322,7 @@ export default async function TripMapPage({
 
         <GuideChapter id="next-step" className="p-0">
           <CTASection>
-            <h2 className="font-[family-name:var(--font-rota-display)] text-4xl md:text-5xl">Continue with this route</h2>
+            <h2 className="font-display text-4xl md:text-5xl">Continue with this route</h2>
             <p className="text-xl text-[var(--color-cream)] max-w-2xl">
               Return to the guided overview or open the export center when you are ready.
             </p>

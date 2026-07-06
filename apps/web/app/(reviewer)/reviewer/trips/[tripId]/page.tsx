@@ -117,21 +117,21 @@ export default async function ReviewerTripPage({
       {review === "queued" ? (
         <Card className="mt-6 border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="pt-6">
-            <p className="rota-muted text-sm">This trip is now marked as in review.</p>
+            <p className="text-on-surface-variant leading-loose text-sm">This trip is now marked as in review.</p>
           </CardContent>
         </Card>
       ) : null}
       {review === "completed" ? (
         <Card className="mt-6 border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="pt-6">
-            <p className="rota-muted text-sm">Reviewer completion saved. The trip now carries reviewed trust markers.</p>
+            <p className="text-on-surface-variant leading-loose text-sm">Reviewer completion saved. The trip now carries reviewed trust markers.</p>
           </CardContent>
         </Card>
       ) : null}
       {review === "locked" ? (
         <Card className="mt-6 border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="pt-6">
-            <p className="rota-muted text-sm">This trip must be unlocked before it can move through human review.</p>
+            <p className="text-on-surface-variant leading-loose text-sm">This trip must be unlocked before it can move through human review.</p>
           </CardContent>
         </Card>
       ) : null}
@@ -153,7 +153,7 @@ export default async function ReviewerTripPage({
         <div className="grid gap-6">
           <Card className="overflow-hidden border-black/5 bg-white/60 shadow-sm">
             <CardHeader className="px-8 pt-8">
-              <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl">Client brief context</CardTitle>
+              <CardTitle className="font-display text-2xl">Client brief context</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-6 px-8 pb-8">
               <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
@@ -176,7 +176,7 @@ export default async function ReviewerTripPage({
           </Card>
           <Card className="overflow-hidden border-black/5 bg-white/60 shadow-sm">
             <CardHeader className="px-8 pt-8">
-              <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl">Reviewer actions</CardTitle>
+              <CardTitle className="font-display text-2xl">Reviewer actions</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 px-8 pb-8">
               {trip && tripCommerceState.canCompleteReview ? (
@@ -186,10 +186,10 @@ export default async function ReviewerTripPage({
                   <div className="grid gap-5">
                     <div>
                       <p className="text-base font-medium text-[var(--color-foreground)]">Complete human review</p>
-                      <p className="rota-muted mt-2 text-sm leading-relaxed">Apply the reviewer trust marker to this unlocked trip.</p>
+                      <p className="text-on-surface-variant leading-loose mt-2 text-sm leading-relaxed">Apply the reviewer trust marker to this unlocked trip.</p>
                     </div>
                     <label className="grid gap-3 text-sm text-[var(--color-foreground)]">
-                      <span className="rota-kicker">Reviewer summary</span>
+                      <span className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Reviewer summary</span>
                       <textarea
                         name="notes"
                         rows={4}
@@ -211,7 +211,7 @@ export default async function ReviewerTripPage({
               ].map((action) => (
                 <div key={action} className="rounded-2xl border border-black/5 bg-white/80 p-6 shadow-sm">
                   <p className="text-base font-medium text-[var(--color-foreground)]">{action}</p>
-                  <p className="rota-muted mt-3 text-sm leading-relaxed">
+                  <p className="text-on-surface-variant leading-loose mt-3 text-sm leading-relaxed">
                     {action === "Add rain fallback"
                       ? "Attach a backup stop to any day that still lacks a weather-safe option."
                       : action === "Flag tourist trap"
@@ -232,7 +232,7 @@ export default async function ReviewerTripPage({
           </Card>
           <Card className="overflow-hidden border-black/5 bg-white/60 shadow-sm">
             <CardHeader className="px-8 pt-8">
-              <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl">Trust markers</CardTitle>
+              <CardTitle className="font-display text-2xl">Trust markers</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3 px-8 pb-8">
               {tripCommerceState.markers.map((marker) => (
@@ -285,11 +285,11 @@ export default async function ReviewerTripPage({
               <RouteMap selectedDayId={activeDay ? String(activeDay.dayIndex) : undefined} days={mapDays} warnings={mapWarnings}>
                 <MapPanel position="left" className="!w-[calc(100%-48px)] sm:!w-[320px] left-6 right-6 sm:right-auto pointer-events-auto">
                   <div className="grid gap-4">
-                    <p className="rota-kicker">Reviewer focus</p>
-                    <h3 className="font-[family-name:var(--font-rota-display)] text-3xl text-[var(--color-foreground)]">
+                    <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Reviewer focus</p>
+                    <h3 className="font-display text-3xl text-[var(--color-foreground)]">
                       {activeDay ? `${activeDay.label} edit layer` : "Map editor"}
                     </h3>
-                    <p className="rota-muted leading-relaxed">
+                    <p className="text-on-surface-variant leading-loose leading-relaxed">
                       {activeItineraryDay?.transportAssumption ??
                         "Travel assumptions and reviewer adjustments will appear here once a route draft is loaded."}
                     </p>
@@ -305,7 +305,7 @@ export default async function ReviewerTripPage({
                           <p className="text-base font-medium text-[var(--color-foreground)]">{stop.placeName}</p>
                           <TravelTimeChip className="shrink-0 self-start sm:self-auto" time={`${stop.startTime}–${stop.endTime}`} />
                         </div>
-                        <p className="rota-muted mt-3 leading-relaxed text-sm sm:text-base">{stop.reason}</p>
+                        <p className="text-on-surface-variant leading-loose mt-3 leading-relaxed text-sm sm:text-base">{stop.reason}</p>
                         {stop.warning ? (
                           <Badge className="mt-4" tone="soft">
                             {stop.warning}
@@ -322,13 +322,13 @@ export default async function ReviewerTripPage({
           <div data-testid="validation-findings">
             <Card className="overflow-hidden border-black/5 bg-white/60 shadow-sm">
               <CardHeader className="px-5 pt-6 sm:px-8 sm:pt-8">
-                <CardTitle className="font-[family-name:var(--font-rota-display)] text-xl sm:text-2xl">Validation findings</CardTitle>
+                <CardTitle className="font-display text-xl sm:text-2xl">Validation findings</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4 px-5 pb-6 sm:px-8 sm:pb-8 md:grid-cols-2">
                 {(activeWarnings ?? routeValidation?.warnings ?? []).map((warning) => (
                   <div key={`${warning.code}-${warning.dayIndex ?? "all"}`} className="rounded-2xl border border-black/5 bg-white/80 p-5 sm:p-6 shadow-sm">
                     <p className="text-base font-medium text-[var(--color-foreground)]">{warning.title}</p>
-                    <p className="rota-muted mt-3 text-sm leading-relaxed">{warning.detail}</p>
+                    <p className="text-on-surface-variant leading-loose mt-3 text-sm leading-relaxed">{warning.detail}</p>
                   </div>
                 ))}
               </CardContent>
@@ -344,7 +344,7 @@ export default async function ReviewerTripPage({
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-1 border-b border-[var(--color-border)] pb-3 last:border-b-0 last:pb-0">
-      <p className="rota-kicker">{label}</p>
+      <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">{label}</p>
       <p className="text-sm text-[var(--color-foreground)]">{value}</p>
     </div>
   );

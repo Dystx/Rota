@@ -96,7 +96,7 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
         <h2 className="font-display italic text-2xl md:text-3xl text-primary leading-tight mb-2">
           The Artisan's Path
         </h2>
-        <p className="rota-muted text-sm leading-relaxed mb-5">
+        <p className="text-on-surface-variant leading-loose text-sm leading-relaxed mb-5">
           A 7-day journey shaped around craft — temples, tea houses, and the slow burn
           of a master at work.
         </p>
@@ -207,7 +207,7 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
                 <p
                   className={[
                     "text-sm leading-relaxed",
-                    isActive ? "text-on-primary opacity-90" : "rota-muted"
+                    isActive ? "text-on-primary opacity-90" : "text-on-surface-variant leading-loose"
                   ].join(" ")}
                 >
                   {stop.note}

@@ -297,7 +297,7 @@ test.describe("Accessibility Audits - Behavior", () => {
       ]);
       trace.push("Form submitted successfully. URL: " + page.url());
     } catch (e) {
-      const pageText = await page.locator('p.rota-form-error, p.rota-muted:has-text("need attention"), p.rota-muted:has-text("Could not save")').first().textContent().catch(()=>"No error text found");
+      const pageText = await page.locator('p.rota-form-error, p.text-on-surface-variant:has-text("need attention"), p.text-on-surface-variant:has-text("Could not save")').first().textContent().catch(()=>"No error text found");
       trace.push("Failed to submit form. Found error: " + pageText);
       throw e;
     } finally {

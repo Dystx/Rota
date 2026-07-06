@@ -84,7 +84,7 @@ export function StatCard({
           className="h-8 w-24 animate-pulse rounded-md bg-[var(--color-skeleton)]"
         />
       ) : (
-        <p className="font-[family-name:var(--font-rota-display)] text-3xl tracking-tight text-[var(--color-foreground)]">
+        <p className="font-display text-3xl tracking-tight text-[var(--color-foreground)]">
           {value}
         </p>
       )}

@@ -45,7 +45,7 @@ export default async function GuideOnboardingPage() {
         <h1 className="font-headline text-headline-lg text-foreground">
           Specialist onboarding
         </h1>
-        <p className="rota-muted max-w-2xl text-sm leading-relaxed">
+        <p className="text-on-surface-variant leading-loose max-w-2xl text-sm leading-relaxed">
           Tell us about your practice. Tier 3 (Full Remote Support)
           specialists join the on-call rota; Tier 4 (Licensed Guide)
           requires a Portugal RNAAT license number. Both tiers are

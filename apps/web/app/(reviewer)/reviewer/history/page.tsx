@@ -99,7 +99,7 @@ export default async function ReviewerHistoryPage() {
           <div data-testid="history-table" className="hidden md:block mt-8">
             <Card className="border-[var(--color-border)] shadow-sm bg-white/60">
               <CardHeader className="px-4 md:px-8 pt-6 md:pt-8 pb-4">
-                <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl">Completed and recent reviews</CardTitle>
+                <CardTitle className="font-display text-2xl">Completed and recent reviews</CardTitle>
               </CardHeader>
               <CardContent className="px-4 md:px-8 pb-6 md:pb-8">
                 {rawData.length > 0 ? (
@@ -124,7 +124,7 @@ export default async function ReviewerHistoryPage() {
           </div>
 
           <div data-testid="history-list" className="grid gap-4 md:hidden mt-8">
-            <h3 className="font-[family-name:var(--font-rota-display)] text-xl font-semibold px-1">Completed and recent reviews</h3>
+            <h3 className="font-display text-xl font-semibold px-1">Completed and recent reviews</h3>
             {rawData.length === 0 ? (
               <Card className="border-[var(--color-border)] bg-white/60 shadow-sm">
                 <CardContent className="p-0">

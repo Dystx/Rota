@@ -92,7 +92,7 @@ export default async function ReviewerOperationsPage() {
       {infoMessage ? (
         <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm" data-testid="reviewer-operations-info">
           <CardContent className="pt-6">
-            <p className="rota-muted text-sm">{infoMessage}</p>
+            <p className="text-on-surface-variant leading-loose text-sm">{infoMessage}</p>
           </CardContent>
         </Card>
       ) : null}
@@ -100,10 +100,10 @@ export default async function ReviewerOperationsPage() {
       <div className="mt-8 flex flex-col gap-8 md:gap-12">
         <Card data-testid="worker-plan-card" className="border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardHeader className="px-4 md:px-8 pt-6 md:pt-8 pb-4">
-            <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl">Background queue</CardTitle>
+            <CardTitle className="font-display text-2xl">Background queue</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-6 px-4 md:px-8 pb-6 md:pb-8">
-            <p className="rota-muted text-base leading-relaxed">{workerPlan.summary}</p>
+            <p className="text-on-surface-variant leading-loose text-base leading-relaxed">{workerPlan.summary}</p>
             {workerPlan.jobs.length === 0 ? (
               <EmptyState variant="table" title="No background jobs" description="Background queues are idle. Newly assigned trips will appear here once they enter the operations pipeline." />
             ) : (
@@ -116,13 +116,13 @@ export default async function ReviewerOperationsPage() {
                     </div>
                     <div>
                       <p className="text-base font-semibold text-[var(--color-foreground)]">{job.title}</p>
-                      <p className="rota-muted mt-1 text-sm leading-relaxed">{job.summary}</p>
+                      <p className="text-on-surface-variant leading-loose mt-1 text-sm leading-relaxed">{job.summary}</p>
                     </div>
                     <div className="mt-auto grid gap-2 pt-2 text-sm">
-                      <p className="text-[var(--color-foreground)]"><span className="rota-kicker mr-2">Owner</span>{job.owner}</p>
-                      <p className="text-[var(--color-foreground)]"><span className="rota-kicker mr-2">Next step</span>{job.nextStep}</p>
+                      <p className="text-[var(--color-foreground)]"><span className="text-xs uppercase tracking-widest text-ochre-dark font-medium mr-2">Owner</span>{job.owner}</p>
+                      <p className="text-[var(--color-foreground)]"><span className="text-xs uppercase tracking-widest text-ochre-dark font-medium mr-2">Next step</span>{job.nextStep}</p>
                       {job.blockingReason ? (
-                        <p className="text-[var(--color-muted-foreground)]"><span className="rota-kicker mr-2">Blocked</span>{job.blockingReason}</p>
+                        <p className="text-[var(--color-muted-foreground)]"><span className="text-xs uppercase tracking-widest text-ochre-dark font-medium mr-2">Blocked</span>{job.blockingReason}</p>
                       ) : null}
                     </div>
                   </div>
@@ -135,7 +135,7 @@ export default async function ReviewerOperationsPage() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           <Card data-testid="checkout-plan-card" className="border-[var(--color-border)] bg-white/60 shadow-sm">
             <CardHeader className="px-4 md:px-8 pt-6 md:pt-8 pb-4">
-              <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl">Checkout tiers</CardTitle>
+              <CardTitle className="font-display text-2xl">Checkout tiers</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-4 px-4 md:px-8 pb-6 md:pb-8">
               {checkoutPlans.map((plan) => (
@@ -144,7 +144,7 @@ export default async function ReviewerOperationsPage() {
                     <Badge tone="soft">{prettify(plan.tier)}</Badge>
                     <Badge tone="soft">{plan.priceLabel}</Badge>
                   </div>
-                  <p className="rota-muted text-base leading-relaxed">{plan.fulfillment}</p>
+                  <p className="text-on-surface-variant leading-loose text-base leading-relaxed">{plan.fulfillment}</p>
                 </div>
               ))}
             </CardContent>
@@ -152,7 +152,7 @@ export default async function ReviewerOperationsPage() {
 
           <Card data-testid="email-preview-card" className="border-[var(--color-border)] bg-white/60 shadow-sm">
             <CardHeader className="px-4 md:px-8 pt-6 md:pt-8 pb-4">
-              <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl">Delivery messages</CardTitle>
+              <CardTitle className="font-display text-2xl">Delivery messages</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-4 px-4 md:px-8 pb-6 md:pb-8">
               {emailPreviews.map((preview) => (
@@ -162,7 +162,7 @@ export default async function ReviewerOperationsPage() {
                   </div>
                   <div>
                     <p className="text-base font-semibold text-[var(--color-foreground)]">{preview.subject}</p>
-                    <p className="rota-muted mt-1 text-sm leading-relaxed">{preview.previewText}</p>
+                    <p className="text-on-surface-variant leading-loose mt-1 text-sm leading-relaxed">{preview.previewText}</p>
                   </div>
                 </div>
               ))}

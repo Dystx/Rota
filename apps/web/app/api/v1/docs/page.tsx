@@ -23,7 +23,7 @@ export default function DeveloperDocsPage() {
         <h1 className="font-headline text-headline-lg text-foreground">
           Rumia API v1
         </h1>
-        <p className="rota-muted max-w-2xl text-sm leading-relaxed">
+        <p className="text-on-surface-variant leading-loose max-w-2xl text-sm leading-relaxed">
           B2B partner API for the destination knowledge
           graph. Read-only. Authenticated via bearer
           token.
@@ -37,7 +37,7 @@ export default function DeveloperDocsPage() {
         <pre className="overflow-x-auto rounded-[14px] border border-[var(--color-border)] bg-surface-container p-4 text-xs leading-relaxed">
 {`Authorization: Bearer rumia_live_<64 hex chars>`}
         </pre>
-        <p className="rota-muted text-sm">
+        <p className="text-on-surface-variant leading-loose text-sm">
           Request an API key from your partner success
           manager. The raw key is shown once; the platform
           stores only its SHA-256 hash. Revocation is
@@ -115,7 +115,7 @@ export default function DeveloperDocsPage() {
         <h2 className="font-headline text-headline-sm text-foreground">
           Roadmap
         </h2>
-        <p className="rota-muted text-sm">
+        <p className="text-on-surface-variant leading-loose text-sm">
           v1 is read-only and unscoped per org. The
           following are planned for v2:
         </p>

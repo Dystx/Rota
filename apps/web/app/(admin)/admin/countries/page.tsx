@@ -105,7 +105,7 @@ export default async function AdminCountriesPage() {
               <CardHeader className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]/30 px-6 py-6 sm:px-8">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <CardTitle className="font-[family-name:var(--font-rota-display)] text-2xl tracking-tight text-[var(--color-foreground)]">
+                    <CardTitle className="font-display text-2xl tracking-tight text-[var(--color-foreground)]">
                       Active Territories
                     </CardTitle>
                     <p className="mt-1 text-sm leading-relaxed text-[var(--color-muted-foreground)]">

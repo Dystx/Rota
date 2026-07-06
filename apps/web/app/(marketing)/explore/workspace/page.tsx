@@ -58,7 +58,7 @@ export default function WorkspaceDemoPage() {
             <h1 className="font-display text-display-mobile md:text-display text-primary leading-tight">
               Edit the route on a <span className="italic text-ochre-dark">flat</span> canvas.
             </h1>
-            <p className="rota-muted text-lg max-w-2xl">
+            <p className="text-on-surface-variant leading-loose text-lg max-w-2xl">
               Same Spatial Engine, mercator projection, three reference layers (ambient pulse,
               specialist badges, itinerary route) — all driven by the layer registry and the
               provider-agnostic TelemetryService.
@@ -83,7 +83,7 @@ export default function WorkspaceDemoPage() {
                     </span>
                     <div>
                       <p className="font-headline-sm text-headline-sm text-primary">{stop.name}</p>
-                      <p className="rota-muted text-sm">{stop.note}</p>
+                      <p className="text-on-surface-variant leading-loose text-sm">{stop.note}</p>
                     </div>
                   </li>
                 ))}
@@ -111,7 +111,7 @@ export default function WorkspaceDemoPage() {
                   <code className="font-mono-micro text-mono-micro uppercase tracking-[0.1em] text-olive-light">trips</code>
                 </li>
               </ul>
-              <p className="rota-muted text-sm">
+              <p className="text-on-surface-variant leading-loose text-sm">
                 Each layer self-binds to its channel via <code className="font-mono-micro">bindLayerToChannel()</code>.
                 Disable, reorder, or swap the underlying renderer without touching layer code.
               </p>

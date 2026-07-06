@@ -20,7 +20,7 @@ export function TestimonialCard({
   return (
     <Card className={cn("overflow-hidden", className)} {...props}>
       <CardContent className="grid gap-6 p-8 sm:p-10">
-        <blockquote className="font-[family-name:var(--font-rota-display)] text-xl leading-relaxed text-[var(--color-foreground)] sm:text-2xl">
+        <blockquote className="font-display text-xl leading-relaxed text-[var(--color-foreground)] sm:text-2xl">
           "{children}"
         </blockquote>
         <div className="flex items-center gap-4">

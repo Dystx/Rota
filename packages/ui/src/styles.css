@@ -364,27 +364,6 @@
     color: var(--color-foreground);
   }
 
-  .rota-heading {
-    font-family: "Playfair Display", serif;
-    font-size: clamp(2.2rem, 4.5vw, 3.8rem);
-    line-height: 1.08;
-    letter-spacing: -0.02em;
-    color: var(--color-foreground);
-  }
-
-  .rota-kicker {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-weight: 500;
-    color: var(--color-muted-foreground);
-  }
-
-  .rota-muted {
-    color: var(--color-muted-foreground);
-    line-height: 1.8;
-  }
-
   .rota-glass-panel {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5));
     backdrop-filter: blur(24px);
