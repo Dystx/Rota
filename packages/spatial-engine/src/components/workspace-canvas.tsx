@@ -387,6 +387,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       <div
         ref={containerRef}
         data-testid={testId}
+        data-map-container=""
         role="application"
         aria-label={`Interactive workspace map of ${initialFocus ? "the selected route" : "Portugal"} — use arrow keys to pan, plus and minus to zoom`}
         tabIndex={0}

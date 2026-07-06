@@ -407,6 +407,7 @@ export function GlobeWorkspace({
     <div
       ref={containerRef}
       data-testid={testId}
+      data-map-container=""
       role="application"
       aria-label={`Interactive globe map of ${initialFocus ? "the selected destination" : "Portugal"} — use arrow keys to pan, plus and minus to zoom`}
       tabIndex={0}
