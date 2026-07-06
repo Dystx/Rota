@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card, CardContent, Input } from "@repo/ui";
+import { Button, Card, CardContent } from "@repo/ui";
 import { getDestinationPreset } from "@repo/spatial-engine";
 
 /**
@@ -11,22 +11,18 @@ import { getDestinationPreset } from "@repo/spatial-engine";
  * inline editable inputs without the ... dots. just integrate it
  * well with the map."
  *
- * Replaces the old `HeroQuickStart` search bar (which sat BELOW
- * the hero) with a single Card that lives INSIDE the hero, at
- * the BOTTOM so the rotating globe stays fully visible above.
- * The card reads as natural language:
+ * Renders as a natural-language sentence:
  *
  *     We are visiting  [Portugal]  for  [7]  days in  [May].
  *
- * Each bracketed field is an inline editable `Input` from
- * `@repo/ui`. Labels are visually hidden (sr-only) so the
- * sentence flows naturally on mobile and desktop; screen
- * readers get the field name via `aria-label`. Underneath the
- * sentence sits a single `Button` ("Begin Journey") — also
- * from the shared UI kit.
- *
- * On submit we navigate to /planner with the values as query
- * params, so the planner can pre-fill its first step.
+ * Each bracketed field is a plain `<input>` (NOT the shared
+ * `Input` primitive — that one targets standalone form fields
+ * with a white background, which reads as a broken form on the
+ * dark hero). The inputs use a dark pill background with cream
+ * text and an ochre underline so they sit inline with the
+ * display-font sentence. Labels are visually hidden (sr-only)
+ * so the sentence flows naturally; screen readers get the
+ * field name via `aria-label`.
  */
 const KNOWN_SLUGS = [
   "lisbon",
@@ -72,19 +68,20 @@ function resolveDestinationSlug(raw: string): string {
 }
 
 /**
- * Shared inline-input className. Labels are sr-only so the
- * sentence flows naturally; the visual sentence itself serves
- * as the label. High-contrast ochre underline + olive-dark
- * pill background so the inputs read clearly against the
- * white card.
+ * Shared inline-input className for the hero sentence. Plain
+ * <input> elements with explicit `appearance-none` so the
+ * browser doesn't draw its own border/background. The dark
+ * pill (bg-ink) + cream text (text-cream) + ochre underline
+ * (border-b-2 border-ochre-light) reads as emphasized text
+ * with a clear editable affordance, not a broken form field.
  */
 const INLINE_FIELD_BASE =
-  "inline-block px-2 py-0.5 md:px-3 md:py-1 bg-[var(--color-foreground)] rounded-md border-b-2 border-[var(--color-accent)] focus:border-[var(--color-accent)] focus:bg-[var(--color-primary)] focus:outline-none text-[var(--color-accent-light)] text-center align-baseline mx-0.5 md:mx-1 transition-colors placeholder:text-[var(--color-accent-light)]";
+  "inline-block appearance-none bg-ink text-cream border-0 border-b-2 border-ochre-light rounded-md px-2 py-0.5 md:px-3 md:py-1 text-center align-baseline mx-0.5 md:mx-1 font-display text-xl md:text-3xl leading-none transition-colors focus:outline-none focus:bg-primary focus:border-ochre-light focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-paper placeholder:text-cream/60";
 
 const INLINE_FIELD_SIZES = {
-  destination: "!w-28 md:!w-40",
-  days: "!w-12 md:!w-16",
-  window: "!w-24 md:!w-32",
+  destination: "w-32 md:w-40",
+  days: "w-14 md:w-16",
+  window: "w-28 md:w-32",
 } as const;
 
 export function HeroIntentCard() {
@@ -115,25 +112,20 @@ export function HeroIntentCard() {
           onSubmit={onBegin}
           className="flex flex-col items-center gap-6"
         >
-          {/* Sentence with inline editable fields. Each field is
-              a raw <Input> (not wrapped in <Field>) so the label
-              doesn't render above the input — the sentence
-              itself is the visual label. `aria-label` gives
-              screen readers the field name. */}
-          <label className="font-display-mobile md:font-display text-xl md:text-3xl text-[var(--color-foreground)] leading-snug text-center w-full text-balance">
+          <label className="font-display text-xl md:text-3xl text-primary leading-snug text-center w-full text-balance">
             <span>We are visiting </span>
             <span className="sr-only">Destination</span>
-            <Input
+            <input
               type="text"
               value={destination}
               onChange={(event) => setDestination(event.target.value)}
               aria-label="Destination"
               data-testid="hero-intent-destination"
-              className={`${INLINE_FIELD_BASE} ${INLINE_FIELD_SIZES.destination} !text-xl md:!text-3xl !font-display-mobile md:!font-display`}
+              className={`${INLINE_FIELD_BASE} ${INLINE_FIELD_SIZES.destination}`}
             />
             <span> for </span>
             <span className="sr-only">Number of days</span>
-            <Input
+            <input
               type="number"
               inputMode="numeric"
               min={1}
@@ -142,25 +134,25 @@ export function HeroIntentCard() {
               onChange={(event) => setDays(event.target.value)}
               aria-label="Number of days"
               data-testid="hero-intent-days"
-              className={`${INLINE_FIELD_BASE} ${INLINE_FIELD_SIZES.days} !text-xl md:!text-3xl !font-display-mobile md:!font-display`}
+              className={`${INLINE_FIELD_BASE} ${INLINE_FIELD_SIZES.days}`}
             />
             <span> days in </span>
             <span className="sr-only">Travel window</span>
-            <Input
+            <input
               type="text"
               value={window}
               onChange={(event) => setWindow(event.target.value)}
               aria-label="Travel window"
               placeholder="May"
               data-testid="hero-intent-window"
-              className={`${INLINE_FIELD_BASE} ${INLINE_FIELD_SIZES.window} !text-xl md:!text-3xl !font-display-mobile md:!font-display`}
+              className={`${INLINE_FIELD_BASE} ${INLINE_FIELD_SIZES.window}`}
             />
             <span>.</span>
           </label>
           <Button
             type="submit"
             data-testid="hero-intent-submit"
-            className="!px-10 !py-4 !text-lg shadow-[0_8px_24px_rgba(24,28,28,0.2)]"
+            className="!px-10 !py-4 !text-lg focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
           >
             Begin Journey
             <span aria-hidden className="material-symbols-outlined !text-[20px] ml-1">

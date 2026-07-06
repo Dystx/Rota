@@ -252,7 +252,7 @@ export function PlannerSingleScreen({
               type="submit"
               disabled={!canSubmit}
               data-testid="planner-synthesize"
-              className="!px-10 !py-5 !text-lg !bg-[var(--color-accent-dark)] !text-white shadow-[0_8px_24px_rgba(206,147,63,0.3)]"
+              className="!px-10 !py-5 !text-lg !bg-[var(--color-accent-dark)] !text-white focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
             >
               {pending ? "Synthesizing…" : "Synthesize Itinerary"}
               <span
