@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, ChipGroup, Field, Input } from "@repo/ui";
 import type { TransportChoice } from "./transport-step";
@@ -125,11 +126,15 @@ export function PlannerSingleScreen({
       className="on-dark relative min-h-screen bg-primary text-linen-dark flex flex-col"
       data-testid="planner-single-screen"
     >
-      {/* Fixed top bar — Rumia wordmark + close (back to home). */}
+      {/* Fixed top bar — Rumia wordmark (clickable → home) + close. */}
       <header className="fixed top-0 w-full z-50 px-container-padding-lg py-4 flex justify-between items-center">
-        <span className="font-headline-sm text-headline-sm italic text-ochre-light">
+        <Link
+          href="/"
+          aria-label="Back to home"
+          className="font-headline-sm text-headline-sm italic text-ochre-light hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded-sm"
+        >
           Rumia
-        </span>
+        </Link>
         <button
           type="button"
           onClick={() => router.push("/")}
