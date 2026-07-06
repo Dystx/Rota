@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { SignInForm } from "./_components/sign-in-form";
+import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
 
 export const metadata: Metadata = {
@@ -28,7 +29,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-paper">
-      <main id="main-content" className="flex-1 flex items-center justify-center px-6 py-16">
+      <TopNav />
+      <main id="main-content" className="flex-1 flex items-center justify-center px-6 py-16 pt-[112px]">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="font-display text-4xl text-ink mb-3">

@@ -12,7 +12,6 @@ import {
   CTASection,
   GuideChapter,
   GuideProgress,
-  PageShell,
   RevealSection,
   SectionHeading,
   TripCard
@@ -22,6 +21,8 @@ import { buildTripSharePath, listTripExportOptions } from "@/lib/trip-export";
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { TopNav } from "../../../../_components/top-nav";
+import { SiteFooter } from "../../../../_components/site-footer";
 import { PrintAutoTrigger } from "./_components/print-auto-trigger";
 
 function getFormatFromHref(href: string) {
@@ -37,7 +38,9 @@ function renderPrintView(
   autoPrint: boolean
 ) {
   return (
-    <PageShell variant="app">
+    <div className="min-h-screen flex flex-col bg-background">
+      <TopNav />
+      <main id="main-content" className="flex-1 pt-header-height">
       <div data-testid="print-view" className="hidden" />
       <PrintAutoTrigger auto={autoPrint} />
       <SectionHeading
@@ -83,7 +86,9 @@ function renderPrintView(
           </CardContent>
         </Card>
       </div>
-    </PageShell>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }
 
@@ -121,13 +126,17 @@ export default async function TripExportPage({
 
   if (trip && trip.ownerUserId && (!user || user.id !== trip.ownerUserId)) {
     return (
-      <PageShell variant="app">
+      <div className="min-h-screen flex flex-col bg-background">
+        <TopNav />
+        <main id="main-content" className="flex-1 pt-header-height">
         <div className="text-center py-16 md:py-32">
           <h1 className="text-5xl">Trip not found</h1>
           <p>This trip does not exist or you do not have permission to view it.</p>
           <Button asChild><Link href="/account">Back to account</Link></Button>
         </div>
-      </PageShell>
+        </main>
+        <SiteFooter />
+      </div>
     );
   }
 
@@ -154,7 +163,9 @@ export default async function TripExportPage({
   const heroDescription = "PDF, print, calendar, and share actions live here, ready when the trip is unlocked.";
 
   return (
-    <PageShell variant="app">
+    <div className="min-h-screen flex flex-col bg-background">
+      <TopNav />
+      <main id="main-content" className="flex-1 pt-header-height">
       <CinematicGuide>
         <GuideProgress chapters={chapters} />
 
@@ -306,6 +317,8 @@ export default async function TripExportPage({
           </CTASection>
         </GuideChapter>
       </CinematicGuide>
-    </PageShell>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

@@ -13,12 +13,13 @@ import {
   GuideChapter,
   GuideProgress,
   MapPanel,
-  PageShell,
   RevealSection,
   StatPill,
   TravelTimeChip
 } from "@repo/ui";
 import { buildPartnerClickHref, selectRelevantPartners } from "@/lib/partner-enrichment";
+import { TopNav } from "../../../../_components/top-nav";
+import { SiteFooter } from "../../../../_components/site-footer";
 import { PrewarmLink, RouteMap } from "./map-components";
 
 export default async function TripMapPage({
@@ -102,7 +103,9 @@ export default async function TripMapPage({
     [];
 
   return (
-    <PageShell variant="app">
+    <div className="min-h-screen flex flex-col bg-background">
+      <TopNav />
+      <main id="main-content" className="flex-1 pt-header-height">
       <CinematicGuide>
         <GuideProgress chapters={chapters} />
 
@@ -334,6 +337,8 @@ export default async function TripMapPage({
           </CTASection>
         </GuideChapter>
       </CinematicGuide>
-    </PageShell>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }
