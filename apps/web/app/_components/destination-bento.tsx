@@ -87,6 +87,18 @@ const PLANNER_HREF_FOR = (slug: BentoSlug) =>
   `/planner?destination=${slug}&days=7`;
 const MAP_HREF_FOR = (slug: BentoSlug) => `/explore/workspace?focus=${slug}`;
 
+/**
+ * Destination-specific bento CTA copy. The previous "Plan this
+ * trip" label was generic and competed with the TopNav and
+ * hero CTAs. Per-destination copy reads as intentional and
+ * matches the bento card's editorial tone.
+ */
+const BENTO_CTA_COPY: Record<BentoSlug, string> = {
+  lisbon: "Plan a Lisbon trip",
+  douro: "Plan a Douro trip",
+  azores: "Plan an Azores trip"
+};
+
 export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {}) {
   const selectStop = useMapStore((state) => state.selectStop);
 
@@ -136,7 +148,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                       data-testid={`bento-cta-plan-${card.slug}`}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-ochre-light text-ochre-dark font-label-ui text-label-ui shadow-sm hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
                     >
-                      Plan this trip
+                      {BENTO_CTA_COPY[card.slug]}
                       <span aria-hidden className="material-symbols-outlined text-[16px]">
                         arrow_forward
                       </span>
