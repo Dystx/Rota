@@ -35,9 +35,9 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
     const variantClasses = {
       cinematic: "min-h-[60vh] py-16 md:py-24 px-4 sm:px-8 max-w-2xl mx-auto",
       compact: "py-8 px-4",
-      table: "py-16 px-4 bg-[rgba(255,255,255,0.4)] border-b border-[var(--color-border)]",
-      form: "py-12 px-4 border border-dashed border-[#e0c2c0] rounded-[var(--radius-glass)] bg-[rgba(224,194,192,0.05)]",
-      map: "absolute inset-0 bg-[rgba(253,251,247,0.85)] backdrop-blur-sm z-10",
+      table: "py-16 px-4 bg-white/40 border-b border-olive-light/20",
+      form: "py-12 px-4 border border-dashed border-ochre-light/40 rounded-[var(--radius-glass)] bg-ochre-light/5",
+      map: "absolute inset-0 bg-paper/85 backdrop-blur-sm z-10",
     };
 
     let errorDetails = null;
@@ -61,7 +61,7 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
         className={cn(baseClasses, variantClasses[variant], className)}
         {...props}
       >
-        <div className={cn("mb-4 text-[#8a3f3a]", variant === 'cinematic' ? 'scale-125 mb-6' : '')}>
+        <div className={cn("mb-4 text-ochre-dark", variant === 'cinematic' ? 'scale-125 mb-6' : '')}>
           {icon || (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
@@ -73,8 +73,8 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
         
         <h3
           className={cn(
-            "text-[var(--color-foreground)]",
-            variant === "cinematic" ? "rota-heading mb-4 text-3xl" : "font-medium text-lg mb-2"
+            "text-primary",
+            variant === "cinematic" ? "font-display mb-4 text-3xl" : "font-medium text-lg mb-2"
           )}
         >
           {title}
@@ -82,7 +82,7 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
         
         <p
           className={cn(
-            "text-[var(--color-muted-foreground)] max-w-md mx-auto",
+            "text-on-surface-variant max-w-md mx-auto",
             variant === "cinematic" ? "text-lg mb-8" : "text-sm mb-4"
           )}
         >
@@ -90,7 +90,7 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
         </p>
 
         {showDetails && errorDetails && (
-          <div className="mt-4 p-4 bg-[#f8f0ef] border border-[#e0c2c0] rounded-md max-w-full overflow-auto text-left w-full text-xs font-mono text-[#8a3f3a]">
+          <div className="mt-4 p-4 bg-olive-light/15 border border-ochre-light/40 rounded-md max-w-full overflow-auto text-left w-full text-xs font-mono text-ochre-dark">
             {errorDetails}
           </div>
         )}
@@ -99,7 +99,7 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
           <button
             onClick={onRetry}
             className={cn(
-              "px-4 py-2 min-h-[44px] bg-[var(--color-atlantic)] text-white rounded-full font-medium text-sm transition-opacity hover:opacity-90",
+              "px-4 py-2 min-h-[44px] bg-ink text-cream rounded-full font-medium text-sm transition-opacity hover:opacity-90",
               showDetails && errorDetails ? "mt-4" : ""
             )}
           >

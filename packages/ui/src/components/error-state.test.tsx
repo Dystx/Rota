@@ -46,7 +46,7 @@ describe("ErrorState", () => {
 
   it("renders table variant correctly", () => {
     const { container } = render(<ErrorState variant="table" />);
-    expect((container.firstChild as HTMLElement).className).toContain("bg-[rgba(255,255,255,0.4)]");
+    expect((container.firstChild as HTMLElement).className).toContain("bg-white/40");
   });
 
   it("renders form variant correctly", () => {
