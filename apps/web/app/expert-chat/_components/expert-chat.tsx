@@ -43,25 +43,21 @@ const INITIAL_MESSAGES: Message[] = [
     time: "10:14"
   },
   {
-    id: "seed-user-1",
-    role: "user",
-    text: "Hi Ana! I was looking at Day 2. Do you think we have enough time to fit in a tea ceremony after the walking tour, or will it feel too rushed?",
-    time: "10:15"
-  },
-  {
     id: "seed-ana-1",
     role: "ana",
-    text: "Good morning! That's a great question. The walking tour usually wraps up around 1:00 PM near Kiyomizu-dera. It might be a bit tight if we try to do a formal ceremony immediately after.\n\nHowever, I know a wonderful, intimate tea house tucked away just a few streets over that offers a slightly abbreviated, yet very authentic experience. It would be perfect for your schedule.",
-    time: "10:17"
+    text: "Hi! I'm Ana, your destination specialist for this trip. I&apos;ve started reviewing your brief and will share a day-by-day proposal shortly.\n\nIn the meantime, feel free to ask me anything — pace, neighborhoods, reservations, rainy-day backups, food preferences. The more you tell me, the sharper the route will be.",
+    time: "10:14"
   }
 ];
 
 const ANA_REPLIES = [
   "Absolutely — I'll pencil that in. Want me to add a reservation note for the venue as well?",
-  "Got it. If we shift the Fushimi Inari visit to the early morning, we'd save enough time for the tea ceremony without feeling rushed.",
-  "Good catch. Let me check the opening hours — some of the smaller venues in Gion close around 5 PM, so we'd want to land before then.",
-  "Yes, I can confirm that for you. The tea house usually has a 1:00 PM seating on weekdays — I can hold a spot if you'd like.",
-  "I'd recommend it. The morning light at Kiyomizu-dera is much better for photos than the afternoon, and the crowds thin out after 11."
+  "Got it. If we shift that to the early morning we'd save enough time for the next stop without feeling rushed.",
+  "Good catch. Let me check the opening hours — some of the smaller venues in this area close around 5 PM, so we'd want to land before then.",
+  "Yes, I can confirm that for you. They usually have a lunch seating on weekdays — I can hold a spot if you'd like.",
+  "I'd recommend it. Morning light is much better for photos at most of the stops on this trip, and the crowds thin out by late morning.",
+  "Let me cross-check that against the route and come back with a recommendation.",
+  "Good question. I'll factor that into the pacing for the day and let you know if anything needs to shift."
 ];
 
 let messageIdCounter = 0;
@@ -75,7 +71,7 @@ export interface ExpertChatProps {
   tripId: string;
 }
 
-export function ExpertChat({ tripId: _tripId }: ExpertChatProps) {
+export function ExpertChat({ tripId }: ExpertChatProps) {
   const [messages, setMessages] = React.useState<Message[]>(INITIAL_MESSAGES);
   const [input, setInput] = React.useState("");
   const [isAnaTyping, setIsAnaTyping] = React.useState(false);
@@ -146,77 +142,62 @@ export function ExpertChat({ tripId: _tripId }: ExpertChatProps) {
           id="main-content"
           className="flex-1 flex overflow-hidden max-w-[1600px] mx-auto w-full"
         >
-          <h1 className="sr-only">Kyoto Autumn Retreat — Expert Chat</h1>
-          {/* Left Side: Visual Timeline */}
+          <h1 className="sr-only">Expert Chat — Trip {tripId}</h1>
+          {/* Left Side: Visual Timeline.
+              The full day-by-day timeline is wired by the Tier 3
+              backend agent (PR-9.4). Until then this aside shows
+              the tripId and a placeholder that follows the same
+              vertical-rhythm + connector-line treatment so the
+              layout doesn't shift when the real timeline mounts. */}
           <aside className="hidden lg:flex flex-col w-1/3 max-w-sm border-r border-olive-light/10 bg-surface-container-low/50 overflow-y-auto scrollbar-hide p-container-padding-lg">
             <div className="mb-section-gap">
-              <h1 className="font-headline-sm text-headline-sm text-primary mb-2">
-                Kyoto Autumn Retreat
+              <p className="font-mono-micro text-mono-micro text-ochre-dark uppercase tracking-widest mb-2">
+                Expert chat
+              </p>
+              <h1 className="font-headline-sm text-headline-sm text-primary mb-2 break-all">
+                Trip {tripId}
               </h1>
               <div className="flex items-center gap-2 text-on-surface-variant font-mono-technical text-mono-technical">
                 <span className="material-symbols-outlined text-[16px]">
-                  calendar_today
+                  forum
                 </span>
-                <span>Oct 12 - Oct 20</span>
+                <span>Ana — destination specialist</span>
               </div>
             </div>
             <div className="relative pl-6 space-y-8 before:absolute before:inset-y-0 before:left-2.5 before:w-px before:bg-olive-light/20">
-              {/* Timeline Node 1 */}
-              <div className="relative">
-                <div className="absolute -left-[29px] w-5 h-5 rounded-full bg-surface-container-highest border-2 border-olive-light flex items-center justify-center z-10">
-                  <div className="w-2 h-2 rounded-full bg-olive-light" />
-                </div>
-                <div className="bg-glass-light/65 backdrop-blur-md p-4 rounded-xl border border-white/50 shadow-sm">
-                  <div className="font-mono-micro text-mono-micro text-olive-light/70 uppercase tracking-wider mb-1">
-                    Day 1 • Oct 12
-                  </div>
-                  <h3 className="font-label-ui text-label-ui text-primary mb-2">
-                    Arrival &amp; Check-in
-                  </h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">
-                    Arrive at KIX, transfer to The Ritz-Carlton Kyoto via
-                    private car.
-                  </p>
-                </div>
-              </div>
-              {/* Timeline Node 2 (Active/Discussing) */}
+              {/* Placeholder node — the real day-by-day timeline
+                  will replace this once the trip.days is wired
+                  through (PR-9.4). Same connector-dot + card
+                  visual rhythm as the active timeline so the
+                  transition is invisible. */}
               <div className="relative">
                 <div className="absolute -left-[29px] w-5 h-5 rounded-full bg-ochre-light/20 border-2 border-ochre-dark flex items-center justify-center z-10">
                   <div className="w-2 h-2 rounded-full bg-ochre-dark animate-pulse" />
                 </div>
                 <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-ochre-light/50 shadow-md ring-1 ring-ochre-light/20">
                   <div className="font-mono-micro text-mono-micro text-ochre-dark uppercase tracking-wider mb-1">
-                    Day 2 • Oct 13
+                    Trip timeline
                   </div>
                   <h3 className="font-label-ui text-label-ui text-primary mb-2">
-                    Higashiyama Exploration
+                    Day-by-day route will appear here
                   </h3>
-                  <div className="w-full h-24 mb-2 rounded-lg overflow-hidden relative">
-                    <div
-                      className="w-full h-full bg-cover bg-center"
-                      style={{
-                        backgroundImage:
-                          "url('https://picsum.photos/seed/higashiyama-walk/400/200')"
-                      }}
-                    />
-                  </div>
-                  <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">
-                    Morning walking tour with local historian.
+                  <p className="font-body-md text-body-md text-on-surface-variant line-clamp-3">
+                    Ana is reviewing this trip&apos;s brief. The full
+                    day-by-day timeline, stops, and pacing will populate
+                    here once the route is finalized. In the meantime,
+                    use the chat to ask anything about the destination.
                   </p>
                 </div>
               </div>
-              {/* Timeline Node 3 */}
               <div className="relative opacity-60">
                 <div className="absolute -left-[29px] w-5 h-5 rounded-full bg-surface-container-highest border-2 border-olive-light/30 flex items-center justify-center z-10" />
                 <div className="bg-glass-light/40 backdrop-blur-md p-4 rounded-xl border border-white/30">
                   <div className="font-mono-micro text-mono-micro text-olive-light/50 uppercase tracking-wider mb-1">
-                    Day 3 • Oct 14
+                    Upcoming
                   </div>
-                  <h3 className="font-label-ui text-label-ui text-primary mb-2">
-                    Arashiyama Bamboo Grove
-                  </h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant line-clamp-1">
-                    Early morning access to bamboo forest.
+                  <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+                    Day cards, transit notes, and reservation confirmations
+                    appear here as the route is confirmed.
                   </p>
                 </div>
               </div>
@@ -341,7 +322,7 @@ export function ExpertChat({ tripId: _tripId }: ExpertChatProps) {
                           </span>
                         </div>
                         <span className="bg-surface-container-high text-olive-dark font-mono-technical text-[10px] px-2 py-0.5 rounded-full">
-                          Day 2 Update
+                          Trip Update
                         </span>
                       </div>
                       <div className="flex gap-4">
@@ -350,30 +331,32 @@ export function ExpertChat({ tripId: _tripId }: ExpertChatProps) {
                             className="w-full h-full bg-cover bg-center"
                             style={{
                               backgroundImage:
-                                "url('https://picsum.photos/seed/matcha-bowl/200/200')"
+                                "url('https://picsum.photos/seed/trip-stop/200/200')"
                             }}
                           />
                         </div>
                         <div className="flex-1">
                           <h4 className="font-headline-sm text-headline-sm text-primary mb-1">
-                            En Tea House Experience
+                            New stop suggestion
                           </h4>
                           <p className="font-body-md text-body-md text-on-surface-variant text-sm mb-3">
-                            A 45-minute casual yet authentic matcha preparation
-                            and tasting, perfectly timed post-tour.
+                            A recommended addition that fits the pacing of
+                            this trip. The full details (time, address,
+                            reservation notes) will populate once the
+                            route is finalized.
                           </p>
                           <div className="flex items-center gap-4 text-xs font-label-ui text-olive-light">
                             <div className="flex items-center gap-1">
                               <span className="material-symbols-outlined text-[14px]">
                                 schedule
                               </span>
-                              2:00 PM
+                              TBD
                             </div>
                             <div className="flex items-center gap-1">
                               <span className="material-symbols-outlined text-[14px]">
                                 payments
                               </span>
-                              +$45/person
+                              Pricing TBD
                             </div>
                           </div>
                         </div>
@@ -423,8 +406,8 @@ export function ExpertChat({ tripId: _tripId }: ExpertChatProps) {
                         check_circle
                       </span>
                       <p className="font-body-md text-body-md text-olive-dark">
-                        <span className="font-medium">En Tea House Experience</span>{" "}
-                        added to <span className="font-medium">Day 2</span>.
+                        <span className="font-medium">New stop suggestion</span>{" "}
+                        added to the trip plan.
                       </p>
                     </div>
                   </div>
@@ -445,7 +428,7 @@ export function ExpertChat({ tripId: _tripId }: ExpertChatProps) {
                         close
                       </span>
                       <p className="font-body-md text-body-md text-on-surface-variant">
-                        No problem — I&apos;ll keep Day 2 as originally planned.
+                        No problem — I&apos;ll keep the route as originally planned.
                       </p>
                     </div>
                   </div>
