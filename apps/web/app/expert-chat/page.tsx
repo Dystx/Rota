@@ -37,22 +37,50 @@ export default async function ExpertChatPage({
           id="main-content"
           className="flex-1 pt-header-height flex items-center justify-center"
         >
-          <EmptyState
-            icon="forum"
-            title="Open this chat from a trip"
-            description="The expert chat is scoped to a specific trip. Open a trip and use the 'Open expert chat' action to start a conversation with the destination specialist."
-            variant="default"
-            action={
+          <div
+            data-testid="expert-chat-empty"
+            className="mx-auto max-w-2xl px-container-padding-sm text-center"
+          >
+            {/* Sample 2-bubble conversation preview — telegraphs
+                "this is a chat" instead of "go back". Muted so
+                it reads as a placeholder, not a real thread. */}
+            <div
+              aria-hidden="true"
+              className="mx-auto mb-8 max-w-md rounded-2xl border border-olive-light/15 bg-white/50 p-4 text-left"
+            >
+              <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-3 text-center">
+                Sample thread
+              </p>
+              <div className="flex flex-col gap-3">
+                <div className="self-start max-w-[80%] rounded-2xl rounded-tl-sm bg-white/80 px-3 py-2 text-[13px] text-primary leading-relaxed">
+                  Tuesday looks rainy in Sintra. Should we swap the palace day for the Belém loop?
+                </div>
+                <div className="self-end max-w-[80%] rounded-2xl rounded-tr-sm bg-ochre-light/30 px-3 py-2 text-[13px] text-primary leading-relaxed">
+                  Good call — let me move Quinta da Regaleira to Thursday and add the Jerónimos monastery.
+                </div>
+              </div>
+            </div>
+
+            <span className="material-symbols-outlined text-[48px] text-olive-light mb-3 block">
+              forum
+            </span>
+            <h1 className="font-headline-lg text-headline-lg text-primary mb-2">
+              Open this chat from a trip
+            </h1>
+            <p className="font-body-md text-body-md text-on-surface-variant mb-6 max-w-prose mx-auto">
+              The expert chat is scoped to a specific trip. Open a trip
+              and use the &ldquo;Open expert chat&rdquo; action to start
+              a conversation with the destination specialist.
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center">
               <Button asChild>
                 <Link href="/account">Browse my trips</Link>
               </Button>
-            }
-            secondaryAction={
               <Button asChild variant="ghost">
                 <Link href="/">Back to home</Link>
               </Button>
-            }
-          />
+            </div>
+          </div>
         </main>
         <SiteFooter />
       </div>
