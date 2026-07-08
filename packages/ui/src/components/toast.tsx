@@ -109,14 +109,36 @@ const variantIcons: Record<ToastVariant, string> = {
  * toast queue as a stacked, bottom-right, dismissable pill list.
  * Renders nothing when the queue is empty.
  */
-export function ToastViewport() {
+export interface ToastViewportProps {
+  position?:
+    | "top-right"
+    | "top-center"
+    | "top-left"
+    | "bottom-right"
+    | "bottom-center"
+    | "bottom-left";
+}
+
+const positionClassName: Record<Required<ToastViewportProps>["position"], string> = {
+  "top-right": "top-4 right-4",
+  "top-center": "top-4 left-1/2 -translate-x-1/2",
+  "top-left": "top-4 left-4",
+  "bottom-right": "bottom-4 right-4",
+  "bottom-center": "bottom-4 left-1/2 -translate-x-1/2",
+  "bottom-left": "bottom-4 left-4"
+};
+
+export function ToastViewport({ position = "bottom-right" }: ToastViewportProps = {}) {
   const items = useToasts();
   if (items.length === 0) return null;
   return (
     <div
       aria-live="polite"
       aria-label="Notifications"
-      className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-[calc(100vw-2rem)] sm:w-auto"
+      className={cn(
+        "fixed z-50 flex flex-col gap-2 max-w-sm w-[calc(100vw-2rem)] sm:w-auto",
+        positionClassName[position]
+      )}
     >
       {items.map((t) => (
         <div
