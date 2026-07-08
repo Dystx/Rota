@@ -7,9 +7,35 @@ import type {
 import { cloneElement, isValidElement } from "react";
 import { cn } from "../lib/cn";
 
+/**
+ * Button — primary action primitive.
+ *
+ * PR-2 polish:
+ *   - 5 variants: primary | secondary | ghost | destructive | link
+ *   - 3 sizes: sm | md | lg
+ *   - 4 tones: neutral | ochre | olive | danger (overlay on variant)
+ *   - leadingIcon / trailingIcon: Material Symbols Outlined name or ReactNode
+ *   - fullWidth: stretches to container
+ *   - isLoading: pending state with spinner + aria-busy
+ *   - loadingIndicator: replace the default spinner
+ *   - Focus ring uses --shadow-focus (3px ochre) instead of Tailwind ring
+ *
+ * Backward compatible: existing call sites that pass only `variant`, `asChild`,
+ * `isLoading`, and `loadingIndicator` continue to work. New props are optional.
+ */
+
+type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "link";
+type ButtonSize = "sm" | "md" | "lg";
+type ButtonTone = "neutral" | "ochre" | "olive" | "danger";
+
 type SharedProps = {
   children: ReactNode;
-  variant?: "primary" | "ghost";
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  tone?: ButtonTone;
+  leadingIcon?: ReactNode;
+  trailingIcon?: ReactNode;
+  fullWidth?: boolean;
   asChild?: boolean;
   /**
    * When true, the button is disabled, aria-busy is set, the
@@ -31,33 +57,83 @@ type SharedProps = {
 
 type NativeButtonProps = SharedProps & ButtonHTMLAttributes<HTMLButtonElement>;
 
-const baseClassName =
-  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[15px] font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60";
-
-const variantClassName = {
-  primary:
-    "bg-[var(--color-foreground)] text-[var(--color-background)] shadow-[0_4px_14px_rgba(24,28,28,0.1)] hover:shadow-[0_6px_20px_rgba(24,28,28,0.15)] hover:bg-[#2a2e2e] disabled:hover:shadow-[0_4px_14px_rgba(24,28,28,0.1)]",
-  ghost:
-    "border border-[var(--color-border)] bg-transparent text-[var(--color-foreground)] hover:border-[var(--color-foreground)] hover:bg-white/50 backdrop-blur-sm disabled:hover:border-[var(--color-border)] disabled:hover:bg-transparent"
+const sizeClassName: Record<ButtonSize, string> = {
+  sm: "h-9 px-4 text-[13px]",
+  md: "h-11 px-6 text-[15px]",
+  lg: "h-14 px-8 text-base"
 };
+
+const variantClassName: Record<ButtonVariant, string> = {
+  primary:
+    "bg-[var(--color-foreground)] text-[var(--color-background)] shadow-[var(--shadow-flat)] hover:shadow-[var(--shadow-raised)] hover:bg-[#2a2e2e] active:bg-[#1f2222] disabled:hover:shadow-[var(--shadow-flat)] disabled:hover:bg-[var(--color-foreground)]",
+  secondary:
+    "bg-olive-light text-on-primary hover:bg-olive-dark active:bg-olive-dark/90 shadow-[var(--shadow-flat)] hover:shadow-[var(--shadow-raised)]",
+  ghost:
+    "border border-[var(--color-border)] bg-transparent text-[var(--color-foreground)] hover:border-[var(--color-foreground)] hover:bg-white/50 backdrop-blur-sm disabled:hover:border-[var(--color-border)] disabled:hover:bg-transparent",
+  destructive:
+    "bg-[var(--color-status-danger-fg)] text-white hover:bg-[#5c1f1f] active:bg-[#4a1818] shadow-[var(--shadow-flat)] hover:shadow-[var(--shadow-raised)]",
+  link:
+    "bg-transparent text-[var(--color-foreground)] underline-offset-4 hover:underline px-0 h-auto shadow-none hover:shadow-none"
+};
+
+const toneClassName: Record<ButtonTone, string> = {
+  neutral: "",
+  ochre: "ring-1 ring-ochre-light/40 hover:ring-ochre-light/70",
+  olive: "ring-1 ring-olive-light/40 hover:ring-olive-light/70",
+  danger: "ring-1 ring-[var(--color-status-danger-border)] hover:ring-[var(--color-status-danger-fg)]"
+};
+
+const baseClassName = cn(
+  "inline-flex items-center justify-center gap-2 rounded-full font-medium",
+  "transition-all duration-base ease-standard",
+  "focus-visible:outline-none focus-visible:shadow-focus",
+  "active:scale-[0.98]",
+  "disabled:cursor-not-allowed disabled:opacity-60"
+);
+
+const sizeOnlyLink = "px-0 py-0"; // link variant ignores size; flatten h-* overrides
 
 /**
  * Small inline spinner used while `isLoading` is true. Kept here
  * (rather than a separate Spinner component) because it's a 1-line
  * UI primitive that only the Button needs.
  */
-function DefaultSpinner() {
+function DefaultSpinner({ tone }: { tone: "white" | "ink" }) {
   return (
     <span
       aria-hidden
-      className="inline-block w-4 h-4 border-2 border-current border-r-transparent rounded-full animate-spin"
+      className={cn(
+        "inline-block w-4 h-4 border-2 rounded-full animate-spin",
+        tone === "white"
+          ? "border-white/40 border-t-white"
+          : "border-current/40 border-t-current"
+      )}
     />
   );
+}
+
+function MaterialSymbol({ name }: { name: string }) {
+  return (
+    <span aria-hidden className="material-symbols-outlined text-[1.1em]">
+      {name}
+    </span>
+  );
+}
+
+function IconSlot({ icon }: { icon: ReactNode | undefined }) {
+  if (!icon) return null;
+  if (typeof icon === "string") return <MaterialSymbol name={icon} />;
+  return <>{icon}</>;
 }
 
 export function Button({
   children,
   variant = "primary",
+  size = "md",
+  tone = "neutral",
+  leadingIcon,
+  trailingIcon,
+  fullWidth = false,
   asChild,
   className,
   isLoading = false,
@@ -65,7 +141,27 @@ export function Button({
   disabled,
   ...props
 }: NativeButtonProps & AnchorHTMLAttributes<HTMLAnchorElement>) {
-  const combinedClassName = cn(baseClassName, variantClassName[variant], className);
+  const isLink = variant === "link";
+  const spinnerTone = variant === "primary" || variant === "destructive" ? "white" : "ink";
+
+  const combinedClassName = cn(
+    baseClassName,
+    isLink ? sizeOnlyLink : sizeClassName[size],
+    variantClassName[variant],
+    toneClassName[tone],
+    fullWidth && "w-full",
+    className
+  );
+
+  const content = (
+    <>
+      {isLoading ? (loadingIndicator ?? <DefaultSpinner tone={spinnerTone} />) : (
+        <IconSlot icon={leadingIcon} />
+      )}
+      <span className={cn(isLoading && "opacity-60")}>{children}</span>
+      {!isLoading ? <IconSlot icon={trailingIcon} /> : null}
+    </>
+  );
 
   if (asChild && isValidElement(children)) {
     const child = children as ReactElement<{ className?: string }>;
@@ -81,8 +177,7 @@ export function Button({
       aria-busy={isLoading || undefined}
       {...props}
     >
-      {isLoading ? (loadingIndicator ?? <DefaultSpinner />) : null}
-      <span className={isLoading ? "opacity-80" : undefined}>{children}</span>
+      {content}
     </button>
   );
 }

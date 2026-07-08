@@ -82,3 +82,87 @@ export const Skeleton = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
   }
 );
 Skeleton.displayName = "Skeleton";
+
+/* ---------------------------------------------------------------------------
+ * PR-2 Skeleton variants
+ * ------------------------------------------------------------------------- */
+
+/** SkeletonCircle — circular placeholder for avatars. */
+export const SkeletonCircle = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { size?: number }
+>(({ className, size = 40, style, ...props }, ref) => (
+  <div
+    ref={ref}
+    style={{ width: size, height: size, ...style }}
+    className={cn("animate-pulse rounded-full bg-[rgba(127,178,196,0.15)]", className)}
+    {...props}
+  />
+));
+SkeletonCircle.displayName = "SkeletonCircle";
+
+/** SkeletonText — stack of N lines (default 3) for paragraph placeholders. */
+export const SkeletonText = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { lines?: number; lastLineWidth?: string }
+>(({ className, lines = 3, lastLineWidth = "60%", ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("grid gap-2", className)}
+    aria-hidden
+    {...props}
+  >
+    {Array.from({ length: lines }).map((_, i) => (
+      <div
+        key={i}
+        className="h-3 animate-pulse rounded-md bg-[rgba(127,178,196,0.15)]"
+        style={{
+          width: i === lines - 1 ? lastLineWidth : "100%"
+        }}
+      />
+    ))}
+  </div>
+));
+SkeletonText.displayName = "SkeletonText";
+
+/** SkeletonCard — 16:9 cover + 2 text lines. */
+export const SkeletonCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "grid gap-3 rounded-xl border border-[var(--color-border)] bg-white/60 p-4",
+      className
+    )}
+    aria-hidden
+    {...props}
+  >
+    <div className="aspect-video w-full animate-pulse rounded-md bg-[rgba(127,178,196,0.15)]" />
+    <div className="h-4 w-3/4 animate-pulse rounded-md bg-[rgba(127,178,196,0.15)]" />
+    <div className="h-3 w-1/2 animate-pulse rounded-md bg-[rgba(127,178,196,0.15)]" />
+  </div>
+));
+SkeletonCard.displayName = "SkeletonCard";
+
+/** SkeletonList — N stacked rows (default 5). */
+export const SkeletonList = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { count?: number }
+>(({ className, count = 5, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("grid gap-3", className)}
+    aria-hidden
+    {...props}
+  >
+    {Array.from({ length: count }).map((_, i) => (
+      <div
+        key={i}
+        className="h-12 animate-pulse rounded-md bg-[rgba(127,178,196,0.15)]"
+      />
+    ))}
+  </div>
+));
+SkeletonList.displayName = "SkeletonList";
