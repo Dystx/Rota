@@ -1,4 +1,5 @@
 export * from "./components/badge";
+export * from "./components/app-layout";
 export * from "./components/button";
 export * from "./components/card";
 export * from "./components/shell";

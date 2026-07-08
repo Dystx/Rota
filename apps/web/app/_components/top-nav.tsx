@@ -85,6 +85,17 @@ export function TopNav() {
 
         {/* Trailing Action & Profile */}
         <div className="flex items-center gap-3 md:gap-6">
+          {/* Locale switcher — placeholder. Real locale routing lands
+              with i18n; today the pill is visual + links back to the
+              same page. */}
+          <div
+            role="group"
+            aria-label="Language"
+            className="hidden md:inline-flex items-center rounded-full border border-olive-light/20 bg-white/40 backdrop-blur-sm p-0.5 text-[11px] font-medium"
+          >
+            <span className="px-2.5 py-1 rounded-full bg-olive-light text-on-primary" aria-current="true">EN</span>
+            <span className="px-2.5 py-1 text-olive-light" aria-disabled>PT</span>
+          </div>
           <Link
             href="/planner"
             data-testid="top-nav-plan-a-trip"
@@ -96,13 +107,9 @@ export function TopNav() {
             href="/account"
             aria-label="Traveler profile — open account"
             aria-current={isActivePath(pathname, "/account") ? "page" : undefined}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full overflow-hidden border border-white/20 shadow-sm flex items-center justify-center scale-95 hover:scale-100 active:opacity-80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full overflow-hidden border border-white/20 shadow-flat flex items-center justify-center bg-olive-light text-on-primary font-display text-sm scale-95 hover:scale-100 active:opacity-80 transition-all duration-base ease-standard focus-visible:outline-none focus-visible:shadow-focus"
           >
-            <img
-              alt=""
-              className="w-10 h-10 object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJnCG5lbmqYcEas2Nf4z5hZZPtjVXDRq2TGeX3XdS4r7JVq4OGrFc0rdoTDxgd0_-MXbB4YPoDQGFjWbrRxYGdAgBQKu6_PeaXiwP6ZEx3gBpaqg-Dq7X86ueESI1-bNfV3znqVQyVKMm4FeLnC5BdGm9U1YH_9xnm1nJzp95YcKIclkYAqs6-lFU5bCBsbu10S71THbosiO6wWD4r4a4Fl0LhpERaj1ORLotenFT3_2dyOL8qp8D4BUWyVxfNVchZ9FakGOE-9f4x"
-            />
+            <span aria-hidden>R</span>
           </Link>
 
           {/* Mobile hamburger — only visible below `md`. */}
