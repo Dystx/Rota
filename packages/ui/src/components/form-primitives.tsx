@@ -449,3 +449,58 @@ export function getInputValue(
 ): string {
   return event.target.value;
 }
+
+/* ---------------------------------------------------------------------------
+ * PR-3 InputAffix — input with leading / trailing icon or text.
+ *
+ * Used when an input needs visual context that a bare <input> cannot
+ * express, e.g. a € price prefix or a search icon. The wrapper is
+ * presentational; the inner <input> is the focusable element so the
+ * existing accessibility tree is unchanged.
+ * ------------------------------------------------------------------------- */
+
+export interface InputAffixProps extends InputHTMLAttributes<HTMLInputElement> {
+  leading?: ReactNode;
+  trailing?: ReactNode;
+  invalid?: boolean;
+  inputClassName?: string;
+}
+
+export const InputAffix = forwardRef<HTMLInputElement, InputAffixProps>(
+  function InputAffix(
+    { leading, trailing, invalid, className, inputClassName, ...props },
+    ref
+  ) {
+    return (
+      <div
+        className={cn(
+          'flex items-center gap-2 rounded-[var(--radius-md,12px)] border bg-white/80 px-3 transition-colors',
+          'focus-within:ring-2 focus-within:ring-[var(--color-accent)] focus-within:ring-offset-1',
+          invalid
+            ? 'border-[var(--color-status-danger-border)]'
+            : 'border-[var(--color-border)]',
+          className
+        )}
+      >
+        {leading ? (
+          <span className="text-[var(--color-muted-foreground)] select-none">
+            {leading}
+          </span>
+        ) : null}
+        <input
+          ref={ref}
+          {...props}
+          className={cn(
+            'h-10 flex-1 bg-transparent text-[15px] leading-relaxed text-[var(--color-ink)] placeholder:text-[var(--color-muted-foreground)] focus:outline-none disabled:opacity-50',
+            inputClassName
+          )}
+        />
+        {trailing ? (
+          <span className="text-[var(--color-muted-foreground)] select-none">
+            {trailing}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+);

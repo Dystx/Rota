@@ -2,8 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@repo/ui";
-import { toast } from "@repo/ui/components/toast";
+import { Button, Field, Input, toast } from "@repo/ui";
 
 interface SignInFormProps {
   next: string;
@@ -24,6 +23,9 @@ interface SignInFormProps {
  * The server action does the actual Supabase signInWithOtp call
  * and redirects to ?sent=1 on success. The client just triggers
  * it and shows UI feedback.
+ *
+ * PR-3: Migrated to <Field> + <Input> primitives for consistent
+ * label / error / focus-ring treatment across the app.
  */
 export function SignInForm({ next, initialSent, initialError }: SignInFormProps) {
   const router = useRouter();
@@ -34,6 +36,11 @@ export function SignInForm({ next, initialSent, initialError }: SignInFormProps)
     const submittedEmail = String(formData.get("email") ?? "").trim();
     startTransition(async () => {
       try {
+        // The server action is imported dynamically because it carries
+        // the "use server" boundary — Next.js will not bundle a static
+        // import of a server action into the client. This is the
+        // documented Next 16 pattern; the action module is not
+        // runtime-selected.
         const { signInWithMagicLinkAction } = await import("../_actions/sign-in");
         await signInWithMagicLinkAction(formData);
         toast.success(
@@ -58,30 +65,35 @@ export function SignInForm({ next, initialSent, initialError }: SignInFormProps)
   return (
     <form
       action={handleSubmit}
-      className="bg-white/80 backdrop-blur-sm rounded-2xl border border-olive-light/20 p-8 shadow-sm"
+      className="grid gap-5 bg-white/80 backdrop-blur-sm rounded-2xl border border-olive-light/20 p-8 shadow-flat"
     >
       <input type="hidden" name="next" value={next} />
 
-      <label htmlFor="email" className="block text-sm font-medium text-ink mb-2">
-        Email address
-      </label>
-      <input
-        id="email"
-        name="email"
-        type="email"
-        required
-        autoComplete="email"
-        placeholder="you@example.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full px-4 py-3 rounded-lg border border-olive-light/30 bg-white text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-transparent transition-colors"
-      />
+      <Field
+        label="Email address"
+        htmlFor="email"
+      >
+        {(field) => (
+          <Input
+            {...field}
+            id="email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        )}
+      </Field>
 
       <Button
         type="submit"
         isLoading={pending}
         loadingIndicator={null}
-        className="mt-6 w-full bg-ink text-cream font-medium py-3 rounded-lg hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 transition-colors"
+        fullWidth
+        className="bg-ink text-cream"
       >
         {pending ? "Sending link…" : "Send magic link"}
       </Button>
@@ -90,7 +102,7 @@ export function SignInForm({ next, initialSent, initialError }: SignInFormProps)
         <div
           role="status"
           aria-live="polite"
-          className="mt-6 p-4 rounded-lg bg-sage/30 border border-olive-light/20 text-ink text-sm"
+          className="p-4 rounded-md bg-sage/30 border border-olive-light/20 text-ink text-sm"
         >
           <strong className="font-medium">Check your inbox.</strong> We sent a sign-in link to your email. It expires in 10 minutes.
         </div>
@@ -99,7 +111,7 @@ export function SignInForm({ next, initialSent, initialError }: SignInFormProps)
       {initialError ? (
         <div
           role="alert"
-          className="mt-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm"
+          className="p-4 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm"
         >
           <strong className="font-medium">Sign-in failed.</strong> {decodeURIComponent(initialError)}
         </div>
