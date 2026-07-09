@@ -11,10 +11,6 @@
 | 6 | **A8** console content | Demo data + client names Portugal-first | 1 | `aeb9ee4` |
 | - | **A8 partial** nav icons | Phosphor on the console sidebar | 2 | `c71adc5` |
 
-## TL;DR
-| 3 | **A2** Phosphor Icons | Icon font migration + call sites | 52 | `062c071` |
-| 4 | **A3+A4+A5** hero, 404, voice | Home restraint, 404 with mark, warm copy | 4 | `076753a` |
-| 5 | **A8** console nav icons | Phosphor map extended, console nav updates | 2 | `c71adc5` |
 
 ## Locked-in brand decisions
 
