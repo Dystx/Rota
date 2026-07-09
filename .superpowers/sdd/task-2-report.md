@@ -272,3 +272,51 @@ Tests       169 passed (169)
 ### Concerns
 
 No blockers. The fixed base is a validation-only origin sentinel; accepted image paths are still rendered exactly as supplied.
+
+---
+
+## Review follow-up — OptionSheet close-callback stability
+
+### Changed files
+
+- `packages/ui/src/components/option-sheet.tsx`
+- `packages/ui/src/components/option-sheet.test.tsx`
+- `.superpowers/sdd/task-2-report.md`
+
+### RED / boundary diagnostic
+
+Added a parent harness that keeps `OptionSheet` open, replaces the parent `onClose` function identity, then closes the sheet. It asserts that only the replacement callback runs and focus returns to the original opening trigger.
+
+```sh
+pnpm --filter @repo/ui test -- option-sheet
+```
+
+Result: exit 0, `33` test files and `170` tests passed. The harness confirms the parent callback identity changes, but jsdom did not expose a failing focus-restoration result when the direct-forwarding implementation was temporarily restored. Source review establishes the unstable boundary: `Modal`'s focus effect depends on `onClose`, so forwarding a changing parent callback permits it to recapture the active element while open.
+
+### GREEN
+
+`OptionSheet` now stores the most recent parent callback in a ref and passes `Modal` a dependency-free `useCallback` wrapper. `Modal` therefore sees one close callback for the sheet lifetime while the close action still invokes the current parent callback.
+
+```sh
+pnpm --filter @repo/ui test -- choice-card choice-chip-group option-sheet trip-context-bar route-consequence trip-summary
+pnpm --filter @repo/ui typecheck
+```
+
+Result: both commands exited 0.
+
+```txt
+Test Files  33 passed (33)
+Tests       170 passed (170)
+@repo/ui typecheck: tsc --noEmit (exit 0)
+```
+
+### Self-review
+
+- `OptionSheet` is the callback-stability boundary; `Modal` was not modified.
+- The ref is refreshed on every `OptionSheet` render, so a close immediately uses the latest parent callback.
+- The regression parent rerenders while the sheet is open, changes callback identity, asserts the original callback is not called, asserts the latest callback runs once, and confirms focus returns to the opening trigger.
+- `git diff --check` is clean for the scoped files.
+
+### Concerns
+
+No implementation blockers. The focused Vitest/jsdom scenario does not fail with the direct-forwarding baseline, so the regression test protects the requested user-facing contract but cannot independently demonstrate the prior focus-effect failure in this environment. The source-level boundary is nevertheless required because `Modal` depends on its `onClose` identity.
