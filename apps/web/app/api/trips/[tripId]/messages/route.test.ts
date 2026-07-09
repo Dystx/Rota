@@ -44,6 +44,12 @@ describe("trip messaging API", () => {
     expect(response.status).toBe(401);
   });
 
+  it("returns 403 when the trip is not owned", async () => {
+    mocks.access.mockResolvedValue({ kind: "forbidden" });
+    const response = await GET(request(), { params });
+    expect(response.status).toBe(403);
+  });
+
   it("returns unavailable when the provider/schema cannot be queried", async () => {
     mocks.client.mockResolvedValue({ from: () => ({ select: () => ({ eq: () => ({ order: async () => ({ data: null, error: new Error("relation does not exist") }) }) }) }) });
     const response = await GET(request(), { params });
