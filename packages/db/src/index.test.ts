@@ -175,6 +175,38 @@ describe("getTripsForUser", () => {
 
     await expect(getTripsForUser(null, 24, { client })).resolves.toEqual([]);
   });
+
+  test("filters trip lists by the authenticated owner before ordering rows", async () => {
+    const filters: Array<[string, unknown]> = [];
+    const client = ({
+      from(table: string) {
+        expect(table).toBe("trips");
+
+        return {
+          select() {
+            return {
+              eq(column: string, value: unknown) {
+                filters.push([column, value]);
+
+                return {
+                  order() {
+                    return {
+                      limit: async () => ({ data: [rawTrip(baseTrip)], error: null })
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+    } as unknown) as RotaDataClient;
+
+    await expect(getTripsForUser("traveler-user-123", 24, { client })).resolves.toEqual([
+      expect.objectContaining({ id: "42", ownerUserId: "traveler-user-123" })
+    ]);
+    expect(filters).toEqual([["owner_user_id", "traveler-user-123"]]);
+  });
 });
 
 function rawTrip(trip: TripDraftDetail) {

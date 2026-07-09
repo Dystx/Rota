@@ -6,14 +6,16 @@
  * "Server Actions must live in a file marked `"use server"` at
  * the top, not as an inline function inside a Client Component"
  * check. The hook imports the action from this module; the
- * hook's public API is unchanged.
+ * hook's public API is unchanged. Because this is client-callable, it
+ * authorizes through the owner-scoped trip helper before it generates or
+ * returns any route locations or stop reasons.
  */
 
 "use server";
 
 import { generateItineraryFromBrief } from "@repo/ai";
-import { getTripDraftById } from "@repo/db";
 import type { Itinerary } from "@repo/types";
+import { getOwnedTrip } from "@/app/lib/trip-access";
 
 import {
   type TripStopRow
@@ -62,14 +64,16 @@ function flattenItineraryToRows(itinerary: Itinerary): TripStopRow[] {
  * the action to its own file with `"use server"` at the top is
  * the supported escape hatch. Returned promise resolves to `null`
  * when the trip doesn't exist; any other error propagates so the
- * hook can record it as `error`.
+ * hook can record it as `error`. Anonymous, missing, and non-owner requests
+ * all receive `null`, so the action does not reveal whether a trip exists.
  */
 export async function fetchTripStopsAction(tripId: string): Promise<FetchResult> {
-  const trip = await getTripDraftById(tripId);
-  if (!trip) {
+  const tripAccess = await getOwnedTrip(tripId);
+
+  if (tripAccess.kind !== "ok") {
     return null;
   }
 
-  const itinerary = await generateItineraryFromBrief(trip.brief);
+  const itinerary = await generateItineraryFromBrief(tripAccess.trip.brief);
   return flattenItineraryToRows(itinerary);
 }

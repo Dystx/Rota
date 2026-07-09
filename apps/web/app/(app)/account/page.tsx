@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import {
   Button,
   Card,
@@ -7,7 +8,7 @@ import {
   EmptyState,
   SectionHeading
 } from "@repo/ui";
-import { isPersistenceConfigError, listTripDrafts } from "@repo/db";
+import { getTripsForUser, isPersistenceConfigError } from "@repo/db";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { TopNav } from "../../_components/top-nav";
 import { SiteFooter } from "../../_components/site-footer";
@@ -43,10 +44,14 @@ export const metadata: Metadata = {
 export default async function AccountPage() {
   const { user } = await getCurrentUser();
 
-  let trips: Awaited<ReturnType<typeof listTripDrafts>> = [];
+  if (!user) {
+    redirect("/sign-in?next=%2Faccount");
+  }
+
+  let trips: Awaited<ReturnType<typeof getTripsForUser>> = [];
   let infoMessage = "";
   try {
-    trips = await listTripDrafts();
+    trips = await getTripsForUser(user.id);
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
       ? "Configure Supabase environment variables to load saved draft trips here."
