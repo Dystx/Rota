@@ -15,6 +15,7 @@ import {
   avoidanceOptions
 } from "@repo/types";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
+import { TripBriefReview } from "./trip-brief-review";
 
 type FormState = {
   destinationCountry: "portugal";
@@ -75,13 +76,12 @@ function briefToFormState(brief: TripBrief): FormState {
   };
 }
 
-function parseBriefFromQuery(raw: string | null): TripBrief | null {
+function parseBriefFromQuery(raw: string | null): Partial<TripBrief> | null {
   if (!raw) return null;
   try {
     const decoded = decodeURIComponent(raw);
     const parsed = JSON.parse(decoded) as unknown;
-    const result = TripBriefSchema.safeParse(parsed);
-    return result.success ? result.data : null;
+    return parsed && typeof parsed === "object" ? parsed as Partial<TripBrief> : null;
   } catch {
     return null;
   }
@@ -118,7 +118,7 @@ function normalizeErrors(issues: FieldErrors) {
   return Object.values(issues).filter(Boolean).length;
 }
 
-export function TripBriefForm() {
+function TripBriefManualForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const incomingBrief = parseBriefFromQuery(searchParams.get("brief"));
@@ -384,61 +384,68 @@ export function TripBriefForm() {
               error={errors.interests}
             />
 
-            <div className="grid gap-8 lg:grid-cols-2">
-              <CheckboxGroup
-                label="Food preferences"
-                options={foodPreferenceOptions}
-                selected={form.foodPreferences}
-                onToggle={(value) => toggleArrayValue("foodPreferences", value)}
-                error={errors.foodPreferences}
-              />
-              <CheckboxGroup
-                label="Avoidances"
-                options={avoidanceOptions}
-                selected={form.avoidances}
-                onToggle={(value) => toggleArrayValue("avoidances", value)}
-                error={errors.avoidances}
-              />
-            </div>
-
-            <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent opacity-60" />
-
-            <div className="grid gap-6 md:grid-cols-[1fr_2fr]">
-              <div className="rota-form-field">
-                <label htmlFor="accommodationLocation" className="rota-form-label">
-                  Base location <span className="opacity-60">(optional)</span>
-                </label>
-                <input
-                  id="accommodationLocation"
-                  type="text"
-                  className="rota-form-input"
-                  placeholder="e.g. Near the river in Porto"
-                  value={form.accommodationLocation}
-                  onChange={(event) => updateValue("accommodationLocation", event.target.value)}
-                  aria-invalid={Boolean(errors.accommodationLocation)}
-                  aria-describedby={errors.accommodationLocation ? "accommodationLocation-error" : undefined}
-                />
-                {errors.accommodationLocation ? (
-                  <p className="rota-form-error" id="accommodationLocation-error" role="alert">{errors.accommodationLocation}</p>
-                ) : null}
+            <details className="group rounded-xl border border-olive-light/15 bg-white/35 p-5" open={!prefilled}>
+              <summary className="cursor-pointer list-none font-headline-sm text-headline-sm text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light rounded-sm">
+                Refine this plan
+                <span className="ml-2 font-body-md text-body-md text-on-surface-variant">
+                  Food, access needs, and extra context
+                </span>
+              </summary>
+              <div className="mt-6 grid gap-8">
+                <div className="grid gap-8 lg:grid-cols-2">
+                  <CheckboxGroup
+                    label="Food preferences"
+                    options={foodPreferenceOptions}
+                    selected={form.foodPreferences}
+                    onToggle={(value) => toggleArrayValue("foodPreferences", value)}
+                    error={errors.foodPreferences}
+                  />
+                  <CheckboxGroup
+                    label="Avoidances"
+                    options={avoidanceOptions}
+                    selected={form.avoidances}
+                    onToggle={(value) => toggleArrayValue("avoidances", value)}
+                    error={errors.avoidances}
+                  />
+                </div>
+                <div className="grid gap-6 md:grid-cols-[1fr_2fr]">
+                  <div className="rota-form-field">
+                    <label htmlFor="accommodationLocation" className="rota-form-label">
+                      Base location <span className="opacity-60">(optional)</span>
+                    </label>
+                    <input
+                      id="accommodationLocation"
+                      type="text"
+                      className="rota-form-input"
+                      placeholder="e.g. Near the river in Porto"
+                      value={form.accommodationLocation}
+                      onChange={(event) => updateValue("accommodationLocation", event.target.value)}
+                      aria-invalid={Boolean(errors.accommodationLocation)}
+                      aria-describedby={errors.accommodationLocation ? "accommodationLocation-error" : undefined}
+                    />
+                    {errors.accommodationLocation ? (
+                      <p className="rota-form-error" id="accommodationLocation-error" role="alert">{errors.accommodationLocation}</p>
+                    ) : null}
+                  </div>
+                  <div className="rota-form-field">
+                    <label htmlFor="rawBrief" className="rota-form-label">
+                      Additional context
+                    </label>
+                    <textarea
+                      id="rawBrief"
+                      rows={4}
+                      className="rota-form-input rota-form-textarea"
+                      placeholder="Any other details? E.g., 'We have a morning flight out of Lisbon on the last day.'"
+                      value={form.rawBrief}
+                      onChange={(event) => updateValue("rawBrief", event.target.value)}
+                      aria-invalid={Boolean(errors.rawBrief)}
+                      aria-describedby={errors.rawBrief ? "rawBrief-error" : undefined}
+                    />
+                    {errors.rawBrief ? <p className="rota-form-error" id="rawBrief-error" role="alert">{errors.rawBrief}</p> : null}
+                  </div>
+                </div>
               </div>
-              <div className="rota-form-field">
-                <label htmlFor="rawBrief" className="rota-form-label">
-                  Additional context
-                </label>
-                <textarea
-                  id="rawBrief"
-                  rows={4}
-                  className="rota-form-input rota-form-textarea"
-                  placeholder="Any other details? E.g., 'We have a morning flight out of Lisbon on the last day.'"
-                  value={form.rawBrief}
-                  onChange={(event) => updateValue("rawBrief", event.target.value)}
-                  aria-invalid={Boolean(errors.rawBrief)}
-                  aria-describedby={errors.rawBrief ? "rawBrief-error" : undefined}
-                />
-                {errors.rawBrief ? <p className="rota-form-error" id="rawBrief-error" role="alert">{errors.rawBrief}</p> : null}
-              </div>
-            </div>
+            </details>
 
             <div className="flex items-center justify-between gap-4 border-t border-[var(--color-border)] pt-8 mt-4">
               <p className="text-on-surface-variant leading-loose text-sm font-medium" role="status" aria-live="polite">
@@ -469,6 +476,12 @@ export function TripBriefForm() {
       )}
     </div>
   );
+}
+
+export function TripBriefForm() {
+  const searchParams = useSearchParams();
+  const incomingBrief = parseBriefFromQuery(searchParams.get("brief"));
+  return incomingBrief ? <TripBriefReview initialBrief={incomingBrief} /> : <TripBriefManualForm />;
 }
 
 export function TripBriefFormBoundary() {
