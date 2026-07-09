@@ -76,12 +76,14 @@ function briefToFormState(brief: TripBrief): FormState {
   };
 }
 
-function parseBriefFromQuery(raw: string | null): Partial<TripBrief> | null {
+function parseBriefFromQuery(raw: string | null): TripBrief | null {
   if (!raw) return null;
   try {
     const decoded = decodeURIComponent(raw);
     const parsed = JSON.parse(decoded) as unknown;
-    return parsed && typeof parsed === "object" ? parsed as Partial<TripBrief> : null;
+    if (!parsed || typeof parsed !== "object") return null;
+    const result = TripBriefSchema.safeParse(parsed);
+    return result.success ? result.data : null;
   } catch {
     return null;
   }
