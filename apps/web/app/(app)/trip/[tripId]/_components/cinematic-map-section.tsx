@@ -98,6 +98,7 @@ interface CinematicMapSectionProps {
   days: TripDay[];
   tripId: string;
   reducedMotion: boolean;
+  selectedDayIndex?: number;
   /**
    * Optional filmstrip stops. When provided, the section subscribes
    * to `useMapStore.activeStopId` and pushes a single-point
@@ -120,6 +121,7 @@ export default function CinematicMapSection({
   days,
   tripId,
   reducedMotion,
+  selectedDayIndex,
   filmstripStops
 }: CinematicMapSectionProps) {
   // Hooks must be called unconditionally (React rules)
@@ -146,8 +148,17 @@ export default function CinematicMapSection({
     offset: ["start end", "end start"]
   });
   const [activeChapterId, setActiveChapterId] = React.useState<string>(
-    chapters[0]?.id ?? ""
+    chapters.find((chapter) => selectedDayIndex === undefined || chapter.id.startsWith(`day-${selectedDayIndex}-`))?.id ?? chapters[0]?.id ?? ""
   );
+
+  React.useEffect(() => {
+    if (selectedDayIndex === undefined) return;
+    const dayChapter = chapters.find((chapter) => chapter.id.startsWith(`day-${selectedDayIndex}-`));
+    if (dayChapter) {
+      lastSourceRef.current = "deep-link";
+      setActiveChapterId(dayChapter.id);
+    }
+  }, [chapters, selectedDayIndex]);
 
   React.useEffect(() => {
     const firstChapterId = chapters[0]?.id ?? "";
@@ -422,8 +433,8 @@ export default function CinematicMapSection({
   const activeChapter = chapters.find((c: ChapterCameraTarget) => c.id === activeChapterId) || chapters[0];
 
   const dayMatch = activeChapter?.id?.match(/day-(\d+)-/);
-  const dayDisplay = dayMatch && dayMatch[1] ? `Day ${parseInt(dayMatch[1], 10) + 1}` : "";
-  const activeDayIndex = dayMatch && dayMatch[1] ? parseInt(dayMatch[1], 10) + 1 : 1;
+  const dayDisplay = dayMatch && dayMatch[1] ? `Day ${parseInt(dayMatch[1], 10)}` : "";
+  const activeDayIndex = dayMatch && dayMatch[1] ? parseInt(dayMatch[1], 10) : selectedDayIndex ?? 1;
   const activeDay = days.find((day) => day.dayIndex === activeDayIndex) ?? days[0];
 
   return (
@@ -461,13 +472,17 @@ export default function CinematicMapSection({
         />
 
         <div className="absolute left-4 top-4 flex flex-wrap gap-2" aria-label="Map filters">
-          <span className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm">{dayDisplay || "Today"}</span>
-          <span className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm">Transport</span>
-          <span className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm">Route layers</span>
+          <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Selected day">{dayDisplay || "Today"}</button>
+          <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Transport filter">Transport</button>
+          <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Route layers filter">Route layers</button>
         </div>
 
-        <ol aria-label="Stops on map" className="absolute right-4 bottom-4 hidden max-h-48 w-64 overflow-auto rounded-xl bg-background/90 p-3 text-sm shadow-lg md:block">
-          {(activeDay?.stops ?? []).map((stop, index) => <li key={`${activeDay?.dayIndex}-${index}`} className="border-b border-black/10 py-2 last:border-0">{typeof stop === "string" ? stop : stop.placeName}</li>)}
+        <ol aria-label="Stops on map" className="absolute right-4 bottom-4 max-h-48 w-[min(20rem,calc(100%-2rem))] overflow-auto rounded-xl bg-background/90 p-3 text-sm shadow-lg">
+          {(activeDay?.stops ?? []).map((stop, index) => {
+            const stopId = `day-${activeDay?.dayIndex}-${index}`;
+            const coordinates = typeof stop === "string" || stop.lng === undefined || stop.lat === undefined ? undefined : ([stop.lng, stop.lat] as const);
+            return <li key={`${activeDay?.dayIndex}-${index}`} className="border-b border-black/10 py-2 last:border-0"><button type="button" className="w-full text-left" disabled={!coordinates} onClick={() => coordinates && useMapStore.getState().selectStop(stopId, coordinates)}>{typeof stop === "string" ? stop : stop.placeName}</button></li>;
+          })}
         </ol>
 
         <div className="absolute left-4 bottom-4 pointer-events-none">

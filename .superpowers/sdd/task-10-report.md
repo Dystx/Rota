@@ -6,3 +6,10 @@ Verification:
 
 - `pnpm vitest run --config vitest.config.ts 'apps/web/app/(app)/trip/[tripId]/_components/trip-route-sync.test.tsx'` — PASS (3 tests)
 - `pnpm --filter web typecheck` — PASS
+
+Review follow-up:
+
+- Query-selected days now initialize the cinematic map chapter and stop list (including the 1-based day label).
+- Generation failures, empty day payloads, and ready itineraries render distinct truthful states; failures retain trip context and expose a retry action.
+- Context-bar edits route to a field-specific planner editor, and map filters/stop equivalents are keyboard-usable on mobile and desktop.
+- Re-ran the focused route-sync tests and web typecheck after these fixes — PASS.

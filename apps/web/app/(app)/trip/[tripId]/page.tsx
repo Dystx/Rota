@@ -76,19 +76,6 @@ type DisplayDay = Pick<ItineraryDay, "dayIndex" | "theme" | "summary" | "warning
   stops: DisplayStop[];
 };
 
-const FALLBACK_PREVIEW_DAYS: DisplayDay[] = [
-  {
-    dayIndex: 1, theme: "Arrival & Orientation", summary: "Get settled and explore the immediate surroundings.",
-    stops: [{ startTime: "14:00", placeName: "Hotel check-in" }, { startTime: "16:00", placeName: "Orientation walk" }],
-    warnings: [],
-  },
-  {
-    dayIndex: 2, theme: "Guided Exploration", summary: "A full day discovering key highlights.",
-    stops: [{ startTime: "09:00", placeName: "Morning activity" }, { startTime: "14:00", placeName: "Afternoon activity" }],
-    warnings: [],
-  }
-];
-
 export default async function TripDetailPage({
   params,
   searchParams
@@ -110,25 +97,22 @@ export default async function TripDetailPage({
 
   const trip = tripAccess.trip;
   let itinerary: GeneratedItinerary | null = null;
+  let itineraryError = false;
 
   try {
     itinerary = await generateItineraryFromBrief(trip.brief);
   } catch {
     itinerary = null;
+    itineraryError = true;
   }
 
   const title = trip ? trip.title : "Generated route overview preview";
   const tripCommerceState = getTripCommerceState({ status: trip?.status, hasHumanReview: trip?.hasHumanReview, isPaid: trip?.isPaid });
   const checkoutPlan = getCheckoutPlan(tripCommerceState.canUnlock ? "paid-trip" : tripCommerceState.canRequestReview ? "human-polish" : "free-preview");
-  // Use the fallback preview when the trip exists but the AI hasn't
-  // generated stops yet (itinerary.days is null or empty). Without
-  // this guard, a half-built trip shows "0 Stops" in the stat pills
-  // and an empty timeline — confusing for the user who can see the
-  // trip title and duration but no day-by-day plan.
-  const timelineDaysRaw: DisplayDay[] = (itinerary?.days && itinerary.days.length > 0)
-    ? itinerary.days
-    : FALLBACK_PREVIEW_DAYS;
-  const usingFallbackItinerary = !itinerary?.days || itinerary.days.length === 0;
+  // Do not synthesize preview days when generation failed or returned
+  // an empty payload: that would present guessed stops as ready data.
+  const timelineDaysRaw: DisplayDay[] = itinerary?.days ?? [];
+  const itineraryEmpty = Boolean(itinerary && itinerary.days.length === 0);
 
   const timelineDays: TimelineDay[] = timelineDaysRaw.map((day) => ({
     id: `day-${day.dayIndex}`,
@@ -365,11 +349,12 @@ export default async function TripDetailPage({
         </GuideChapter>
 
         <GuideChapter id="route" className="p-0 relative min-h-[60vh]">
-          {itinerary?.days ? (
+          {itinerary?.days && itinerary.days.length > 0 ? (
             <CinematicMapSection
               days={itinerary.days}
               tripId={tripId}
               reducedMotion={false}
+              selectedDayIndex={selectedDayIndex}
               filmstripStops={filmstripStops}
             />
           ) : (
@@ -379,9 +364,10 @@ export default async function TripDetailPage({
             // section evenly.
             <EmptyState
               icon="map"
-              title={usingFallbackItinerary ? "Itinerary is generating" : "Route unavailable"}
-              description={usingFallbackItinerary ? "Your saved brief is ready; day-by-day stops will appear when generation finishes." : "The saved route is unavailable right now. Try again shortly or open the trip brief."}
+              title={itineraryError ? "Itinerary unavailable" : itineraryEmpty ? "No itinerary days yet" : "Itinerary is generating"}
+              description={itineraryError ? "We couldn’t load the saved route. Your last saved trip details are unchanged; try again shortly." : itineraryEmpty ? "The saved itinerary has no day data yet. Try again after generation finishes." : "Your saved brief is ready; day-by-day stops will appear when generation finishes."}
               variant="map"
+              action={itineraryError ? <Link href={`/trip/${tripId}?retry=1#route`} className="mt-4 inline-flex min-h-11 items-center rounded-full bg-olive-light px-5 text-white">Retry generation</Link> : undefined}
             />
           )}
         </GuideChapter>
