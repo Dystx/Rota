@@ -174,10 +174,23 @@ export default function CinematicMapSection({
   }, [chapters]);
 
   React.useEffect(() => {
+    // An explicit day deep-link may target a day whose stops have not
+    // geocoded yet, so no chapter can represent it. Keep that day selected
+    // while the chapter surface falls back to the first available chapter;
+    // otherwise deriving from the fallback chapter would silently overwrite
+    // the user's requested day.
+    if (
+      selectedDayIndex !== undefined &&
+      !chapters.some((chapter) => chapter.id.startsWith(`day-${selectedDayIndex}-`))
+    ) {
+      setSelectedDay(selectedDayIndex);
+      return;
+    }
+
     setSelectedDay((currentDay) =>
       deriveSelectedDayFromChapter(activeChapterId, days, currentDay)
     );
-  }, [activeChapterId, days]);
+  }, [activeChapterId, chapters, days, selectedDayIndex]);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;

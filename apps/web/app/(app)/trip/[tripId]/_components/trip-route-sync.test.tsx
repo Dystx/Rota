@@ -39,6 +39,15 @@ describe("trip route synchronization", () => {
     expect(deriveSelectedDayFromChapter("day-2-stop-0", days, 1)).toBe(1);
   });
 
+  it("preserves an explicit unresolved day when the active chapter falls back to Day 1", () => {
+    const days = [
+      { dayIndex: 1, stops: [{ placeName: "Porto", lng: -8.6, lat: 41.1 }] },
+      { dayIndex: 2, stops: [{ placeName: "Pending" }] }
+    ];
+
+    expect(deriveSelectedDayFromChapter("day-1-stop-0", days, 1, 2)).toBe(2);
+  });
+
   it("keeps an explicit unresolved day label and no-map-stops state", async () => {
     render(<SelectedDayStatus day={2} hasGeocodedStops={false} />);
     expect(screen.getByText("Day 2")).toBeTruthy();

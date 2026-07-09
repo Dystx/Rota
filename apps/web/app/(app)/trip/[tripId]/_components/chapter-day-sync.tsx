@@ -3,8 +3,18 @@
 export function deriveSelectedDayFromChapter(
   chapterId: string | undefined,
   days: readonly { dayIndex: number; stops: readonly ({ placeName?: string; lng?: number; lat?: number } | string)[] }[],
-  previousDay?: number
+  previousDay?: number,
+  explicitDayIndex?: number
 ): number | undefined {
+  if (
+    explicitDayIndex !== undefined &&
+    !days.some((day) => day.dayIndex === explicitDayIndex && day.stops.some(
+      (stop) => typeof stop !== "string" && stop.lng !== undefined && stop.lat !== undefined
+    ))
+  ) {
+    return explicitDayIndex;
+  }
+
   const match = chapterId?.match(/^day-(\d+)-/);
   const dayIndex = match?.[1] ? Number(match[1]) : undefined;
   if (!dayIndex) return previousDay;

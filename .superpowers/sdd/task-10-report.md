@@ -20,3 +20,9 @@ Final review follow-up:
 - Map chapter/list stop IDs now consistently use `day-${day}-stop-${index}`, so selecting either surface highlights the same source stop.
 - Explicit unresolved day selections retain their day label and expose the no-map-stops state via a tested status component; transport and layer chips are explicit menu controls with observable expanded/selection state.
 - Verification: focused route-sync tests — PASS (6 tests); `pnpm --filter web typecheck` — PASS; `pnpm lint` — PASS.
+
+Task 10 unresolved-day guard:
+
+- Added an explicit-day guard so a `?day=2` selection remains on Day 2 when only Day 1 has geocoded chapters; the map retains the Day 2 stop list and no-map-stops state while chapter navigation falls back safely.
+- Added regression coverage for explicit unresolved-day preservation.
+- Verification: focused cinematic/route-sync tests — PASS (11 tests).
