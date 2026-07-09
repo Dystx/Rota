@@ -223,3 +223,52 @@ Non-blocking issues: none
 ### Concerns
 
 No blockers. The UI Vitest configuration retains rendered DOM between tests, so the keyboard regression test scopes its role queries to its own render container.
+
+---
+
+## Review follow-up — image URL normalization guard
+
+### Changed files
+
+- `packages/ui/src/components/choice-card.tsx`
+- `packages/ui/src/components/choice-card.test.tsx`
+
+### RED
+
+Added a regression case for `imageSrc="/\\cdn.example.com/train.jpg"`.
+
+```sh
+pnpm --filter @repo/ui test -- choice-card
+```
+
+Result: exit 1. The previous prefix-only guard rendered an image for the path even though URL normalization resolves it to the `cdn.example.com` origin.
+
+```txt
+ChoiceCard > does not render root-relative paths normalized to a remote origin
+expect(element).not.toBeInTheDocument()
+found <img src="/\\cdn.example.com/train.jpg" />
+
+Test Files  1 failed | 32 passed (33)
+Tests       1 failed | 168 passed (169)
+```
+
+### GREEN
+
+`ChoiceCard` now keeps the root-relative-prefix condition and additionally resolves the path against a fixed local base, rendering only when the resolved origin equals that base's origin. This rejects the backslash-normalization bypass as well as `//...` and absolute remote URLs, while accepting root-relative local assets.
+
+```sh
+pnpm --filter @repo/ui test -- choice-card choice-chip-group option-sheet trip-context-bar route-consequence trip-summary
+pnpm --filter @repo/ui typecheck
+```
+
+Result: both commands exited 0.
+
+```txt
+Test Files  33 passed (33)
+Tests       169 passed (169)
+@repo/ui typecheck: tsc --noEmit (exit 0)
+```
+
+### Concerns
+
+No blockers. The fixed base is a validation-only origin sentinel; accepted image paths are still rendered exactly as supplied.

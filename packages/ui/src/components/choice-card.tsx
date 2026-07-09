@@ -5,6 +5,8 @@ import type { JSX, KeyboardEvent } from "react";
 import { useReducedMotion } from "../hooks/use-reduced-motion";
 import { cn } from "../lib/cn";
 
+const fixedLocalBase = new URL("https://rota.local");
+
 export function ChoiceCard(props: {
   id: string;
   name: string;
@@ -18,7 +20,8 @@ export function ChoiceCard(props: {
 }): JSX.Element {
   const reducedMotion = useReducedMotion();
   const localImageSrc =
-    props.imageSrc?.startsWith("/") && !props.imageSrc.startsWith("//")
+    props.imageSrc?.startsWith("/") &&
+    new URL(props.imageSrc, fixedLocalBase).origin === fixedLocalBase.origin
       ? props.imageSrc
       : undefined;
 

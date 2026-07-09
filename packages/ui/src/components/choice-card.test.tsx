@@ -72,6 +72,23 @@ describe("ChoiceCard", () => {
     expect(container.querySelector("img")).not.toBeInTheDocument();
   });
 
+  it("does not render root-relative paths normalized to a remote origin", () => {
+    const { container } = render(
+      <ChoiceCard
+        id="train"
+        name="transport"
+        value="train"
+        label="Train"
+        description="Relax between cities."
+        imageSrc="/\\cdn.example.com/train.jpg"
+        selected={false}
+        onSelect={vi.fn()}
+      />
+    );
+
+    expect(container.querySelector("img")).not.toBeInTheDocument();
+  });
+
   it("renders a root-relative local image", () => {
     const { container } = render(
       <ChoiceCard
