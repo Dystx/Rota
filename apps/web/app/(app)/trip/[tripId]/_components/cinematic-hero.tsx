@@ -5,6 +5,7 @@ import { m, useScroll, useTransform } from 'motion/react';
 import { KenBurnsImage } from '@repo/ui/components/ken-burns-image';
 import { FilmGrain } from '@repo/ui/components/film-grain';
 import { useReducedMotion } from '@repo/ui/hooks/use-reduced-motion';
+import { BrandMark } from '@repo/ui/components/brand-mark';
 import { cn } from '@repo/ui/lib/cn';
 
 export interface CinematicHeroProps {
@@ -80,6 +81,12 @@ export function CinematicHero({
           style={{ background: 'var(--cinematic-overlay-vignette)' }} 
         />
         <FilmGrain intensity="subtle" />
+
+      {/* Brand mark overlay — anchors the world mark above the
+          cinematic image. PR-A7. */}
+      <div className="absolute top-6 right-6 md:top-8 md:right-12 z-10">
+        <BrandMark size="md" tone="dark" />
+      </div>
       </div>
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12">

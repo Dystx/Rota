@@ -45,37 +45,37 @@ interface PipelineBoardProps {
 
 const FALLBACK_ITEMS: PipelineItem[] = [
   {
-    id: "fallback-tokyo",
-    title: "Tokyo Culinary Tour",
-    body: "Client requested focus on omakase experiences and hidden izakayas in Shinjuku.",
-    clientName: "E. Sato",
+    id: "fallback-sintra",
+    title: "Sintra Day Trip",
+    body: "Family of 4. Wants Pena Palace at golden hour, a quiet Quinta for lunch, and a cab back from Cascais by 7pm.",
+    clientName: "M. Silva",
     status: "draft",
     slaHours: 2,
     updatedAt: null
   },
   {
-    id: "fallback-alpine",
-    title: "Alpine Ski Retreat",
-    body: "Family of 4, needs gear rental integration and ski school bookings.",
-    clientName: "J. Doe",
+    id: "fallback-douro",
+    title: "Douro Valley Hike",
+    body: "Couple, both 30s. Seven-day hiking route from Peso da Régua to Pinhão, two vineyard stops with a sommelier.",
+    clientName: "J. Santos",
     status: "draft",
     slaHours: 12,
     updatedAt: null
   },
   {
-    id: "fallback-amalfi",
-    title: "Amalfi Coast Honeymoon",
-    body: "Reviewing proposed yacht charter schedule and dinner reservations.",
-    clientName: "M. Rossi",
+    id: "fallback-comporta",
+    title: "Comporta Beach Week",
+    body: "Reviewing proposed boat day on the Sado estuary and dinner at a rice-fish-farm restaurant in Melides.",
+    clientName: "P. Costa",
     status: "in_revision",
     slaHours: null,
     updatedAt: new Date(Date.now() - 10 * 60_000).toISOString()
   },
   {
-    id: "fallback-iceland",
-    title: "Iceland Ring Road",
-    body: "Can we add an extra day near Vik? The forecast looks great.",
-    clientName: "L. Chen",
+    id: "fallback-azores",
+    title: "São Miguel & Azores",
+    body: "Can we add a full-day sailing charter out of Ponta Delgada? Flight times look good.",
+    clientName: "L. Almeida",
     status: "active_chat",
     slaHours: null,
     updatedAt: null
