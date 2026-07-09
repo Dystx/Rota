@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Metadata } from "next";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
@@ -26,7 +27,7 @@ export default function HomePage() {
       <TopNav />
 
       <main className="flex-1" id="main-content">
-        <section className="relative h-[60vh] min-h-[560px] md:h-[80vh] md:min-h-[720px] w-full flex flex-col justify-start items-center overflow-hidden bg-primary">
+        <section className="relative w-full flex flex-col items-center justify-start overflow-visible bg-primary pb-12 md:h-[80vh] md:min-h-[720px] md:overflow-hidden md:pb-0">
           <HeroMap initialProjection="globe" />
 
           <div

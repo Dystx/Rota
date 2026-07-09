@@ -1,7 +1,14 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getDestinationPreset } from "@repo/spatial-engine";
+import {
+  runViewTransition,
+  setTransitionName,
+  supportsViewTransitions
+} from "@repo/ui";
 import { useMapStore } from "@/store/useMapStore";
 import { publicDraftToPlannerUrl } from "../(marketing)/_components/public-trip-choices";
 
@@ -96,6 +103,7 @@ const BENTO_CTA_COPY: Record<BentoSlug, string> = {
 };
 
 export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {}) {
+  const router = useRouter();
   const selectStop = useMapStore((state) => state.selectStop);
 
   const handleBentoClick = (slug: BentoSlug) => {
@@ -103,6 +111,39 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
     if (preset && preset.camera.center) {
       selectStop(slug, [preset.camera.center[0], preset.camera.center[1]]);
     }
+  };
+
+  const handlePlanNavigation = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    slug: BentoSlug,
+    href: string
+  ) => {
+    handleBentoClick(slug);
+
+    // Preserve native new-tab and modified-click behavior. The standard
+    // link semantics also ensure Enter activation dispatches the same click
+    // path as a pointer interaction.
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const navigate = () => router.push(href);
+    if (!supportsViewTransitions()) {
+      navigate();
+      return;
+    }
+
+    setTransitionName(event.currentTarget, `destination-card-${slug}`);
+    runViewTransition(navigate);
   };
 
   return (
@@ -157,21 +198,17 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
 
           if (mode === "plan") {
             return (
-              <div
+              <Link
                 key={card.slug}
+                href={planHref}
                 data-testid={`bento-card-${card.slug}`}
                 data-slug={card.slug}
-                onClick={() => handleBentoClick(card.slug)}
-                className={`${card.gridClass} group relative rounded-xl overflow-hidden shadow-lg border border-white/40`}
+                aria-label={`Plan this trip to ${card.label}`}
+                onClick={(event) => handlePlanNavigation(event, card.slug, planHref)}
+                className={`${card.gridClass} group relative block rounded-xl overflow-hidden border border-white/40 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light`}
               >
-                <Link
-                  href={planHref}
-                  aria-label={`Plan this trip to ${card.label}`}
-                  data-testid={`bento-cta-plan-${card.slug}`}
-                  className="absolute inset-0 z-10 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-                />
                 {cardBody}
-              </div>
+              </Link>
             );
           }
 

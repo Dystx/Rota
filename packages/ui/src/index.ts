@@ -15,6 +15,11 @@ export type { TripCardProps } from "./components/trip-card";
 export { ArchiveLayout } from "./components/archive-layout";
 export type { ArchiveLayoutProps } from "./components/archive-layout";
 export { useReducedMotion } from "./hooks/use-reduced-motion";
+export {
+  runViewTransition,
+  setTransitionName,
+  supportsViewTransitions
+} from "./lib/view-transition";
 export { MotionProvider } from "./components/motion-provider";
 export { KenBurnsImage } from "./components/ken-burns-image";
 export { FilmGrain } from "./components/film-grain";

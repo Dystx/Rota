@@ -267,7 +267,7 @@ function HeroGlobeWithSync({
  * the map engine is loading or unavailable, and each plotted region is a real
  * button rather than a visual-only map pin.
  */
-function StaticPortugalFallback() {
+export function StaticPortugalFallback() {
   const router = useRouter();
   const pins = [
     { slug: "porto", label: "Porto & the North", top: "20%", left: "53%" },

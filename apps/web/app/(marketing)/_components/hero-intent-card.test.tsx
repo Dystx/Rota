@@ -2,6 +2,7 @@ import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { HeroIntentCard } from "./hero-intent-card";
+import { StaticPortugalFallback } from "../hero-map";
 
 const push = vi.fn();
 
@@ -62,5 +63,19 @@ describe("HeroIntentCard", () => {
     fireEvent.keyDown(azores, { key: "Enter" });
 
     expect(azores.getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("gives each static-map pin an accessible route action", () => {
+    render(<StaticPortugalFallback />);
+
+    const portoPin = screen.getByRole("button", {
+      name: "Build a route for Porto & the North"
+    });
+
+    fireEvent.click(portoPin);
+
+    expect(push).toHaveBeenCalledWith(
+      "/planner?destination=porto&days=7&transport=transit&vibe=balanced"
+    );
   });
 });
