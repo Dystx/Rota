@@ -7,6 +7,7 @@ export function TripSummary(props: {
   draft: TripContextValues;
   primaryAction: string;
   onPrimaryAction: () => void;
+  primaryActionDisabled?: boolean;
 }): JSX.Element {
   const travelWindow = props.draft.travelWindow ?? "Any time";
   const dayLabel = props.draft.days === 1 ? "day" : "days";
@@ -39,7 +40,7 @@ export function TripSummary(props: {
             <dd className="mt-1 text-[var(--color-foreground)]">{props.draft.vibe}</dd>
           </div>
         </dl>
-        <Button type="button" fullWidth onClick={props.onPrimaryAction}>
+        <Button type="button" fullWidth onClick={props.onPrimaryAction} disabled={props.primaryActionDisabled} aria-disabled={props.primaryActionDisabled || undefined}>
           {props.primaryAction}
         </Button>
       </CardContent>

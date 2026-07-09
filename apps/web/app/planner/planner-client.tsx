@@ -1,6 +1,8 @@
 "use client";
 
 import { PlannerSingleScreen } from "./_components/planner-single-screen";
+import type { TransportChoice } from "./_components/transport-step";
+import type { Vibe } from "./_components/vibe-step";
 
 export interface PlannerInitialState {
   /**
@@ -12,6 +14,8 @@ export interface PlannerInitialState {
   initialDays?: number;
   /** Travel window from the URL, e.g. "May", "Sep". */
   initialWindow?: string;
+  initialTransport?: TransportChoice | "";
+  initialVibe?: Vibe;
 }
 
 /**
@@ -29,6 +33,8 @@ export function PlannerClient({ initial }: { initial?: PlannerInitialState } = {
       initialDestination={initial?.initialDestination}
       initialDays={initial?.initialDays}
       initialWindow={initial?.initialWindow}
+      initialTransport={initial?.initialTransport}
+      initialVibe={initial?.initialVibe}
     />
   );
 }

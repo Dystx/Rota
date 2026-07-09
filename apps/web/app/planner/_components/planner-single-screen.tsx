@@ -55,7 +55,8 @@ export function PlannerSingleScreen({
     transport: initialTransport || "transit",
     vibe: initialVibe,
   }));
-  const [sheet, setSheet] = React.useState<"destination" | "window" | null>(null);
+  const [sheet, setSheet] = React.useState<"destination" | "window" | "days" | "transport" | "vibe" | null>(null);
+  const [focusedGroup, setFocusedGroup] = React.useState<"destination" | "days" | "details">("destination");
   const [pending, setPending] = React.useState(false);
 
   const update = <K extends keyof TripChoiceDraft>(key: K, value: TripChoiceDraft[K]) =>
@@ -81,6 +82,16 @@ export function PlannerSingleScreen({
       </header>
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 pb-12 md:px-8 lg:grid-cols-[1.2fr_.8fr]">
+        <div className="contents">
+          <div className="lg:col-start-2 lg:row-start-1">
+            <TripContextBar draft={context} onEdit={(key) => {
+              if (key === "destination") setSheet("destination");
+              else if (key === "travelWindow") setSheet("window");
+              else if (key === "days") setSheet("days");
+              else if (key === "transport") setSheet("transport");
+              else if (key === "vibe") setSheet("vibe");
+            }} tripState="draft" />
+          </div>
         <section className="grid content-start gap-6">
           <div className="grid gap-2">
             <p className="font-mono-micro uppercase tracking-widest text-ochre-light">Compose your route</p>
@@ -88,21 +99,25 @@ export function PlannerSingleScreen({
             <p className="max-w-xl text-linen-dark/75">Choose a few anchors. We&apos;ll turn them into a considered itinerary.</p>
           </div>
 
-          <div className="grid gap-3" aria-label="Destination choices">
+          <nav aria-label="Trip choices" className="grid grid-cols-3 gap-2 md:hidden">
+            {([["destination", "Where"], ["days", "How long"], ["details", "Details"]] as const).map(([value, label]) => <button key={value} type="button" aria-pressed={focusedGroup === value} onClick={() => setFocusedGroup(value)} className="min-h-11 rounded-full border border-white/20 px-3 text-sm aria-[pressed=true]:border-ochre-light aria-[pressed=true]:text-ochre-light">{label}</button>)}
+          </nav>
+
+          <div className={`grid gap-3 ${focusedGroup !== "destination" ? "hidden md:grid" : ""}`} aria-label="Destination choices">
             <div className="flex items-center justify-between"><h2 className="font-headline-sm text-xl">Where to?</h2><button type="button" onClick={() => setSheet("destination")} className="text-sm underline">Browse all</button></div>
             <div className="grid gap-3 sm:grid-cols-2">
               {DESTINATIONS.slice(0, 2).map(([value, description]) => <ChoiceCard key={value} id={`destination-${value}`} name="destination" value={value} label={value} description={description} selected={draft.destination === value} onSelect={(next) => update("destination", next)} />)}
             </div>
           </div>
 
-          <div className="grid gap-3" aria-label="Trip duration choices">
+          <div className={`grid gap-3 ${focusedGroup !== "days" ? "hidden md:grid" : ""}`} aria-label="Trip duration choices">
             <h2 className="font-headline-sm text-xl">How long?</h2>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {DURATIONS.map((days) => <ChoiceCard key={days} id={`duration-${days}`} name="days" value={String(days)} label={`${days} days`} description={days === 7 ? "A balanced first journey." : "A different pace, same care."} selected={draft.days === days} onSelect={() => update("days", days)} />)}
             </div>
           </div>
 
-          <div className="grid gap-4 rounded-xl border border-white/15 bg-white/5 p-5">
+          <div className={`grid gap-4 rounded-xl border border-white/15 bg-white/5 p-5 ${focusedGroup !== "details" ? "hidden md:grid" : ""}`} aria-label="Trip details choices">
             <button type="button" onClick={() => setSheet("window")} className="flex min-h-11 items-center justify-between text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" aria-label="Choose travel window">
               <span><span className="block text-xs uppercase tracking-widest text-ochre-light">Travel window</span><span className="block text-lg">{draft.travelWindow ?? "Any time"}</span></span><span aria-hidden>⌄</span>
             </button>
@@ -113,11 +128,11 @@ export function PlannerSingleScreen({
           <RouteConsequence status="ready" transportLabel={draft.transport === "transit" ? "Transit keeps the route to two bases" : "Car opens the Douro interior"} stopCount={draft.transport === "transit" ? 2 : 4} />
         </section>
 
-        <aside className="grid content-start gap-4 lg:sticky lg:top-6 lg:self-start">
-          <TripContextBar draft={context} onEdit={(key) => key === "travelWindow" ? setSheet("window") : key === "destination" ? setSheet("destination") : undefined} tripState="draft" />
-          <TripSummary draft={context} primaryAction={pending ? "Updating your route" : "Build my itinerary"} onPrimaryAction={submit} />
+        <aside className="grid content-start gap-4 lg:col-start-2 lg:row-start-2 lg:sticky lg:top-6 lg:self-start">
+          <TripSummary draft={context} primaryAction={pending ? "Updating your route" : "Build my itinerary"} onPrimaryAction={submit} primaryActionDisabled={pending || !draft.destination.trim() || draft.days < 1} />
           {pending ? <p role="status" className="text-center text-sm text-linen-dark/70">Updating your route</p> : null}
         </aside>
+        </div>
       </div>
 
       <OptionSheet open={sheet === "destination"} title="Choose a destination" description="Start with the place that pulls you in." onClose={() => setSheet(null)}>
@@ -125,6 +140,15 @@ export function PlannerSingleScreen({
       </OptionSheet>
       <OptionSheet open={sheet === "window"} title="When will you go?" description="A season is enough; the route will do the rest." onClose={() => setSheet(null)}>
         <div role="radiogroup" aria-label="Travel window" className="grid gap-2">{WINDOWS.map((value) => <button key={value} type="button" role="radio" aria-checked={(draft.travelWindow ?? "Any time") === value} onClick={() => { update("travelWindow", value === "Any time" ? null : value); setSheet(null); }} className="min-h-11 rounded-lg border p-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light">{value}</button>)}</div>
+      </OptionSheet>
+      <OptionSheet open={sheet === "days"} title="How long will you go?" onClose={() => setSheet(null)}>
+        <div role="radiogroup" aria-label="Trip duration" className="grid gap-2">{DURATIONS.map((days) => <button key={days} type="button" role="radio" aria-checked={draft.days === days} onClick={() => { update("days", days); setSheet(null); }} className="min-h-11 rounded-lg border p-3 text-left">{days} days</button>)}</div>
+      </OptionSheet>
+      <OptionSheet open={sheet === "transport"} title="How will you move?" onClose={() => setSheet(null)}>
+        <ChoiceChipGroup label="Transport" multiple={false} selected={[draft.transport]} onChange={(values) => { if (values[0]) update("transport", values[0] as TransportChoice); setSheet(null); }} options={[{ value: "transit", label: "Transit & walking" }, { value: "car", label: "Rental car" }]} />
+      </OptionSheet>
+      <OptionSheet open={sheet === "vibe"} title="What is the trip vibe?" onClose={() => setSheet(null)}>
+        <ChoiceChipGroup label="Vibe" multiple={false} selected={[draft.vibe]} onChange={(values) => { if (values[0]) update("vibe", values[0] as Vibe); setSheet(null); }} options={[{ value: "restorative", label: "Restorative" }, { value: "balanced", label: "Balanced" }, { value: "high_energy", label: "High energy" }]} />
       </OptionSheet>
     </main>
   );
