@@ -20,9 +20,14 @@ export function ChoiceChipGroup(props: {
 }): JSX.Element {
   const labelId = useId();
   const multiple = props.multiple ?? true;
+  const options = props.options.map((option) => ({
+    value: option.value,
+    label: option.label,
+    description: option.description ?? option.consequence
+  }));
 
-  function handleChange(values: string[]): void {
-    props.onChange(multiple ? values : values.slice(-1));
+  function handleSingleChange(value: string): void {
+    props.onChange([value]);
   }
 
   return (
@@ -30,18 +35,25 @@ export function ChoiceChipGroup(props: {
       <p id={labelId} className="text-sm font-medium text-[var(--color-foreground)]">
         {props.label}
       </p>
-      <ChipGroup
-        multiple
-        ariaLabel={props.label}
-        aria-labelledby={labelId}
-        options={props.options.map((option) => ({
-          value: option.value,
-          label: option.label,
-          description: option.description ?? option.consequence
-        }))}
-        value={multiple ? props.selected : props.selected.slice(0, 1)}
-        onChange={handleChange}
-      />
+      {multiple ? (
+        <ChipGroup
+          multiple
+          ariaLabel={props.label}
+          aria-labelledby={labelId}
+          options={options}
+          value={props.selected}
+          onChange={props.onChange}
+        />
+      ) : (
+        <ChipGroup
+          multiple={false}
+          ariaLabel={props.label}
+          aria-labelledby={labelId}
+          options={options}
+          value={props.selected[0] ?? null}
+          onChange={handleSingleChange}
+        />
+      )}
     </section>
   );
 }

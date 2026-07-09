@@ -71,4 +71,38 @@ describe("ChoiceCard", () => {
 
     expect(container.querySelector("img")).not.toBeInTheDocument();
   });
+
+  it("renders a root-relative local image", () => {
+    const { container } = render(
+      <ChoiceCard
+        id="train"
+        name="transport"
+        value="train"
+        label="Train"
+        description="Relax between cities."
+        imageSrc="/images/train.jpg"
+        selected={false}
+        onSelect={vi.fn()}
+      />
+    );
+
+    expect(container.querySelector("img")).toHaveAttribute("src", "/images/train.jpg");
+  });
+
+  it("does not render absolute HTTPS image URLs", () => {
+    const { container } = render(
+      <ChoiceCard
+        id="train"
+        name="transport"
+        value="train"
+        label="Train"
+        description="Relax between cities."
+        imageSrc="https://cdn.example.com/train.jpg"
+        selected={false}
+        onSelect={vi.fn()}
+      />
+    );
+
+    expect(container.querySelector("img")).not.toBeInTheDocument();
+  });
 });
