@@ -1,126 +1,108 @@
 "use client";
 
 import Link from "next/link";
+import { ChoiceCard, RouteConsequence } from "@repo/ui";
+import React from "react";
 import { useState } from "react";
 
-type MobilityOption = "yes" | "no";
+export type TransportChoice = "car" | "transit";
+export type MobilityUpdate = (choice: TransportChoice) => void | Promise<void>;
 
-interface TileConfig {
-  id: MobilityOption;
-  title: string;
-  caption: string;
-  icon: string;
-}
+type MobilityTilesProps = {
+  initialChoice?: TransportChoice;
+  onChoiceChange?: MobilityUpdate;
+};
 
-const TILES: TileConfig[] = [
-  {
-    id: "yes",
-    title: "Yes, airport pickup",
-    caption: "Flexible exploration",
-    icon: "car_rental",
+const OPTIONS: Record<TransportChoice, {
+  label: string;
+  description: string;
+  consequence: string;
+  travelMinutes: number;
+  stops: number;
+  warnings: string[];
+}> = {
+  car: {
+    label: "Drive between regions",
+    description: "A rental car gives you the most flexibility for viewpoints and quieter stops.",
+    consequence: "42 min typical drive · 2 base transfers",
+    travelMinutes: 42,
+    stops: 2,
+    warnings: ["Parking and winding roads add a little friction on scenic days."]
   },
-  {
-    id: "no",
-    title: "No, transit & walking",
-    caption: "City immersion",
-    icon: "directions_transit",
-  },
-];
+  transit: {
+    label: "Train, transit & walking",
+    description: "Keep the route relaxed with trains, local transit, and walks between close-by stops.",
+    consequence: "68 min typical travel · 4 base transfers",
+    travelMinutes: 68,
+    stops: 4,
+    warnings: ["Some viewpoints need an extra transfer or a short taxi connection."]
+  }
+};
 
-/**
- * MobilityTiles — body content for the Logistics screen (Mock 1.3).
- *
- * Source: docs/prototype.html (LogisticsPage inner card).
- *
- * Two selectable tiles plus the back/continue footer. The Continue Link is
- * disabled until a selection is made; selecting a tile adds a `.selected`
- * marker so the inline `group-[:has(.selected)]:opacity-100` Tailwind v4
- * utility shows the corner check_circle.
- */
-export function MobilityTiles() {
-  const [selected, setSelected] = useState<MobilityOption | null>(null);
+/** Trip-scoped mobility choices and their immediate route consequences. */
+export function MobilityTiles({ initialChoice = "transit", onChoiceChange }: MobilityTilesProps) {
+  const [selected, setSelected] = useState<TransportChoice>(initialChoice);
+  const [status, setStatus] = useState<"idle" | "updating" | "ready" | "error">("ready");
+  const [pending, setPending] = useState<TransportChoice | null>(null);
+
+  async function choose(choice: TransportChoice) {
+    setSelected(choice);
+    setPending(choice);
+    setStatus(onChoiceChange ? "updating" : "ready");
+    if (!onChoiceChange) return;
+    try {
+      await onChoiceChange(choice);
+      setPending(null);
+      setStatus("ready");
+    } catch {
+      // Keep the optimistic choice visible so a retry does not discard the
+      // traveler's last valid selection.
+      setStatus("error");
+    }
+  }
+
+  function retry() {
+    if (pending) void choose(pending);
+  }
+
+  const option = OPTIONS[selected];
 
   return (
     <>
-      <header className="text-center">
-        <div className="inline-block px-3 py-1 bg-olive-light/10 rounded-full mb-4">
-          <span className="font-mono-micro text-mono-micro text-olive-dark uppercase tracking-widest">
-            Logistics
-          </span>
-        </div>
-        <h1 className="font-headline-lg text-headline-lg text-primary mb-2">
-          Will you rent a car?
-        </h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">
-          We&apos;ll tailor your itinerary based on your mobility preferences.
-        </p>
-      </header>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {TILES.map((tile) => {
-          const isSelected = selected === tile.id;
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" role="radiogroup" aria-label="Choose transport">
+        {(Object.keys(OPTIONS) as TransportChoice[]).map((choice) => {
+          const item = OPTIONS[choice];
           return (
-            <button
-              key={tile.id}
-              type="button"
-              onClick={() => setSelected(tile.id)}
-              aria-pressed={isSelected}
-              aria-label={`${tile.title} — ${tile.caption}`}
-              className={[
-                "group relative flex flex-col items-center justify-center p-6 bg-surface-container-lowest/80 border rounded-lg transition-all duration-300 hover-pull overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2",
-                isSelected
-                  ? "border-ochre-light bg-surface-container-lowest selected"
-                  : "border-olive-light/10 hover:border-ochre-light hover:bg-surface-container-lowest",
-              ].join(" ")}
-            >
-              <div className="absolute inset-0 bg-ochre-light/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <span className="ph text-4xl text-olive-dark mb-4 group-hover:text-ochre-dark transition-colors">
-                {tile.icon}
-              </span>
-              <span className="font-label-ui text-label-ui text-primary mb-1">
-                {tile.title}
-              </span>
-              <span className="font-body-md text-body-md text-on-surface-variant text-center text-sm">
-                {tile.caption}
-              </span>
-              <div className="absolute top-4 right-4 opacity-0 group-[:has(.selected)]:opacity-100 transition-opacity">
-                <span className="ph text-ochre-dark">
-                  check_circle
-                </span>
-              </div>
-            </button>
+            <ChoiceCard
+              key={choice}
+              id={`logistics-${choice}`}
+              name="transport"
+              value={choice}
+              label={item.label}
+              description={item.description}
+              consequence={item.consequence}
+              selected={selected === choice}
+              onSelect={(value) => void choose(value as TransportChoice)}
+            />
           );
         })}
       </div>
 
-      <div className="flex justify-between items-center mt-4 pt-6 border-t border-olive-dark/10">
-        <Link
-          href="/planner"
-          className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded"
-        >
-          <span className="ph text-sm ph-arrow-left">arrow-left</span>
-          Back
-        </Link>
-        <Link
-          href="/checkout"
-          aria-disabled={!selected}
-          tabIndex={selected ? undefined : -1}
-          className={[
-            "font-label-ui text-label-ui px-6 py-3 rounded-lg transition-colors duration-200 hover-pull shadow-sm flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2",
-            selected
-              ? "bg-olive-dark text-on-primary hover:bg-primary"
-              : "bg-olive-dark text-on-primary hover:bg-primary pointer-events-none opacity-50",
-          ].join(" ")}
-        >
-          Continue
-          <span className="ph text-sm ph-arrow-right">arrow-right</span>
-        </Link>
-      </div>
+      <RouteConsequence
+        status={status}
+        stopCount={option.stops}
+        travelMinutes={option.travelMinutes}
+        transportLabel={selected === "car" ? "Rental car" : "Transit + walking"}
+        warnings={option.warnings}
+        onRetry={retry}
+      />
 
+      <div className="flex items-center justify-between border-t border-olive-dark/10 pt-6">
+        <Link href="/planner" className="font-label-ui text-label-ui text-on-surface-variant">Back</Link>
+        <Link href="/checkout" aria-disabled={status === "updating"} className="rounded-lg bg-olive-dark px-6 py-3 font-label-ui text-label-ui text-on-primary">Continue</Link>
+      </div>
       <div className="sr-only" aria-live="polite">
-        {selected
-          ? `Selected: ${selected === "yes" ? "rental car" : "transit & walking"}`
-          : "No mobility preference selected"}
+        {status === "updating" ? "Updating route" : status === "error" ? "Route update failed; retry available" : `Selected: ${selected === "car" ? "rental car" : "transit and walking"}`}
       </div>
     </>
   );

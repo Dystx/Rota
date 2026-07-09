@@ -23,7 +23,8 @@ export default async function LogisticsPage({
   const tripAccess = await getOwnedTrip(tripId);
 
   if (tripAccess.kind === "anonymous") {
-    redirect(`/sign-in?next=${encodeURIComponent(`/logistics?trip=${tripId}`)}`);
+    // Do not reflect an arbitrary trip id in an unauthenticated redirect.
+    redirect("/sign-in");
   }
 
   if (tripAccess.kind !== "ok") {
@@ -52,7 +53,16 @@ export default async function LogisticsPage({
         {/* Main Card Container */}
         <main id="main-content" className="relative z-10 w-full max-w-2xl mx-auto">
           <div className="glass-panel-light rounded-xl p-8 md:p-12 deep-shadow flex flex-col gap-8">
-            <MobilityTiles />
+            <header className="text-center">
+              <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-2">Route logistics</p>
+              <h1 className="font-headline-lg text-headline-lg text-primary">{trip.title}</h1>
+              <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
+                Choose how you want to move through {trip.brief.regions.map((region) => region.replace(/-/g, " ")).join(", ")}.
+              </p>
+            </header>
+            <MobilityTiles
+              initialChoice={trip.brief.transportMode === "rental-car" ? "car" : "transit"}
+            />
           </div>
         </main>
       </div>
