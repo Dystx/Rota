@@ -39,6 +39,13 @@ test.describe("@task11 checkout package choice", () => {
   });
 });
 
+test.describe("@task11 export retry access", () => {
+  test("rejects anonymous retry requests before resolving trip state", async ({ request }) => {
+    const response = await request.post("/api/trips/not-a-trip/export/retry", { maxRedirects: 0 });
+    expect(response.status()).toBe(401);
+  });
+});
+
 test.describe("@task11 export state and retry", () => {
   test.use({ storageState: createTravelerStorageState() });
 

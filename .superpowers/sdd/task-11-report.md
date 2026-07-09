@@ -12,3 +12,4 @@
 - Final review hardening: export GET now resolves trips through `getOwnedTrip` before reading paid/export state, and itinerary generation failures render `Unlocked · Error` with retry instead of `Ready`.
 - Export jobs now use an explicit storage adapter boundary. Production defaults to truthful `Unavailable` until a durable trip-ID job table/worker is deployed; the in-memory adapter is test-only and never used as the production default.
 - Added focused export-job transition tests for unavailable, queued, ready, error, retry, and locked states. Verification: `pnpm --filter web exec tsc --noEmit` and targeted Vitest (export-jobs/trip-access) pass.
+- Retry POST now enforces traveler API authentication before owner resolution; anonymous denial is covered in the lifecycle Playwright suite.
