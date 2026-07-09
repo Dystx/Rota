@@ -31,4 +31,44 @@ describe("ChoiceCard", () => {
     fireEvent.click(choice);
     expect(onSelect).toHaveBeenCalledWith("train");
   });
+
+  it.each(["Enter", " "])("selects the choice when %s is pressed", (key) => {
+    const onSelect = vi.fn();
+
+    const { container } = render(
+      <ChoiceCard
+        id="train"
+        name="transport"
+        value="train"
+        label="Train"
+        description="Relax between cities."
+        selected={false}
+        onSelect={onSelect}
+      />
+    );
+
+    const choice = container.querySelector<HTMLButtonElement>('button[role="radio"]');
+    expect(choice).not.toBeNull();
+    fireEvent.keyDown(choice!, { key });
+
+    expect(onSelect).toHaveBeenCalledOnce();
+    expect(onSelect).toHaveBeenCalledWith("train");
+  });
+
+  it("does not render protocol-relative image URLs", () => {
+    const { container } = render(
+      <ChoiceCard
+        id="train"
+        name="transport"
+        value="train"
+        label="Train"
+        description="Relax between cities."
+        imageSrc="//cdn.example.com/train.jpg"
+        selected={false}
+        onSelect={vi.fn()}
+      />
+    );
+
+    expect(container.querySelector("img")).not.toBeInTheDocument();
+  });
 });

@@ -36,4 +36,14 @@ describe("ChoiceChipGroup", () => {
     fireEvent.click(food);
     expect(food).toHaveAttribute("aria-pressed", "false");
   });
+
+  it.each(["Enter", " "])("toggles choices when %s is pressed", (key) => {
+    const { container } = render(<ChipHarness />);
+
+    const history = container.querySelector<HTMLButtonElement>('[data-chip="true"]:last-child');
+    expect(history).not.toBeNull();
+    fireEvent.keyDown(history!, { key });
+
+    expect(history).toHaveAttribute("aria-pressed", "true");
+  });
 });

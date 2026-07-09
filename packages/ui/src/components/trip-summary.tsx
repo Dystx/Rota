@@ -9,6 +9,7 @@ export function TripSummary(props: {
   onPrimaryAction: () => void;
 }): JSX.Element {
   const travelWindow = props.draft.travelWindow ?? "Any time";
+  const dayLabel = props.draft.days === 1 ? "day" : "days";
 
   return (
     <Card as="section" aria-label="Trip summary">
@@ -23,7 +24,7 @@ export function TripSummary(props: {
           </div>
           <div>
             <dt className="text-xs font-semibold uppercase tracking-widest text-[var(--color-muted-foreground)]">Length</dt>
-            <dd className="mt-1 text-[var(--color-foreground)]">{props.draft.days} days</dd>
+            <dd className="mt-1 text-[var(--color-foreground)]">{props.draft.days} {dayLabel}</dd>
           </div>
           <div>
             <dt className="text-xs font-semibold uppercase tracking-widest text-[var(--color-muted-foreground)]">Travel window</dt>

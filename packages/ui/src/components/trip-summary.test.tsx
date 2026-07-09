@@ -28,4 +28,22 @@ describe("TripSummary", () => {
     fireEvent.click(action);
     expect(onPrimaryAction).toHaveBeenCalledOnce();
   });
+
+  it("uses singular day wording for a one-day trip", () => {
+    const { container } = render(
+      <TripSummary
+        draft={{
+          destination: "Porto",
+          days: 1,
+          travelWindow: "October",
+          transport: "Train",
+          vibe: "Relaxed"
+        }}
+        primaryAction="Build my trip"
+        onPrimaryAction={vi.fn()}
+      />
+    );
+
+    expect(container).toHaveTextContent("1 day");
+  });
 });
