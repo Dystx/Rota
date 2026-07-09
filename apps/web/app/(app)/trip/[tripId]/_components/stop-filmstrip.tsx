@@ -59,7 +59,8 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
       </div>
       <div
         role="region"
-        aria-label="Stop filmstrip"
+        aria-label="Stop filmstrip (swipe cards)"
+        aria-roledescription="carousel"
         className="flex gap-gutter overflow-x-auto scrollbar-hide px-container-padding-lg pb-4 snap-x snap-mandatory"
         data-testid="filmstrip-track"
       >
@@ -230,8 +231,19 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
           <span className="font-label-ui text-label-ui">Add Stop</span>
         </a>
       </div>
-      <ol aria-label="Stops list" className="sr-only">
-        {stops.map((stop) => <li key={`list-${stop.id}`}><button type="button" onClick={() => stop.coordinates && selectStop(stop.id, stop.coordinates)}>{stop.startTime} — {stop.placeName}</button></li>)}
+      <ol aria-label="Stops list (text view)" className="mt-2 grid gap-2 px-container-padding-lg pb-4 md:hidden">
+        {stops.map((stop, index) => <li key={`list-${stop.id}`}>
+          <button
+            type="button"
+            className="flex min-h-11 w-full items-center justify-between rounded-lg border border-olive-dark/15 bg-white/70 px-3 py-2 text-left text-sm text-primary"
+            onClick={() => stop.coordinates && selectStop(stop.id, stop.coordinates)}
+            disabled={!stop.coordinates}
+            aria-label={`${stop.startTime} — ${stop.placeName}${stop.coordinates ? "" : " (no map coordinates yet)"} (Stop ${index + 1} of ${stops.length})`}
+          >
+            <span>{stop.startTime} — {stop.placeName}</span>
+            <span className="font-mono-micro text-on-surface-variant" aria-hidden="true">{index + 1}/{stops.length}</span>
+          </button>
+        </li>)}
       </ol>
     </section>
   );

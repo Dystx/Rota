@@ -50,6 +50,7 @@ import {
   useTargetCoordinatesCameraSync
 } from "@/lib/hooks/useTargetCoordinatesCameraSync";
 import { useMapStore } from "@/store/useMapStore";
+import { deriveSelectedDayFromChapter } from "./chapter-day-sync";
 
 type ChapterActivationSource = "scroll" | "click" | "keyboard" | "deep-link";
 
@@ -170,6 +171,12 @@ export default function CinematicMapSection({
       chapters.some((chapter) => chapter.id === currentId) ? currentId : firstChapterId
     );
   }, [chapters]);
+
+  React.useEffect(() => {
+    setSelectedDay((currentDay) =>
+      deriveSelectedDayFromChapter(activeChapterId, days, currentDay)
+    );
+  }, [activeChapterId, days]);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
