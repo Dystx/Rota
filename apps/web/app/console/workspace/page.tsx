@@ -10,10 +10,10 @@ export default function ConsoleWorkspacePage() {
   return (
     <>
       <div
-        className="min-h-screen flex flex-col bg-background relative"
+        className="md:ml-64 min-h-screen flex flex-col bg-background relative"
         style={{ backgroundImage: AMBIENT_PATTERN }}
       >
-        <header className="h-header-height px-container-padding-lg flex items-center justify-between border-b border-olive-light/10 bg-surface/50 backdrop-blur-md shrink-0 z-10 md:ml-64">
+        <header className="h-header-height px-container-padding-lg flex items-center justify-between border-b border-olive-light/10 bg-surface/50 backdrop-blur-md shrink-0 z-10">
           <div className="flex items-center gap-3 min-w-0">
             <span className="font-mono-technical text-mono-technical bg-surface-container-high text-on-surface-variant px-2 py-1 rounded">
               TRP-8924-JP
@@ -39,7 +39,7 @@ export default function ConsoleWorkspacePage() {
           </div>
         </header>
 
-        <main id="main-content" className="flex-1 md:ml-64 flex overflow-hidden">
+        <main id="main-content" className="flex-1 flex overflow-hidden">
           <aside className="w-full md:w-1/3 md:min-w-[320px] md:max-w-[400px] border-r border-olive-light/10 bg-glass-light backdrop-blur-md overflow-y-auto p-container-padding-sm flex flex-col gap-section-gap shrink-0">
             <div className="flex items-center justify-between">
               <h3 className="font-headline-sm text-headline-sm text-primary">

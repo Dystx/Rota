@@ -255,7 +255,7 @@ export default function ConsoleMessagesPage() {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col bg-background relative">
+      <div className="md:ml-64 min-h-screen flex flex-col bg-background relative">
         <div
           aria-hidden
           className="fixed inset-0 z-0 bg-cover bg-center opacity-40 blur-sm pointer-events-none"
@@ -269,7 +269,7 @@ export default function ConsoleMessagesPage() {
           className="fixed inset-0 z-0 bg-glass-light/30 pointer-events-none"
         />
 
-        <main id="main-content" className="relative z-10 flex-1 md:ml-64 h-screen flex gap-gutter p-container-padding-sm overflow-hidden">
+        <main id="main-content" className="relative z-10 flex-1 h-screen flex gap-gutter p-container-padding-sm overflow-hidden">
           <h1 className="sr-only">Messaging Hub</h1>
           {/* Column 1: Itinerary Days */}
           <ConversationList

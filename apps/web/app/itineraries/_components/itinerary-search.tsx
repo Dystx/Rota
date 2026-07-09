@@ -98,8 +98,9 @@ export function ItinerarySearch({ trips }: { trips: TripDraftListItem[] }) {
         data-testid="itinerary-result-count"
         className="font-mono-micro text-mono-micro text-on-surface-variant/70 mb-4"
       >
-        {visible.length} of {trips.length}
-        {visible.length === 1 ? " itinerary" : " itineraries"}
+        {visible.length === trips.length
+          ? `${trips.length} ${trips.length === 1 ? "itinerary" : "itineraries"}`
+          : `${visible.length} of ${trips.length} ${trips.length === 1 ? "itinerary" : "itineraries"}`}
       </p>
 
       {visible.length === 0 ? (

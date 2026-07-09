@@ -22,6 +22,14 @@ interface IntersectionObserverGateProps {
    * placeholder — `data-static-schematic` is the test hook.
    */
   fallback?: React.ReactNode;
+  /**
+   * When true, the gate fires immediately on mount (skips the
+   * observer + the 1.5s fallback timer). Use for surfaces where
+   * the section is the primary content of the page and a blank
+   * 700px tall placeholder is unacceptable — the trip detail
+   * page's cinematic route section.
+   */
+  forceMount?: boolean;
   className?: string;
 }
 
@@ -42,12 +50,15 @@ export function IntersectionObserverGate({
   rootMargin = "100px",
   children,
   fallback,
+  forceMount = false,
   className
 }: IntersectionObserverGateProps): React.ReactElement {
   const sentinelRef = React.useRef<HTMLDivElement | null>(null);
-  const [isIntersecting, setIsIntersecting] = React.useState(false);
-
+  const [isIntersecting, setIsIntersecting] = React.useState(forceMount);
   React.useEffect(() => {
+    if (forceMount) {
+      return;
+    }
     const node = sentinelRef.current;
     if (!node) return;
     if (typeof IntersectionObserver === "undefined") {
@@ -60,7 +71,6 @@ export function IntersectionObserverGate({
         if (entries.some((entry) => entry.isIntersecting)) {
           setIsIntersecting(true);
           observer.disconnect();
-          if (fallbackTimer !== null) window.clearTimeout(fallbackTimer);
         }
       },
       { rootMargin }
@@ -83,7 +93,7 @@ export function IntersectionObserverGate({
       observer.disconnect();
       window.clearTimeout(fallbackTimer);
     };
-  }, [rootMargin]);
+  }, [rootMargin, forceMount]);
 
   if (isIntersecting) {
     return <>{children}</>;

@@ -225,6 +225,7 @@ export const WorkspaceTripCanvas = React.forwardRef<
       className={className}
     >
       <IntersectionObserverGate
+        forceMount
         rootMargin="100px"
         fallback={
           <div

@@ -4,8 +4,11 @@ import { PipelinePageClient } from "./_components/pipeline-page-client";
 export default function ConsolePipelinePage() {
   return (
     <>
-      <div className="min-h-screen flex flex-col bg-background">
-        <main id="main-content" className="flex-1 md:ml-64 p-container-padding-lg max-h-screen overflow-hidden flex flex-col">
+      <div className="md:ml-64 min-h-screen flex flex-col bg-background">
+        <main
+          id="main-content"
+          className="flex-1 p-container-padding-lg overflow-hidden flex flex-col"
+        >
           <PipelinePageClient />
         </main>
         <SiteFooter />
