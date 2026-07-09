@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Button, EmptyState } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { isFeatureEnabled } from "@repo/config";
 import { getOwnedTrip } from "@/app/lib/trip-access";
+import { BetaUnavailable } from "../_components/beta-unavailable";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
 import { ExpertChat } from "./_components/expert-chat";
@@ -14,9 +16,7 @@ import { ExpertChat } from "./_components/expert-chat";
  * `EmptyState` with a "Browse my trips" CTA back to `/account`
  * instead of dropping the user into a hardcoded Kyoto
  * conversation. When the trip is present, the client
- * `ExpertChat` component mounts and renders the chat timeline
- * + composer (currently still seeded with the Kyoto timeline
- * as a placeholder until the timeline is wired to `trip.days`).
+ * `ExpertChat` component loads only authenticated, trip-scoped messages.
  *
  * The user lands here from the "Open expert chat →" action on
  * `/trip/[id]`; the per-trip `?trip=` is what scopes the
@@ -30,6 +30,16 @@ export default async function ExpertChatPage({
   const { trip: tripParam } = await searchParams;
   const tripId = tripParam?.trim() || null;
 
+  if (!isFeatureEnabled("tripMessaging")) {
+    return (
+      <BetaUnavailable
+        title="Expert messaging is not available yet"
+        description="Messaging will become available here when trip messaging is enabled. Your itinerary and review status remain available from the trip itself."
+        returnHref={tripId ? `/trip/${encodeURIComponent(tripId)}` : "/itineraries"}
+      />
+    );
+  }
+
   if (!tripId) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
@@ -42,26 +52,6 @@ export default async function ExpertChatPage({
             data-testid="expert-chat-empty"
             className="mx-auto max-w-2xl px-container-padding-sm text-center"
           >
-            {/* Sample 2-bubble conversation preview — telegraphs
-                "this is a chat" instead of "go back". Muted so
-                it reads as a placeholder, not a real thread. */}
-            <div
-              aria-hidden="true"
-              className="mx-auto mb-8 max-w-md rounded-2xl border border-olive-light/15 bg-white/50 p-4 text-left"
-            >
-              <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-3 text-center">
-                Sample thread
-              </p>
-              <div className="flex flex-col gap-3">
-                <div className="self-start max-w-[80%] rounded-2xl rounded-tl-sm bg-white/80 px-3 py-2 text-[13px] text-primary leading-relaxed">
-                  Tuesday looks rainy in Sintra. Should we swap the palace day for the Belém loop?
-                </div>
-                <div className="self-end max-w-[80%] rounded-2xl rounded-tr-sm bg-ochre-light/30 px-3 py-2 text-[13px] text-primary leading-relaxed">
-                  Good call — let me move Quinta da Regaleira to Thursday and add the Jerónimos monastery.
-                </div>
-              </div>
-            </div>
-
             <span className="ph text-[48px] text-olive-light mb-3 block ph-chat-circle-dots">chat-circle-dots</span>
             <h1 className="font-headline-lg text-headline-lg text-primary mb-2">
               Open this chat from a trip
@@ -94,6 +84,17 @@ export default async function ExpertChatPage({
 
   if (tripAccess.kind !== "ok") {
     redirect("/itineraries?notice=unavailable");
+  }
+
+  const reviewed = tripAccess.trip.hasHumanReview || tripAccess.trip.status === "reviewed";
+  if (!tripAccess.trip.isPaid || !reviewed) {
+    return (
+      <BetaUnavailable
+        title="Expert messaging is reserved for reviewed trips"
+        description="Unlock your trip and complete the local specialist review before messaging becomes available."
+        returnHref={`/trip/${encodeURIComponent(tripId)}`}
+      />
+    );
   }
 
   return <ExpertChat tripId={tripId} />;
