@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandMark } from "@repo/ui";
 
 /**
  * SiteFooter — global footer.
@@ -46,9 +47,13 @@ export function SiteFooter() {
           <div className="grid gap-3">
             <Link
               href="/"
-              className="font-headline-lg text-headline-lg italic text-primary focus-visible:outline-none focus-visible:shadow-focus rounded-sm"
+              aria-label="Rumia — go to home"
+              className="inline-flex items-center gap-2 focus-visible:outline-none focus-visible:shadow-focus rounded-sm"
             >
-              Rumia
+              <BrandMark size="sm" tone="light" />
+              <span className="font-headline-lg text-headline-lg italic text-primary">
+                Rumia
+              </span>
             </Link>
             <p className="font-body text-body text-olive-light max-w-xs">
               Intentional Humanism in Travel — Portugal-first, AI-planned, human-curated.

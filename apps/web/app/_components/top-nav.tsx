@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BrandMark } from "@repo/ui";
 
 interface NavItem {
   href: string;
@@ -53,9 +54,13 @@ export function TopNav() {
         <Link
           href="/"
           aria-current={isActivePath(pathname, "/") ? "page" : undefined}
-          className="font-headline-lg text-headline-lg italic text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+          aria-label="Rumia — go to home"
+          className="inline-flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          Rumia
+          <BrandMark size="sm" tone="light" />
+          <span className="font-display italic text-headline-sm text-primary">
+            Rumia
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
