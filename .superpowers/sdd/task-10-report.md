@@ -26,3 +26,10 @@ Task 10 unresolved-day guard:
 - Added an explicit-day guard so a `?day=2` selection remains on Day 2 when only Day 1 has geocoded chapters; the map retains the Day 2 stop list and no-map-stops state while chapter navigation falls back safely.
 - Added regression coverage for explicit unresolved-day preservation.
 - Verification: focused cinematic/route-sync tests — PASS (11 tests).
+
+Task 10 final conditional fix:
+
+- Distinguished an explicit `?day=N` selection from default map mode. Default visits and filmstrip now choose the first day with geocoded stops (Day 2 when Day 1 has none), while explicit unresolved days retain their label and no-map-stops state.
+- Added `selectedDayIsExplicit` to the map section and mark map-menu changes explicit, preserving unresolved local selections even when the chapter surface falls back.
+- Regression coverage includes default Day 1/Day 2 geocoding fallback and explicit `?day=1` preservation.
+- Verification: focused route-sync tests — PASS (8 tests); `pnpm --filter web typecheck` — PASS.

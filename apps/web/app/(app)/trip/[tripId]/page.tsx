@@ -143,8 +143,15 @@ export default async function TripDetailPage({
   // The filmstrip shows the first day's stops under "Today's Stops";
   // the vertical ItineraryTimeline below still shows the full week.
   const requestedDay = Number(query.day);
-  const selectedDayIndex = Number.isInteger(requestedDay) && requestedDay > 0 ? requestedDay : timelineDaysRaw[0]?.dayIndex ?? 1;
-  const firstDay = timelineDaysRaw.find((day) => day.dayIndex === selectedDayIndex) ?? timelineDaysRaw[0];
+  const hasExplicitDay = Number.isInteger(requestedDay) && requestedDay > 0;
+  // A default visit should land on the first day that has map data. Keep an
+  // explicit query day distinct so an unresolved day can remain selected.
+  const selectedDayIndex = hasExplicitDay ? requestedDay : undefined;
+  const defaultDay = timelineDaysRaw.find((day) =>
+    day.stops.some((stop) => typeof stop !== "string" && stop.lng !== undefined && stop.lat !== undefined)
+  ) ?? timelineDaysRaw[0];
+  const filmstripDayIndex = selectedDayIndex ?? defaultDay?.dayIndex;
+  const firstDay = timelineDaysRaw.find((day) => day.dayIndex === filmstripDayIndex) ?? defaultDay;
   const filmstripStops: FilmstripStop[] = firstDay
     ? firstDay.stops.map((stop, idx) => {
         const time = (
@@ -355,6 +362,7 @@ export default async function TripDetailPage({
               tripId={tripId}
               reducedMotion={false}
               selectedDayIndex={selectedDayIndex}
+              selectedDayIsExplicit={hasExplicitDay}
               filmstripStops={filmstripStops}
             />
           ) : (
@@ -376,7 +384,7 @@ export default async function TripDetailPage({
           <section className="py-12 md:py-16 bg-surface-container-low/40 border-t border-olive-light/10">
             <div className="mx-auto max-w-[1400px]">
               <nav aria-label="Trip days" className="mb-6 flex gap-2 overflow-x-auto px-container-padding-lg">
-                {timelineDaysRaw.map((day) => <Link key={day.dayIndex} href={`?day=${day.dayIndex}#route`} aria-current={day.dayIndex === selectedDayIndex ? "page" : undefined} className={`min-h-11 rounded-full border px-4 py-2 text-sm ${day.dayIndex === selectedDayIndex ? "bg-olive-light text-white" : "bg-white/70"}`}>Day {day.dayIndex}</Link>)}
+                {timelineDaysRaw.map((day) => <Link key={day.dayIndex} href={`?day=${day.dayIndex}#route`} aria-current={day.dayIndex === filmstripDayIndex ? "page" : undefined} className={`min-h-11 rounded-full border px-4 py-2 text-sm ${day.dayIndex === filmstripDayIndex ? "bg-olive-light text-white" : "bg-white/70"}`}>Day {day.dayIndex}</Link>)}
               </nav>
               <StopFilmstrip stops={filmstripStops} />
               <Link href="#itinerary" className="mt-2 inline-flex px-container-padding-lg text-sm font-medium underline">View day agenda</Link>

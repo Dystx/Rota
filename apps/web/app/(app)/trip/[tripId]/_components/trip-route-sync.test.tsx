@@ -39,6 +39,17 @@ describe("trip route synchronization", () => {
     expect(deriveSelectedDayFromChapter("day-2-stop-0", days, 1)).toBe(1);
   });
 
+  it("defaults to the first geocoded day when Day 1 has no map stops", () => {
+    const days = [
+      { dayIndex: 1, stops: [{ placeName: "Pending" }] },
+      { dayIndex: 2, stops: [{ placeName: "Porto", lng: -8.6, lat: 41.1 }] }
+    ];
+
+    expect(deriveSelectedDayFromChapter("day-2-stop-0", days)).toBe(2);
+    expect(deriveSelectedDayFromChapter("day-1-stop-0", days, undefined, 1)).toBe(1);
+    expect(deriveSelectedDayFromChapter("day-2-stop-0", days, 1, 1)).toBe(1);
+  });
+
   it("preserves an explicit unresolved day when the active chapter falls back to Day 1", () => {
     const days = [
       { dayIndex: 1, stops: [{ placeName: "Porto", lng: -8.6, lat: 41.1 }] },

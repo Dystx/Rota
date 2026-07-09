@@ -100,6 +100,8 @@ interface CinematicMapSectionProps {
   tripId: string;
   reducedMotion: boolean;
   selectedDayIndex?: number;
+  /** True when the day came from ?day= or a user menu selection. */
+  selectedDayIsExplicit?: boolean;
   /**
    * Optional filmstrip stops. When provided, the section subscribes
    * to `useMapStore.activeStopId` and pushes a single-point
@@ -123,6 +125,7 @@ export default function CinematicMapSection({
   tripId,
   reducedMotion,
   selectedDayIndex,
+  selectedDayIsExplicit = false,
   filmstripStops
 }: CinematicMapSectionProps) {
   // Hooks must be called unconditionally (React rules)
@@ -155,6 +158,9 @@ export default function CinematicMapSection({
   const [transportFilter, setTransportFilter] = React.useState("All transport");
   const [layerFilter, setLayerFilter] = React.useState("Route + stops");
   const [selectedDay, setSelectedDay] = React.useState(selectedDayIndex);
+  const [isDaySelectionExplicit, setIsDaySelectionExplicit] = React.useState(
+    selectedDayIsExplicit
+  );
   const activeStopId = useMapStore((state) => state.activeStopId);
 
   React.useEffect(() => {
@@ -180,17 +186,23 @@ export default function CinematicMapSection({
     // otherwise deriving from the fallback chapter would silently overwrite
     // the user's requested day.
     if (
-      selectedDayIndex !== undefined &&
-      !chapters.some((chapter) => chapter.id.startsWith(`day-${selectedDayIndex}-`))
+      isDaySelectionExplicit &&
+      selectedDay !== undefined &&
+      !chapters.some((chapter) => chapter.id.startsWith(`day-${selectedDay}-`))
     ) {
-      setSelectedDay(selectedDayIndex);
+      setSelectedDay(selectedDay);
       return;
     }
 
     setSelectedDay((currentDay) =>
-      deriveSelectedDayFromChapter(activeChapterId, days, currentDay)
+      deriveSelectedDayFromChapter(
+        activeChapterId,
+        days,
+        currentDay,
+        isDaySelectionExplicit ? currentDay : undefined
+      )
     );
-  }, [activeChapterId, chapters, days, selectedDayIndex]);
+  }, [activeChapterId, chapters, days, isDaySelectionExplicit, selectedDay]);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
@@ -503,7 +515,7 @@ export default function CinematicMapSection({
         <div className="absolute left-4 top-4 flex flex-wrap gap-2" aria-label="Map filters">
           <div className="relative">
             <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Selected day menu" aria-haspopup="menu" aria-controls="map-day-options" aria-expanded={openFilter === "day"} onClick={() => setOpenFilter(openFilter === "day" ? null : "day")}>{dayLabel}</button>
-            {openFilter === "day" ? <div id="map-day-options" role="menu" aria-label="Selected day options" className="absolute left-0 top-full z-20 mt-2 grid min-w-32 gap-1 rounded-xl bg-background p-2 shadow-lg">{days.map((day) => <button role="menuitemradio" aria-checked={day.dayIndex === activeDayIndex} type="button" key={day.dayIndex} className="rounded-lg px-3 py-2 text-left text-xs hover:bg-muted" onClick={() => { const chapter = chapters.find((item) => item.id.startsWith(`day-${day.dayIndex}-`)); if (chapter) setActiveChapterId(chapter.id); setSelectedDay(day.dayIndex); setOpenFilter(null); }}>{`Day ${day.dayIndex}`}</button>)}</div> : null}
+            {openFilter === "day" ? <div id="map-day-options" role="menu" aria-label="Selected day options" className="absolute left-0 top-full z-20 mt-2 grid min-w-32 gap-1 rounded-xl bg-background p-2 shadow-lg">{days.map((day) => <button role="menuitemradio" aria-checked={day.dayIndex === activeDayIndex} type="button" key={day.dayIndex} className="rounded-lg px-3 py-2 text-left text-xs hover:bg-muted" onClick={() => { const chapter = chapters.find((item) => item.id.startsWith(`day-${day.dayIndex}-`)); if (chapter) setActiveChapterId(chapter.id); setSelectedDay(day.dayIndex); setIsDaySelectionExplicit(true); setOpenFilter(null); }}>{`Day ${day.dayIndex}`}</button>)}</div> : null}
           </div>
           <div className="relative">
             <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Transport filter menu" aria-haspopup="menu" aria-controls="map-transport-options" aria-expanded={openFilter === "transport"} onClick={() => setOpenFilter(openFilter === "transport" ? null : "transport")}>{transportFilter}</button>
