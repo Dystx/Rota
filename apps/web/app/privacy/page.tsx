@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { TopNav } from "../_components/top-nav";
+import { SiteFooter } from "../_components/site-footer";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Rumia",
@@ -49,6 +50,7 @@ export default function PrivacyPage() {
           </div>
         </article>
       </main>
+      <SiteFooter />
     </>
   );
 }

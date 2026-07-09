@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { TopNav } from "../_components/top-nav";
+import { SiteFooter } from "../_components/site-footer";
 
 export const metadata: Metadata = {
   title: "Global Support | Rumia",
@@ -72,8 +73,21 @@ export default function SupportPage() {
               </p>
             </a>
           </div>
+          <section className="mt-10 grid gap-3" aria-label="Support topics">
+            {[
+              ["How the preview works", "The free preview shows a route shape. Full itinerary text and exports require the €19 unlock."],
+              ["When expert polish is available", "The €49 review is available after unlock and has a one-business-day target."],
+              ["Bookings and changes", "Rumia provides recommendations. Confirm bookings, hours, visas, and insurance directly with providers."]
+            ].map(([title, body]) => (
+              <details key={title} className="rounded-xl border border-olive-light/20 bg-white/70 p-4">
+                <summary className="cursor-pointer font-headline-sm text-headline-sm text-primary">{title}</summary>
+                <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">{body}</p>
+              </details>
+            ))}
+          </section>
         </article>
       </main>
+      <SiteFooter />
     </>
   );
 }

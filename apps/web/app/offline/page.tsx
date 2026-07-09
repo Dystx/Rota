@@ -1,4 +1,5 @@
 import { PageShell } from "@repo/ui";
+import Link from "next/link";
 
 /**
  * Offline fallback. Served by the PWA service worker when the
@@ -24,13 +25,12 @@ export default function OfflinePage() {
             You&apos;re offline
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant">
-            Rumia can&apos;t reach the network right now. Your saved trips
-            are still available — tap <strong>My Trips</strong> in the nav
-            to browse the local cache.
+            Rumia can&apos;t reach the network right now. Cached trip previews remain available on this device; reconnect to refresh your route.
           </p>
           <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant">
             Reconnect automatically when you&apos;re back online
           </p>
+          <Link href="/explore" className="rounded-full bg-olive-light px-5 py-3 text-sm font-semibold text-on-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light">Return to Discover</Link>
         </div>
       </main>
     </PageShell>

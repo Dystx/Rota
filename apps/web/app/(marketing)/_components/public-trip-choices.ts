@@ -28,6 +28,25 @@ export const PUBLIC_DESTINATION_CHOICES: readonly ChoiceOption[] = [
   }
 ];
 
+/** One source of truth for every public atlas surface. */
+export const PUBLIC_DESTINATION_ATLAS = [
+  { slug: "lisbon", label: "Lisbon & Surrounds", region: "Capital coast", description: "Hills, Sintra, Cascais, and a generous first route." },
+  { slug: "porto", label: "Porto & the North", region: "North", description: "Riverside culture, cellar doors, and northern character." },
+  { slug: "douro", label: "Douro Valley", region: "Wine country", description: "Terraced vineyards and slow river days." },
+  { slug: "algarve", label: "The Algarve", region: "South coast", description: "Clifftop paths, small towns, and Atlantic light." },
+  { slug: "azores", label: "The Azores", region: "Atlantic islands", description: "Volcanic lakes, thermal water, and open ocean." }
+] as const;
+
+export type PublicDestinationSlug = (typeof PUBLIC_DESTINATION_ATLAS)[number]["slug"];
+
+export function publicDestination(slug: string) {
+  return PUBLIC_DESTINATION_ATLAS.find((option) => option.slug === slug) ?? PUBLIC_DESTINATION_ATLAS[0];
+}
+
+export function publicDestinationDraftUrl(slug: string, days = 7, vibe: TripChoiceDraft["vibe"] = "balanced") {
+  return publicDraftToPlannerUrl(publicDestination(slug).slug, days, vibe);
+}
+
 export const PUBLIC_DURATION_CHOICES: readonly ChoiceOption[] = [3, 5, 7, 10].map((days) => ({
   value: String(days),
   label: `${days} days`,

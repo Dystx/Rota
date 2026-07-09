@@ -3,6 +3,12 @@
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
+function safeNext(value: string) {
+  if (!value.startsWith("/") || value.startsWith("//")) return "/account";
+  if (["/admin", "/reviewer", "/console", "/api"].some((prefix) => value === prefix || value.startsWith(`${prefix}/`))) return "/account";
+  return value;
+}
+
 /**
  * signInWithMagicLinkAction — sends a one-time sign-in link to the
  * submitted email via Supabase Auth's `signInWithOtp` flow.
@@ -17,7 +23,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
  */
 export async function signInWithMagicLinkAction(formData: FormData): Promise<void> {
   const email = formData.get("email");
-  const next = formData.get("next") ?? "/account";
+  const next = safeNext(String(formData.get("next") ?? "/account"));
 
   if (typeof email !== "string" || !email.includes("@")) {
     redirect(`/sign-in?error=${encodeURIComponent("Please enter a valid email address.")}&next=${encodeURIComponent(String(next))}`);

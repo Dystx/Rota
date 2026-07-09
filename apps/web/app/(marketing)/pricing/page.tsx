@@ -37,7 +37,10 @@ export default function PricingPage() {
               title={tier.tier.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
               highlighted={index === 1}
               highlightBadge={index === 1 ? <Badge>Recommended</Badge> : undefined}
-              features={tier.deliverables}
+              features={[
+                ...tier.deliverables,
+                index === 0 ? "Preview only; no export" : index === 1 ? "Immediate access after payment" : "One business day target; after unlock"
+              ]}
               price={tier.priceLabel}
               fulfillment={tier.fulfillment}
               action={

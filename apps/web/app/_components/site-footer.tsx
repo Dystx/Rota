@@ -16,23 +16,23 @@ import { BrandMark } from "@repo/ui";
  */
 
 const PRODUCT_LINKS = [
-  { href: "/itineraries", label: "Itineraries" },
-  { href: "/vault", label: "Vault" },
+  { href: "/explore", label: "Discover" },
+  { href: "/portugal", label: "Destinations" },
   { href: "/planner", label: "Plan a trip" },
   { href: "/pricing", label: "Pricing" }
 ];
 
 const COMPANY_LINKS = [
-  { href: "/human-review", label: "How it works" },
+  { href: "/how-it-works", label: "How it works" },
   { href: "/portugal", label: "Portugal guide" },
-  { href: "/expert-chat", label: "Expert chat" }
+  { href: "/support", label: "Support" }
 ];
 
 const LEGAL_LINKS = [
   { href: "/privacy", label: "Privacy Policy" },
   { href: "/terms", label: "Terms of Service" },
   { href: "/sustainability", label: "Sustainability" },
-  { href: "/support", label: "Global Support" }
+  { href: "/support", label: "Support" }
 ];
 
 export function SiteFooter() {
@@ -58,12 +58,8 @@ export function SiteFooter() {
             <p className="font-body text-body text-olive-light max-w-xs">
               Intentional Humanism in Travel — Portugal-first, AI-planned, human-curated.
             </p>
-            <p className="inline-flex items-center gap-2 font-mono-micro text-mono-micro text-olive-light">
-              <span
-                aria-hidden
-                className="h-2 w-2 rounded-full bg-[var(--color-status-success-dot)]"
-              />
-              All systems operational
+            <p className="font-mono-micro text-mono-micro text-olive-light">
+              Built for considered Portugal journeys.
             </p>
           </div>
 
@@ -131,7 +127,7 @@ export function SiteFooter() {
             © {new Date().getFullYear()} Rumia. All rights reserved.
           </p>
           <p className="font-mono-micro text-mono-micro text-olive-light">
-            Made in Portugal · EN
+            Made in Portugal · English
           </p>
         </div>
       </div>

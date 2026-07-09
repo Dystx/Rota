@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useMapStore } from "@/store/useMapStore";
 import { fixtureRouteCollection } from "@repo/spatial-engine";
+import { publicDestination, publicDestinationDraftUrl } from "../../_components/public-trip-choices";
 
 /**
  * A single stop rendered in the workspace filmstrip. Server-safe shape.
@@ -38,6 +39,7 @@ interface WorkspaceShellProps {
  * choice: `pace` adjusts zoom, `tone` adjusts pitch.
  */
 export function WorkspaceShell({ stops }: WorkspaceShellProps) {
+  const destination = publicDestination("porto");
   const paceTone = useMapStore((state) => state.paceTone);
   const setPaceTone = useMapStore((state) => state.setPaceTone);
   const selectStop = useMapStore((state) => state.selectStop);
@@ -89,16 +91,15 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
             Day 3 of 7
           </span>
           <span className="inline-flex items-center font-mono-micro text-mono-micro uppercase tracking-[0.2em] bg-olive-dark/55 text-ochre-light px-2 py-1 rounded backdrop-blur-sm">
-            Kyoto
+            {destination.label}
           </span>
         </div>
 
         <h2 className="font-display italic text-2xl md:text-3xl text-primary leading-tight mb-2">
-          The Artisan's Path
+          A route worth taking slowly
         </h2>
         <p className="text-on-surface-variant leading-loose text-sm leading-relaxed mb-5">
-          A 7-day journey shaped around craft — temples, tea houses, and the slow burn
-          of a master at work.
+          A seven-day preview shaped around place, pace, and the stops that connect naturally.
         </p>
 
         <div data-testid="workspace-refinement-pills" className="grid gap-2">
@@ -144,15 +145,15 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
 
       {/* === Bottom: stop-card filmstrip === */}
       <div className="absolute bottom-0 left-0 right-0 z-10 px-6 pb-6">
-        <div className="flex items-center justify-between mb-3 px-2">
+          <div className="flex items-center justify-between mb-3 px-2">
           <p className="font-mono-micro text-mono-micro uppercase tracking-[0.2em] text-ochre-light">
             Today's Stops
           </p>
           <Link
-            href="#"
+            href={publicDestinationDraftUrl(destination.slug)}
             className="font-mono-micro text-mono-micro uppercase tracking-[0.2em] text-ochre-light hover:text-ochre-dark transition-colors"
           >
-            View all →
+            Plan this route →
           </Link>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2" data-testid="workspace-filmstrip">

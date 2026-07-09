@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { ArchiveLayout, TripCard } from "@repo/ui";
 import { TopNav } from "../../_components/top-nav";
 import { SiteFooter } from "../../_components/site-footer";
+import { PUBLIC_DESTINATION_ATLAS, publicDestinationDraftUrl } from "../_components/public-trip-choices";
 
 export const metadata: Metadata = {
   title: "Curated Portugal Regions & Experiences | Portugal Travel Concierge",
@@ -10,49 +11,6 @@ export const metadata: Metadata = {
     canonical: "/portugal"
   }
 };
-
-const regions = [
-  {
-    name: "Porto & The North",
-    caption: "Historic cellars, dramatic river valleys, and deeply rooted culinary traditions."
-  },
-  {
-    name: "Douro Valley",
-    caption: "Terraced vineyards, premium wine estates, and scenic river navigation."
-  },
-  {
-    name: "Lisbon & Surroundings",
-    caption: "Seven hills of culture, vibrant neighborhoods, and coastal escapes."
-  },
-  {
-    name: "Sintra",
-    caption: "Palaces, misty microclimates, and romantic 19th-century architecture."
-  },
-  {
-    name: "Cascais",
-    caption: "Refined coastal living, dramatic cliffs, and ocean-front dining."
-  },
-  {
-    name: "Alentejo",
-    caption: "Vast plains, cork forests, dark skies, and slow-paced living."
-  },
-  {
-    name: "Algarve",
-    caption: "Golden cliffs, hidden coves, and world-class coastal hiking."
-  },
-  {
-    name: "Coimbra",
-    caption: "Ancient university heritage, fado music, and deep history."
-  },
-  {
-    name: "Aveiro",
-    caption: "Canals, colorful moliceiro boats, and art nouveau architecture."
-  }
-] as const;
-
-function slugify(text: string) {
-  return text.toLowerCase().replace(/\s+/g, "-");
-}
 
 export default function PortugalPage() {
   return (
@@ -72,14 +30,14 @@ export default function PortugalPage() {
         }}
       >
         <ul role="list" data-testid="region-grid" className="contents list-none p-0 m-0">
-          {regions.map((region) => (
-            <li key={region.name}>
+          {PUBLIC_DESTINATION_ATLAS.map((region) => (
+            <li key={region.slug}>
               <TripCard
-                testid={`region-card-${slugify(region.name)}`}
-                title={region.name}
-                caption={region.caption}
-                href="/planner"
-                cta={<span className="text-[13px] font-medium text-olive-light">Start your prompt →</span>}
+                testid={`region-card-${region.slug}`}
+                title={region.label}
+                caption={region.description}
+                href={publicDestinationDraftUrl(region.slug)}
+                cta={<span className="text-[13px] font-medium text-olive-light">Preview this route →</span>}
               />
             </li>
           ))}

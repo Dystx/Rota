@@ -31,7 +31,7 @@ export default function HumanReviewPage() {
         <SectionHeading
           eyebrow="Trust layer"
           title="Expert polish for your itinerary"
-          description="Elevate your generated route with a premium human review. Our local Portugal specialists adjust pacing, swap restaurants, and add exclusive rain plans."
+          description="Expert polish is the final step after your €19 itinerary unlock: a €49 one-time review with a one-business-day target."
           h1={true}
         />
 
@@ -40,11 +40,11 @@ export default function HumanReviewPage() {
             <FeatureGridItem title="Route & Pacing Validation">
               We ensure your driving times are realistic and your daily schedule allows you to breathe. We fix overly ambitious AI routes before you hit the road.
             </FeatureGridItem>
-            <FeatureGridItem title="Restaurant Curation">
-              We swap generic recommendations for hard-to-find local favorites, hidden gems, and confirm their opening hours for your travel dates.
+            <FeatureGridItem title="Restaurant curation">
+              We suggest local alternatives and flag where you should confirm opening hours yourself.
             </FeatureGridItem>
-            <FeatureGridItem title="Rain Plans & Contingencies">
-              We add backup plans for outdoor activities, ensuring your trip stays on track regardless of unexpected weather changes.
+            <FeatureGridItem title="Rain plans">
+              We add practical weather alternatives; the review does not make bookings or guarantees.
             </FeatureGridItem>
           </FeatureGrid>
         </div>
@@ -52,7 +52,7 @@ export default function HumanReviewPage() {
         <div className="grid gap-12 lg:grid-cols-2">
           <div className="space-y-8">
             <TestimonialCard author="Sofia Almeida" role="Lead Portugal Specialist">
-              We don't just check the map—we visualize your entire day. If a restaurant is closed on Mondays or a coastal drive faces afternoon fog, we adjust the itinerary before you even arrive.
+              We check the shape of your days and suggest realistic local adjustments before you travel.
             </TestimonialCard>
 
             <Card className="bg-linen-dark">

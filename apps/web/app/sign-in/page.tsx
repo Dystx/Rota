@@ -15,9 +15,15 @@ interface SignInPageProps {
   searchParams: Promise<{ next?: string; sent?: string; error?: string }>;
 }
 
+function safeNext(value: string | undefined) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/account";
+  if (["/admin", "/reviewer", "/console", "/api"].some((prefix) => value === prefix || value.startsWith(`${prefix}/`))) return "/account";
+  return value;
+}
+
 export default async function SignInPage({ searchParams }: SignInPageProps) {
   const params = await searchParams;
-  const next = params.next ?? "/account";
+  const next = safeNext(params.next);
   const sent = params.sent === "1";
   const error = params.error;
 

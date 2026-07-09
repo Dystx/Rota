@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { TopNav } from "../_components/top-nav";
+import { SiteFooter } from "../_components/site-footer";
 
 export const metadata: Metadata = {
   title: "Sustainability | Rumia",
@@ -42,6 +43,7 @@ export default function SustainabilityPage() {
           </div>
         </article>
       </main>
+      <SiteFooter />
     </>
   );
 }

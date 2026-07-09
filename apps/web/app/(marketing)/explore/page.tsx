@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import { TopNav } from "../../_components/top-nav";
 import { SiteFooter } from "../../_components/site-footer";
 import { DiscoveryGlobe } from "./discovery-globe";
+import { PUBLIC_DESTINATION_ATLAS, publicDestinationDraftUrl } from "../_components/public-trip-choices";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Explore the world | Rumia Discovery Hub",
@@ -32,6 +34,23 @@ export default function ExplorePage() {
           </header>
 
           <DiscoveryGlobe />
+
+          <section aria-labelledby="atlas-options" className="grid gap-4">
+            <div>
+              <p className="font-mono-micro text-mono-micro uppercase tracking-[0.2em] text-ochre-dark">Destination atlas</p>
+              <h2 id="atlas-options" className="font-headline-lg text-headline-lg text-primary">Choose a place to preview</h2>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              {PUBLIC_DESTINATION_ATLAS.map((destination) => (
+                <Link key={destination.slug} href={publicDestinationDraftUrl(destination.slug)} className="rounded-2xl border border-olive-dark/10 bg-linen-dark/70 p-5 transition hover:border-ochre-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" data-testid={`atlas-card-${destination.slug}`}>
+                  <p className="font-mono-micro text-mono-micro uppercase tracking-[0.15em] text-ochre-dark">{destination.region}</p>
+                  <h3 className="mt-2 font-headline-sm text-headline-sm text-primary">{destination.label}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">{destination.description}</p>
+                  <span className="mt-4 inline-flex text-sm font-semibold text-olive-light">Preview route →</span>
+                </Link>
+              ))}
+            </div>
+          </section>
 
           <section className="grid gap-8 md:grid-cols-3">
             <article className="rounded-2xl border border-olive-dark/10 bg-linen-dark/70 p-card-padding">

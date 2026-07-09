@@ -11,8 +11,10 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/itineraries", label: "Itineraries" },
-  { href: "/vault", label: "Vault" }
+  { href: "/explore", label: "Discover" },
+  { href: "/portugal", label: "Destinations" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" }
 ];
 
 function isActivePath(pathname: string | null, href: string): boolean {
@@ -90,17 +92,6 @@ export function TopNav() {
 
         {/* Trailing Action & Profile */}
         <div className="flex items-center gap-3 md:gap-6">
-          {/* Locale switcher — placeholder. Real locale routing lands
-              with i18n; today the pill is visual + links back to the
-              same page. */}
-          <div
-            role="group"
-            aria-label="Language"
-            className="hidden md:inline-flex items-center rounded-full border border-olive-light/20 bg-white/40 backdrop-blur-sm p-0.5 text-[11px] font-medium"
-          >
-            <span className="px-2.5 py-1 rounded-full bg-olive-light text-on-primary" aria-current="true">EN</span>
-            <span className="px-2.5 py-1 text-olive-light" aria-disabled>PT</span>
-          </div>
           <Link
             href="/planner"
             data-testid="top-nav-plan-a-trip"
@@ -127,9 +118,7 @@ export function TopNav() {
             data-testid="top-nav-mobile-toggle"
             className="md:hidden w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-full hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span aria-hidden className="ph ph-list">
-              {mobileOpen ? "x" : "list"}
-            </span>
+            <span aria-hidden className={mobileOpen ? "ph ph-x" : "ph ph-list"} />
           </button>
         </div>
       </div>

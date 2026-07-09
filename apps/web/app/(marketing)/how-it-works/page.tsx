@@ -13,24 +13,20 @@ export const metadata: Metadata = {
 
 const flow = [
   {
-    title: "1. Prompt & Capture",
-    description: "Tell us about your ideal Portugal trip in plain English. We handle the complexity of translating your vision into a structured travel framework."
+    title: "1. Free preview",
+    description: "Choose a destination and pace. See a useful route preview at €0, with no card and no full export."
   },
   {
-    title: "2. Schema-Aligned Brief",
-    description: "Your prompt is normalized into a structured brief. If any critical travel details are missing—like dates or travel pace—we'll ask focused follow-up questions."
+    title: "2. Itinerary unlock",
+    description: "Unlock the complete day-by-day route and exports for €19. It is a one-time payment, delivered immediately."
   },
   {
-    title: "3. Cinematic Route Preview",
-    description: "Experience a rich, cinematic preview of your generated route. Explore daily pacing, region summaries, and core logistics before committing."
+    title: "3. Expert polish",
+    description: "After unlock, add a local specialist review for €49. Expect practical pacing, food, and weather adjustments within one business day."
   },
   {
-    title: "4. Unlock & Human Review",
-    description: "Unlock the full itinerary with a single payment. Opt for an expert human review to get personalized local adjustments and insider recommendations."
-  },
-  {
-    title: "5. Export & Travel",
-    description: "Return to your account at any time to access your finalized route. Export to map providers or PDF and enjoy a seamless travel experience."
+    title: "4. Travel with limits clear",
+    description: "Recommendations are not bookings. Confirm opening hours, transport, visas, and insurance yourself."
   }
 ];
 
@@ -45,8 +41,8 @@ export default function HowItWorksPage() {
       <PageShell bare>
         <SectionHeading
           eyebrow="The Journey"
-          title="From idea to itinerary in five steps"
-          description="A deliberate progression that takes the friction out of planning while maintaining high standards for local travel."
+          title="From free preview to expert polish"
+          description="One clear ascension model: preview the route, unlock the itinerary, then add human judgment when it matters."
           h1={true}
         />
         {/* 5-step flow rendered as a 1-up / 2-up / 5-up grid so all
