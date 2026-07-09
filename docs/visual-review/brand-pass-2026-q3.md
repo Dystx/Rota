@@ -7,11 +7,11 @@
 > the SVG). V3.1 of the azulejo R shipped after two iterations.
 
 ## TL;DR
+| 5 | **A7** trip hero mark | Trip page hero now wears the mark | 1 | `aeb9ee4` |
+| 6 | **A8** console content | Demo data + client names Portugal-first | 1 | `aeb9ee4` |
+| - | **A8 partial** nav icons | Phosphor on the console sidebar | 2 | `c71adc5` |
 
-| # | PR | Surface | Files | Commit |
-|---|---|---|---|---|
-| 1 | **A1** mark + sign-in | Brand identity lands | 5 | `0f5ddf5` |
-| 2 | **A6** chrome lockup | TopNav + footer wear the mark | 2 | `6f9ed20` |
+## TL;DR
 | 3 | **A2** Phosphor Icons | Icon font migration + call sites | 52 | `062c071` |
 | 4 | **A3+A4+A5** hero, 404, voice | Home restraint, 404 with mark, warm copy | 4 | `076753a` |
 | 5 | **A8** console nav icons | Phosphor map extended, console nav updates | 2 | `c71adc5` |
