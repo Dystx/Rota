@@ -4,6 +4,7 @@ import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
 import { resolveCoverImage } from "@/lib/trip-cover";
 import { getOwnedTrip } from "@/app/lib/trip-access";
+import { PackageSelector } from "./_components/package-selector";
 
 /**
  * Checkout page — Stitch 1.5 split-screen tier ascension.
@@ -161,7 +162,8 @@ export default async function CheckoutPage({
                 ) : null}
               </header>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <PackageSelector tripId={tripId} />
+              <div className="hidden grid grid-cols-1 md:grid-cols-2 gap-4" aria-hidden="true">
                 {/* Tier 1: Core AI (Included) */}
                 <div
                   data-testid="checkout-tier-core"

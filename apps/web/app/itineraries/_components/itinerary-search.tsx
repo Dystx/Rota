@@ -73,23 +73,13 @@ export function ItinerarySearch({ trips }: { trips: TripDraftListItem[] }) {
             />
           </div>
         </label>
-        <label>
-          <span className="sr-only">Filter by status</span>
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value as typeof statusFilter)
-            }
-            data-testid="itinerary-status-filter"
-            className="font-body-md text-body-md px-4 py-2.5 rounded-lg bg-white/70 border border-olive-light/30 focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light"
-          >
-            <option value="all">All statuses</option>
-            <option value="draft">Drafts</option>
-            <option value="paid">Unlocked</option>
-            <option value="in_review">In review</option>
-            <option value="reviewed">Reviewed</option>
-          </select>
-        </label>
+      </div>
+      <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Filter itineraries by status" data-testid="itinerary-status-filter">
+        {([['all','All'],['draft','Drafts'],['paid','Unlocked'],['in_review','In review'],['reviewed','Reviewed']] as const).map(([value,label]) => (
+          <button key={value} type="button" onClick={() => setStatusFilter(value)} aria-pressed={statusFilter === value} data-testid={`itinerary-filter-${value}`} className={`rounded-full border px-4 py-2 text-sm transition-colors ${statusFilter === value ? "border-olive-dark bg-olive-dark text-white" : "border-olive-light/30 bg-white/70 text-primary hover:bg-olive-light/10"}`}>
+            {label}
+          </button>
+        ))}
       </div>
 
       <p

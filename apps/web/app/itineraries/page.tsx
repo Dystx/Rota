@@ -82,7 +82,7 @@ function EmptyState({ signedIn }: { signedIn: boolean }) {
       </p>
       <div className="flex flex-wrap gap-3 justify-center">
         <Link
-          href="/"
+          href="/planner"
           className="inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-6 py-2.5 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           Plan a trip

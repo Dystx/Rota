@@ -1,6 +1,8 @@
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
 import { VaultGallery } from "./_components/vault-gallery";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { getTripsForUser } from "@repo/db";
 
 /**
  * Vault page — Saved Vault & Export (1.7 reference parity).
@@ -11,7 +13,9 @@ import { VaultGallery } from "./_components/vault-gallery";
  * can be opened by clicking a card. The drawer slides in from the right
  * and echoes the selected trip's title.
  */
-export default function VaultPage() {
+export default async function VaultPage() {
+  const { user } = await getCurrentUser();
+  const trips = user ? await getTripsForUser(user.id) : [];
   return (
     <>
       <TopNav />
@@ -20,7 +24,7 @@ export default function VaultPage() {
           id="main-content"
           className="flex-grow pt-[88px] pb-section-gap px-container-padding-sm md:px-container-padding-lg max-w-[1440px] mx-auto w-full flex flex-col md:flex-row gap-section-gap relative"
         >
-          <VaultGallery />
+          <VaultGallery trips={trips} />
         </main>
 
         <SiteFooter />

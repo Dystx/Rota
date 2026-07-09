@@ -9,6 +9,7 @@ import {
   buildTripPdfFilename
 } from "@/lib/trip-export";
 import { internalError, isApiResponse, notFoundError, requireApiRole, validationError, forbiddenError } from "@/lib/auth/api";
+import { markExportJobError, markExportJobReady, queueExportJob } from "@/app/lib/export-jobs";
 
 export async function GET(request: Request, { params }: { params: Promise<{ tripId: string }> }) {
   const auth = await requireApiRole(["traveler"]);
@@ -36,7 +37,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ trip
       return forbiddenError("Unlock the trip before exporting it.");
     }
 
+    queueExportJob(tripId);
     const itinerary = await generateItineraryFromBrief(trip.brief);
+    markExportJobReady(tripId);
 
     if (format === "pdf") {
       const pdf = buildTripPdfExport(trip, itinerary);
@@ -69,6 +72,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ trip
       }
     });
   } catch (error) {
+    markExportJobError(tripId);
     return internalError(
       isPersistenceConfigError(error) ? "Supabase environment variables are not configured yet, so exports are unavailable." : "Could not export this trip.",
       isPersistenceConfigError(error) ? 503 : 500

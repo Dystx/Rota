@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { TripDraftListItem } from "@repo/db";
 
 interface VaultCard {
   id: string;
@@ -11,32 +12,14 @@ interface VaultCard {
   imageSeed: string;
 }
 
-const CARDS: VaultCard[] = [
-  {
-    id: "portugal-escape",
-    title: "Portugal Escape",
-    subtitle: "Douro Terroir & Lisbon Nights",
-    badge: "Itinerary",
-    days: "7 DAYS • 2 GUESTS",
-    imageSeed: "douro-valley-vault",
-  },
-  {
-    id: "kyoto-minimalism",
-    title: "Kyoto Minimalism",
-    subtitle: "Temples & Modernity",
-    badge: "Draft",
-    days: "10 DAYS • SOLO",
-    imageSeed: "kyoto-minimalism-vault",
-  },
-  {
-    id: "iceland-ring",
-    title: "Iceland Ring Road",
-    subtitle: "Volcanic Landscapes & Hot Springs",
-    badge: "Inspiration",
-    days: "8 DAYS • COUPLE",
-    imageSeed: "iceland-ring-vault",
-  },
-];
+const toCard = (trip: TripDraftListItem): VaultCard => ({
+  id: trip.id,
+  title: trip.title || "Untitled trip",
+  subtitle: [trip.brief?.destinationCountry, trip.brief?.regions?.[0]].filter(Boolean).join(" · ") || "Saved itinerary",
+  badge: trip.status === "draft" ? "Draft" : "Itinerary",
+  days: `${trip.brief?.tripLengthDays ?? 0} DAYS • ${trip.brief?.travelersCount ?? 1} ${trip.brief?.travelersCount === 1 ? "TRAVELER" : "TRAVELERS"}`,
+  imageSeed: trip.id,
+});
 
 /**
  * Vault gallery + sliding export drawer (1.7 reference parity).
@@ -48,7 +31,8 @@ const CARDS: VaultCard[] = [
  * "Selected Itinerary" card echoes the clicked card so the user can see
  * which trip the export will act on.
  */
-export function VaultGallery() {
+export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
+  const CARDS = trips.map(toCard);
   const [openCardId, setOpenCardId] = useState<string | null>(null);
   const selected = CARDS.find((c) => c.id === openCardId) ?? null;
   const isOpen = openCardId !== null;
@@ -92,7 +76,12 @@ export function VaultGallery() {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-          {CARDS.map((card) => (
+          {CARDS.length === 0 ? (
+            <div data-testid="vault-empty" className="rounded-xl border border-olive-light/20 bg-glass-light/60 p-card-padding text-center">
+              <p className="font-headline-md text-headline-md text-primary">Your vault is empty</p>
+              <p className="mt-2 text-on-surface-variant">Plan a trip to save an itinerary here.</p>
+            </div>
+          ) : CARDS.map((card) => (
             <button
               key={card.id}
               type="button"
@@ -104,7 +93,7 @@ export function VaultGallery() {
                 <div
                   className="bg-cover bg-center w-full h-full group-hover:scale-105 transition-transform duration-500"
                   style={{
-                    backgroundImage: `url('https://picsum.photos/seed/${card.imageSeed}/800/400')`,
+                    backgroundImage: "url('/trip-covers/porto-ribeira.svg')",
                   }}
                 />
                 <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm px-2 py-1 rounded text-primary font-mono-micro text-mono-micro uppercase tracking-wider">

@@ -23,6 +23,7 @@ import { getOwnedTrip } from "@/app/lib/trip-access";
 import { TopNav } from "../../../../_components/top-nav";
 import { SiteFooter } from "../../../../_components/site-footer";
 import { PrintAutoTrigger } from "./_components/print-auto-trigger";
+import { getExportJobState } from "@/app/lib/export-jobs";
 
 function getFormatFromHref(href: string) {
   if (href.includes("view=print")) return "print";
@@ -186,15 +187,20 @@ export default async function TripExportPage({
             </RevealSection>
             <RevealSection delayMs={120}>
               <div className="grid gap-4 md:grid-cols-2" data-testid="export-options">
-                {listTripExportOptions(tripId).map((option) => (
-                  <TripCard
-                    key={option.label}
-                    title={option.label}
-                    caption={option.description}
-                    href={option.href}
-                    testid={`export-option-${getFormatFromHref(option.href)}`}
-                  />
-                ))}
+                {listTripExportOptions(tripId).map((option) => {
+                  const format = getFormatFromHref(option.href);
+                  const locked = format !== "print" && !tripCommerceState.canExport;
+                  const jobState = locked ? "locked" : getExportJobState(tripId, true);
+                  const stateLabel = jobState === "retry" ? "Retry queued" : jobState[0].toUpperCase() + jobState.slice(1);
+                  const statusLabel = locked ? "Locked" : `Unlocked · ${stateLabel}`;
+                  return (
+                    <div key={option.label} data-testid={`export-format-${format}`} className="relative">
+                      <TripCard title={option.label} caption={`${option.description} · ${statusLabel}`} href={locked ? undefined : option.href} testid={`export-option-${format}`} />
+                      <span className="absolute right-4 top-4 rounded-full border px-2 py-1 text-xs" data-testid={`export-status-${format}`}>{statusLabel}</span>
+                      {jobState === "error" ? <form action={`/api/trips/${tripId}/export/retry`} method="post" className="mt-2"><button type="submit" className="text-sm underline">Retry</button></form> : null}
+                    </div>
+                  );
+                })}
               </div>
             </RevealSection>
           </div>

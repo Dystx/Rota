@@ -69,6 +69,18 @@ export async function handleUnlockCheckoutRequest(
     return auth;
   }
 
+  let selectedPackage = "core";
+  try {
+    const body = await request.clone().formData();
+    const value = body.get("package");
+    if (value !== null) {
+      if (value !== "core" && value !== "specialist") return new Response("Invalid package.", { status: 400 });
+      selectedPackage = value;
+    }
+  } catch {
+    // Stripe-hosted checkout may submit without a form body.
+  }
+
   try {
     const trip = await getTrip(tripId, { client: auth.client });
 
@@ -86,7 +98,7 @@ export async function handleUnlockCheckoutRequest(
 
     const checkoutSession = await checkoutProvider.createSession({
       cancelUrl: buildCheckoutReturnUrl(request, tripId, "cancelled"),
-      purchaseKind: "unlock",
+      purchaseKind: selectedPackage === "specialist" ? "human_review" : "unlock",
       successUrl: buildCheckoutReturnUrl(request, tripId, "checkout-started"),
       tripId,
       userId: auth.userId
