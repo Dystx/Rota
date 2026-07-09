@@ -14,3 +14,13 @@ export function deriveSelectedDayFromChapter(
   );
   return hasGeocodedStops ? dayIndex : previousDay;
 }
+
+export function SelectedDayStatus({ day, hasGeocodedStops }: { day: number; hasGeocodedStops: boolean }) {
+  return (
+    <div aria-live="polite">
+      <span>{`Day ${day}`}</span>
+      {!hasGeocodedStops ? <p>No map stops for {`Day ${day}`} yet. Your stop list is still available above.</p> : null}
+    </div>
+  );
+}
+import * as React from "react";

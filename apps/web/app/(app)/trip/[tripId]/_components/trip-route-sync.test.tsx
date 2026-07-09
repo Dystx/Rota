@@ -1,10 +1,12 @@
 import * as React from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { StopFilmstrip } from "./stop-filmstrip";
 import { TripContextBarClient } from "./trip-context-bar-client";
 import { useMapStore } from "../../../../../store/useMapStore";
-import { deriveSelectedDayFromChapter } from "./chapter-day-sync";
+import { deriveSelectedDayFromChapter, SelectedDayStatus } from "./chapter-day-sync";
+
+vi.mock("./workspace-trip-canvas", () => ({ default: () => <div data-testid="mock-trip-canvas" /> }));
 
 afterEach(() => {
   cleanup();
@@ -35,6 +37,12 @@ describe("trip route synchronization", () => {
     ];
     expect(deriveSelectedDayFromChapter("day-1-stop-0", days, 2)).toBe(1);
     expect(deriveSelectedDayFromChapter("day-2-stop-0", days, 1)).toBe(1);
+  });
+
+  it("keeps an explicit unresolved day label and no-map-stops state", async () => {
+    render(<SelectedDayStatus day={2} hasGeocodedStops={false} />);
+    expect(screen.getByText("Day 2")).toBeTruthy();
+    expect(screen.getByText(/No map stops for Day 2 yet/)).toBeTruthy();
   });
 
   it("opens context edits from the shared context bar", () => {

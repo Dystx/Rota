@@ -14,3 +14,9 @@ Review follow-up:
 - Context-bar edits route to a field-specific planner editor, and map filters/stop equivalents are keyboard-usable on mobile and desktop.
 - Re-ran the focused route-sync tests and web typecheck after these fixes — PASS.
 - Final review fixes: `?edit=` is parsed by the planner and opens the matching editor sheet; map filter chips now expose stateful menus; selected days without geocoded stops retain their day label/list and show an explicit no-map-stops message.
+
+Final review follow-up:
+
+- Map chapter/list stop IDs now consistently use `day-${day}-stop-${index}`, so selecting either surface highlights the same source stop.
+- Explicit unresolved day selections retain their day label and expose the no-map-stops state via a tested status component; transport and layer chips are explicit menu controls with observable expanded/selection state.
+- Verification: focused route-sync tests — PASS (6 tests); `pnpm --filter web typecheck` — PASS; `pnpm lint` — PASS.
