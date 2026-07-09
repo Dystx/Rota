@@ -2,12 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-
-function safeNext(value: string) {
-  if (!value.startsWith("/") || value.startsWith("//")) return "/account";
-  if (["/admin", "/reviewer", "/console", "/api"].some((prefix) => value === prefix || value.startsWith(`${prefix}/`))) return "/account";
-  return value;
-}
+import { safeNext } from "../../auth/safe-next";
 
 /**
  * signInWithMagicLinkAction — sends a one-time sign-in link to the

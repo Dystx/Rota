@@ -1,5 +1,6 @@
-import { PageShell } from "@repo/ui";
 import Link from "next/link";
+import { TopNav } from "../_components/top-nav";
+import { SiteFooter } from "../_components/site-footer";
 
 /**
  * Offline fallback. Served by the PWA service worker when the
@@ -9,7 +10,8 @@ import Link from "next/link";
  */
 export default function OfflinePage() {
   return (
-    <PageShell variant="marketing">
+    <div className="min-h-screen flex flex-col bg-background">
+      <TopNav />
       <main
         id="main-content"
         className="min-h-[60vh] flex items-center justify-center px-container-padding-lg py-section-gap"
@@ -33,6 +35,7 @@ export default function OfflinePage() {
           <Link href="/explore" className="rounded-full bg-olive-light px-5 py-3 text-sm font-semibold text-on-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light">Return to Discover</Link>
         </div>
       </main>
-    </PageShell>
+      <SiteFooter />
+    </div>
   );
 }

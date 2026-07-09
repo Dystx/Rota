@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMapStore } from "@/store/useMapStore";
 import { fixtureRouteCollection } from "@repo/spatial-engine";
 import { publicDestination, publicDestinationDraftUrl } from "../../_components/public-trip-choices";
@@ -40,6 +41,7 @@ interface WorkspaceShellProps {
  */
 export function WorkspaceShell({ stops }: WorkspaceShellProps) {
   const destination = publicDestination("porto");
+  const router = useRouter();
   const paceTone = useMapStore((state) => state.paceTone);
   const setPaceTone = useMapStore((state) => state.setPaceTone);
   const selectStop = useMapStore((state) => state.selectStop);
@@ -75,9 +77,14 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
       // convention so the workspace and the home bento agree on what
       // is "selected".
       selectStop(slug, coords);
+      router.push(publicDestinationDraftUrl(destination.slug));
     },
-    [selectStop, labelCoords]
+    [selectStop, labelCoords, router, destination.slug]
   );
+
+  const updateVibe = React.useCallback((vibe: "restorative" | "balanced" | "high_energy") => {
+    router.replace(publicDestinationDraftUrl(destination.slug, 7, vibe));
+  }, [router, destination.slug]);
 
   return (
     <>
@@ -109,13 +116,13 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
           <div className="flex flex-wrap gap-2">
             <Pill
               selected={paceTone.pace === "Relaxed"}
-              onClick={() => setPaceTone({ ...paceTone, pace: "Relaxed" })}
+              onClick={() => { setPaceTone({ ...paceTone, pace: "Relaxed" }); updateVibe("restorative"); }}
             >
               Relaxed
             </Pill>
             <Pill
               selected={paceTone.pace === "Active"}
-              onClick={() => setPaceTone({ ...paceTone, pace: "Active" })}
+              onClick={() => { setPaceTone({ ...paceTone, pace: "Active" }); updateVibe("high_energy"); }}
             >
               Active
             </Pill>
@@ -123,13 +130,13 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
           <div className="flex flex-wrap gap-2">
             <Pill
               selected={paceTone.tone === "Hidden Gems"}
-              onClick={() => setPaceTone({ ...paceTone, tone: "Hidden Gems" })}
+              onClick={() => { setPaceTone({ ...paceTone, tone: "Hidden Gems" }); updateVibe("restorative"); }}
             >
               Hidden Gems
             </Pill>
             <Pill
               selected={paceTone.tone === "Classics"}
-              onClick={() => setPaceTone({ ...paceTone, tone: "Classics" })}
+              onClick={() => { setPaceTone({ ...paceTone, tone: "Classics" }); updateVibe("balanced"); }}
             >
               Classics
             </Pill>

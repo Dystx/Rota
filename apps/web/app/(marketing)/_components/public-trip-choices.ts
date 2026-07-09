@@ -15,6 +15,12 @@ export const PUBLIC_DESTINATION_CHOICES: readonly ChoiceOption[] = [
     consequence: "A compact city-and-country escape."
   },
   {
+    value: "douro",
+    label: "Douro Valley",
+    description: "Terraced vineyards and slow river days.",
+    consequence: "A river-shaped reset."
+  },
+  {
     value: "algarve",
     label: "The Algarve",
     description: "Clifftop paths, small towns, and long Atlantic light.",

@@ -9,7 +9,7 @@ test.describe("public discovery and trust routes", () => {
     }
     await expect(page.locator("main")).toBeVisible();
     await expect(page.locator("h1").first()).toBeVisible();
-    for (const label of ["Discover", "Destinations", "How it works", "Pricing", "Plan a Trip"]) {
+    for (const label of ["Discover", "Destinations", "How it works", "Pricing", "Plan a trip"]) {
       await expect(page.getByRole("link", { name: label, exact: true }).first()).toBeVisible();
     }
   });

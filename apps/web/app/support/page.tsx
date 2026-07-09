@@ -41,7 +41,7 @@ export default function SupportPage() {
                 Expert Chat
               </h2>
               <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-                Async, 24-hour response time. Free for every trip.
+                Async support for questions about your route and account.
               </p>
             </Link>
             <Link

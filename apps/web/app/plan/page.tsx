@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
 /**
  * /plan — the explicit landing for the home-hero CTA.
@@ -7,5 +7,5 @@ import { redirect } from "next/navigation";
  * the rest of the app without breaking the home CTA's href.
  */
 export default function PlanPage(): never {
-  redirect("/planner");
+  permanentRedirect("/planner");
 }

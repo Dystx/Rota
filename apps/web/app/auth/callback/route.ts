@@ -1,11 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-
-function safeNext(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/account";
-  if (["/admin", "/reviewer", "/console", "/api"].some((prefix) => value === prefix || value.startsWith(`${prefix}/`))) return "/account";
-  return value;
-}
+import { safeNext } from "../safe-next";
 
 /**
  * /auth/callback — Supabase magic-link return URL.

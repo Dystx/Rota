@@ -5,7 +5,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useMapStore } from "@/store/useMapStore";
 import { getDestinationPreset } from "@repo/spatial-engine";
-import { publicDraftToPlannerUrl } from "./_components/public-trip-choices";
+import { PUBLIC_DESTINATION_ATLAS, publicDraftToPlannerUrl } from "./_components/public-trip-choices";
 
 /**
  * Structural type for the parts of a MapLibre Map we touch
@@ -269,12 +269,17 @@ function HeroGlobeWithSync({
  */
 export function StaticPortugalFallback() {
   const router = useRouter();
-  const pins = [
-    { slug: "porto", label: "Porto & the North", top: "20%", left: "53%" },
-    { slug: "lisbon", label: "Lisbon & Surrounds", top: "50%", left: "42%" },
-    { slug: "algarve", label: "The Algarve", top: "76%", left: "52%" },
-    { slug: "azores", label: "The Azores", top: "44%", left: "20%" }
-  ] as const;
+  const pinLayout: Record<string, { top: string; left: string }> = {
+    porto: { top: "20%", left: "53%" },
+    lisbon: { top: "50%", left: "42%" },
+    douro: { top: "32%", left: "58%" },
+    algarve: { top: "76%", left: "52%" },
+    azores: { top: "44%", left: "20%" }
+  };
+  const pins = PUBLIC_DESTINATION_ATLAS.map((destination) => ({
+    ...destination,
+    ...pinLayout[destination.slug]
+  }));
 
   return (
     <div

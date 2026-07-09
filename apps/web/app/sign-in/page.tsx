@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { SignInForm } from "./_components/sign-in-form";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
+import { safeNext } from "../auth/safe-next";
 
 export const metadata: Metadata = {
   title: "Sign in | Rumia",
@@ -13,12 +14,6 @@ export const metadata: Metadata = {
 
 interface SignInPageProps {
   searchParams: Promise<{ next?: string; sent?: string; error?: string }>;
-}
-
-function safeNext(value: string | undefined) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/account";
-  if (["/admin", "/reviewer", "/console", "/api"].some((prefix) => value === prefix || value.startsWith(`${prefix}/`))) return "/account";
-  return value;
 }
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
