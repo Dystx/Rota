@@ -136,6 +136,49 @@
   }
 }
 
+/* View transitions are an enhancement: route state is always updated before
+ * their snapshots are displayed, and browsers without the pseudo-elements
+ * simply ignore these rules. Keep the effect opacity-only so it remains a
+ * quiet handoff rather than a spatial movement. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--motion-duration-fast);
+  animation-timing-function: var(--motion-easing-cinematic);
+}
+
+::view-transition-old(root) {
+  animation-name: rota-view-transition-out;
+}
+
+::view-transition-new(root) {
+  animation-name: rota-view-transition-in;
+}
+
+@keyframes rota-view-transition-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes rota-view-transition-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The application can mirror an OS preference into this attribute before a
+ * client component mounts. Suppress spatial motion, including parallax and
+ * line-drawing effects, while leaving immediate state and opacity available. */
+[data-reduced-motion="true"],
+[data-reduced-motion="true"] * {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+  transform: none !important;
+  scroll-behavior: auto !important;
+}
+
 /* WCAG AA contrast fix: --color-atlantic (#ce933f) on the page background
  * (--color-background #e8fff0) yields 2.54:1, failing the 4.5:1 threshold
  * for normal text. Route every `text-[var(--color-atlantic)]` usage to

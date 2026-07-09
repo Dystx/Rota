@@ -10,6 +10,20 @@ a {
   text-decoration: none;
 }
 
+/* Scroll-driven animation is opt-in and confined to public storytelling
+ * sections. Interactive planner and trip controls do not receive a timeline,
+ * so their content is complete and operable without animation support. */
+@supports (scroll-timeline-name: --public-story) {
+  [data-public-story] {
+    scroll-timeline-name: --public-story;
+    scroll-timeline-axis: block;
+  }
+
+  [data-public-story-reveal] {
+    animation-timeline: --public-story;
+  }
+}
+
 /* ---- Text selection ----
    The previous global `selection:bg-[var(--color-accent)]/30` in
    PageShell + root body used the ochre accent at 30% opacity —
