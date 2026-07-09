@@ -1,5 +1,5 @@
 import { generateItineraryFromBrief } from "@repo/ai";
-import { getTripDraftById, isPersistenceConfigError } from "@repo/db";
+import { isPersistenceConfigError } from "@repo/db";
 import {
   buildTripCalendarExport,
   buildTripCalendarFilename,
@@ -9,6 +9,7 @@ import {
   buildTripPdfFilename
 } from "@/lib/trip-export";
 import { internalError, isApiResponse, notFoundError, requireApiRole, validationError, forbiddenError } from "@/lib/auth/api";
+import { getOwnedTrip } from "@/app/lib/trip-access";
 import { markExportJobError, markExportJobReady, queueExportJob } from "@/app/lib/export-jobs";
 
 export async function GET(request: Request, { params }: { params: Promise<{ tripId: string }> }) {
@@ -27,11 +28,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ trip
   }
 
   try {
-    const trip = await getTripDraftById(tripId, { client: auth.client });
+    const access = await getOwnedTrip(tripId);
 
-    if (!trip) {
+    if (access.kind !== "ok") {
       return notFoundError("Trip not found.");
     }
+
+    const trip = access.trip;
 
     if (!trip.isPaid) {
       return forbiddenError("Unlock the trip before exporting it.");

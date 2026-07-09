@@ -190,8 +190,8 @@ export default async function TripExportPage({
                 {listTripExportOptions(tripId).map((option) => {
                   const format = getFormatFromHref(option.href);
                   const locked = format !== "print" && !tripCommerceState.canExport;
-                  const jobState = locked ? "locked" : getExportJobState(tripId, true);
-                  const stateLabel = jobState === "retry" ? "Retry queued" : jobState[0].toUpperCase() + jobState.slice(1);
+                  const jobState = locked ? "locked" : infoMessage ? "error" : getExportJobState(tripId, true);
+                  const stateLabel = jobState === "retry" ? "Retry queued" : jobState.charAt(0).toUpperCase() + jobState.slice(1);
                   const statusLabel = locked ? "Locked" : `Unlocked · ${stateLabel}`;
                   return (
                     <div key={option.label} data-testid={`export-format-${format}`} className="relative">
