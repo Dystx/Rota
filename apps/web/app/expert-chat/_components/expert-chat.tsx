@@ -15,13 +15,19 @@ type LoadState = "loading" | "ready" | "empty" | "denied" | "error";
 
 function normalizeMessages(value: unknown): Message[] {
   if (!Array.isArray(value)) return [];
-  return value.flatMap((item, index) => {
+  return value.flatMap((item) => {
     if (!item || typeof item !== "object") return [];
     const row = item as Record<string, unknown>;
-    const text = typeof row.body === "string" ? row.body : typeof row.text === "string" ? row.text : null;
-    if (!text) return [];
-    const author = row.authorRole === "traveler" || row.role === "user" ? "user" : "specialist";
-    return [{ id: String(row.id ?? `message-${index}`), role: author as Message["role"], text, time: typeof row.createdAt === "string" ? row.createdAt : undefined }];
+    const text = typeof row.body === "string" ? row.body : null;
+    const id = typeof row.id === "string" ? row.id.trim() : "";
+    if (!id || !text?.trim()) return [];
+    const author = row.authorRole === "traveler" || row.role === "user"
+      ? "user"
+      : row.authorRole === "specialist" || row.role === "specialist"
+        ? "specialist"
+        : null;
+    if (!author) return [];
+    return [{ id, role: author, text: text.trim(), time: typeof row.createdAt === "string" ? row.createdAt : undefined }];
   });
 }
 
@@ -39,7 +45,7 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
     setState("loading");
     try {
       const response = await fetch(`/api/trips/${encodeURIComponent(tripId)}/messages`, { credentials: "include" });
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401 || response.status === 403 || response.status === 404) {
         setState("denied");
         return;
       }
@@ -66,7 +72,7 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ body })
       });
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401 || response.status === 403 || response.status === 404) {
         setState("denied");
         return;
       }

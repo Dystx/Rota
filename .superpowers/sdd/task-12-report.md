@@ -9,3 +9,16 @@ provider failures, and a disabled capability return a structured 503
 The client treats 401/403 responses as denied and provider 503 responses as a
 provider-error state. Sends are acknowledged only after the API succeeds and
 the canonical message list is reloaded.
+
+Final review follow-up:
+
+- GET and POST responses with status 404 now map to the denied state, matching
+  the trip-scoped API's missing-trip response instead of presenting a provider
+  outage.
+- Message normalization now requires a nonempty string id, nonempty body, and
+  an explicit traveler/user or specialist role; malformed rows are discarded
+  rather than rendered with fabricated IDs or specialist defaults.
+- Verification: focused expert-chat plus trip-messaging API tests — PASS (9
+  tests). `pnpm --filter web typecheck` — PASS. Route tests now narrow the
+  handler's optional response through an assertion helper without weakening
+  status/body assertions.
