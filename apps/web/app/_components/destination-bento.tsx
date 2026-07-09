@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { getDestinationPreset } from "@repo/spatial-engine";
 import { useMapStore } from "@/store/useMapStore";
+import { publicDraftToPlannerUrl } from "../(marketing)/_components/public-trip-choices";
 
 /**
  * DestinationBento — editorial bento grid (Stitch 1.1 home layout).
@@ -13,9 +14,8 @@ import { useMapStore } from "@/store/useMapStore";
  *   - The Azores (12-col, 1-row) — Island Archipelago
  *
  * Per-card CTAs (Stitch 1.3 "1 click to begin" pattern):
- *   - `mode="plan"` (the home) — each card has two CTAs:
- *       primary: "Plan this trip" → /planner?destination=<slug>&days=7
- *       secondary: "Map" → /explore/workspace?focus=<slug>
+ *   - `mode="plan"` (the home) — each card has one route action
+ *       backed by the same choice-draft URL adapter as the hero.
  *   - `mode="explore"` (the default, used by /explore and
  *     /portugal) — each card has a single link that covers the
  *     full card area: "View on the map" → /explore/workspace?focus=<slug>
@@ -31,10 +31,7 @@ type BentoSlug = (typeof BENTO_SLUGS)[number];
 export type DestinationBentoMode = "explore" | "plan";
 
 export interface DestinationBentoProps {
-  /**
-   * `plan` = home-page treatment (dual CTA: plan + map).
-   * `explore` = default (single full-card link to /explore/workspace).
-   */
+  /** `plan` = home route action; `explore` = map workspace link. */
   mode?: DestinationBentoMode;
 }
 
@@ -83,8 +80,7 @@ const BENTO_CARDS: BentoCardData[] = [
   }
 ];
 
-const PLANNER_HREF_FOR = (slug: BentoSlug) =>
-  `/planner?destination=${slug}&days=7`;
+const PLANNER_HREF_FOR = (slug: BentoSlug) => publicDraftToPlannerUrl(slug);
 const MAP_HREF_FOR = (slug: BentoSlug) => `/explore/workspace?focus=${slug}`;
 
 /**
@@ -140,30 +136,10 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                   {card.caption}
                 </p>
                 {mode === "plan" ? (
-                  <div className="mt-3 flex flex-wrap items-center gap-2 relative z-30">
-                    <Link
-                      href={planHref}
-                      aria-label={`Plan this trip to ${card.label}`}
-                      onClick={(event) => event.stopPropagation()}
-                      data-testid={`bento-cta-plan-${card.slug}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-ochre-light text-ochre-dark font-label-ui text-label-ui shadow-sm hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-                    >
-                      {BENTO_CTA_COPY[card.slug]}
-                      <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
-                    </Link>
-                    <Link
-                      href={mapHref}
-                      aria-label={`View ${card.label} on the map`}
-                      onClick={(event) => event.stopPropagation()}
-                      data-testid={`bento-cta-map-${card.slug}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/30 text-ochre-light font-label-ui text-label-ui backdrop-blur-sm hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-                    >
-                      View on map
-                      <span aria-hidden className="ph text-[16px]">
-                        map
-                      </span>
-                    </Link>
-                  </div>
+                  <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-ochre-light px-3 py-1.5 font-label-ui text-label-ui text-ochre-dark shadow-sm">
+                    {BENTO_CTA_COPY[card.slug]}
+                    <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
+                  </span>
                 ) : (
                   <span className="mt-3 inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-light opacity-0 motion-safe:group-hover:opacity-100 transition-opacity">
                     <span
@@ -191,6 +167,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                 <Link
                   href={planHref}
                   aria-label={`Plan this trip to ${card.label}`}
+                  data-testid={`bento-cta-plan-${card.slug}`}
                   className="absolute inset-0 z-10 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
                 />
                 {cardBody}

@@ -2,8 +2,10 @@
 
 import dynamic from "next/dynamic";
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { useMapStore } from "@/store/useMapStore";
 import { getDestinationPreset } from "@repo/spatial-engine";
+import { publicDraftToPlannerUrl } from "./_components/public-trip-choices";
 
 /**
  * Structural type for the parts of a MapLibre Map we touch
@@ -98,6 +100,7 @@ function resolveHeroFocus(slug: HeroFocusSlug | null | undefined): ResolvedFocus
  */
 export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
   const [projection, setProjection] = React.useState<HeroProjection>(initialProjection);
+  const [mapReady, setMapReady] = React.useState(false);
 
   // Wire the visible map surface back to the cross-page Zustand
   // store. Subscribers stay stable across renders — no need to
@@ -115,7 +118,10 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
         projection={projection}
         onStopClick={onStopClick}
         onProjectionChange={setProjection}
+        onReady={() => setMapReady(true)}
       />
+
+      {!mapReady ? <StaticPortugalFallback /> : null}
 
       <ProjectionToggle value={projection} onChange={setProjection} />
     </div>
@@ -134,11 +140,13 @@ export function HeroMap({ initialProjection = "globe" }: HeroMapProps) {
 function HeroGlobeWithSync({
   projection,
   onStopClick,
-  onProjectionChange
+  onProjectionChange,
+  onReady
 }: {
   projection: HeroProjection;
   onStopClick: (id: string, coords: readonly [number, number]) => void;
   onProjectionChange: (next: HeroProjection) => void;
+  onReady: () => void;
 }) {
   const targetCoordinates = useMapStore((state) => state.targetCoordinates);
   const setTargetCoordinates = useMapStore((state) => state.setTargetCoordinates);
@@ -248,8 +256,62 @@ function HeroGlobeWithSync({
             }
           }, 1300);
         }
+        onReady();
       }}
     />
+  );
+}
+
+/**
+ * A semantic, no-WebGL fallback for the hero map. It remains available while
+ * the map engine is loading or unavailable, and each plotted region is a real
+ * button rather than a visual-only map pin.
+ */
+function StaticPortugalFallback() {
+  const router = useRouter();
+  const pins = [
+    { slug: "porto", label: "Porto & the North", top: "20%", left: "53%" },
+    { slug: "lisbon", label: "Lisbon & Surrounds", top: "50%", left: "42%" },
+    { slug: "algarve", label: "The Algarve", top: "76%", left: "52%" },
+    { slug: "azores", label: "The Azores", top: "44%", left: "20%" }
+  ] as const;
+
+  return (
+    <div
+      data-testid="hero-map-fallback"
+      aria-label="Static Portugal route map"
+      className="absolute inset-0 z-10 overflow-hidden bg-[radial-gradient(circle_at_50%_38%,rgba(234,184,117,0.2),transparent_30%),linear-gradient(150deg,#17372e,#0c1f16)]"
+    >
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 360 540"
+        className="absolute left-1/2 top-1/2 h-[125%] w-auto -translate-x-1/2 -translate-y-1/2 opacity-80"
+      >
+        <path
+          d="M188 38 229 56 242 104 224 151 239 196 219 247 235 296 213 349 225 399 205 450 213 500 177 517 150 482 162 432 145 383 161 331 146 284 163 236 148 188 166 140 151 91Z"
+          fill="#315445"
+          stroke="#eab875"
+          strokeWidth="4"
+        />
+        <path d="M185 65 194 495" stroke="#eab875" strokeWidth="2" strokeDasharray="7 9" opacity=".65" />
+      </svg>
+      <p className="absolute left-5 top-5 font-mono-micro text-mono-micro uppercase tracking-widest text-linen-dark/80">
+        Portugal route map
+      </p>
+      {pins.map((pin) => (
+        <button
+          key={pin.slug}
+          type="button"
+          aria-label={`Build a route for ${pin.label}`}
+          onClick={() => router.push(publicDraftToPlannerUrl(pin.slug))}
+          className="absolute z-20 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-ochre-light/70 bg-ink/85 px-3 py-2 font-label-ui text-label-ui text-linen-dark shadow-lg backdrop-blur focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+          style={{ top: pin.top, left: pin.left }}
+        >
+          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-ochre-light" />
+          {pin.label}
+        </button>
+      ))}
+    </div>
   );
 }
 

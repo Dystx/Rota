@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Metadata } from "next";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
@@ -6,6 +5,7 @@ import { HeroMap } from "./hero-map";
 import { BrandMark } from "@repo/ui";
 import { HowItWorks } from "./_components/how-it-works";
 import { DestinationBento } from "../_components/destination-bento";
+import { HeroIntentCard } from "./_components/hero-intent-card";
 
 export const metadata: Metadata = {
   title: "Discover Intentionally. | Rumia",
@@ -18,10 +18,7 @@ export const metadata: Metadata = {
  * Rumia landing page — 3-element hero (PR-A3).
  *   1. Headline  "Discover *Intentionally*."
  *   2. Subhead   "Portugal-first itineraries, plotted with care."
- *   3. CTA       "Plan a trip" → /plan
- *
- * The Intent Engine chip card moved to /plan. The BrandMark
- * anchors the top-right of the hero.
+ *   3. Choice-led route starter → /planner
  */
 export default function HomePage() {
   return (
@@ -62,16 +59,8 @@ export default function HomePage() {
               className="font-body-lg md:font-body-xl text-body-lg md:text-body-xl text-linen-dark/90 max-w-xl drop-shadow-md px-2"
             >
               Portugal-first itineraries, plotted with care.
-              Tell us where you&rsquo;re going.
             </p>
-            <Link
-              href="/plan"
-              data-testid="home-cta"
-              className="inline-flex items-center gap-2 rounded-full bg-cream text-ink px-7 py-3.5 text-[15px] font-medium hover:bg-cream/90 active:scale-[0.98] transition-all duration-base ease-standard focus-visible:outline-none focus-visible:shadow-focus"
-            >
-              Plan a trip
-              <span aria-hidden className="ph ph-arrow-right text-[1.1em]" />
-            </Link>
+            <HeroIntentCard />
           </div>
         </section>
 
