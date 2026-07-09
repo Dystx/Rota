@@ -16,7 +16,7 @@ export default function OfflinePage() {
         <div className="max-w-xl text-center flex flex-col items-center gap-gutter">
           <span
             aria-hidden
-            className="material-symbols-outlined text-[64px] text-on-surface-variant"
+            className="ph text-[64px] text-on-surface-variant"
           >
             cloud_off
           </span>

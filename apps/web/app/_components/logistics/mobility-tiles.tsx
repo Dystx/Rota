@@ -74,7 +74,7 @@ export function MobilityTiles() {
               ].join(" ")}
             >
               <div className="absolute inset-0 bg-ochre-light/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <span className="material-symbols-outlined text-4xl text-olive-dark mb-4 group-hover:text-ochre-dark transition-colors">
+              <span className="ph text-4xl text-olive-dark mb-4 group-hover:text-ochre-dark transition-colors">
                 {tile.icon}
               </span>
               <span className="font-label-ui text-label-ui text-primary mb-1">
@@ -84,7 +84,7 @@ export function MobilityTiles() {
                 {tile.caption}
               </span>
               <div className="absolute top-4 right-4 opacity-0 group-[:has(.selected)]:opacity-100 transition-opacity">
-                <span className="material-symbols-outlined text-ochre-dark">
+                <span className="ph text-ochre-dark">
                   check_circle
                 </span>
               </div>
@@ -98,7 +98,7 @@ export function MobilityTiles() {
           href="/planner"
           className="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded"
         >
-          <span className="material-symbols-outlined text-sm">arrow_back</span>
+          <span className="ph text-sm ph-arrow-left">arrow-left</span>
           Back
         </Link>
         <Link
@@ -113,9 +113,7 @@ export function MobilityTiles() {
           ].join(" ")}
         >
           Continue
-          <span className="material-symbols-outlined text-sm">
-            arrow_forward
-          </span>
+          <span className="ph text-sm ph-arrow-right">arrow-right</span>
         </Link>
       </div>
 

@@ -223,7 +223,7 @@ export function WorkspaceShell({ stops }: WorkspaceShellProps) {
             data-testid="workspace-add-stop"
             className="group min-w-[180px] rounded-2xl border-2 border-dashed border-outline-variant bg-white/30 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-ochre-dark hover:bg-white/50 transition-colors"
           >
-            <span className="material-symbols-outlined text-3xl" aria-hidden="true">add</span>
+            <span className="ph text-3xl ph-plus" aria-hidden="true">plus</span>
             <span className="font-mono-micro text-mono-micro uppercase tracking-[0.2em]">
               Add Stop
             </span>
@@ -270,7 +270,7 @@ function IconButton({ ariaLabel, icon }: IconButtonProps) {
       aria-label={ariaLabel}
       className="w-12 h-12 rounded-full bg-glass-light/85 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-sm hover:bg-white transition-colors text-primary"
     >
-      <span className="material-symbols-outlined text-[22px]" aria-hidden="true">{icon}</span>
+      <span className="ph text-[22px]" aria-hidden="true">{icon}</span>
     </button>
   );
 }

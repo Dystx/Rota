@@ -61,9 +61,7 @@ export default async function ExpertChatPage({
               </div>
             </div>
 
-            <span className="material-symbols-outlined text-[48px] text-olive-light mb-3 block">
-              forum
-            </span>
+            <span className="ph text-[48px] text-olive-light mb-3 block ph-chat-circle-dots">chat-circle-dots</span>
             <h1 className="font-headline-lg text-headline-lg text-primary mb-2">
               Open this chat from a trip
             </h1>

@@ -45,7 +45,7 @@ export function ConversationList({
           aria-label="Filter days"
           className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          <span aria-hidden className="material-symbols-outlined">filter_list</span>
+          <span aria-hidden className="ph ph-funnel">funnel</span>
         </button>
       </header>
       <div className="p-3 border-b border-olive-light/10 bg-surface-container-lowest/50">
@@ -53,10 +53,8 @@ export function ConversationList({
           <span className="sr-only">Search days</span>
           <span
             aria-hidden
-            className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
-          >
-            search
-          </span>
+            className="ph absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none ph-magnifying-glass"
+          >magnifying-glass</span>
           <input
             type="search"
             value={search}

@@ -127,8 +127,8 @@ export function TopNav() {
             data-testid="top-nav-mobile-toggle"
             className="md:hidden w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-full hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span aria-hidden className="material-symbols-outlined">
-              {mobileOpen ? "close" : "menu"}
+            <span aria-hidden className="ph ph-list">
+              {mobileOpen ? "x" : "list"}
             </span>
           </button>
         </div>

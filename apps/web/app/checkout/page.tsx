@@ -80,7 +80,7 @@ export default async function CheckoutPage({
                     <div className="w-14 h-14 rounded-full bg-olive-light/15 flex items-center justify-center">
                       <span
                         aria-hidden
-                        className="material-symbols-outlined text-3xl text-olive-dark"
+                        className="ph text-3xl text-olive-dark"
                       >
                         travel_explore
                       </span>
@@ -96,7 +96,7 @@ export default async function CheckoutPage({
                       data-testid="checkout-empty-cta"
                       className="mt-1 inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-4 py-2 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                     >
-                      <span aria-hidden className="material-symbols-outlined text-[18px]">
+                      <span aria-hidden className="ph text-[18px]">
                         add_location_alt
                       </span>
                       Plan a trip
@@ -136,9 +136,7 @@ export default async function CheckoutPage({
                     className="mt-2 inline-flex items-center gap-1 font-mono-technical text-mono-technical text-ochre-dark hover:text-primary"
                   >
                     View trip
-                    <span aria-hidden className="material-symbols-outlined text-[16px]">
-                      arrow_forward
-                    </span>
+                    <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
                   </Link>
                 ) : null}
               </div>
@@ -192,7 +190,7 @@ export default async function CheckoutPage({
                       <li key={line} className="flex items-start gap-2">
                         <span
                           aria-hidden
-                          className="material-symbols-outlined text-olive-light text-[18px] mt-0.5"
+                          className="ph text-olive-light text-[18px] mt-0.5"
                         >
                           check_circle
                         </span>
@@ -248,7 +246,7 @@ export default async function CheckoutPage({
                       <li key={item.label} className="flex items-start gap-2">
                         <span
                           aria-hidden
-                          className="material-symbols-outlined text-ochre-light text-[18px] mt-0.5"
+                          className="ph text-ochre-light text-[18px] mt-0.5"
                           style={{ fontVariationSettings: "'FILL' 1" }}
                         >
                           {item.icon}
@@ -295,9 +293,7 @@ export default async function CheckoutPage({
 
               {!tripId ? (
                 <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
-                  <span aria-hidden className="material-symbols-outlined text-[18px]">
-                    info
-                  </span>
+                  <span aria-hidden className="ph text-[18px] ph-info">info</span>
                   These tiers apply to a specific trip. Plan one first and
                   the checkout options will land here automatically.
                 </p>

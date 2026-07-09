@@ -119,7 +119,7 @@ export default function WorkspaceDemoPage() {
                 href="/explore"
                 className="mt-2 inline-flex w-fit items-center gap-2 font-mono-micro text-mono-micro uppercase tracking-[0.2em] text-olive-light hover:text-ochre-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
-                <span className="material-symbols-outlined text-base" aria-hidden="true">public</span>
+                <span className="ph text-base ph-globe" aria-hidden="true">globe</span>
                 See the 3D globe →
               </Link>
             </article>

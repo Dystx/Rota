@@ -61,10 +61,8 @@ export function ItinerarySearch({ trips }: { trips: TripDraftListItem[] }) {
           <div className="relative">
             <span
               aria-hidden
-              className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]"
-            >
-              search
-            </span>
+              className="ph absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] ph-magnifying-glass"
+            >magnifying-glass</span>
             <input
               type="search"
               value={query}
@@ -234,9 +232,9 @@ function ItineraryCard({
           </p>
         )}
         <span className="inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-dark group-hover:underline">
-          <span className="material-symbols-outlined text-[16px]">ios_share</span>
+          <span className="ph text-[16px] ph-share-network">share-network</span>
           Export &amp; share
-          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+          <span className="ph text-[16px] ph-arrow-right">arrow-right</span>
         </span>
       </div>
     </button>

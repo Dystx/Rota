@@ -76,7 +76,7 @@ export function TransportStep({
             <span
               aria-hidden
               className={cn(
-                "material-symbols-outlined text-4xl",
+                "ph text-4xl",
                 isSelected ? "text-ochre-dark" : "text-on-surface-variant"
               )}
             >

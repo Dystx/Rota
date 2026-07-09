@@ -81,7 +81,7 @@ export function PaceToneControl() {
                   : "bg-white/70 text-primary border border-olive-light/40 hover:bg-olive-light/15")
               }
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
+              <span aria-hidden="true" className="ph text-[16px]">
                 {opt.icon}
               </span>
               {opt.value}
@@ -109,7 +109,7 @@ export function PaceToneControl() {
                   : "bg-white/70 text-primary border border-olive-light/40 hover:bg-olive-light/15")
               }
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
+              <span aria-hidden="true" className="ph text-[16px]">
                 {opt.icon}
               </span>
               {opt.value}

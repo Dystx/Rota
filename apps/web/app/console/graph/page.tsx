@@ -64,10 +64,10 @@ export default function ConsoleGraphPage() {
               : "text-linen-dark"
           }`}
         >
-          <span aria-hidden className="material-symbols-outlined text-[18px]">
+          <span aria-hidden className="ph text-[18px]">
             {hasChildren ? (isExpanded ? "expand_more" : "chevron_right") : node.icon}
           </span>
-          <span aria-hidden className="material-symbols-outlined text-[18px] text-ochre-light">
+          <span aria-hidden className="ph text-[18px] text-ochre-light">
             {hasChildren ? node.icon : ""}
           </span>
           <span className="flex-1 truncate">{node.label}</span>
@@ -104,10 +104,8 @@ export default function ConsoleGraphPage() {
             <span className="sr-only">Search graph nodes</span>
             <span
               aria-hidden
-              className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-linen-dark/50 pointer-events-none"
-            >
-              search
-            </span>
+              className="ph absolute left-3 top-1/2 -translate-y-1/2 text-linen-dark/50 pointer-events-none ph-magnifying-glass"
+            >magnifying-glass</span>
             <input
               type="search"
               placeholder="Search nodes…"
@@ -127,9 +125,7 @@ export default function ConsoleGraphPage() {
                 aria-label="Filter tree"
                 className="p-2 rounded-lg text-linen-dark/70 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-olive-dark"
               >
-                <span aria-hidden className="material-symbols-outlined">
-                  filter_list
-                </span>
+                <span aria-hidden className="ph ph-funnel">funnel</span>
               </button>
             </header>
             <div className="flex-1 overflow-y-auto p-4 font-mono-technical text-mono-technical">
@@ -171,7 +167,7 @@ export default function ConsoleGraphPage() {
                       aria-label="Edit node"
                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark"
                     >
-                      <span aria-hidden className="material-symbols-outlined">
+                      <span aria-hidden className="ph">
                         edit
                       </span>
                     </button>
@@ -180,7 +176,7 @@ export default function ConsoleGraphPage() {
                       aria-label="View revision history"
                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark"
                     >
-                      <span aria-hidden className="material-symbols-outlined">
+                      <span aria-hidden className="ph">
                         history
                       </span>
                     </button>
@@ -193,7 +189,7 @@ export default function ConsoleGraphPage() {
                   <h3 className="font-headline-sm text-headline-sm text-linen-dark mb-3 flex items-center gap-2">
                     <span
                       aria-hidden
-                      className="material-symbols-outlined text-ochre-light"
+                      className="ph text-ochre-light"
                     >
                       data_array
                     </span>
@@ -216,7 +212,7 @@ export default function ConsoleGraphPage() {
 
                 <article className="bg-black/40 border border-white/5 rounded-lg p-card-padding flex flex-col">
                   <h3 className="font-headline-sm text-headline-sm text-linen-dark mb-3 flex items-center gap-2">
-                    <span aria-hidden className="material-symbols-outlined text-ochre-light">
+                    <span aria-hidden className="ph text-ochre-light">
                       satellite_alt
                     </span>
                     Spatial Data (PostGIS)

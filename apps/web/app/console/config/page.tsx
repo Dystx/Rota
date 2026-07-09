@@ -38,7 +38,7 @@ export default function ConsoleConfigPage() {
                   type="button"
                   className="font-label-ui text-label-ui inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-on-primary hover:bg-olive-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                 >
-                  <span aria-hidden className="material-symbols-outlined text-[18px]">
+                  <span aria-hidden className="ph text-[18px]">
                     save
                   </span>
                   Deploy Config
@@ -56,10 +56,8 @@ export default function ConsoleConfigPage() {
                   <header className="flex items-center gap-2 mb-6">
                     <span
                       aria-hidden
-                      className="material-symbols-outlined text-ochre-dark"
-                    >
-                      tune
-                    </span>
+                      className="ph text-ochre-dark ph-sliders-horizontal"
+                    >sliders-horizontal</span>
                     <h3 className="font-headline-sm text-headline-sm text-primary">
                       LLM Prompt Multipliers
                     </h3>
@@ -82,10 +80,8 @@ export default function ConsoleConfigPage() {
                   <header className="flex items-center gap-2 mb-6">
                     <span
                       aria-hidden
-                      className="material-symbols-outlined text-olive-light"
-                    >
-                      directions_transit
-                    </span>
+                      className="ph text-olive-light ph-bus"
+                    >bus</span>
                     <h3 className="font-headline-sm text-headline-sm text-primary">
                       Transit &amp; Logistics Engine
                     </h3>

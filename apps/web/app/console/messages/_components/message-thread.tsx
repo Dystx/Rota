@@ -204,7 +204,7 @@ export function MessageThread({
             aria-label="Open client profile"
             className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span aria-hidden className="material-symbols-outlined">
+            <span aria-hidden className="ph">
               person
             </span>
           </button>
@@ -213,7 +213,7 @@ export function MessageThread({
             aria-label="Open itinerary map"
             className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span aria-hidden className="material-symbols-outlined">
+            <span aria-hidden className="ph">
               map
             </span>
           </button>
@@ -245,7 +245,7 @@ export function MessageThread({
             >
               <span
                 aria-hidden
-                className="material-symbols-outlined text-[40px] text-ochre-light"
+                className="ph text-[40px] text-ochre-light"
               >
                 lock
               </span>
@@ -263,9 +263,7 @@ export function MessageThread({
                 className="inline-flex items-center gap-2 bg-ink text-cream font-medium text-sm px-5 py-2.5 rounded-full hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
                 Sign in
-                <span aria-hidden className="material-symbols-outlined text-[16px]">
-                  arrow_forward
-                </span>
+                <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
               </a>
             </div>
           ) : (
@@ -285,10 +283,8 @@ export function MessageThread({
           >
             <span
               aria-hidden
-              className="material-symbols-outlined text-4xl text-on-surface-variant"
-            >
-              forum
-            </span>
+              className="ph text-4xl text-on-surface-variant ph-chat-circle-dots"
+            >chat-circle-dots</span>
             <p className="font-headline-sm text-headline-sm text-primary">
               No messages yet
             </p>
@@ -391,7 +387,7 @@ export function MessageThread({
                   aria-label="Attach file"
                   className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                 >
-                  <span aria-hidden className="material-symbols-outlined">
+                  <span aria-hidden className="ph">
                     attach_file
                   </span>
                 </button>
@@ -400,9 +396,7 @@ export function MessageThread({
                   aria-label="AI assistance"
                   className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                 >
-                  <span aria-hidden className="material-symbols-outlined">
-                    auto_awesome
-                  </span>
+                  <span aria-hidden className="ph ph-sparkle">sparkle</span>
                 </button>
               </div>
               <div className="flex items-center gap-3">
@@ -428,7 +422,7 @@ export function MessageThread({
                   aria-label="Send message"
                   className="inline-flex items-center gap-2 bg-primary text-on-primary font-label-ui text-label-ui px-4 py-2 rounded-lg hover:bg-olive-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <span aria-hidden className="material-symbols-outlined text-[18px]">
+                  <span aria-hidden className="ph text-[18px]">
                     send
                   </span>
                   {isChatPending ? "Sending…" : "Send"}

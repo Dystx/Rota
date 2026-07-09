@@ -60,7 +60,7 @@ export function TimelineItem({
           }
         />
         {variant === "ochre" ? (
-          <span className="material-symbols-outlined text-ochre-light text-[14px]">
+          <span className="ph text-ochre-light text-[14px]">
             priority_high
           </span>
         ) : null}
@@ -72,7 +72,7 @@ export function TimelineItem({
       <div className={cardClass}>
         {overrideBanner ? (
           <div className="absolute top-0 left-0 right-0 bg-ochre-light/10 border-b border-ochre-light/20 py-1.5 px-card-padding flex items-center gap-2">
-            <span className="material-symbols-outlined text-ochre-dark text-[16px]">
+            <span className="ph text-ochre-dark text-[16px]">
               warning
             </span>
             <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">

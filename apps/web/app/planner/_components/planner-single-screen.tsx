@@ -141,9 +141,7 @@ export function PlannerSingleScreen({
           aria-label="Close planner"
           className="text-linen-dark opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded-sm"
         >
-          <span aria-hidden className="material-symbols-outlined text-2xl">
-            close
-          </span>
+          <span aria-hidden className="ph text-2xl ph-x">x</span>
         </button>
       </header>
 
@@ -155,9 +153,7 @@ export function PlannerSingleScreen({
           {/* AI Intent Engine badge. */}
           <div className="flex justify-center">
             <span className="inline-flex items-center gap-2 bg-glass-dark backdrop-blur-md border border-white/20 px-4 py-2 rounded-full">
-              <span aria-hidden className="material-symbols-outlined text-[14px] text-ochre-light">
-                auto_awesome
-              </span>
+              <span aria-hidden className="ph text-[14px] text-ochre-light ph-sparkle">sparkle</span>
               <span className="font-mono-micro text-mono-micro text-tertiary-fixed-dim uppercase tracking-wider">
                 AI Intent Engine
               </span>
@@ -257,10 +253,8 @@ export function PlannerSingleScreen({
               {pending ? "Synthesizing…" : "Synthesize Itinerary"}
               <span
                 aria-hidden
-                className="material-symbols-outlined !text-[20px] ml-1"
-              >
-                arrow_forward
-              </span>
+                className="ph !text-[20px] ml-1 ph-arrow-right"
+              >arrow-right</span>
             </Button>
           </div>
         </div>

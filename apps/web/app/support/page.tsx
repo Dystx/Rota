@@ -33,7 +33,7 @@ export default function SupportPage() {
               href="/expert-chat"
               className="block p-5 rounded-xl border border-olive-light/30 bg-white/80 hover:border-ochre-light/60 transition-colors"
             >
-              <span className="material-symbols-outlined text-ochre-dark mb-2 block">
+              <span className="ph text-ochre-dark mb-2 block">
                 chat_bubble
               </span>
               <h2 className="font-headline-sm text-headline-sm text-primary">
@@ -47,7 +47,7 @@ export default function SupportPage() {
               href="/account"
               className="block p-5 rounded-xl border border-olive-light/30 bg-white/80 hover:border-ochre-light/60 transition-colors"
             >
-              <span className="material-symbols-outlined text-ochre-dark mb-2 block">
+              <span className="ph text-ochre-dark mb-2 block">
                 account_circle
               </span>
               <h2 className="font-headline-sm text-headline-sm text-primary">
@@ -61,7 +61,7 @@ export default function SupportPage() {
               href="mailto:hello@rumia.pt"
               className="block p-5 rounded-xl border border-olive-light/30 bg-white/80 hover:border-ochre-light/60 transition-colors"
             >
-              <span className="material-symbols-outlined text-ochre-dark mb-2 block">
+              <span className="ph text-ochre-dark mb-2 block">
                 mail
               </span>
               <h2 className="font-headline-sm text-headline-sm text-primary">

@@ -250,7 +250,7 @@ export default async function TripDetailPage({
                       className="inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-2 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                     >
                       View Route
-                      <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                      <span className="ph text-[16px] ph-arrow-right">arrow-right</span>
                     </Link>
                   ) : null}
                 </div>
@@ -299,7 +299,7 @@ export default async function TripDetailPage({
                     aria-label="Open export and share panel"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 text-primary border border-olive-light/40 font-label-ui text-label-ui hover:bg-olive-light/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                   >
-                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">ios_share</span>
+                    <span aria-hidden="true" className="ph text-[16px] ph-share-network">share-network</span>
                     Share
                   </Link>
                   <Link
@@ -308,7 +308,7 @@ export default async function TripDetailPage({
                     aria-label="Download this trip"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-olive-light text-on-primary font-label-ui text-label-ui hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                   >
-                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">download</span>
+                    <span aria-hidden="true" className="ph text-[16px] ph-download-simple">download-simple</span>
                     Download
                   </Link>
                 </div>
@@ -327,7 +327,7 @@ export default async function TripDetailPage({
                       variant="ghost"
                       className="border border-olive-light text-olive-dark hover:bg-olive-light/10"
                     >
-                      <span className="material-symbols-outlined text-[16px] mr-1">support_agent</span>
+                      <span className="ph text-[16px] mr-1 ph-headset">headset</span>
                       Request Polish — async chat with a specialist
                     </Button>
                   </form>
@@ -454,11 +454,9 @@ export default async function TripDetailPage({
                  <Link href={`/expert-chat?trip=${tripId}`}>
                    <span
                      aria-hidden
-                     className="material-symbols-outlined text-[20px] mr-1"
+                     className="ph text-[20px] mr-1 ph-chat-circle-dots"
                      style={{ fontVariationSettings: "'FILL' 1" }}
-                   >
-                     forum
-                   </span>
+                   >chat-circle-dots</span>
                    Open expert chat
                  </Link>
                </Button>

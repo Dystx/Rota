@@ -312,7 +312,7 @@ function ToggleButton({
           : "text-linen-dark hover:bg-white/20")
       }
     >
-      <span className="material-symbols-outlined text-base" aria-hidden="true">{icon}</span>
+      <span className="ph ph-magnifying-glass text-base" aria-hidden="true">{icon}</span>
       {label}
     </button>
   );

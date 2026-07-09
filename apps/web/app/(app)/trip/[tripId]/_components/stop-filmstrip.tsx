@@ -142,7 +142,7 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
                         : "text-on-surface-variant hover:text-ochre-dark")
                     }
                   >
-                    <span className="material-symbols-outlined text-[18px]">
+                    <span className="ph text-[18px]">
                       more_vert
                     </span>
                   </span>
@@ -174,10 +174,8 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
                     >
                       <span
                         aria-hidden="true"
-                        className="material-symbols-outlined text-[14px]"
-                      >
-                        schedule
-                      </span>
+                        className="ph text-[14px] ph-calendar"
+                      >calendar</span>
                       {stop.durationHours.toFixed(1)} hrs
                     </div>
                   )}
@@ -217,7 +215,7 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
             aria-hidden="true"
             className="w-12 h-12 rounded-full border-2 border-olive-light/60 flex items-center justify-center"
           >
-            <span className="material-symbols-outlined text-[24px]">add</span>
+            <span className="ph text-[24px] ph-plus">plus</span>
           </span>
           <span className="font-label-ui text-label-ui">Add Stop</span>
         </a>

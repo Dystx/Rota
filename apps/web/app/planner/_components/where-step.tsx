@@ -95,7 +95,7 @@ export function WhereStep({
           className="flex items-center justify-between gap-2 p-4 rounded-xl border-2 border-olive-light/30 bg-white hover:border-ochre-light/60 hover:bg-ochre-light/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           <span className="flex items-center gap-2">
-            <span aria-hidden className="material-symbols-outlined text-ochre-dark">
+            <span aria-hidden className="ph text-ochre-dark">
               place
             </span>
             <span className="font-headline-sm text-headline-sm text-primary">
@@ -104,7 +104,7 @@ export function WhereStep({
           </span>
           <span className="inline-flex items-center gap-1 font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
             Change
-            <span aria-hidden className="material-symbols-outlined text-[14px]">
+            <span aria-hidden className="ph text-[14px]">
               edit
             </span>
           </span>

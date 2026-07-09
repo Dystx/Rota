@@ -21,7 +21,7 @@ export function KpiCard({ eyebrow, icon, iconTone = "ochre-dark", value, trend }
         </span>
         <span
           aria-hidden
-          className={`material-symbols-outlined ${
+          className={`ph ${
             iconTone === "ochre-dark" ? "text-ochre-dark" : "text-olive-light"
           }`}
         >
@@ -34,7 +34,7 @@ export function KpiCard({ eyebrow, icon, iconTone = "ochre-dark", value, trend }
       <p
         className={`font-label-ui text-label-ui flex items-center gap-1 ${trendColor}`}
       >
-        <span aria-hidden className="material-symbols-outlined text-[18px]">
+        <span aria-hidden className="ph text-[18px]">
           {trendIcon}
         </span>
         {trend.label}

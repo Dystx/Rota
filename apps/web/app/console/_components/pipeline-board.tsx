@@ -373,7 +373,7 @@ export function PipelineBoard({
                   : "px-3 py-1.5 rounded-md bg-olive-light/15 border border-olive-light/40 text-olive-dark font-mono-technical text-[12px] flex items-center gap-2"
               }
             >
-              <span aria-hidden className="material-symbols-outlined text-[14px]">
+              <span aria-hidden className="ph text-[14px]">
                 {toast.kind === "error" ? "error" : "check_circle"}
               </span>
               <span>{toast.message}</span>

@@ -50,9 +50,7 @@ export default function ConsoleWorkspacePage() {
                 aria-label="Filter anchors"
                 className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
-                <span aria-hidden className="material-symbols-outlined">
-                  filter_list
-                </span>
+                <span aria-hidden className="ph ph-funnel">funnel</span>
               </button>
             </div>
 
@@ -98,7 +96,7 @@ export default function ConsoleWorkspacePage() {
                       <span className="flex items-center gap-1">
                         <span
                           aria-hidden
-                          className="material-symbols-outlined text-[16px]"
+                          className="ph text-[16px]"
                         >
                           directions_walk
                         </span>
@@ -107,7 +105,7 @@ export default function ConsoleWorkspacePage() {
                       <span className="flex items-center gap-1">
                         <span
                           aria-hidden
-                          className="material-symbols-outlined text-[16px]"
+                          className="ph text-[16px]"
                         >
                           groups
                         </span>
@@ -133,7 +131,7 @@ export default function ConsoleWorkspacePage() {
                       aria-label="Edit lunch entry"
                       className="p-2 rounded-lg text-ochre-dark hover:bg-ochre-light/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                     >
-                      <span aria-hidden className="material-symbols-outlined">
+                      <span aria-hidden className="ph">
                         edit
                       </span>
                     </button>
@@ -155,10 +153,8 @@ export default function ConsoleWorkspacePage() {
                       <span className="sr-only">Search alternatives</span>
                       <span
                         aria-hidden
-                        className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
-                      >
-                        search
-                      </span>
+                        className="ph absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none ph-magnifying-glass"
+                      >magnifying-glass</span>
                       <input
                         type="search"
                         placeholder="Find a substitute restaurant…"
@@ -176,10 +172,8 @@ export default function ConsoleWorkspacePage() {
                           </span>
                           <span
                             aria-hidden
-                            className="material-symbols-outlined text-ochre-dark text-[18px]"
-                          >
-                            add
-                          </span>
+                            className="ph text-ochre-dark text-[18px] ph-plus"
+                          >plus</span>
                         </button>
                       </li>
                       <li>
@@ -192,10 +186,8 @@ export default function ConsoleWorkspacePage() {
                           </span>
                           <span
                             aria-hidden
-                            className="material-symbols-outlined text-ochre-dark text-[18px]"
-                          >
-                            add
-                          </span>
+                            className="ph text-ochre-dark text-[18px] ph-plus"
+                          >plus</span>
                         </button>
                       </li>
                     </ul>

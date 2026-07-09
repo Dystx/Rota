@@ -86,20 +86,12 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        {/* Material Symbols Outlined — icon font used by the prototype */}
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-        />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin=""
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        />
+        {/* Phosphor Icons — regular weight, self-hosted. Replaces
+            Material Symbols Outlined (PR-A2). Phosphor's humanist
+            shapes read more like a hand-drawn mark — pairs better
+            with the brand's italic + warm-voice tone. */}
+        <link rel="preconnect" href="/brand/phosphor" crossOrigin="" />
+        <link rel="stylesheet" href="/brand/phosphor/style.css" />
       </head>
       <body className="bg-background text-on-background font-body-md text-body-md antialiased overflow-x-hidden">
         <a

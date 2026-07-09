@@ -89,10 +89,8 @@ export function HeroQuickStart() {
         >
           <span
             aria-hidden
-            className="material-symbols-outlined text-on-surface-variant pl-4"
-          >
-            search
-          </span>
+            className="ph text-on-surface-variant pl-4 ph-magnifying-glass"
+          >magnifying-glass</span>
           <label htmlFor="hero-quick-start-input" className="sr-only">
             Where are you going?
           </label>
@@ -112,9 +110,7 @@ export function HeroQuickStart() {
             className="inline-flex items-center gap-1.5 mr-2 px-4 py-1.5 rounded-full bg-olive-light text-on-primary font-label-ui text-label-ui hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             Begin
-            <span aria-hidden className="material-symbols-outlined text-[14px]">
-              arrow_forward
-            </span>
+            <span aria-hidden className="ph text-[14px] ph-arrow-right">arrow-right</span>
           </button>
         </form>
         <p className="mt-3 font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant text-center">

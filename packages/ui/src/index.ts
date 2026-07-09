@@ -1,3 +1,5 @@
+export * from "./components/icon";
+
 export * from "./components/brand-mark";
 export * from "./components/badge";
 export * from "./components/app-layout";

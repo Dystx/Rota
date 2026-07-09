@@ -106,7 +106,7 @@ export function TriagePanel({
           <div className="flex items-center gap-2">
             <span
               aria-hidden
-              className="material-symbols-outlined text-ochre-dark"
+              className="ph text-ochre-dark"
             >
               library_books
             </span>
@@ -119,9 +119,7 @@ export function TriagePanel({
             aria-label="Add new snippet"
             className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span aria-hidden className="material-symbols-outlined">
-              add_circle
-            </span>
+            <span aria-hidden className="ph ph-plus-circle">plus-circle</span>
           </button>
         </header>
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-gutter">
@@ -163,7 +161,7 @@ export function TriagePanel({
         <header className="px-4 py-3 border-b border-white/10 bg-black/20 flex items-center gap-2 shrink-0">
           <span
             aria-hidden
-            className="material-symbols-outlined text-ochre-light"
+            className="ph text-ochre-light"
           >
             timeline
           </span>
@@ -262,7 +260,7 @@ export function TriagePanel({
               data-testid="push-event-submit"
               className="mt-2 w-full inline-flex items-center justify-center gap-2 bg-ochre-dark text-white font-label-ui text-label-ui px-4 py-2.5 rounded-lg hover:bg-ochre-light hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <span aria-hidden className="material-symbols-outlined text-[18px]">
+              <span aria-hidden className="ph text-[18px]">
                 sync_alt
               </span>
               {isTimelinePending ? "Pushing…" : "Push to Timeline"}
@@ -289,7 +287,7 @@ export function TriagePanel({
             className="border-t border-white/10 pt-4 mt-2"
           >
             <h4 className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-2 flex items-center gap-2">
-              <span aria-hidden className="material-symbols-outlined text-[14px]">
+              <span aria-hidden className="ph text-[14px]">
                 history
               </span>
               Recent pushes

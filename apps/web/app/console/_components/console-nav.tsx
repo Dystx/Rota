@@ -71,7 +71,7 @@ export function ConsoleNav() {
               >
                 <span
                   aria-hidden
-                  className="material-symbols-outlined"
+                  className="ph"
                 >
                   {item.icon}
                 </span>{" "}

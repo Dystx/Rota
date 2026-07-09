@@ -155,9 +155,7 @@ export function HeroIntentCard() {
             className="!px-10 !py-4 !text-lg focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
           >
             Begin Journey
-            <span aria-hidden className="material-symbols-outlined !text-[20px] ml-1">
-              arrow_forward
-            </span>
+            <span aria-hidden className="ph !text-[20px] ml-1 ph-arrow-right">arrow-right</span>
           </Button>
         </form>
       </CardContent>

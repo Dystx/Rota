@@ -75,7 +75,7 @@ export function VaultGallery() {
               aria-label="Grid view"
               className="p-2 rounded-full hover:bg-surface-variant text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
             >
-              <span className="material-symbols-outlined" aria-hidden="true">
+              <span className="ph" aria-hidden="true">
                 grid_view
               </span>
             </button>
@@ -84,7 +84,7 @@ export function VaultGallery() {
               aria-label="List view"
               className="p-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
             >
-              <span className="material-symbols-outlined" aria-hidden="true">
+              <span className="ph" aria-hidden="true">
                 view_list
               </span>
             </button>
@@ -123,11 +123,9 @@ export function VaultGallery() {
                     {card.days}
                   </span>
                   <span
-                    className="material-symbols-outlined text-on-surface-variant group-hover:text-ochre-dark transition-colors"
+                    className="ph text-on-surface-variant group-hover:text-ochre-dark transition-colors ph-arrow-right"
                     aria-hidden="true"
-                  >
-                    arrow_forward
-                  </span>
+                  >arrow-right</span>
                 </div>
               </div>
             </button>
@@ -164,9 +162,7 @@ export function VaultGallery() {
             onClick={close}
             className="text-on-surface-variant hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded"
           >
-            <span className="material-symbols-outlined" aria-hidden="true">
-              close
-            </span>
+            <span className="ph ph-x" aria-hidden="true">x</span>
           </button>
         </div>
 
@@ -186,7 +182,7 @@ export function VaultGallery() {
             className="w-full text-left group bg-surface hover:bg-surface-container-high border border-outline-variant/30 rounded-lg p-4 transition-all duration-200 flex items-start gap-4 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-olive-light/10 text-olive-light rounded-md group-hover:bg-ochre-light/20 group-hover:text-ochre-dark transition-colors">
-              <span className="material-symbols-outlined" aria-hidden="true">
+              <span className="ph" aria-hidden="true">
                 picture_as_pdf
               </span>
             </div>
@@ -205,7 +201,7 @@ export function VaultGallery() {
             className="w-full text-left group bg-surface hover:bg-surface-container-high border border-outline-variant/30 rounded-lg p-4 transition-all duration-200 flex items-start gap-4 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-olive-light/10 text-olive-light rounded-md group-hover:bg-ochre-light/20 group-hover:text-ochre-dark transition-colors">
-              <span className="material-symbols-outlined" aria-hidden="true">
+              <span className="ph" aria-hidden="true">
                 sync_saved_locally
               </span>
             </div>
@@ -224,7 +220,7 @@ export function VaultGallery() {
             className="w-full text-left group bg-surface hover:bg-surface-container-high border border-outline-variant/30 rounded-lg p-4 transition-all duration-200 flex items-start gap-4 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-olive-light/10 text-olive-light rounded-md group-hover:bg-ochre-light/20 group-hover:text-ochre-dark transition-colors">
-              <span className="material-symbols-outlined" aria-hidden="true">
+              <span className="ph" aria-hidden="true">
                 share
               </span>
             </div>
@@ -246,7 +242,7 @@ export function VaultGallery() {
             className="w-full bg-primary text-on-primary py-3 rounded-lg font-label-ui text-label-ui shadow-sm hover:bg-olive-light hover:shadow-md transition-all duration-200 flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             <span
-              className="material-symbols-outlined text-sm"
+              className="ph text-sm"
               aria-hidden="true"
             >
               file_download

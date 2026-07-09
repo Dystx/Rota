@@ -56,7 +56,7 @@ function EmptyState({ signedIn }: { signedIn: boolean }) {
       data-testid="itineraries-empty"
       className="bg-glass-light/60 backdrop-blur-md rounded-xl border border-olive-light/20 p-card-padding text-center max-w-2xl mx-auto"
     >
-      <span className="material-symbols-outlined text-[48px] text-olive-light mb-3 block">
+      <span className="ph text-[48px] text-olive-light mb-3 block">
         map
       </span>
       <h2 className="font-headline-lg text-headline-lg text-primary mb-2">

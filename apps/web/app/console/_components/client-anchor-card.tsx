@@ -31,7 +31,7 @@ export function ClientAnchorCard({
         <div className="flex items-center gap-2">
           <span
             aria-hidden
-            className="material-symbols-outlined text-ochre-dark"
+            className="ph text-ochre-dark"
           >
             {icon}
           </span>

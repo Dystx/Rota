@@ -72,10 +72,8 @@ export function PipelineHeader({
         <span className="sr-only">Search pipeline</span>
         <span
           aria-hidden
-          className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
-        >
-          search
-        </span>
+          className="ph absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none ph-magnifying-glass"
+        >magnifying-glass</span>
         <input
           type="search"
           value={query}
@@ -96,7 +94,7 @@ export function PipelineHeader({
           data-testid="pipeline-filter-button"
           className="font-label-ui text-label-ui flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-white/40 backdrop-blur-md text-primary hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          <span className="material-symbols-outlined">tune</span>
+          <span className="ph ph-sliders-horizontal">sliders-horizontal</span>
           {filterLabel}
         </button>
         {filterOpen ? (
@@ -129,7 +127,7 @@ export function PipelineHeader({
                 >
                   {opt.label}
                   {selected ? (
-                    <span aria-hidden className="material-symbols-outlined text-[16px]">check</span>
+                    <span aria-hidden className="ph text-[16px] ph-check">check</span>
                   ) : null}
                 </button>
               );
@@ -147,7 +145,7 @@ export function PipelineHeader({
           data-testid="pipeline-filter-clear"
           className="font-label-ui text-label-ui flex items-center gap-1 px-3 py-2 rounded-full text-ochre-dark hover:bg-ochre-light/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          <span className="material-symbols-outlined text-[16px]">close</span>
+          <span className="ph text-[16px] ph-x">x</span>
           Clear
         </button>
       )}

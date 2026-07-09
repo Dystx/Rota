@@ -89,7 +89,7 @@ export function HowItWorks() {
                 aria-hidden
                 className="inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full bg-ochre-light/15 text-olive-dark"
               >
-                <span className="material-symbols-outlined text-[20px] md:text-[22px]">
+                <span className="ph text-[20px] md:text-[22px]">
                   {step.icon}
                 </span>
               </span>

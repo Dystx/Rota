@@ -37,7 +37,7 @@ export function PrintAutoTrigger({ auto }: { auto: boolean }) {
       data-testid="print-now-button"
       className="inline-flex items-center gap-2 bg-olive-dark text-on-primary font-label-ui text-label-ui px-5 py-2.5 rounded-full hover:bg-olive-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
     >
-      <span aria-hidden="true" className="material-symbols-outlined text-[18px]">print</span>
+      <span aria-hidden="true" className="ph text-[18px] ph-printer">printer</span>
       Print now
     </button>
   );

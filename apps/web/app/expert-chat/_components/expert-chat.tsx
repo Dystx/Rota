@@ -158,9 +158,7 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
                 Trip {tripId}
               </h1>
               <div className="flex items-center gap-2 text-on-surface-variant font-mono-technical text-mono-technical">
-                <span className="material-symbols-outlined text-[16px]">
-                  forum
-                </span>
+                <span className="ph text-[16px] ph-chat-circle-dots">chat-circle-dots</span>
                 <span>Ana — destination specialist</span>
               </div>
             </div>
@@ -312,11 +310,9 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <span
-                            className="material-symbols-outlined text-ochre-dark text-[18px]"
+                            className="ph text-ochre-dark text-[18px] ph-star"
                             style={{ fontVariationSettings: "'FILL' 1" }}
-                          >
-                            stars
-                          </span>
+                          >star</span>
                           <span className="font-mono-micro text-mono-micro text-ochre-dark uppercase tracking-wider">
                             Specialist Recommendation
                           </span>
@@ -347,13 +343,11 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
                           </p>
                           <div className="flex items-center gap-4 text-xs font-label-ui text-olive-light">
                             <div className="flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[14px]">
-                                schedule
-                              </span>
+                              <span className="ph text-[14px] ph-calendar">calendar</span>
                               TBD
                             </div>
                             <div className="flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[14px]">
+                              <span className="ph text-[14px]">
                                 payments
                               </span>
                               Pricing TBD
@@ -400,7 +394,7 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
                   <div className="max-w-[85%] w-full">
                     <div className="bg-olive-light/20 p-4 rounded-2xl border border-olive-light/40 flex items-center gap-3">
                       <span
-                        className="material-symbols-outlined text-olive-dark"
+                        className="ph text-olive-dark"
                         style={{ fontVariationSettings: "'FILL' 1" }}
                       >
                         check_circle
@@ -422,11 +416,9 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
                   <div className="max-w-[85%] w-full">
                     <div className="bg-surface-container-high/40 p-4 rounded-2xl border border-olive-light/20 flex items-center gap-3">
                       <span
-                        className="material-symbols-outlined text-on-surface-variant"
+                        className="ph text-on-surface-variant ph-x"
                         style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        close
-                      </span>
+                      >x</span>
                       <p className="font-body-md text-body-md text-on-surface-variant">
                         No problem — I&apos;ll keep the route as originally planned.
                       </p>
@@ -444,7 +436,7 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
                   aria-label="Attach"
                   className="p-2 text-on-surface-variant hover:text-primary transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded"
                 >
-                  <span className="material-symbols-outlined">add_circle</span>
+                  <span className="ph ph-plus-circle">plus-circle</span>
                 </button>
                 <textarea
                   ref={textareaRef}
@@ -465,7 +457,7 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
                   className="p-2 bg-primary text-white rounded-xl hover:bg-olive-dark transition-colors shrink-0 flex items-center justify-center h-10 w-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <span
-                    className="material-symbols-outlined text-[20px]"
+                    className="ph text-[20px]"
                     style={{ fontVariationSettings: "'FILL' 1" }}
                   >
                     send

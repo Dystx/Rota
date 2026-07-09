@@ -149,9 +149,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-ochre-light text-ochre-dark font-label-ui text-label-ui shadow-sm hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
                     >
                       {BENTO_CTA_COPY[card.slug]}
-                      <span aria-hidden className="material-symbols-outlined text-[16px]">
-                        arrow_forward
-                      </span>
+                      <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
                     </Link>
                     <Link
                       href={mapHref}
@@ -161,7 +159,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/30 text-ochre-light font-label-ui text-label-ui backdrop-blur-sm hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
                     >
                       View on map
-                      <span aria-hidden className="material-symbols-outlined text-[16px]">
+                      <span aria-hidden className="ph text-[16px]">
                         map
                       </span>
                     </Link>
@@ -170,7 +168,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                   <span className="mt-3 inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-light opacity-0 motion-safe:group-hover:opacity-100 transition-opacity">
                     <span
                       aria-hidden
-                      className="material-symbols-outlined text-base"
+                      className="ph text-base"
                     >
                       map
                     </span>

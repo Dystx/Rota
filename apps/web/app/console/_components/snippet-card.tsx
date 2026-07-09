@@ -43,7 +43,7 @@ export function SnippetCard({ title, body }: SnippetCardProps) {
     >
       <span
         aria-hidden="true"
-        className="material-symbols-outlined text-[14px] text-outline group-hover:text-ochre-light mt-0.5 shrink-0"
+        className="ph text-[14px] text-outline group-hover:text-ochre-light mt-0.5 shrink-0"
       >
         drag_indicator
       </span>

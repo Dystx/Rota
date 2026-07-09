@@ -17,7 +17,7 @@ export function ValidationBar({ checks }: ValidationBarProps) {
     <div className="absolute bottom-0 right-0 left-0 bg-glass-dark border-t border-white/10 p-4 shadow-2xl z-20 flex flex-col gap-3 md:flex-row md:justify-between md:items-center backdrop-blur-xl">
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light flex items-center gap-2">
-          <span aria-hidden className="material-symbols-outlined text-[16px]">
+          <span aria-hidden className="ph text-[16px]">
             rule
           </span>
           Logistical Checks
@@ -37,9 +37,7 @@ export function ValidationBar({ checks }: ValidationBarProps) {
         type="button"
         className="font-label-ui text-label-ui inline-flex items-center gap-2 bg-ochre-light text-primary px-6 py-2.5 rounded-lg hover:bg-ochre-dark hover:text-on-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark transition-colors"
       >
-        <span aria-hidden className="material-symbols-outlined text-[18px]">
-          auto_awesome
-        </span>
+        <span aria-hidden className="ph text-[18px] ph-sparkle">sparkle</span>
         Resolve Conflicts
       </button>
     </div>
