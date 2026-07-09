@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { BrandMark } from "@repo/ui";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { SignInForm } from "./_components/sign-in-form";
 import { TopNav } from "../_components/top-nav";
@@ -30,30 +31,45 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   return (
     <div className="min-h-screen flex flex-col bg-paper">
       <TopNav />
+
+      {/* Sign-in lock-up: mark + italic wordmark, centered above the card. */}
+      <div className="flex justify-center pt-28 pb-3">
+        <div className="inline-flex items-center gap-4">
+          <BrandMark size="lg" tone="light" />
+          <span className="font-display italic text-headline-sm text-primary">
+            Rumia
+          </span>
+        </div>
+      </div>
+
       <main
         id="main-content"
-        data-map-container=""
-        className="flex-1 flex items-center justify-center px-6 py-16 pt-[112px]"
+        className="flex-1 flex items-center justify-center px-6 pt-12 pb-16"
       >
         <div className="w-full max-w-md">
-          <div className="text-center mb-8">
+          <div className="text-center mb-10">
             <h1 className="font-display text-4xl text-ink mb-3">
               Sign <em className="text-ochre-dark not-italic">in</em>
             </h1>
-            <p className="text-ink-soft text-base">
-              We&apos;ll email you a one-time link. No password to remember.
-            </p>
-            <p className="mt-4 font-display text-sm italic text-ochre-dark/80 max-w-xs mx-auto">
-              &ldquo;The trip was crafted around our family pace — not the other way around.&rdquo;
+            <p className="text-ink-soft text-base max-w-xs mx-auto">
+              We&rsquo;ll email you a one-time link. No password to remember.
             </p>
           </div>
 
           <SignInForm next={next} initialSent={sent} initialError={error} />
 
-          <p className="mt-8 text-center text-sm text-ink-soft">
-            New to Rumia?{" "}
-            <a href="/how-it-works" className="text-ochre-dark underline underline-offset-2 hover:text-ochre">
-              Learn how it works
+          {/* Why a link? — warm-voice microcopy replacing the previous
+              branded testimonial block. The earlier "&ldquo;The trip was
+              crafted around our family pace&rdquo;" was a stitch from a
+              different brand voice; this one is honest and brief. */}
+          <p className="mt-8 text-center text-sm text-olive-dark max-w-xs mx-auto">
+            No tracking, no social login, no second screen. Just you and your inbox.
+            <br />
+            <a
+              href="/how-it-works"
+              className="text-ochre-dark underline underline-offset-2 hover:text-ochre transition-colors duration-fast ease-standard"
+            >
+              How it works
             </a>
             .
           </p>
