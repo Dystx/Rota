@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { generateItineraryFromBrief } from "@repo/ai";
-import { getTripDraftById, isPersistenceConfigError } from "@repo/db";
 import {
   Badge,
   Button,
@@ -19,8 +19,7 @@ import {
 import { buildEmailPreview } from "@repo/emails";
 import { buildTripSharePath, listTripExportOptions } from "@/lib/trip-export";
 import { getTripCommerceState } from "@/lib/trip-commerce";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getCurrentUser } from "@/lib/auth/current-user";
+import { getOwnedTrip } from "@/app/lib/trip-access";
 import { TopNav } from "../../../../_components/top-nav";
 import { SiteFooter } from "../../../../_components/site-footer";
 import { PrintAutoTrigger } from "./_components/print-auto-trigger";
@@ -104,40 +103,26 @@ export default async function TripExportPage({
   // `?print=1` opens the browser print dialog automatically so
   // the 1-click PDF flow from the export drawer fires immediately.
   const autoPrint = printFlag === "1";
-  let trip = null;
+  const tripAccess = await getOwnedTrip(tripId);
+
+  if (tripAccess.kind === "anonymous") {
+    redirect(`/sign-in?next=${encodeURIComponent(`/trip/${tripId}/export`)}`);
+  }
+
+  if (tripAccess.kind !== "ok") {
+    redirect("/itineraries?notice=unavailable");
+  }
+
+  const trip = tripAccess.trip;
   let itinerary = null;
   let infoMessage = "";
 
-  const { user } = await getCurrentUser();
-
   try {
-    trip = await getTripDraftById(tripId);
-
-    if (trip) {
-      itinerary = await generateItineraryFromBrief(trip.brief);
-    }
+    itinerary = await generateItineraryFromBrief(trip.brief);
   } catch (error) {
-    infoMessage = isPersistenceConfigError(error)
-      ? "Saved trip data is not available right now. Export files will return when the trip reloads."
-      : error instanceof Error
-        ? "Could not load trip exports yet."
-        : "Could not load trip exports yet.";
-  }
-
-  if (trip && trip.ownerUserId && (!user || user.id !== trip.ownerUserId)) {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <TopNav />
-        <main id="main-content" className="flex-1 pt-header-height">
-        <div className="text-center py-16 md:py-32">
-          <h1 className="text-5xl">Trip not found</h1>
-          <p>This trip does not exist or you do not have permission to view it.</p>
-          <Button asChild><Link href="/account">Back to account</Link></Button>
-        </div>
-        </main>
-        <SiteFooter />
-      </div>
-    );
+    infoMessage = error instanceof Error
+      ? "Could not load trip exports yet."
+      : "Could not load trip exports yet.";
   }
 
   if (view === "print") {

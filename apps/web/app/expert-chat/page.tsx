@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Button, EmptyState } from "@repo/ui";
-import { getTripDraftById } from "@repo/db";
+import { getOwnedTrip } from "@/app/lib/trip-access";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
 import { ExpertChat } from "./_components/expert-chat";
@@ -85,42 +86,14 @@ export default async function ExpertChatPage({
     );
   }
 
-  // Best-effort: try to load the trip to confirm it exists and
-  // surface a friendly empty state when the id is bogus. The
-  // chat component itself doesn't need the trip row to mount
-  // (the timeline is still hardcoded) but we want the page to
-  // 404 gracefully when the user mistypes the id.
-  let tripExists = true;
-  try {
-    const trip = await getTripDraftById(tripId);
-    if (!trip) tripExists = false;
-  } catch {
-    tripExists = false;
+  const tripAccess = await getOwnedTrip(tripId);
+
+  if (tripAccess.kind === "anonymous") {
+    redirect(`/sign-in?next=${encodeURIComponent(`/expert-chat?trip=${tripId}`)}`);
   }
 
-  if (!tripExists) {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <TopNav />
-        <main
-          id="main-content"
-          className="flex-1 pt-header-height flex items-center justify-center"
-        >
-          <EmptyState
-            icon="error"
-            title="We couldn't find that trip"
-            description={`Trip ${tripId} is not in your account, or the link is no longer valid. Pick a trip from your list to open its expert chat.`}
-            variant="default"
-            action={
-              <Button asChild>
-                <Link href="/account">Browse my trips</Link>
-              </Button>
-            }
-          />
-        </main>
-        <SiteFooter />
-      </div>
-    );
+  if (tripAccess.kind !== "ok") {
+    redirect("/itineraries?notice=unavailable");
   }
 
   return <ExpertChat tripId={tripId} />;

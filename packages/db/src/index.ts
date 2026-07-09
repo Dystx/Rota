@@ -108,7 +108,7 @@ function parseTripRow(row: RawTripRow | null): TripDraftDetail | null {
 
 function selectTripsQuery(options?: DataClientOptions) {
   return resolvePrivilegedServerDataClient(options).from("trips").select(
-    "id,title,status,visibility,is_paid,has_human_review,created_at,trip_briefs!inner(id,normalized_json,status)"
+    "id,title,status,visibility,is_paid,has_human_review,owner_user_id,created_at,trip_briefs!inner(id,normalized_json,status)"
   );
 }
 
@@ -204,6 +204,37 @@ export async function getTripDraftById(tripId: string, options?: DataClientOptio
   }
 
   const { data, error } = await selectTripsQuery(options).eq("id", numericTripId).single();
+
+  if (error) {
+    if (error.code === "PGRST116") {
+      return null;
+    }
+
+    throw new Error(error.message);
+  }
+
+  return parseTripRow(data as RawTripRow | null);
+}
+
+/**
+ * Fetch a draft only when it belongs to the supplied authenticated owner.
+ * This query is deliberately separate from privileged reviewer/admin reads.
+ */
+export async function getTripDraftByIdForOwner(
+  tripId: string,
+  ownerUserId: string,
+  options?: DataClientOptions
+): Promise<TripDraftDetail | null> {
+  const numericTripId = toNumericTripId(tripId);
+
+  if (numericTripId === null) {
+    return null;
+  }
+
+  const { data, error } = await selectTripsQuery(options)
+    .eq("id", numericTripId)
+    .eq("owner_user_id", ownerUserId)
+    .single();
 
   if (error) {
     if (error.code === "PGRST116") {
@@ -339,10 +370,8 @@ export async function listTripDrafts(limit = 12, options?: DataClientOptions): P
  * WHERE — it just relaxes the row-level filter), so a traveler
  * who has a non-null owner_user_id will only see their own rows.
  *
- * If the user has no `userId` (signed-out / traveler persona
- * without an owner_user_id on their rows), the page falls back
- * to `listTripDrafts()` so the page is never empty during
- * the early-product "show me what the seed looks like" beat.
+ * Anonymous callers receive no rows. This keeps a missed route-level auth
+ * guard from silently falling back to a privileged, unscoped list query.
  */
 export async function getTripsForUser(
   userId: string | null | undefined,
@@ -350,7 +379,7 @@ export async function getTripsForUser(
   options?: DataClientOptions
 ): Promise<TripDraftListItem[]> {
   if (!userId) {
-    return listTripDrafts(limit, options);
+    return [];
   }
   const { data, error } = await selectTripsQuery(options)
     .eq("owner_user_id", userId)

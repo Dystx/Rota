@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
 import { getCurrentUser } from "@/lib/auth/current-user";
@@ -12,14 +13,21 @@ import { ItinerarySearch } from "./_components/itinerary-search";
  * `owner_user_id`), passes them to a small client island for
  * search + status filter, and renders the rest as static cards.
  *
- * Auth: the page is server-rendered. If there's no session, the
- * page shows an empty state with a sign-in CTA — the previous
- * hardcoded "Kyoto Autumn Retreat" wireframe is gone.
+ * Auth: the page is server-rendered. Anonymous visitors are sent to sign-in
+ * before the privileged list query runs.
  */
-export default async function ItinerariesPage() {
+export default async function ItinerariesPage({
+  searchParams
+}: {
+  searchParams: Promise<{ notice?: string }>;
+}) {
   const { user } = await getCurrentUser();
-  const userId = user?.id ?? null;
-  const trips = await getTripsForUser(userId);
+  if (!user) {
+    redirect("/sign-in?next=%2Fitineraries");
+  }
+
+  const { notice } = await searchParams;
+  const trips = await getTripsForUser(user.id);
 
   return (
     <>
@@ -36,10 +44,15 @@ export default async function ItinerariesPage() {
             <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl">
               Your personalized archive of curated itineraries and inspirations.
             </p>
+            {notice === "unavailable" ? (
+              <p role="status" className="mt-4 font-body-sm text-body-sm text-on-surface-variant">
+                That itinerary is unavailable. Choose one from your archive.
+              </p>
+            ) : null}
           </header>
 
           {trips.length === 0 ? (
-            <EmptyState signedIn={userId !== null} />
+            <EmptyState signedIn />
           ) : (
             <ItinerarySearch trips={trips} />
           )}

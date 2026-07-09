@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
-import { isPersistenceConfigError, getTripDraftById } from "@repo/db";
 import { resolveCoverImage } from "@/lib/trip-cover";
+import { getOwnedTrip } from "@/app/lib/trip-access";
 
 /**
  * Checkout page — Stitch 1.5 split-screen tier ascension.
@@ -13,7 +14,7 @@ import { resolveCoverImage } from "@/lib/trip-cover";
  * pill (Stitch 1.5 pattern).
  *
  * Reads `?trip=<id>` from the URL. When present, the left
- * panel pulls the trip data via `getTripDraftById` and shows
+ * panel pulls owner-scoped trip data and shows
  * the cover + brief. When missing (the page is opened from
  * the marketing surface), the left panel falls back to a
  * "no trip yet" card pointing to /planner.
@@ -28,17 +29,18 @@ export default async function CheckoutPage({
   const tripHref = tripId ? `/trip/${tripId}` : "/account";
 
   let trip = null;
-  let tripError = "";
   if (tripId) {
-    try {
-      trip = await getTripDraftById(tripId);
-    } catch (error) {
-      tripError = isPersistenceConfigError(error)
-        ? "Configure Supabase environment variables to load this trip."
-        : error instanceof Error
-          ? error.message
-          : "Could not load trip details.";
+    const tripAccess = await getOwnedTrip(tripId);
+
+    if (tripAccess.kind === "anonymous") {
+      redirect(`/sign-in?next=${encodeURIComponent(`/checkout?trip=${tripId}`)}`);
     }
+
+    if (tripAccess.kind !== "ok") {
+      redirect("/itineraries?notice=unavailable");
+    }
+
+    trip = tripAccess.trip;
   }
 
   const coverImage = trip ? resolveCoverImage(trip.brief) : null;
@@ -120,15 +122,6 @@ export default async function CheckoutPage({
                 >
                   {briefSummary}
                 </p>
-                {tripError ? (
-                  <p
-                    role="alert"
-                    data-testid="checkout-trip-error"
-                    className="font-mono-technical text-mono-technical text-red-700"
-                  >
-                    {tripError}
-                  </p>
-                ) : null}
                 {tripId ? (
                   <Link
                     href={`/trip/${tripId}`}

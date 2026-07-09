@@ -6,6 +6,8 @@ import {
   DuplicateActiveReviewerAssignmentError,
   filterActiveReviewerAssignments,
   fulfillTripPaymentWebhook,
+  getTripDraftByIdForOwner,
+  getTripsForUser,
   getLatestAssignmentForReviewerTrip,
   getReviewerAssignmentById,
   reviewerHasTripAssignment,
@@ -125,6 +127,55 @@ const baseTrip = {
   tripBriefStatus: "submitted",
   visibility: "private"
 } satisfies TripDraftDetail;
+
+describe("getTripDraftByIdForOwner", () => {
+  test("filters a trip lookup by the authenticated owner before reading a single row", async () => {
+    const filters: Array<[string, unknown]> = [];
+    const client = ({
+      from(table: string) {
+        expect(table).toBe("trips");
+
+        return {
+          select() {
+            return {
+              eq(column: string, value: unknown) {
+                filters.push([column, value]);
+
+                return {
+                  eq(nextColumn: string, nextValue: unknown) {
+                    filters.push([nextColumn, nextValue]);
+
+                    return {
+                      single: async () => ({ data: rawTrip(baseTrip), error: null })
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+    } as unknown) as RotaDataClient;
+
+    await expect(getTripDraftByIdForOwner("42", "traveler-user-123", { client })).resolves.toEqual(baseTrip);
+    expect(filters).toEqual([
+      ["id", 42],
+      ["owner_user_id", "traveler-user-123"]
+    ]);
+  });
+});
+
+describe("getTripsForUser", () => {
+  test("does not run an unscoped privileged list query without an authenticated owner", async () => {
+    const client = ({
+      from() {
+        throw new Error("anonymous list query must not reach the database");
+      }
+    } as unknown) as RotaDataClient;
+
+    await expect(getTripsForUser(null, 24, { client })).resolves.toEqual([]);
+  });
+});
 
 function rawTrip(trip: TripDraftDetail) {
   return {

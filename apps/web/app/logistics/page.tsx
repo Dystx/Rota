@@ -1,6 +1,8 @@
 import { TopNav } from "../_components/top-nav";
 import { SiteFooter } from "../_components/site-footer";
 import { MobilityTiles } from "../_components/logistics/mobility-tiles";
+import { redirect } from "next/navigation";
+import { getOwnedTrip } from "@/app/lib/trip-access";
 
 /**
  * Logistics page — Mock 1.3 (Smart Logistical Cards).
@@ -10,7 +12,26 @@ import { MobilityTiles } from "../_components/logistics/mobility-tiles";
  * two large selectable mobility tiles and a back/continue footer.
  * State (selected tile) is owned by the client-only `MobilityTiles` component.
  */
-export default function LogisticsPage() {
+export default async function LogisticsPage({
+  searchParams
+}: {
+  searchParams: Promise<{ trip?: string }>;
+}) {
+  const tripId = (await searchParams).trip?.trim();
+  if (!tripId) redirect("/planner");
+
+  const tripAccess = await getOwnedTrip(tripId);
+
+  if (tripAccess.kind === "anonymous") {
+    redirect(`/sign-in?next=${encodeURIComponent(`/logistics?trip=${tripId}`)}`);
+  }
+
+  if (tripAccess.kind !== "ok") {
+    redirect("/itineraries?notice=unavailable");
+  }
+
+  const trip = tripAccess.trip;
+
   return (
     <>
       <TopNav />

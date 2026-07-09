@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { generateItineraryFromBrief } from "@repo/ai";
-import { getTripDraftById, isPersistenceConfigError, listPartners } from "@repo/db";
+import { listPartners } from "@repo/db";
 import { buildRouteValidation } from "@repo/routing";
 import {
   type MapRouteWarning,
@@ -18,6 +19,7 @@ import {
   TravelTimeChip
 } from "@repo/ui";
 import { buildPartnerClickHref, selectRelevantPartners } from "@/lib/partner-enrichment";
+import { getOwnedTrip } from "@/app/lib/trip-access";
 import { TopNav } from "../../../../_components/top-nav";
 import { SiteFooter } from "../../../../_components/site-footer";
 import { PrewarmLink, RouteMap } from "./map-components";
@@ -33,30 +35,34 @@ export default async function TripMapPage({
   const { day } = await searchParams;
   const requestedDayIndex = Number(day);
   const selectedDayIndex = Number.isInteger(requestedDayIndex) && requestedDayIndex > 0 ? requestedDayIndex : 1;
-  let trip = null;
+  const tripAccess = await getOwnedTrip(tripId);
+
+  if (tripAccess.kind === "anonymous") {
+    redirect(`/sign-in?next=${encodeURIComponent(`/trip/${tripId}/map`)}`);
+  }
+
+  if (tripAccess.kind !== "ok") {
+    redirect("/itineraries?notice=unavailable");
+  }
+
+  const trip = tripAccess.trip;
   let itinerary = null;
   let partnerOffers = [] as Awaited<ReturnType<typeof listPartners>>;
   let routeValidation = null;
   let infoMessage = "";
 
   try {
-    trip = await getTripDraftById(tripId);
-
-    if (trip) {
-      itinerary = await generateItineraryFromBrief(trip.brief);
-      routeValidation = buildRouteValidation(itinerary);
-      partnerOffers = selectRelevantPartners(
-        await listPartners(),
-        [routeValidation.days[0]?.region ?? trip.brief.regions[0] ?? ""],
-        trip.brief.destinationCountry
-      );
-    }
+    itinerary = await generateItineraryFromBrief(trip.brief);
+    routeValidation = buildRouteValidation(itinerary);
+    partnerOffers = selectRelevantPartners(
+      await listPartners(),
+      [routeValidation.days[0]?.region ?? trip.brief.regions[0] ?? ""],
+      trip.brief.destinationCountry
+    );
   } catch (error) {
-    infoMessage = isPersistenceConfigError(error)
-      ? "Saved route data is not available right now. Showing the latest preview."
-      : error instanceof Error
-        ? "Could not load the saved trip route yet."
-        : "Could not load the saved trip route yet.";
+    infoMessage = error instanceof Error
+      ? "Could not load the saved trip route yet."
+      : "Could not load the saved trip route yet.";
   }
 
   const activeDay = routeValidation?.days.find((routeDay) => routeDay.dayIndex === selectedDayIndex) ?? routeValidation?.days[0];
