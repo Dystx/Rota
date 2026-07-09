@@ -66,6 +66,10 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ body })
       });
+      if (response.status === 401 || response.status === 403) {
+        setState("denied");
+        return;
+      }
       if (!response.ok) throw new Error("provider");
       setInput("");
       await loadMessages();
