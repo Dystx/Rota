@@ -59,13 +59,13 @@ function EmptyState({ signedIn }: { signedIn: boolean }) {
       <span className="ph text-[48px] text-olive-light mb-3 block">
         map
       </span>
-      <h2 className="font-headline-lg text-headline-lg text-primary mb-2">
-        {signedIn ? "No itineraries yet" : "Sign in to see your itineraries"}
-      </h2>
-      <p className="font-body-md text-body-md text-on-surface-variant mb-6 max-w-prose mx-auto">
-        {signedIn
-          ? "Once you plan a trip and confirm the brief, your itinerary lands here. The hero's \"Begin Journey\" CTA starts a new one."
-          : "Your saved trips, vault exports, and human-review requests show up here. Anonymous browsing doesn't store anything yet."}
+        <h2 className="font-display-mobile text-headline-sm md:font-display md:text-headline text-primary mb-2 italic">
+          {signedIn ? "Nothing on the map yet." : "Sign in to see your trips."}
+        </h2>
+        <p className="font-body-md text-body-md text-on-surface-variant mb-6 max-w-prose mx-auto">
+          {signedIn
+            ? "Let’s plot your first route. Tell us where you want to go — once you confirm the brief, your itinerary lands here."
+            : "Your saved trips, vault exports, and human-review requests show up here. Anonymous browsing doesn’t store anything yet."}
       </p>
       <div className="flex flex-wrap gap-3 justify-center">
         <Link
