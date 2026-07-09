@@ -3,6 +3,7 @@ import { SiteFooter } from "../_components/site-footer";
 import { MobilityTiles } from "../_components/logistics/mobility-tiles";
 import { redirect } from "next/navigation";
 import { getOwnedTrip } from "@/app/lib/trip-access";
+import { persistLogisticsTransport } from "./actions";
 
 /**
  * Logistics page — Mock 1.3 (Smart Logistical Cards).
@@ -43,7 +44,7 @@ export default async function LogisticsPage({
             className="absolute inset-0 bg-cover bg-center transform scale-105"
             style={{
               backgroundImage:
-                "url('https://picsum.photos/seed/transit-network-blur/1920/1080')",
+                "url('/hero/portugal-coast-golden-hour.svg')",
               filter: "blur(12px) brightness(1.05)",
             }}
           />
@@ -61,7 +62,9 @@ export default async function LogisticsPage({
               </p>
             </header>
             <MobilityTiles
+              tripId={trip.id}
               initialChoice={trip.brief.transportMode === "rental-car" ? "car" : "transit"}
+              onChoiceChange={(choice) => persistLogisticsTransport(trip.id, choice)}
             />
           </div>
         </main>

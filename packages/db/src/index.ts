@@ -275,6 +275,27 @@ export async function getTripDraftByIdForOwner(
   return parseTripRow(data as RawTripRow | null);
 }
 
+/** Update only the transport preference for an owned trip draft. */
+export async function updateTripTransportMode(
+  tripId: string,
+  transportMode: "no-car" | "rental-car" | "train-and-transfers",
+  ownerUserId: string,
+  options?: DataClientOptions
+): Promise<boolean> {
+  const trip = await getTripDraftByIdForOwner(tripId, ownerUserId, options);
+  if (!trip) return false;
+  const client = resolvePrivilegedServerDataClient(options);
+  const { data, error } = await client
+    .from("trip_briefs")
+    .update({ transport_mode: transportMode, normalized_json: { ...trip.brief, transportMode } })
+    .eq("id", trip.tripBriefId)
+    .eq("owner_user_id", ownerUserId)
+    .select("id")
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return Boolean(data);
+}
+
 export async function markTripAsPaid(tripId: string, options?: DataClientOptions): Promise<TripDraftDetail | null> {
   const numericTripId = toNumericTripId(tripId);
 

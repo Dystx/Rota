@@ -11,6 +11,7 @@ export type MobilityUpdate = (choice: TransportChoice) => void | Promise<void>;
 type MobilityTilesProps = {
   initialChoice?: TransportChoice;
   onChoiceChange?: MobilityUpdate;
+  tripId?: string;
 };
 
 const OPTIONS: Record<TransportChoice, {
@@ -40,21 +41,25 @@ const OPTIONS: Record<TransportChoice, {
 };
 
 /** Trip-scoped mobility choices and their immediate route consequences. */
-export function MobilityTiles({ initialChoice = "transit", onChoiceChange }: MobilityTilesProps) {
+export function MobilityTiles({ initialChoice = "transit", onChoiceChange, tripId }: MobilityTilesProps) {
   const [selected, setSelected] = useState<TransportChoice>(initialChoice);
   const [status, setStatus] = useState<"idle" | "updating" | "ready" | "error">("ready");
   const [pending, setPending] = useState<TransportChoice | null>(null);
+  const requestRef = React.useRef(0);
 
   async function choose(choice: TransportChoice) {
+    const requestId = ++requestRef.current;
     setSelected(choice);
     setPending(choice);
     setStatus(onChoiceChange ? "updating" : "ready");
     if (!onChoiceChange) return;
     try {
       await onChoiceChange(choice);
+      if (requestId !== requestRef.current) return;
       setPending(null);
       setStatus("ready");
     } catch {
+      if (requestId !== requestRef.current) return;
       // Keep the optimistic choice visible so a retry does not discard the
       // traveler's last valid selection.
       setStatus("error");
@@ -98,8 +103,8 @@ export function MobilityTiles({ initialChoice = "transit", onChoiceChange }: Mob
       />
 
       <div className="flex items-center justify-between border-t border-olive-dark/10 pt-6">
-        <Link href="/planner" className="font-label-ui text-label-ui text-on-surface-variant">Back</Link>
-        <Link href="/checkout" aria-disabled={status === "updating"} className="rounded-lg bg-olive-dark px-6 py-3 font-label-ui text-label-ui text-on-primary">Continue</Link>
+        <Link href={tripId ? `/planner?trip=${encodeURIComponent(tripId)}` : "/planner"} className="font-label-ui text-label-ui text-on-surface-variant">Back</Link>
+        <Link href={tripId ? `/checkout?trip=${encodeURIComponent(tripId)}` : "/checkout"} aria-disabled={status === "updating"} className="rounded-lg bg-olive-dark px-6 py-3 font-label-ui text-label-ui text-on-primary">Continue</Link>
       </div>
       <div className="sr-only" aria-live="polite">
         {status === "updating" ? "Updating route" : status === "error" ? "Route update failed; retry available" : `Selected: ${selected === "car" ? "rental car" : "transit and walking"}`}
