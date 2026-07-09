@@ -13,3 +13,4 @@ Review follow-up:
 - Generation failures, empty day payloads, and ready itineraries render distinct truthful states; failures retain trip context and expose a retry action.
 - Context-bar edits route to a field-specific planner editor, and map filters/stop equivalents are keyboard-usable on mobile and desktop.
 - Re-ran the focused route-sync tests and web typecheck after these fixes — PASS.
+- Final review fixes: `?edit=` is parsed by the planner and opens the matching editor sheet; map filter chips now expose stateful menus; selected days without geocoded stops retain their day label/list and show an explicit no-map-stops message.

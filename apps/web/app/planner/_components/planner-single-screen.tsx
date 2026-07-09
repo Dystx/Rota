@@ -22,6 +22,7 @@ export interface PlannerSingleScreenProps {
   initialWindow?: string;
   initialTransport?: TransportChoice | "";
   initialVibe?: Vibe;
+  initialEdit?: "destination" | "travelWindow" | "days" | "transport" | "vibe";
 }
 
 const DESTINATIONS = [
@@ -46,6 +47,7 @@ export function PlannerSingleScreen({
   initialWindow = "",
   initialTransport = "transit",
   initialVibe = "balanced",
+  initialEdit,
 }: PlannerSingleScreenProps) {
   const router = useRouter();
   const [draft, setDraft] = React.useState<TripChoiceDraft>(() => normalizeDraft({
@@ -58,6 +60,16 @@ export function PlannerSingleScreen({
   const [sheet, setSheet] = React.useState<"destination" | "window" | "days" | "transport" | "vibe" | null>(null);
   const [focusedGroup, setFocusedGroup] = React.useState<"destination" | "days" | "details">("destination");
   const [pending, setPending] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!initialEdit) return;
+    setSheet(initialEdit === "travelWindow" ? "window" : initialEdit);
+    if (initialEdit === "travelWindow" || initialEdit === "transport" || initialEdit === "vibe") {
+      setFocusedGroup("details");
+    } else if (initialEdit === "days") {
+      setFocusedGroup("days");
+    }
+  }, [initialEdit]);
 
   const update = <K extends keyof TripChoiceDraft>(key: K, value: TripChoiceDraft[K]) =>
     setDraft((current) => ({ ...current, [key]: value }));

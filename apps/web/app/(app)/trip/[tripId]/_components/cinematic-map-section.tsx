@@ -150,6 +150,10 @@ export default function CinematicMapSection({
   const [activeChapterId, setActiveChapterId] = React.useState<string>(
     chapters.find((chapter) => selectedDayIndex === undefined || chapter.id.startsWith(`day-${selectedDayIndex}-`))?.id ?? chapters[0]?.id ?? ""
   );
+  const [openFilter, setOpenFilter] = React.useState<"day" | "transport" | "layers" | null>(null);
+  const [transportFilter, setTransportFilter] = React.useState("All transport");
+  const [layerFilter, setLayerFilter] = React.useState("Route + stops");
+  const [selectedDay, setSelectedDay] = React.useState(selectedDayIndex);
 
   React.useEffect(() => {
     if (selectedDayIndex === undefined) return;
@@ -433,9 +437,13 @@ export default function CinematicMapSection({
   const activeChapter = chapters.find((c: ChapterCameraTarget) => c.id === activeChapterId) || chapters[0];
 
   const dayMatch = activeChapter?.id?.match(/day-(\d+)-/);
-  const dayDisplay = dayMatch && dayMatch[1] ? `Day ${parseInt(dayMatch[1], 10)}` : "";
-  const activeDayIndex = dayMatch && dayMatch[1] ? parseInt(dayMatch[1], 10) : selectedDayIndex ?? 1;
-  const activeDay = days.find((day) => day.dayIndex === activeDayIndex) ?? days[0];
+  const dayDisplay = selectedDay !== undefined ? `Day ${selectedDay}` : dayMatch && dayMatch[1] ? `Day ${parseInt(dayMatch[1], 10)}` : "";
+  const activeDayIndex = selectedDay ?? (dayMatch && dayMatch[1] ? parseInt(dayMatch[1], 10) : 1);
+  const activeDay = days.find((day) => day.dayIndex === activeDayIndex);
+  const hasGeocodedStops = (activeDay?.stops ?? []).some(
+    (stop) => typeof stop !== "string" && stop.lng !== undefined && stop.lat !== undefined
+  );
+  const dayLabel = selectedDay !== undefined && !activeDay ? `Day ${selectedDay}` : dayDisplay || "Today";
 
   return (
     <div
@@ -472,9 +480,18 @@ export default function CinematicMapSection({
         />
 
         <div className="absolute left-4 top-4 flex flex-wrap gap-2" aria-label="Map filters">
-          <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Selected day">{dayDisplay || "Today"}</button>
-          <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Transport filter">Transport</button>
-          <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Route layers filter">Route layers</button>
+          <div className="relative">
+            <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Selected day" aria-expanded={openFilter === "day"} onClick={() => setOpenFilter(openFilter === "day" ? null : "day")}>{dayLabel}</button>
+            {openFilter === "day" ? <div role="menu" aria-label="Selected day options" className="absolute left-0 top-full z-20 mt-2 grid min-w-32 gap-1 rounded-xl bg-background p-2 shadow-lg">{days.map((day) => <button role="menuitemradio" aria-checked={day.dayIndex === activeDayIndex} type="button" key={day.dayIndex} className="rounded-lg px-3 py-2 text-left text-xs hover:bg-muted" onClick={() => { const chapter = chapters.find((item) => item.id.startsWith(`day-${day.dayIndex}-`)); if (chapter) setActiveChapterId(chapter.id); setSelectedDay(day.dayIndex); setOpenFilter(null); }}>{`Day ${day.dayIndex}`}</button>)}</div> : null}
+          </div>
+          <div className="relative">
+            <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Transport filter" aria-expanded={openFilter === "transport"} onClick={() => setOpenFilter(openFilter === "transport" ? null : "transport")}>{transportFilter}</button>
+            {openFilter === "transport" ? <div role="menu" aria-label="Transport options" className="absolute left-0 top-full z-20 mt-2 grid min-w-36 gap-1 rounded-xl bg-background p-2 shadow-lg">{["All transport", "Walking", "Transit", "Driving"].map((value) => <button role="menuitemradio" aria-checked={transportFilter === value} type="button" key={value} className="rounded-lg px-3 py-2 text-left text-xs hover:bg-muted" onClick={() => { setTransportFilter(value); setOpenFilter(null); }}>{value}</button>)}</div> : null}
+          </div>
+          <div className="relative">
+            <button type="button" className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm" aria-label="Route layers filter" aria-expanded={openFilter === "layers"} onClick={() => setOpenFilter(openFilter === "layers" ? null : "layers")}>{layerFilter}</button>
+            {openFilter === "layers" ? <div role="menu" aria-label="Route layer options" className="absolute left-0 top-full z-20 mt-2 grid min-w-36 gap-1 rounded-xl bg-background p-2 shadow-lg">{["Route + stops", "Stops only", "Route only"].map((value) => <button role="menuitemradio" aria-checked={layerFilter === value} type="button" key={value} className="rounded-lg px-3 py-2 text-left text-xs hover:bg-muted" onClick={() => { setLayerFilter(value); setOpenFilter(null); }}>{value}</button>)}</div> : null}
+          </div>
         </div>
 
         <ol aria-label="Stops on map" className="absolute right-4 bottom-4 max-h-48 w-[min(20rem,calc(100%-2rem))] overflow-auto rounded-xl bg-background/90 p-3 text-sm shadow-lg">
@@ -483,6 +500,8 @@ export default function CinematicMapSection({
             const coordinates = typeof stop === "string" || stop.lng === undefined || stop.lat === undefined ? undefined : ([stop.lng, stop.lat] as const);
             return <li key={`${activeDay?.dayIndex}-${index}`} className="border-b border-black/10 py-2 last:border-0"><button type="button" className="w-full text-left" disabled={!coordinates} onClick={() => coordinates && useMapStore.getState().selectStop(stopId, coordinates)}>{typeof stop === "string" ? stop : stop.placeName}</button></li>;
           })}
+          {activeDay && !hasGeocodedStops ? <li className="py-2 text-xs text-muted-foreground">No map stops for {`Day ${activeDay.dayIndex}`} yet. Your stop list is still available above.</li> : null}
+          {!activeDay ? <li className="py-2 text-xs text-muted-foreground">No map stops for {dayLabel} yet. Your selected day has no geocoded places.</li> : null}
         </ol>
 
         <div className="absolute left-4 bottom-4 pointer-events-none">

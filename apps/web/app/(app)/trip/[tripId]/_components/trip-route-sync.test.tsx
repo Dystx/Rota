@@ -30,4 +30,10 @@ describe("trip route synchronization", () => {
     fireEvent.click(screen.getByRole("button", { name: "Edit destination" }));
     expect(screen.getByRole("dialog", { name: "Edit destination" })).toBeTruthy();
   });
+
+  it("routes each context edit to the matching planner editor", () => {
+    render(<TripContextBarClient draft={{ destination: "Porto", days: 5, travelWindow: null, transport: "Transit", vibe: "Balanced" }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Edit transport" }));
+    expect(screen.getByRole("link", { name: "Edit transport in planner" }).getAttribute("href")).toBe("/planner?edit=transport");
+  });
 });

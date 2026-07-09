@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 export default async function PlannerPage({
   searchParams
 }: {
-  searchParams: Promise<{ destination?: string; days?: string; window?: string; transport?: string; vibe?: string }>;
+  searchParams: Promise<{ destination?: string; days?: string; window?: string; transport?: string; vibe?: string; edit?: string }>;
 }) {
   const params = await searchParams;
   const days = Math.max(1, Math.min(60, parseInt(params.days ?? "7", 10) || 7));
@@ -42,6 +42,7 @@ export default async function PlannerPage({
     initialWindow: params.window
     ,initialTransport: params.transport === "car" || params.transport === "transit" ? params.transport : "transit"
     ,initialVibe: params.vibe === "restorative" || params.vibe === "balanced" || params.vibe === "high_energy" ? params.vibe : "balanced"
+    ,initialEdit: params.edit === "destination" || params.edit === "travelWindow" || params.edit === "days" || params.edit === "transport" || params.edit === "vibe" ? params.edit : undefined
   };
 
   return <PlannerClient initial={initial} />;

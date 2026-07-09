@@ -16,6 +16,7 @@ export interface PlannerInitialState {
   initialWindow?: string;
   initialTransport?: TransportChoice | "";
   initialVibe?: Vibe;
+  initialEdit?: "destination" | "travelWindow" | "days" | "transport" | "vibe";
 }
 
 /**
@@ -35,6 +36,7 @@ export function PlannerClient({ initial }: { initial?: PlannerInitialState } = {
       initialWindow={initial?.initialWindow}
       initialTransport={initial?.initialTransport}
       initialVibe={initial?.initialVibe}
+      initialEdit={initial?.initialEdit}
     />
   );
 }
