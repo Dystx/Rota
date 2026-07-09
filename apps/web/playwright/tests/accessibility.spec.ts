@@ -72,6 +72,7 @@ async function verifyLandmarksAndFocus(page: any, routePath: string) {
 
   const skipLinkCount = await page.locator("a.sr-only:has-text('Skip')").count();
   expect(skipLinkCount, `Route ${routePath} should have a skip-to-content link`).toBe(1);
+  await expect(page.locator("img[src*='placehold'], img[src*='placeholder'], img[src*='unsplash.com']"), `${routePath} must not contain fallback placeholder imagery`).toHaveCount(0);
 }
 
 async function auditSourceHeading(routePath: string): Promise<boolean> {
@@ -171,11 +172,22 @@ test.describe("Accessibility Audit - Traveler", () => {
   
   for (const route of routes) {
     test(`@smoke @a11y traveler route ${route}`, async ({ page }) => {
+      const authCookies = await page.context().cookies();
+      expect(authCookies.some((cookie) => cookie.name.includes("auth-token")), "traveler storage state must be loaded before auditing protected routes").toBe(true);
       await page.goto(route);
+      await expect(page).not.toHaveURL(/\/sign-in/);
       await verifyLandmarksAndFocus(page, route);
       await runAxe(page, route);
     });
   }
+});
+
+test("@smoke @a11y planner is choice-led and input-free", async ({ page }) => {
+  await page.goto("/planner");
+  await expect(page.locator("main")).toHaveCount(1);
+  await expect(page.locator("h1:visible")).toHaveCount(1);
+  await expect(page.locator("main input, main textarea"), "Planner choices must not regress to free-form inputs").toHaveCount(0);
+  await expect(page.locator("[aria-label='Destination choices'] [role='radio'], [aria-label='Destination choices'] button").first()).toBeVisible();
 });
 
 test.describe("Accessibility Audit - Reviewer", () => {

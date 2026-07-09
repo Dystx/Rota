@@ -4,12 +4,15 @@ import path from "path";
 
 const routes = {
   marketing: ["/", "/portugal", "/how-it-works", "/pricing", "/human-review"],
-  traveler: ["/trip/new", "/trip/3", "/trip/3/map", "/trip/3/export", "/account"],
+  traveler: ["/planner", "/trip/new", "/trip/3", "/trip/3/map", "/trip/3/export", "/checkout", "/itineraries", "/account"],
   reviewer: ["/reviewer/queue", "/reviewer/profile", "/reviewer/history"],
   admin: ["/admin/places", "/admin/analytics"],
 };
 
 test.describe("@smoke @visual mobile-overflow sweep", () => {
+  // Keep the overflow contract tied to the brief's 390px mobile width,
+  // independent of the device preset's default viewport.
+  test.use({ viewport: { width: 390, height: 844 } });
   const results: Array<{ path: string; scrollWidth: number; viewportWidth: number; ok: boolean }> = [];
 
   test.afterAll(() => {
@@ -29,7 +32,8 @@ test.describe("@smoke @visual mobile-overflow sweep", () => {
       test.skip(!isMobile, "Overflow sweep is only for mobile");
 
       await page.goto(route);
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
+      await page.waitForTimeout(250);
 
       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       const viewportWidth = await page.evaluate(() => window.innerWidth);

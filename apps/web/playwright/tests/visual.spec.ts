@@ -52,11 +52,25 @@ const maskLocators = (page: any) => [
   page.locator('[data-testid="partner-id"]')
 ];
 
+async function assertRouteQuality(page: any, route: string, authenticated = false) {
+  await expect(page.locator("main"), `${route} should expose exactly one main landmark`).toHaveCount(1);
+  await expect(page.locator("h1:visible"), `${route} should expose exactly one visible h1`).toHaveCount(1);
+  await expect(page.locator("img[src*='placehold'], img[src*='placeholder'], img[src*='unsplash.com']"), `${route} must not use placeholder imagery`).toHaveCount(0);
+  if (authenticated) {
+    const authCookies = await page.context().cookies();
+    expect(authCookies.some((cookie: { name: string }) => cookie.name.includes("auth-token")), `${route} requires an authenticated storage-state marker`).toBe(true);
+    // A happy-path capture must never silently become an auth redirect.
+    await expect(page).not.toHaveURL(/\/sign-in/);
+    await expect(page.locator("body")).not.toContainText("Sign in to");
+  }
+}
+
 test.describe("@smoke @visual Marketing baselines", () => {
   for (const route of marketingRoutes) {
     const routeName = route === "/" ? "home" : route.replace(/\//g, "-").replace(/^-/, "");
     test(`marketing route ${route}`, async ({ page }, testInfo) => {
       await page.goto(route);
+      await assertRouteQuality(page, route);
       // The home page renders the GlobeWorkspace with a ~3.2s intro
       // camera choreography (earth → europe beat). CSS animations are
       // disabled above, but the WebGL camera position is driven by
@@ -97,6 +111,7 @@ test.describe("@smoke @visual Traveler baselines", () => {
     const routeName = route.replace(/\//g, "-").replace(/^-/, "");
     test(`traveler route ${route}`, async ({ page }, testInfo) => {
       await page.goto(route);
+      await assertRouteQuality(page, route, true);
       await disableAnimations(page);
       await settleForScreenshot(page);
       await expect(page).toHaveScreenshot(`${testInfo.project.name}-traveler-${routeName}.png`, {
@@ -116,6 +131,7 @@ test.describe("@smoke @visual Reviewer baselines", () => {
     const routeName = route.replace(/\//g, "-").replace(/^-/, "");
     test(`reviewer route ${route}`, async ({ page }, testInfo) => {
       await page.goto(route);
+      await assertRouteQuality(page, route, true);
       await disableAnimations(page);
       await settleForScreenshot(page);
       await expect(page).toHaveScreenshot(`${testInfo.project.name}-reviewer-${routeName}.png`, {
@@ -135,6 +151,7 @@ test.describe("@smoke @visual Admin baselines", () => {
     const routeName = route.replace(/\//g, "-").replace(/^-/, "");
     test(`admin route ${route}`, async ({ page }, testInfo) => {
       await page.goto(route);
+      await assertRouteQuality(page, route, true);
       await disableAnimations(page);
       await settleForScreenshot(page);
       await expect(page).toHaveScreenshot(`${testInfo.project.name}-admin-${routeName}.png`, {
