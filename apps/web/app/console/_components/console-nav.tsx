@@ -10,12 +10,12 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/console/pipeline", label: "Pipeline", icon: "assignment_turned_in" },
-  { href: "/console/workspace", label: "Revision Workspace", icon: "edit_note" },
-  { href: "/console/messages", label: "Messaging Hub", icon: "chat_bubble" },
-  { href: "/console/graph", label: "Knowledge Graph", icon: "account_tree" },
-  { href: "/console/metrics", label: "Metrics", icon: "analytics" },
-  { href: "/console/config", label: "System Config", icon: "settings" }
+  { href: "/console/pipeline", label: "Pipeline", icon: "check-circle" },
+  { href: "/console/workspace", label: "Revision Workspace", icon: "note-pencil" },
+  { href: "/console/messages", label: "Messaging Hub", icon: "chat-circle" },
+  { href: "/console/graph", label: "Knowledge Graph", icon: "tree-structure" },
+  { href: "/console/metrics", label: "Metrics", icon: "chart-line-up" },
+  { href: "/console/config", label: "System Config", icon: "gear" }
 ];
 
 /**

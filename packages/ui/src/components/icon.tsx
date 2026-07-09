@@ -62,7 +62,13 @@ export const MATERIAL_TO_PHOSPHOR: Record<string, string> = {
   auto_awesome: "sparkle",
   info: "info",
   menu: "list",
-  home: "house"
+  home: "house",
+  // console nav
+  assignment_turned_in: "check-circle",
+  chat_bubble: "chat-circle",
+  account_tree: "tree-structure",
+  analytics: "chart-line-up",
+  settings: "gear"
 };
 
 const WEIGHT_CLASS: Record<IconWeight, string> = {
