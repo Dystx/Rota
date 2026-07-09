@@ -4,7 +4,8 @@ import type { TripDraftDetail } from "@repo/db";
 const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   getTripDraftById: vi.fn(),
-  getTripDraftByIdForOwner: vi.fn()
+  getTripDraftByIdForOwner: vi.fn(),
+  tripDraftExists: vi.fn()
 }));
 
 vi.mock("@/lib/auth/current-user", () => ({
@@ -13,7 +14,8 @@ vi.mock("@/lib/auth/current-user", () => ({
 
 vi.mock("@repo/db", () => ({
   getTripDraftById: mocks.getTripDraftById,
-  getTripDraftByIdForOwner: mocks.getTripDraftByIdForOwner
+  getTripDraftByIdForOwner: mocks.getTripDraftByIdForOwner,
+  tripDraftExists: mocks.tripDraftExists
 }));
 
 import { getOwnedTrip } from "./trip-access";
@@ -64,10 +66,12 @@ describe("getOwnedTrip", () => {
   test("returns missing when the authenticated owner's filtered lookup has no row", async () => {
     mocks.getCurrentUser.mockResolvedValue({ user: { id: "traveler-user-123" } });
     mocks.getTripDraftByIdForOwner.mockResolvedValue(null);
-    mocks.getTripDraftById.mockResolvedValue(null);
+    mocks.tripDraftExists.mockResolvedValue(false);
 
     await expect(getOwnedTrip("42")).resolves.toEqual({ kind: "missing" });
     expect(mocks.getTripDraftByIdForOwner).toHaveBeenCalledWith("42", "traveler-user-123");
+    expect(mocks.tripDraftExists).toHaveBeenCalledWith("42");
+    expect(mocks.getTripDraftById).not.toHaveBeenCalled();
   });
 
   test("returns the owner-filtered trip for its authenticated owner", async () => {
@@ -85,8 +89,10 @@ describe("getOwnedTrip", () => {
   test("classifies a non-owner result without returning its trip", async () => {
     mocks.getCurrentUser.mockResolvedValue({ user: { id: "traveler-user-123" } });
     mocks.getTripDraftByIdForOwner.mockResolvedValue(null);
-    mocks.getTripDraftById.mockResolvedValue({ ...ownedTrip, ownerUserId: "another-traveler" });
+    mocks.tripDraftExists.mockResolvedValue(true);
 
     await expect(getOwnedTrip("42")).resolves.toEqual({ kind: "forbidden" });
+    expect(mocks.tripDraftExists).toHaveBeenCalledWith("42");
+    expect(mocks.getTripDraftById).not.toHaveBeenCalled();
   });
 });

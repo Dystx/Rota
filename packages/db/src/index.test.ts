@@ -7,6 +7,7 @@ import {
   filterActiveReviewerAssignments,
   fulfillTripPaymentWebhook,
   getTripDraftByIdForOwner,
+  tripDraftExists,
   getTripsForUser,
   getLatestAssignmentForReviewerTrip,
   getReviewerAssignmentById,
@@ -162,6 +163,34 @@ describe("getTripDraftByIdForOwner", () => {
       ["id", 42],
       ["owner_user_id", "traveler-user-123"]
     ]);
+  });
+});
+
+describe("tripDraftExists", () => {
+  test("uses an id-only head/count query and returns a boolean", async () => {
+    const filters: Array<[string, unknown]> = [];
+    const client = ({
+      from(table: string) {
+        expect(table).toBe("trips");
+
+        return {
+          select(columns: string, options: unknown) {
+            expect(columns).toBe("id");
+            expect(options).toEqual({ count: "exact", head: true });
+
+            return {
+              eq(column: string, value: unknown) {
+                filters.push([column, value]);
+                return Promise.resolve({ count: 1, error: null });
+              }
+            };
+          }
+        };
+      }
+    } as unknown) as RotaDataClient;
+
+    await expect(tripDraftExists("42", { client })).resolves.toBe(true);
+    expect(filters).toEqual([["id", 42]]);
   });
 });
 

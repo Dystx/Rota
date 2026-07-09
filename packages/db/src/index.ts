@@ -61,6 +61,11 @@ type RawTripRow = {
     | null;
 };
 
+type TripExistenceQuery = PromiseLike<{
+  count: number | null;
+  error: { message: string } | null;
+}>;
+
 
 function buildTripTitle(brief: TripBrief) {
   const firstRegion = brief.regions[0]?.replace(/-/g, " ") ?? "Portugal";
@@ -214,6 +219,29 @@ export async function getTripDraftById(tripId: string, options?: DataClientOptio
   }
 
   return parseTripRow(data as RawTripRow | null);
+}
+
+/**
+ * Checks whether a numeric trip ID exists without reading any trip or brief
+ * data. This is only for internal access-result classification.
+ */
+export async function tripDraftExists(tripId: string, options?: DataClientOptions): Promise<boolean> {
+  const numericTripId = toNumericTripId(tripId);
+
+  if (numericTripId === null) {
+    return false;
+  }
+
+  const { count, error } = await (resolvePrivilegedServerDataClient(options)
+    .from("trips")
+    .select("id", { count: "exact", head: true })
+    .eq("id", numericTripId) as unknown as TripExistenceQuery);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (count ?? 0) > 0;
 }
 
 /**

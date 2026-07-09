@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getTripDraftById, getTripDraftByIdForOwner, type TripDraftDetail } from "@repo/db";
+import { getTripDraftByIdForOwner, tripDraftExists, type TripDraftDetail } from "@repo/db";
 import { getCurrentUser } from "@/lib/auth/current-user";
 
 export type TripAccessResult =
@@ -12,9 +12,9 @@ export type TripAccessResult =
 /**
  * Resolves a traveler trip request without returning a non-owned trip.
  *
- * The owner-filtered query is the only source for an `ok` trip. The second
- * lookup is internal classification after authentication; route boundaries
- * deliberately render `missing` and `forbidden` identically.
+ * The owner-filtered query is the only source for an `ok` trip. After that
+ * lookup misses, an id-only existence probe classifies the result internally;
+ * route boundaries deliberately render `missing` and `forbidden` identically.
  */
 export async function getOwnedTrip(tripId: string): Promise<TripAccessResult> {
   const { user } = await getCurrentUser();
@@ -29,7 +29,7 @@ export async function getOwnedTrip(tripId: string): Promise<TripAccessResult> {
     return { kind: "ok", trip, userId: user.id };
   }
 
-  const existingTrip = await getTripDraftById(tripId);
+  const exists = await tripDraftExists(tripId);
 
-  return existingTrip ? { kind: "forbidden" } : { kind: "missing" };
+  return exists ? { kind: "forbidden" } : { kind: "missing" };
 }
