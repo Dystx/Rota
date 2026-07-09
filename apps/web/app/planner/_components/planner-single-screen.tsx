@@ -3,31 +3,19 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, ChipGroup, Field, Input } from "@repo/ui";
+import {
+  Button,
+  ChoiceCard,
+  ChoiceChipGroup,
+  OptionSheet,
+  RouteConsequence,
+  TripContextBar,
+  TripSummary,
+} from "@repo/ui";
+import { draftToPlannerUrl, normalizeDraft, type TripChoiceDraft } from "../_lib/choice-model";
 import type { TransportChoice } from "./transport-step";
 import type { Vibe } from "./vibe-step";
 
-/**
- * PlannerSingleScreen — replaces the 5-step sequential wizard
- * with one screen of inline-editable fields, using shared
- * `@repo/ui` primitives.
- *
- * Layout (top to bottom):
- *
- *   "We are crafting a journey to [Portugal] for [7] days in [May]."
- *     — three inline `Field` + `Input` fields, ochre underline.
- *
- *   "Mobility" — `ChipGroup` (Car / Transit).
- *
- *   "Energy"   — `ChipGroup` (Calm / Balanced / Full).
- *
- *   [ Synthesize Itinerary → ]
- *
- * All questions are visible at once — the user types, clicks
- * chips, and synthesizes without navigating between screens.
- * URL state is preserved (destination + days on entry, all
- * fields on completion) so a refresh mid-flow resumes cleanly.
- */
 export interface PlannerSingleScreenProps {
   initialDestination?: string;
   initialDays?: number;
@@ -36,229 +24,108 @@ export interface PlannerSingleScreenProps {
   initialVibe?: Vibe;
 }
 
-const DESTINATION_LABELS: Record<string, string> = {
-  portugal: "Portugal",
-  lisbon: "Lisbon",
-  porto: "Porto",
-  douro: "the Douro Valley",
-  sintra: "Sintra",
-  cascais: "Cascais",
-  coimbra: "Coimbra",
-  algarve: "the Algarve",
-  azores: "the Azores",
-};
+const DESTINATIONS = [
+  ["Portugal", "A first taste of Portugal, from coast to countryside."],
+  ["Lisbon", "Tile-lined streets, miradouros, and the Tagus light."],
+  ["Porto", "Ribeira walks, Atlantic air, and the Douro nearby."],
+  ["the Algarve", "Warm coves, slow lunches, and wide-open horizons."],
+] as const;
+const DURATIONS = [3, 5, 7, 14] as const;
+const WINDOWS = ["Any time", "April–May", "June–July", "September–October"] as const;
 
-function prettyDestination(slug: string): string {
-  const key = slug.trim().toLowerCase();
-  return (
-    DESTINATION_LABELS[key] ??
-    key.replace(/\b\w/g, (c) => c.toUpperCase())
-  );
+function destinationLabel(value: string): string {
+  const key = value.trim().toLowerCase();
+  if (key === "portugal") return "Portugal";
+  if (key === "algarve" || key === "the algarve") return "the Algarve";
+  return value.replace(/\b\w/g, (c) => c.toUpperCase());
 }
-
-const MOBILITY_OPTIONS = [
-  {
-    value: "car",
-    label: "Car",
-    description: "Airport pickup",
-  },
-  {
-    value: "transit",
-    label: "Transit & walking",
-    description: "No rental",
-  },
-] as const;
-
-const ENERGY_OPTIONS = [
-  { value: "restorative", label: "Calm" },
-  { value: "balanced", label: "Balanced" },
-  { value: "high_energy", label: "Full" },
-] as const;
 
 export function PlannerSingleScreen({
   initialDestination = "Portugal",
   initialDays = 7,
   initialWindow = "",
-  initialTransport = "",
+  initialTransport = "transit",
   initialVibe = "balanced",
 }: PlannerSingleScreenProps) {
   const router = useRouter();
-
-  const [destination, setDestination] = React.useState(initialDestination);
-  const [days, setDays] = React.useState(String(initialDays));
-  const [window, setWindow] = React.useState(initialWindow);
-  const [transport, setTransport] = React.useState<TransportChoice | "">(
-    initialTransport
-  );
-  const [vibe, setVibe] = React.useState<Vibe>(initialVibe);
+  const [draft, setDraft] = React.useState<TripChoiceDraft>(() => normalizeDraft({
+    destination: destinationLabel(initialDestination),
+    days: initialDays,
+    travelWindow: initialWindow || null,
+    transport: initialTransport || "transit",
+    vibe: initialVibe,
+  }));
+  const [sheet, setSheet] = React.useState<"destination" | "window" | null>(null);
   const [pending, setPending] = React.useState(false);
 
-  const daysNum = Math.max(1, Math.min(60, parseInt(days, 10) || 1));
-  const canSubmit =
-    destination.trim().length > 0 && daysNum > 0 && !pending;
-
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!canSubmit) return;
+  const update = <K extends keyof TripChoiceDraft>(key: K, value: TripChoiceDraft[K]) =>
+    setDraft((current) => ({ ...current, [key]: value }));
+  const submit = () => {
+    if (pending) return;
     setPending(true);
-
-    const place = prettyDestination(destination);
-    const transportPhrase =
-      transport === "car"
-        ? "rental car"
-        : transport === "transit"
-          ? "public transit"
-          : "mixed transit";
-    const vibePhrase =
-      vibe === "restorative"
-        ? "calm, restorative"
-        : vibe === "high_energy"
-          ? "full, high-energy"
-          : "balanced";
-    const monthPhrase = window ? ` in ${window}` : "";
-    const prompt = `A ${daysNum}-day trip to ${place}${monthPhrase}, ${vibePhrase} pace, ${transportPhrase}.`;
-    router.push(`/trip/new?prompt=${encodeURIComponent(prompt)}&days=${daysNum}`);
+    router.push(draftToPlannerUrl(draft));
+  };
+  const context = {
+    destination: draft.destination,
+    days: draft.days,
+    travelWindow: draft.travelWindow,
+    transport: draft.transport === "car" ? "Car" : "Transit",
+    vibe: draft.vibe === "high_energy" ? "High energy" : draft.vibe === "restorative" ? "Restorative" : "Balanced",
   };
 
   return (
-    <main
-      id="main-content"
-      className="on-dark relative min-h-screen bg-primary text-linen-dark flex flex-col"
-      data-testid="planner-single-screen"
-    >
-      {/* Fixed top bar — Rumia wordmark (clickable → home) + close. */}
-      <header className="fixed top-0 w-full z-50 px-container-padding-lg py-4 flex justify-between items-center">
-        <Link
-          href="/"
-          aria-label="Back to home"
-          className="font-headline-sm text-headline-sm italic text-ochre-light hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded-sm"
-        >
-          Rumia
-        </Link>
-        <button
-          type="button"
-          onClick={() => router.push("/")}
-          aria-label="Close planner"
-          className="text-linen-dark opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded-sm"
-        >
-          <span aria-hidden className="ph text-2xl ph-x">x</span>
-        </button>
+    <main id="main-content" className="min-h-screen bg-primary text-linen-dark" data-testid="planner-single-screen">
+      <header className="flex justify-between items-center px-container-padding-lg py-5">
+        <Link href="/" aria-label="Back to home" className="font-headline-sm italic text-ochre-light">Rumia</Link>
+        <button type="button" onClick={() => router.push("/")} aria-label="Close planner" className="rounded p-2 text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light">×</button>
       </header>
 
-      <form
-        onSubmit={onSubmit}
-        className="flex-grow flex items-center justify-center px-container-padding-sm md:px-container-padding-lg py-24"
-      >
-        <div className="max-w-4xl w-full flex flex-col gap-12">
-          {/* AI Intent Engine badge. */}
-          <div className="flex justify-center">
-            <span className="inline-flex items-center gap-2 bg-glass-dark backdrop-blur-md border border-white/20 px-4 py-2 rounded-full">
-              <span aria-hidden className="ph text-[14px] text-ochre-light ph-sparkle">sparkle</span>
-              <span className="font-mono-micro text-mono-micro text-tertiary-fixed-dim uppercase tracking-wider">
-                AI Intent Engine
-              </span>
-            </span>
+      <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 pb-12 md:px-8 lg:grid-cols-[1.2fr_.8fr]">
+        <section className="grid content-start gap-6">
+          <div className="grid gap-2">
+            <p className="font-mono-micro uppercase tracking-widest text-ochre-light">Compose your route</p>
+            <h1 className="font-display text-4xl leading-tight md:text-6xl">A trip that sounds like you.</h1>
+            <p className="max-w-xl text-linen-dark/75">Choose a few anchors. We&apos;ll turn them into a considered itinerary.</p>
           </div>
 
-          {/* Sentence with inline editable fields. Each field is
-              a raw <Input> (not wrapped in <Field>) so the label
-              doesn't render above the input — the sentence
-              itself is the visual label. `aria-label` gives
-              screen readers the field name. */}
-          <h1 className="font-display-mobile md:font-display text-2xl md:text-5xl text-linen-dark leading-snug text-center flex flex-wrap items-baseline justify-center gap-x-1 gap-y-2 md:gap-x-2 md:gap-y-3 text-balance">
-            <span>We are crafting a journey to </span>
-            <span className="sr-only">Destination</span>
-            <Input
-              type="text"
-              value={destination}
-              onChange={(event) => setDestination(event.target.value)}
-              aria-label="Destination"
-              data-testid="planner-destination"
-              className="!w-32 md:!w-56 !inline-block !px-2 md:!px-3 !py-0.5 md:!py-1 !text-2xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !text-ochre-light"
-            />
-            <span> for </span>
-            <span className="sr-only">Number of days</span>
-            <Input
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={60}
-              value={days}
-              onChange={(event) => setDays(event.target.value)}
-              aria-label="Number of days"
-              data-testid="planner-days"
-              className="!w-12 md:!w-20 !inline-block !px-2 md:!px-3 !py-0.5 md:!py-1 !text-2xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !text-ochre-light"
-            />
-            <span> days in </span>
-            <span className="sr-only">Travel window</span>
-            <Input
-              type="text"
-              value={window}
-              onChange={(event) => setWindow(event.target.value)}
-              aria-label="Travel window"
-              placeholder="May"
-              data-testid="planner-window"
-              className="!w-24 md:!w-40 !inline-block !px-2 md:!px-3 !py-0.5 md:!py-1 !text-2xl md:!text-5xl !text-center !font-display-mobile md:!font-display !border-[var(--color-accent)] !bg-white/10 !placeholder:text-ochre-light !text-ochre-light"
-            />
-            <span>.</span>
-          </h1>
-
-          {/* Compact pill selectors for transport + vibe using the
-              shared `ChipGroup` primitive (WAI-ARIA radiogroup with
-              arrow-key navigation built in). The two groups sit
-              side-by-side, centered as a unit so the layout matches
-              the centered H1 above. On mobile they stack. */}
-          <div className="flex flex-col items-center gap-8 md:flex-row md:justify-center md:items-start md:gap-12">
-            <div className="flex flex-col gap-3 items-center md:items-start">
-              <label className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm">
-                Mobility
-              </label>
-              <ChipGroup
-                ariaLabel="Mobility"
-                value={transport === "" ? null : transport}
-                onChange={(next: "car" | "transit") => setTransport(next)}
-                options={MOBILITY_OPTIONS.map((o) => ({
-                  value: o.value,
-                  label: o.label,
-                  description: o.description,
-                }))}
-              />
-            </div>
-
-            <div className="flex flex-col gap-3 items-center md:items-start">
-              <label className="font-mono-technical text-mono-technical uppercase tracking-widest text-ochre-light text-sm">
-                Energy
-              </label>
-              <ChipGroup
-                ariaLabel="Energy"
-                value={vibe}
-                onChange={(next: Vibe) => setVibe(next)}
-                options={ENERGY_OPTIONS.map((o) => ({
-                  value: o.value,
-                  label: o.label,
-                }))}
-              />
+          <div className="grid gap-3" aria-label="Destination choices">
+            <div className="flex items-center justify-between"><h2 className="font-headline-sm text-xl">Where to?</h2><button type="button" onClick={() => setSheet("destination")} className="text-sm underline">Browse all</button></div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {DESTINATIONS.slice(0, 2).map(([value, description]) => <ChoiceCard key={value} id={`destination-${value}`} name="destination" value={value} label={value} description={description} selected={draft.destination === value} onSelect={(next) => update("destination", next)} />)}
             </div>
           </div>
 
-          {/* Synthesize CTA. Centered to match the H1 + selector
-              rhythm above. */}
-          <div className="flex justify-center">
-            <Button
-              type="submit"
-              disabled={!canSubmit}
-              data-testid="planner-synthesize"
-              className="!px-10 !py-5 !text-lg !bg-[var(--color-accent-dark)] !text-white focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
-            >
-              {pending ? "Synthesizing…" : "Synthesize Itinerary"}
-              <span
-                aria-hidden
-                className="ph !text-[20px] ml-1 ph-arrow-right"
-              >arrow-right</span>
-            </Button>
+          <div className="grid gap-3" aria-label="Trip duration choices">
+            <h2 className="font-headline-sm text-xl">How long?</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {DURATIONS.map((days) => <ChoiceCard key={days} id={`duration-${days}`} name="days" value={String(days)} label={`${days} days`} description={days === 7 ? "A balanced first journey." : "A different pace, same care."} selected={draft.days === days} onSelect={() => update("days", days)} />)}
+            </div>
           </div>
-        </div>
-      </form>
+
+          <div className="grid gap-4 rounded-xl border border-white/15 bg-white/5 p-5">
+            <button type="button" onClick={() => setSheet("window")} className="flex min-h-11 items-center justify-between text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" aria-label="Choose travel window">
+              <span><span className="block text-xs uppercase tracking-widest text-ochre-light">Travel window</span><span className="block text-lg">{draft.travelWindow ?? "Any time"}</span></span><span aria-hidden>⌄</span>
+            </button>
+            <ChoiceChipGroup label="Transport" multiple={false} selected={[draft.transport]} onChange={(values) => values[0] && update("transport", values[0] as TransportChoice)} options={[{ value: "transit", label: "Transit & walking" }, { value: "car", label: "Rental car" }]} />
+            <ChoiceChipGroup label="Vibe" multiple={false} selected={[draft.vibe]} onChange={(values) => values[0] && update("vibe", values[0] as Vibe)} options={[{ value: "restorative", label: "Restorative" }, { value: "balanced", label: "Balanced" }, { value: "high_energy", label: "High energy" }]} />
+          </div>
+
+          <RouteConsequence status="ready" transportLabel={draft.transport === "transit" ? "Transit keeps the route to two bases" : "Car opens the Douro interior"} stopCount={draft.transport === "transit" ? 2 : 4} />
+        </section>
+
+        <aside className="grid content-start gap-4 lg:sticky lg:top-6 lg:self-start">
+          <TripContextBar draft={context} onEdit={(key) => key === "travelWindow" ? setSheet("window") : key === "destination" ? setSheet("destination") : undefined} tripState="draft" />
+          <TripSummary draft={context} primaryAction={pending ? "Updating your route" : "Build my itinerary"} onPrimaryAction={submit} />
+          {pending ? <p role="status" className="text-center text-sm text-linen-dark/70">Updating your route</p> : null}
+        </aside>
+      </div>
+
+      <OptionSheet open={sheet === "destination"} title="Choose a destination" description="Start with the place that pulls you in." onClose={() => setSheet(null)}>
+        <div className="grid gap-3">{DESTINATIONS.map(([value, description]) => <ChoiceCard key={value} id={`sheet-destination-${value}`} name="destination-sheet" value={value} label={value} description={description} selected={draft.destination === value} onSelect={(next) => { update("destination", next); setSheet(null); }} />)}</div>
+      </OptionSheet>
+      <OptionSheet open={sheet === "window"} title="When will you go?" description="A season is enough; the route will do the rest." onClose={() => setSheet(null)}>
+        <div role="radiogroup" aria-label="Travel window" className="grid gap-2">{WINDOWS.map((value) => <button key={value} type="button" role="radio" aria-checked={(draft.travelWindow ?? "Any time") === value} onClick={() => { update("travelWindow", value === "Any time" ? null : value); setSheet(null); }} className="min-h-11 rounded-lg border p-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light">{value}</button>)}</div>
+      </OptionSheet>
     </main>
   );
 }

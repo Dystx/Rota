@@ -19,7 +19,7 @@ export interface PlannerInitialState {
  *
  * Replaces the previous 5-step sequential wizard. All questions
  * (destination, days, window, transport, vibe) live on one
- * screen with inline editable inputs + compact chip selectors.
+ * screen with choice cards, chips, and sheets.
  * One click on "Synthesize Itinerary" sends the user to
  * /trip/new with a prompt.
  */

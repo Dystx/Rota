@@ -38,7 +38,8 @@ export default async function PlannerPage({
   const destination = (params.destination ?? "portugal").toLowerCase();
   const initial: PlannerInitialState = {
     initialDays: days,
-    initialDestination: destination
+    initialDestination: destination,
+    initialWindow: params.window
   };
 
   return <PlannerClient initial={initial} />;
