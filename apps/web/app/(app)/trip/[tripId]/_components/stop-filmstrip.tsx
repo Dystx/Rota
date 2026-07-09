@@ -1,6 +1,8 @@
 "use client";
 
+import * as React from "react";
 import { useMapStore } from "../../../../../store/useMapStore";
+import { runViewTransition } from "@repo/ui";
 
 /**
  * StopFilmstrip — 1.4 reference: horizontal snap-x filmstrip of stops.
@@ -49,10 +51,15 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
       aria-label="Today's stops"
       data-testid="filmstrip-section"
     >
-      <h2 className="font-headline-sm text-headline-sm text-primary mb-4 px-container-padding-lg drop-shadow-md">
-        Today&apos;s Stops
-      </h2>
+      <div className="mb-4 flex items-center justify-between gap-4 px-container-padding-lg">
+        <h2 className="font-headline-sm text-headline-sm text-primary drop-shadow-md">Today&apos;s Stops</h2>
+        <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant md:hidden">
+          {stops.length} stops
+        </p>
+      </div>
       <div
+        role="region"
+        aria-label="Stop filmstrip"
         className="flex gap-gutter overflow-x-auto scrollbar-hide px-container-padding-lg pb-4 snap-x snap-mandatory"
         data-testid="filmstrip-track"
       >
@@ -73,7 +80,10 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
                 // and gives TypeScript a narrow type for
                 // `stop.coordinates` in the call below.
                 if (!hasCoords) return;
-                selectStop(stop.id, stop.coordinates as readonly [number, number]);
+                runViewTransition(() => {
+                  selectStop(stop.id, stop.coordinates as readonly [number, number]);
+                  document.querySelector("[data-testid='trip-map-route']")?.scrollIntoView({ behavior: "smooth", block: "center" });
+                });
               }}
               disabled={!hasCoords}
               // `aria-pressed` is for toggle buttons. A
@@ -89,7 +99,7 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
                   : `${stop.startTime} — ${stop.placeName} (no map coordinates yet)`
               }
               className={
-                "text-left min-w-[300px] w-[300px] rounded-xl overflow-hidden shadow-sm flex flex-col snap-center group transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light " +
+                "text-left min-w-[calc(100vw-4rem)] w-[calc(100vw-4rem)] md:min-w-[300px] md:w-[300px] rounded-xl overflow-hidden shadow-sm flex flex-col snap-center group transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light " +
                 (isActive
                   ? "bg-glass-dark text-linen-dark border border-ochre-light/50 shadow-2xl relative transform scale-[1.02] cursor-pointer"
                   : hasCoords
@@ -107,7 +117,7 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
                 <div
                   className="w-full h-full bg-cover bg-center"
                   style={{
-                    backgroundImage: `url('https://picsum.photos/seed/${stop.imageSeed ?? stop.id}/400/200')`
+                    backgroundImage: "url('/trip-covers/porto-ribeira.svg')"
                   }}
                 />
                 <div
@@ -220,6 +230,9 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
           <span className="font-label-ui text-label-ui">Add Stop</span>
         </a>
       </div>
+      <ol aria-label="Stops list" className="sr-only">
+        {stops.map((stop) => <li key={`list-${stop.id}`}><button type="button" onClick={() => stop.coordinates && selectStop(stop.id, stop.coordinates)}>{stop.startTime} — {stop.placeName}</button></li>)}
+      </ol>
     </section>
   );
 }

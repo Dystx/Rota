@@ -17,6 +17,7 @@ import { CinematicHero } from "./_components/cinematic-hero";
 import CinematicMapSection from "./_components/cinematic-map-section";
 import { PaceToneControl } from "./_components/pace-tone-control";
 import { StopFilmstrip, type FilmstripStop } from "./_components/stop-filmstrip";
+import { TripContextBarClient } from "./_components/trip-context-bar-client";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false }
@@ -89,12 +90,14 @@ const FALLBACK_PREVIEW_DAYS: DisplayDay[] = [
 ];
 
 export default async function TripDetailPage({
-  params
+  params,
+  searchParams
 }: {
   params: Promise<{ tripId: string }>;
-  searchParams: Promise<{ review?: string; unlock?: string }>;
+  searchParams: Promise<{ review?: string; unlock?: string; day?: string }>;
 }) {
   const { tripId } = await params;
+  const query = await searchParams;
   const tripAccess = await getOwnedTrip(tripId);
 
   if (tripAccess.kind === "anonymous") {
@@ -155,7 +158,9 @@ export default async function TripDetailPage({
   // Flatten the day/stop tree into the filmstrip's stop list.
   // The filmstrip shows the first day's stops under "Today's Stops";
   // the vertical ItineraryTimeline below still shows the full week.
-  const firstDay = timelineDaysRaw[0];
+  const requestedDay = Number(query.day);
+  const selectedDayIndex = Number.isInteger(requestedDay) && requestedDay > 0 ? requestedDay : timelineDaysRaw[0]?.dayIndex ?? 1;
+  const firstDay = timelineDaysRaw.find((day) => day.dayIndex === selectedDayIndex) ?? timelineDaysRaw[0];
   const filmstripStops: FilmstripStop[] = firstDay
     ? firstDay.stops.map((stop, idx) => {
         const time = (
@@ -212,6 +217,17 @@ export default async function TripDetailPage({
             durationDays={trip?.brief.tripLengthDays}
             coverImageUrl={resolveCoverImage(trip?.brief)}
           />
+          {trip ? (
+            <div className="mx-auto max-w-[1100px] px-6 pt-6" data-testid="trip-context-bar">
+              <TripContextBarClient draft={{
+                destination: trip.brief.regions.map(prettify).join(", ") || prettify(trip.brief.destinationCountry),
+                days: trip.brief.tripLengthDays,
+                travelWindow: null,
+                transport: prettify(trip.brief.transportMode),
+                vibe: trip.brief.pace ? prettify(trip.brief.pace) : "Balanced"
+              }} tripState={tripCommerceState.canExport ? "unlocked" : "preview"} />
+            </div>
+          ) : null}
           <div className="mx-auto max-w-[800px] px-6 py-16 grid gap-6">
             <RevealSection delayMs={0}>
               <div
@@ -363,8 +379,8 @@ export default async function TripDetailPage({
             // section evenly.
             <EmptyState
               icon="map"
-              title="The map will render once the route is drafted"
-              description="Day-by-day stops, filmstrip, and route arcs all live here. The map stays hidden until the AI has something concrete to draw."
+              title={usingFallbackItinerary ? "Itinerary is generating" : "Route unavailable"}
+              description={usingFallbackItinerary ? "Your saved brief is ready; day-by-day stops will appear when generation finishes." : "The saved route is unavailable right now. Try again shortly or open the trip brief."}
               variant="map"
             />
           )}
@@ -373,7 +389,11 @@ export default async function TripDetailPage({
         {filmstripStops.length > 0 && (
           <section className="py-12 md:py-16 bg-surface-container-low/40 border-t border-olive-light/10">
             <div className="mx-auto max-w-[1400px]">
+              <nav aria-label="Trip days" className="mb-6 flex gap-2 overflow-x-auto px-container-padding-lg">
+                {timelineDaysRaw.map((day) => <Link key={day.dayIndex} href={`?day=${day.dayIndex}#route`} aria-current={day.dayIndex === selectedDayIndex ? "page" : undefined} className={`min-h-11 rounded-full border px-4 py-2 text-sm ${day.dayIndex === selectedDayIndex ? "bg-olive-light text-white" : "bg-white/70"}`}>Day {day.dayIndex}</Link>)}
+              </nav>
               <StopFilmstrip stops={filmstripStops} />
+              <Link href="#itinerary" className="mt-2 inline-flex px-container-padding-lg text-sm font-medium underline">View day agenda</Link>
             </div>
           </section>
         )}

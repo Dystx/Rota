@@ -423,6 +423,8 @@ export default function CinematicMapSection({
 
   const dayMatch = activeChapter?.id?.match(/day-(\d+)-/);
   const dayDisplay = dayMatch && dayMatch[1] ? `Day ${parseInt(dayMatch[1], 10) + 1}` : "";
+  const activeDayIndex = dayMatch && dayMatch[1] ? parseInt(dayMatch[1], 10) + 1 : 1;
+  const activeDay = days.find((day) => day.dayIndex === activeDayIndex) ?? days[0];
 
   return (
     <div
@@ -433,6 +435,7 @@ export default function CinematicMapSection({
       <section
         role="region"
         aria-label="Cinematic trip map"
+        data-testid="trip-map-route"
         tabIndex={-1}
         onKeyDown={handleKeyDown}
         className="h-full w-full sticky top-[var(--header-h,0)]"
@@ -456,6 +459,16 @@ export default function CinematicMapSection({
           onSelect={handleChapterSelect}
           className="absolute right-4 top-4 hidden md:flex"
         />
+
+        <div className="absolute left-4 top-4 flex flex-wrap gap-2" aria-label="Map filters">
+          <span className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm">{dayDisplay || "Today"}</span>
+          <span className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm">Transport</span>
+          <span className="rounded-full bg-background/90 px-3 py-2 text-xs font-medium shadow-sm">Route layers</span>
+        </div>
+
+        <ol aria-label="Stops on map" className="absolute right-4 bottom-4 hidden max-h-48 w-64 overflow-auto rounded-xl bg-background/90 p-3 text-sm shadow-lg md:block">
+          {(activeDay?.stops ?? []).map((stop, index) => <li key={`${activeDay?.dayIndex}-${index}`} className="border-b border-black/10 py-2 last:border-0">{typeof stop === "string" ? stop : stop.placeName}</li>)}
+        </ol>
 
         <div className="absolute left-4 bottom-4 pointer-events-none">
           {effectiveReducedMotion ? (

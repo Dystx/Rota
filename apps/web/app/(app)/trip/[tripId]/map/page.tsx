@@ -187,7 +187,7 @@ export default async function TripMapPage({
         <GuideChapter id="route" className="py-12 md:py-24">
           <div className="mx-auto max-w-[1200px] grid gap-8">
             <RevealSection>
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3" data-testid="trip-map-day-tabs" aria-label="Map day and route filters">
                 <span className="mr-2 text-xs font-semibold uppercase tracking-widest text-[var(--color-muted-foreground)]">
                   Route layers
                 </span>
