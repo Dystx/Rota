@@ -59,10 +59,23 @@ export function TripBriefReview({ initialBrief }: { initialBrief: Record<string,
     setBusy(true); setErrors({}); setMessage("");
     try {
       const response = await fetch("/api/trips", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(parsed.data) });
-      const payload = await response.json() as { tripId?: string; message?: string; error?: { message?: string }; errors?: Record<string, string[]>; fieldErrors?: Record<string, string[]> };
+      const payload = await response.json() as {
+        tripId?: string;
+        message?: string;
+        error?: { message?: string; details?: Record<string, string[] | string> };
+        errors?: Record<string, string[]>;
+        fieldErrors?: Record<string, string[]>;
+      };
       if (!response.ok) {
-        const apiErrors = payload.errors ?? payload.fieldErrors;
-        if (apiErrors) { const next: Record<string, string> = {}; Object.entries(apiErrors).forEach(([key, values]) => { if (values?.[0]) next[key] = values[0]; }); setErrors(next); }
+        const apiErrors = payload.errors ?? payload.fieldErrors ?? payload.error?.details;
+        if (apiErrors) {
+          const next: Record<string, string> = {};
+          Object.entries(apiErrors).forEach(([key, values]) => {
+            const message = Array.isArray(values) ? values[0] : values;
+            if (message) next[key] = message;
+          });
+          setErrors(next);
+        }
         setMessage(payload.error?.message ?? payload.message ?? "Could not save the trip brief yet."); return;
       }
       setMessage("Trip brief saved. Opening the draft route…"); if (payload.tripId) router.push(`/trip/${payload.tripId}`);
