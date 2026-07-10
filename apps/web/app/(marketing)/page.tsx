@@ -48,13 +48,13 @@ export default function HomePage() {
               data-testid="home-headline"
               className="font-display-mobile text-display-mobile md:font-display md:text-display text-linen-dark tracking-tight drop-shadow-2xl"
             >
-              Discover <span className="italic text-ochre-light">Intentionally.</span>
+              Your Portugal trip, <span className="italic text-ochre-light">solved.</span>
             </h1>
             <p
               data-testid="home-value-prop"
               className="font-body-lg md:font-body-xl text-body-lg md:text-body-xl text-linen-dark/90 max-w-xl drop-shadow-md px-2"
             >
-              Portugal-first itineraries, plotted with care.
+              AI shapes the first route. Portugal specialists verify the decisions that benefit from local judgment.
             </p>
             <HeroIntentCard />
           </div>
