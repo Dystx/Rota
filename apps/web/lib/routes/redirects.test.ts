@@ -10,4 +10,9 @@ describe("resolveLegacyRedirect", () => {
   it("leaves live routes untouched", () => {
     expect(resolveLegacyRedirect("/planner")).toBeNull();
   });
+
+  it("normalizes legacy discovery fixtures", () => {
+    expect(resolveLegacyRedirect("/explore")).toEqual({ destination: "/portugal", status: 308 });
+    expect(resolveLegacyRedirect("/explore/workspace")).toEqual({ destination: "/planner", status: 308 });
+  });
 });

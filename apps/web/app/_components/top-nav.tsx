@@ -11,9 +11,9 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/explore", label: "Discover" },
-  { href: "/portugal", label: "Destinations" },
+  { href: "/portugal", label: "Portugal" },
   { href: "/how-it-works", label: "How it works" },
+  { href: "/local-expertise", label: "Local expertise" },
   { href: "/pricing", label: "Pricing" }
 ];
 
@@ -97,7 +97,7 @@ export function TopNav() {
             data-testid="top-nav-plan-a-trip"
             className="hidden md:inline-flex bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-2 rounded-full hover:bg-olive-dark transition-colors duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            Plan a trip
+            Plan Portugal
           </Link>
           <Link
             href="/sign-in"
@@ -155,7 +155,7 @@ export function TopNav() {
                 data-testid="top-nav-mobile-plan-a-trip"
                 className="mt-2 inline-flex w-full justify-center bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-3 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
-                Plan a trip
+                Plan Portugal
               </Link>
             </li>
           </ul>

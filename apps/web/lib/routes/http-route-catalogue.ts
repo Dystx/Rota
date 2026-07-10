@@ -17,8 +17,8 @@ export const PUBLIC_SITEMAP_PATHS = [
 export const HTTP_ROUTE_CATALOGUE: readonly HttpRouteDefinition[] = [
   { path: "/", responsibility: "Portugal-first acquisition", shell: "public", indexable: true, auth: "public" },
   { path: "/portugal", responsibility: "Curated Portugal discovery", shell: "public", indexable: true, auth: "public" },
-  { path: "/explore", responsibility: "Visual destination exploration", shell: "public", indexable: false, auth: "public" },
-  { path: "/explore/workspace", responsibility: "Map-first planning preview", shell: "public", indexable: false, auth: "public" },
+  { path: "/explore", responsibility: "Legacy discovery entry", shell: "none", indexable: false, auth: "public", redirect: { status: 308, destination: "/portugal" } },
+  { path: "/explore/workspace", responsibility: "Legacy workspace entry", shell: "none", indexable: false, auth: "public", redirect: { status: 308, destination: "/planner" } },
   { path: "/how-it-works", responsibility: "Explain the planning ascension", shell: "public", indexable: true, auth: "public" },
   { path: "/human-review", responsibility: "Explain specialist review", shell: "public", indexable: false, auth: "public" },
   { path: "/local-expertise", responsibility: "Explain local specialist value", shell: "public", indexable: true, auth: "public" },

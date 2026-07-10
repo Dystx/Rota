@@ -15,17 +15,20 @@ import { BrandMark } from "@repo/ui";
  *     from the server response)
  */
 
-const PRODUCT_LINKS = [
-  { href: "/explore", label: "Discover" },
-  { href: "/portugal", label: "Destinations" },
-  { href: "/planner", label: "Plan a trip" },
-  { href: "/pricing", label: "Pricing" }
+const PORTUGAL_LINKS = [
+  { href: "/portugal", label: "Destination atlas" },
+  { href: "/local-expertise", label: "Local expertise" }
 ];
 
-const COMPANY_LINKS = [
+const PRODUCT_LINKS = [
   { href: "/how-it-works", label: "How it works" },
-  { href: "/portugal", label: "Portugal guide" },
-  { href: "/support", label: "Support" }
+  { href: "/pricing", label: "Pricing" },
+  { href: "/planner", label: "Plan Portugal" }
+];
+
+const HELP_LINKS = [
+  { href: "/support", label: "Support" },
+  { href: "/offline", label: "Offline help" }
 ];
 
 const LEGAL_LINKS = [
@@ -63,7 +66,24 @@ export function SiteFooter() {
             </p>
           </div>
 
-          {/* Product column */}
+          <nav aria-label="Portugal" className="grid gap-3">
+            <h4 className="font-label-ui text-label-ui uppercase tracking-widest text-olive-light">
+              Portugal
+            </h4>
+            <ul className="grid gap-2 list-none p-0 m-0">
+              {PORTUGAL_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="font-body text-body text-on-surface-variant hover:text-primary transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:shadow-focus rounded-sm"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
           <nav aria-label="Product" className="grid gap-3">
             <h4 className="font-label-ui text-label-ui uppercase tracking-widest text-olive-light">
               Product
@@ -82,26 +102,11 @@ export function SiteFooter() {
             </ul>
           </nav>
 
-          {/* Company column */}
-          <nav aria-label="Company" className="grid gap-3">
-            <h4 className="font-label-ui text-label-ui uppercase tracking-widest text-olive-light">
-              Company
-            </h4>
-            <ul className="grid gap-2 list-none p-0 m-0">
-              {COMPANY_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="font-body text-body text-on-surface-variant hover:text-primary transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:shadow-focus rounded-sm"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <nav aria-label="Help" className="grid gap-3">
+            <h4 className="font-label-ui text-label-ui uppercase tracking-widest text-olive-light">Help</h4>
+            <ul className="grid gap-2 list-none p-0 m-0">{HELP_LINKS.map((link) => <li key={link.href}><Link href={link.href} className="font-body text-body text-on-surface-variant hover:text-primary transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:shadow-focus rounded-sm">{link.label}</Link></li>)}</ul>
           </nav>
 
-          {/* Legal column */}
           <nav aria-label="Legal" className="grid gap-3">
             <h4 className="font-label-ui text-label-ui uppercase tracking-widest text-olive-light">
               Legal
