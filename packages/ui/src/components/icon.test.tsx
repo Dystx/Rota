@@ -7,20 +7,17 @@ import { Icon } from "./icon";
 afterEach(() => cleanup());
 
 describe("Icon", () => {
-  it("renders the regular weight class for a named glyph", () => {
-    render(<Icon name="arrow-right" />);
-    const span = screen.getByTestId("icon");
-    expect(span).toHaveClass("ph");
-    expect(span).toHaveClass("ph-arrow-right");
-    expect(span).toHaveAttribute("data-icon", "arrow-right");
-    expect(span).toHaveAttribute("data-weight", "regular");
+  it("renders an inline svg without a font ligature", () => {
+    const { container } = render(<Icon name="arrow-right" />);
+    const svg = screen.getByTestId("icon");
+    expect(svg.tagName).toBe("svg");
+    expect(svg).toHaveAttribute("data-icon", "arrow-right");
+    expect(container.querySelector(".ph, .material-symbols-outlined")).toBeNull();
   });
 
-  it("supports bold weight class", () => {
+  it("supports a visual weight", () => {
     render(<Icon name="house" weight="bold" />);
-    const span = screen.getByTestId("icon");
-    expect(span).toHaveClass("ph-bold");
-    expect(span).toHaveClass("ph-house");
+    expect(screen.getByTestId("icon")).toHaveAttribute("stroke-width", "2.4");
   });
 
   it("is aria-hidden by default", () => {
