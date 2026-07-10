@@ -28,11 +28,14 @@ the corresponding release is enabled.
 
 ## Task 13 evidence
 
-The route-level release checks are recorded by these Playwright artifacts:
+The entries below are the executable/listed Playwright sources. Listing a test
+or a snapshot directory is not a browser-pass claim: a pass is only recorded
+after the test runs against the fresh server configured in
+`apps/web/playwright.config.ts`. No browser-pass artifact is asserted here.
 
-| Journey / surface | Test artifact | State coverage |
-| --- | --- | --- |
-| Choice-led traveler (`/` → `/planner` → `/trip/new` → `/trip/3` → map → checkout return → export) | `playwright/tests/choice-led-traveler.spec.ts` | signed-in traveler, keyboard-only choices, reduced motion |
-| Public and traveler visual routes | `playwright/tests/visual.spec.ts-snapshots/{desktop-chrome,mobile-chromium}-*.png` | 1440px desktop and 390px mobile; one main/visible h1; no placeholder imagery |
-| Route accessibility | `playwright/tests/accessibility.spec.ts` and `.sisyphus/evidence/future-roadmap/task-37-axe-violations.json` | public/traveler/reviewer/admin, serious/critical axe gate, skip link, planner choice-only controls |
-| Mobile overflow | `playwright/tests/mobile-overflow.spec.ts` and `.sisyphus/evidence/future-roadmap/task-36-mobile-overflow.json` | 390px document width across public, traveler, reviewer, and admin routes |
+| Journey / surface | Executable source (listed) | Browser status | State coverage |
+| --- | --- | --- | --- |
+| Choice-led traveler (`/` → `/planner` → `/trip/new` → `/trip/3` → map → checkout return → export) | `apps/web/playwright/tests/choice-led-traveler.spec.ts` | Failed fresh-server run: `/trip/3` redirected to `/itineraries?notice=unavailable` (seeded Supabase trip unavailable) | signed-in traveler, keyboard-only choices, reduced motion |
+| Public and traveler visual routes | `apps/web/playwright/tests/visual.spec.ts` and `visual.spec.ts-snapshots/` | Pending fresh-server run | 1440px desktop and 390px mobile; one main/visible h1; no placeholder imagery |
+| Route accessibility | `apps/web/playwright/tests/accessibility.spec.ts` | Pending fresh-server run | public/traveler/reviewer/admin, serious/critical axe gate, skip link, planner choice-only controls |
+| Mobile overflow | `apps/web/playwright/tests/mobile-overflow.spec.ts` | Pending fresh-server run | explicit 390px document width across public, traveler, reviewer, and admin routes |

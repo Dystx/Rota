@@ -16,9 +16,12 @@ export default defineConfig({
     video: "retain-on-failure"
   },
   webServer: {
-    command: "pnpm exec next start --hostname 127.0.0.1 --port 3105",
+    // Always build and start a fresh production server for route-level checks.
+    // Reusing a process from another checkout can silently exercise stale
+    // planner/UI code and make visual and accessibility evidence invalid.
+    command: "pnpm exec next build && pnpm exec next start --hostname 127.0.0.1 --port 3105",
     url: "http://127.0.0.1:3105",
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120_000
   },
   projects: [
@@ -28,7 +31,7 @@ export default defineConfig({
     },
     {
       name: "mobile-chromium",
-      use: { ...devices["Pixel 5"] }
+      use: { ...devices["Pixel 5"], viewport: { width: 390, height: 844 } }
     }
   ]
 });
