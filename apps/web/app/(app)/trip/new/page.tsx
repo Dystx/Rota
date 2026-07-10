@@ -35,7 +35,7 @@ export default function NewTripPage() {
             Shape your brief
           </h1>
           <p className="text-on-surface-variant leading-loose text-xl max-w-2xl mx-auto">
-            Choose the specifics that shape your trip. We use these structured details to craft a paced, realistic Portugal itinerary.
+            Choose the details that shape your trip. We use these decisions to craft a paced, realistic Portugal itinerary.
           </p>
         </div>
       </section>
