@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
+import { getTravelerTripId } from "../fixtures/traveler-trip";
 
 // T21 Core Trip Lifecycle E2E Suite
 // Covers the traveler persona walking the read-only lifecycle surfaces:
@@ -20,27 +21,27 @@ import { createTravelerStorageState } from "../fixtures/traveler-auth";
 //
 // Grep tag: @traveler-lifecycle (matches `--grep traveler-lifecycle`).
 
-const TRIP_ID = "3";
+const tripId = () => getTravelerTripId();
 
 test.describe("@smoke @traveler-lifecycle traveler trip lifecycle", () => {
   test.use({ storageState: createTravelerStorageState() });
 
   test("traveler can load overview, map, and export surfaces for a trip", async ({ page }) => {
-    await page.goto(`/trip/${TRIP_ID}`);
+    await page.goto(`/trip/${tripId()}`);
     await expect(page.getByTestId("trip-overview-header")).toBeVisible();
-    await expect(page).toHaveURL(new RegExp(`/trip/${TRIP_ID}$`));
+    await expect(page).toHaveURL(new RegExp(`/trip/${tripId()}$`));
 
-    await page.goto(`/trip/${TRIP_ID}/map`);
+    await page.goto(`/trip/${tripId()}/map`);
     await expect(page.getByTestId("trip-map-header")).toBeVisible();
-    await expect(page).toHaveURL(new RegExp(`/trip/${TRIP_ID}/map$`));
+    await expect(page).toHaveURL(new RegExp(`/trip/${tripId()}/map$`));
 
-    await page.goto(`/trip/${TRIP_ID}/export`);
+    await page.goto(`/trip/${tripId()}/export`);
     await expect(page.getByTestId("trip-export-header")).toBeVisible();
-    await expect(page).toHaveURL(new RegExp(`/trip/${TRIP_ID}/export$`));
+    await expect(page).toHaveURL(new RegExp(`/trip/${tripId()}/export$`));
   });
 
   test("export center exposes share, access, and included-list surfaces", async ({ page }) => {
-    await page.goto(`/trip/${TRIP_ID}/export`);
+    await page.goto(`/trip/${tripId()}/export`);
 
     await expect(page.getByTestId("trip-export-header")).toBeVisible();
     await expect(page.getByTestId("export-options")).toBeVisible();
@@ -50,7 +51,7 @@ test.describe("@smoke @traveler-lifecycle traveler trip lifecycle", () => {
   });
 
   test("export print view renders the print-only marker", async ({ page }) => {
-    await page.goto(`/trip/${TRIP_ID}/export?view=print`);
+    await page.goto(`/trip/${tripId()}/export?view=print`);
 
     await expect(page.locator('[data-testid="print-view"]')).toBeAttached();
   });

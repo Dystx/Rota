@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { travelerTripPath } from "../../fixtures/traveler-trip";
 
 /**
  * Trip map integration tests.
@@ -19,7 +20,7 @@ test.describe("Trip Map (Spatial Engine)", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("trip page map renders the spatial-engine canvas frame", async ({ page }) => {
-    await page.goto("/trip/3/map");
+    await page.goto(travelerTripPath("/map"));
 
     // The trip map page wraps the route layer in a frame with
     // `data-testid="trip-workspace-canvas-frame"` whether the live
@@ -41,7 +42,7 @@ test.describe("Trip Map (Spatial Engine)", () => {
   });
 
   test("trip page map renders the spatial-engine canvas when focused", async ({ page }) => {
-    await page.goto("/trip/3/map?focus=lisbon");
+    await page.goto(travelerTripPath("/map?focus=lisbon"));
 
     // The new component always lands the camera on the `?focus=`
     // destination via the same deep-link plumbing `/explore/workspace`

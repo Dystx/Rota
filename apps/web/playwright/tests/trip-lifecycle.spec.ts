@@ -1,11 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
+import { getTravelerTripId } from "../fixtures/traveler-trip";
 
 // Task 11 lifecycle coverage. The seeded traveler state is intentionally used
 // here, but Supabase-backed routes may redirect to sign-in/archive when the
 // local environment has no live data. Those cases are explicit skips (rather
 // than empty assertions) so CI still reports the missing prerequisite.
-const TRIP_ID = "3";
+const tripId = () => getTravelerTripId();
 
 async function openOwnedRoute(page: Parameters<typeof test>[0] extends never ? never : any, path: string, reason: string) {
   await page.goto(path);
@@ -31,7 +32,7 @@ test.describe("@task11 checkout package choice", () => {
 
   test("selected package is persisted in the unlock form when an owned trip is available", async ({ page }) => {
     test.use({ storageState: createTravelerStorageState() });
-    await openOwnedRoute(page, `/checkout?trip=${TRIP_ID}`, "owned checkout data unavailable");
+    await openOwnedRoute(page, `/checkout?trip=${tripId()}`, "owned checkout data unavailable");
     const core = page.getByTestId("checkout-package-core");
     await core.click();
     await expect(page.locator('input[name="package"]')).toHaveValue("core");
@@ -50,7 +51,7 @@ test.describe("@task11 export state and retry", () => {
   test.use({ storageState: createTravelerStorageState() });
 
   test("format cards expose locked/unlocked state and preserve it on reload", async ({ page }) => {
-    await openOwnedRoute(page, `/trip/${TRIP_ID}/export`, "export trip data unavailable");
+    await openOwnedRoute(page, `/trip/${tripId()}/export`, "export trip data unavailable");
     const formats = page.locator('[data-testid^="export-format-"]');
     await expect(formats).toHaveCount(4);
     await expect(page.getByTestId("export-format-print")).toBeVisible();
@@ -60,7 +61,7 @@ test.describe("@task11 export state and retry", () => {
   });
 
   test("ready/error/retry labels and retry action are rendered when the persisted job reaches them", async ({ page }) => {
-    await openOwnedRoute(page, `/trip/${TRIP_ID}/export`, "export job data unavailable");
+    await openOwnedRoute(page, `/trip/${tripId()}/export`, "export job data unavailable");
     const statuses = page.locator('[data-testid^="export-status-"]');
     await expect(statuses).toHaveCount(4);
     const text = await statuses.allTextContents();

@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { createAdminStorageState } from "../fixtures/admin-auth";
 import * as fs from "fs";
 import * as path from "path";
+import { travelerTripPath } from "../fixtures/traveler-trip";
 
 interface RouteBudget {
   maxJsBytes: number;
@@ -33,9 +34,6 @@ interface RouteMeasurement {
 const ROUTES = [
   { path: "/", auth: false, isMap: false },
   { path: "/trip/new", auth: false, isMap: false },
-  { path: "/trip/3", auth: true, isMap: true },
-  { path: "/trip/3/map", auth: true, isMap: true },
-  { path: "/trip/3/export", auth: true, isMap: false },
   { path: "/admin/analytics", auth: true, isMap: false }
 ];
 
@@ -59,6 +57,11 @@ const measurements: RouteMeasurement[] = [];
 
 test.describe("@perf Performance & Bundle Budgets", () => {
   test.use({ storageState: createAdminStorageState() });
+  const travelerRoutes = [
+    { resolve: () => travelerTripPath(), isMap: true },
+    { resolve: () => travelerTripPath("/map"), isMap: true },
+    { resolve: () => travelerTripPath("/export"), isMap: false }
+  ];
 
   test.afterAll(() => {
     const evidenceDir = path.join(process.cwd(), '../../.sisyphus/evidence/future-roadmap');
@@ -259,6 +262,32 @@ test.describe("@perf Performance & Bundle Budgets", () => {
       expect(resources.jsBytes, `JS bundle size (${Math.round(resources.jsBytes/1024)}KB) exceeds budget (${Math.round(budget.maxJsBytes/1024)}KB)`).toBeLessThanOrEqual(budget.maxJsBytes);
       expect(resources.totalBytes, `Total bundle size (${Math.round(resources.totalBytes/1024)}KB) exceeds budget (${Math.round(budget.maxTotalBytes/1024)}KB)`).toBeLessThanOrEqual(budget.maxTotalBytes);
       expect(timing.timingMs, `Timing (${Math.round(timing.timingMs)}ms) exceeds budget (${budget.maxTimingMs}ms)`).toBeLessThanOrEqual(budget.maxTimingMs);
+    });
+  }
+
+  for (const [index, { resolve, isMap }] of travelerRoutes.entries()) {
+    test(`Measure generated traveler trip route ${index + 1}`, async ({ page }) => {
+      const routePath = resolve();
+      const budget = getBudgetForRoute(isMap);
+      await page.goto(routePath, { waitUntil: "networkidle" });
+      const resources: ResourceSummary = await page.evaluate(() => {
+        const entries = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
+        let jsBytes = 0;
+        let jsCount = 0;
+        let totalBytes = 0;
+        let hasMapProvider = false;
+        for (const entry of entries) {
+          const size = entry.transferSize || entry.encodedBodySize || entry.decodedBodySize || 0;
+          totalBytes += size;
+          const isScript = entry.initiatorType === "script" || entry.name.endsWith(".js") || entry.name.includes("/_next/static/chunks/");
+          if (isScript) { jsBytes += size; jsCount++; }
+          const urlLower = entry.name.toLowerCase();
+          if (urlLower.includes("maplibre") || urlLower.includes("workspace-canvas") || urlLower.includes("trip-workspace-canvas") || urlLower.includes("@repo/spatial-engine")) hasMapProvider = true;
+        }
+        return { jsBytes, jsCount, totalBytes, totalCount: entries.length, hasMapProvider };
+      });
+      expect(resources.totalBytes).toBeLessThanOrEqual(budget.maxTotalBytes);
+      if (isMap) expect(resources.hasMapProvider).toBe(true);
     });
   }
 });

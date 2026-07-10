@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
 import { createTravelerStorageState } from "../../fixtures/traveler-auth";
+import { travelerTripPath } from "../../fixtures/traveler-trip";
 
 /**
  * Trip page filmstrip → map → camera integration.
  *
- * Asserts the end-to-end UX contract on `/trip/3`:
+ * Asserts the end-to-end UX contract on the generated traveler trip route:
  *
  *   1. The filmstrip section renders three stop cards under
  *      "Today's Stops" (one per stop on the first itinerary day).
@@ -29,7 +30,7 @@ test.describe("Filmstrip → Map → Camera (Trip Page)", () => {
   });
 
   test("clicking a stop card updates aria-pressed and keeps the map canvas stable", async ({ page }) => {
-    await page.goto("/trip/3");
+    await page.goto(travelerTripPath());
 
     // The filmstrip section sits below the route chapter on the trip page.
     const filmstrip = page.locator('[data-testid="filmstrip-section"]');
@@ -84,7 +85,7 @@ test.describe("Filmstrip → Map → Camera (Trip Page)", () => {
   });
 
   test("cards render enabled when coordinates are present (deterministic provider)", async ({ page }) => {
-    await page.goto("/trip/3");
+    await page.goto(travelerTripPath());
 
     const filmstrip = page.locator('[data-testid="filmstrip-section"]');
     await filmstrip.scrollIntoViewIfNeeded();

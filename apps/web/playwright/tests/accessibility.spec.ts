@@ -5,6 +5,7 @@ import * as path from "path";
 import { createAdminStorageState } from "../fixtures/admin-auth";
 import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
+import { getTravelerTripId, travelerTripPath } from "../fixtures/traveler-trip";
 
 const axeResults: { path: string; violations: any[] }[] = [];
 const h1AuditResults: {
@@ -19,6 +20,10 @@ const h1AuditResults: {
   error?: string;
 }[] = [];
 let shouldWriteH1Audit = false;
+const tripId = () => getTravelerTripId();
+const tripPath = () => travelerTripPath();
+const tripExportPath = () => travelerTripPath("/export");
+const tripMapPath = () => travelerTripPath("/map");
 
 test.afterAll(() => {
   const dir = path.join(process.cwd(), "../../.sisyphus/evidence/future-roadmap");
@@ -80,7 +85,7 @@ async function verifyLandmarksAndFocus(page: any, routePath: string) {
 
 async function auditSourceHeading(routePath: string): Promise<boolean> {
   const sourceFiles: Record<string, string> = {
-    "/trip/3/export": "app/(app)/trip/[tripId]/export/page.tsx",
+    [tripExportPath()]: "app/(app)/trip/[tripId]/export/page.tsx",
     "/reviewer/history": "app/(reviewer)/reviewer/history/page.tsx",
     "/admin/countries": "app/(admin)/admin/countries/page.tsx",
     "/admin/regions": "app/(admin)/admin/regions/page.tsx",
@@ -118,7 +123,7 @@ async function recordH1Audit(page: any, routePath: string): Promise<{
       : "page";
   const sourceVerified = await auditSourceHeading(routePath);
   const samePath = new URL(finalUrl, "http://127.0.0.1").pathname === routePath;
-  const isAuthGateRoute = ["/admin/countries", "/admin/regions", "/admin/partners", "/admin/reviewers", "/admin/quality", "/reviewer/history", "/trip/3/export"].includes(routePath);
+  const isAuthGateRoute = ["/admin/countries", "/admin/regions", "/admin/partners", "/admin/reviewers", "/admin/quality", "/reviewer/history", tripExportPath()].includes(routePath);
   const status = visibleH1Count === 1
     ? "ok"
     : bodyClass === "auth-redirect"
@@ -171,10 +176,11 @@ test.describe("Accessibility Audit - Public", () => {
 
 test.describe("Accessibility Audit - Traveler", () => {
   test.use({ storageState: createTravelerStorageState() });
-  const routes = ["/trip/new", "/trip/3", "/account"];
+  const routes: Array<() => string> = [() => "/trip/new", tripPath, () => "/account"];
   
-  for (const route of routes) {
-    test(`@smoke @a11y traveler route ${route}`, async ({ page }) => {
+  for (const [index, routeFactory] of routes.entries()) {
+    test(`@smoke @a11y traveler route ${index + 1}`, async ({ page }) => {
+      const route = routeFactory();
       const authCookies = await page.context().cookies();
       expect(authCookies.some((cookie) => cookie.name.includes("auth-token")), "traveler storage state must be loaded before auditing protected routes").toBe(true);
       await page.goto(route);
@@ -224,7 +230,7 @@ test("@smoke @a11y route h1 sweep", async ({ browser }) => {
     test.skip();
   }
   // The sweep visits 22 routes (5 marketing + 5 traveler + 5
-  // reviewer + 7 admin). The 3D map on /trip/3/map and the
+  // reviewer + 7 admin). The 3D map on the traveler trip map and the
   // admin pages adds to per-route load time, so the default
   // 30s test timeout is too tight. 90s gives the sweep enough
   // headroom for slow route loads.
@@ -233,8 +239,8 @@ test("@smoke @a11y route h1 sweep", async ({ browser }) => {
   shouldWriteH1Audit = true;
   const sweeps: Array<{ storageState?: string; routes: string[] }> = [
     { routes: ["/", "/portugal", "/how-it-works", "/pricing", "/human-review"] },
-    { storageState: createTravelerStorageState(), routes: ["/trip/new", "/trip/3", "/trip/3/map", "/trip/3/export", "/account"] },
-    { storageState: createReviewerStorageState(), routes: ["/reviewer/queue", "/reviewer/profile", "/reviewer/history", "/reviewer/operations", "/reviewer/trips/3"] },
+    { storageState: createTravelerStorageState(), routes: ["/trip/new", tripPath(), tripMapPath(), tripExportPath(), "/account"] },
+    { storageState: createReviewerStorageState(), routes: ["/reviewer/queue", "/reviewer/profile", "/reviewer/history", "/reviewer/operations", `/reviewer/trips/${tripId()}`] },
     { storageState: createAdminStorageState(), routes: ["/admin/places", "/admin/analytics", "/admin/countries", "/admin/regions", "/admin/partners", "/admin/reviewers", "/admin/quality"] }
   ];
 
@@ -282,9 +288,9 @@ test.describe("Accessibility Audits - Behavior", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({ tripId: "3", tripBriefId: "3", message: "Trip brief saved." })
+          body: JSON.stringify({ tripId: tripId(), tripBriefId: tripId(), message: "Trip brief saved." })
         });
-        trace.push("Mocked POST /api/trips with tripId=3 for keyboard-only a11y isolation");
+        trace.push(`Mocked POST /api/trips with tripId=${tripId()} for keyboard-only a11y isolation`);
       } else {
         await route.continue();
       }
@@ -342,7 +348,7 @@ test("@smoke @a11y focus-visible regression", async ({ page }) => {
 test("@smoke @a11y reduced-motion respect", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce" });
   const page = await context.newPage();
-  const route = "/trip/3";
+  const route = tripPath();
   const evidenceDir = path.join(process.cwd(), "../../.sisyphus/evidence/full-app-framer-redesign");
 
   if (!fs.existsSync(evidenceDir)) {

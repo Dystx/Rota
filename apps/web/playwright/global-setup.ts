@@ -139,19 +139,37 @@ async function ensurePersona(
   }
 }
 
-async function ensureTravelerTrip(admin: SupabaseClient, travelerEmail: string): Promise<void> {
+const E2E_TRIP_TITLE = "Playwright-owned Portugal route [e2e-fixture]";
+const E2E_TRIP_RAW_INPUT = "Playwright-owned traveler fixture [e2e-fixture]";
+
+type TravelerTripFixture = {
+  tripId: string;
+  tripBriefId: string;
+  ownerUserId: string;
+};
+
+async function ensureTravelerTrip(admin: SupabaseClient, travelerEmail: string): Promise<TravelerTripFixture> {
   const users = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
   if (users.error) throw new Error(`[playwright global-setup] Could not list users for trip fixture: ${users.error.message}`);
   const traveler = users.data.users.find((user) => user.email === travelerEmail);
   if (!traveler) throw new Error(`[playwright global-setup] Traveler persona missing for trip fixture.`);
 
-  const existing = await admin.from("trips").select("id,owner_user_id").eq("id", 3).maybeSingle();
-  if (existing.error) throw new Error(`[playwright global-setup] Could not inspect trip fixture: ${existing.error.message}`);
+  // Reuse only the fixture that this setup created for this exact persona and
+  // marker. Never inspect or mutate a well-known id from the hosted project.
+  const existing = await admin
+    .from("trips")
+    .select("id,trip_brief_id,owner_user_id")
+    .eq("owner_user_id", traveler.id)
+    .eq("title", E2E_TRIP_TITLE)
+    .limit(1)
+    .maybeSingle();
+  if (existing.error) throw new Error(`[playwright global-setup] Could not inspect owned trip fixture: ${existing.error.message}`);
   if (existing.data) {
-    if (existing.data.owner_user_id !== traveler.id) {
-      throw new Error("[playwright global-setup] Trip id 3 exists but is not owned by the E2E traveler.");
-    }
-    return;
+    return {
+      ownerUserId: traveler.id,
+      tripBriefId: String(existing.data.trip_brief_id),
+      tripId: String(existing.data.id)
+    };
   }
 
   const brief = {
@@ -169,7 +187,7 @@ async function ensureTravelerTrip(admin: SupabaseClient, travelerEmail: string):
     avoidances: ["rushed-schedules"],
     transport_mode: "train-and-transfers",
     accommodation_location: "Lisbon historic center",
-    raw_input: "A calm five-day Portugal route with local food and room to wander.",
+    raw_input: E2E_TRIP_RAW_INPUT,
     normalized_json: {
       destinationCountry: "portugal",
       regions: ["lisbon", "douro-valley"],
@@ -191,21 +209,73 @@ async function ensureTravelerTrip(admin: SupabaseClient, travelerEmail: string):
     status: "submitted"
   };
 
-  const insertedBrief = await admin.from("trip_briefs").insert(brief).select("id").single();
-  if (insertedBrief.error || !insertedBrief.data) throw new Error(`[playwright global-setup] Could not create trip brief fixture: ${insertedBrief.error?.message ?? "unknown error"}`);
+  // Prefer the transaction RPC so a failed trip insert cannot leave a partial
+  // brief behind. It allocates the identity id server-side.
+  const created = await admin.rpc("create_trip_draft", {
+    p_accommodation_location: brief.accommodation_location,
+    p_avoidances: brief.avoidances,
+    p_budget_level: brief.budget_level,
+    p_destination_country: brief.destination_country,
+    p_destination_regions: brief.destination_regions,
+    p_end_date: brief.end_date,
+    p_food_preferences: brief.food_preferences,
+    p_interests: brief.interests,
+    p_normalized_json: brief.normalized_json,
+    p_owner_user_id: traveler.id,
+    p_pace: brief.pace,
+    p_raw_input: brief.raw_input,
+    p_start_date: brief.start_date,
+    p_title: E2E_TRIP_TITLE,
+    p_transport_mode: brief.transport_mode,
+    p_traveler_type: brief.traveler_type,
+    p_travelers_count: brief.travelers_count,
+    p_trip_length_days: brief.trip_length_days
+  }).single();
+  let row = created.data as { trip_id?: number | string; trip_brief_id?: number | string } | null;
+  if (created.error || !row) {
+    // Some hosted projects have not applied the transaction RPC migration yet.
+    // Fall back to two service-role inserts with no caller-supplied identity
+    // id. Cleanup keeps the brief table consistent if the second insert fails.
+    const insertedBrief = await admin.from("trip_briefs").insert(brief).select("id").single();
+    if (insertedBrief.error || !insertedBrief.data) {
+      throw new Error(
+        `[playwright global-setup] Could not create owned trip fixture via RPC (${created.error?.message ?? "no row"}) or direct brief insert (${insertedBrief.error?.message ?? "unknown error"}).`
+      );
+    }
 
-  const insertedTrip = await admin.from("trips").insert({
-    id: 3,
-    trip_brief_id: insertedBrief.data.id,
-    country_slug: "portugal",
-    title: "Lisbon & Douro — a considered route",
-    status: "draft",
-    visibility: "private",
-    owner_user_id: traveler.id,
-    is_paid: false,
-    has_human_review: false
-  });
-  if (insertedTrip.error) throw new Error(`[playwright global-setup] Could not create trip fixture: ${insertedTrip.error.message}`);
+    const insertedTrip = await admin
+      .from("trips")
+      .insert({
+        country_slug: "portugal",
+        has_human_review: false,
+        is_paid: false,
+        owner_user_id: traveler.id,
+        status: "draft",
+        title: E2E_TRIP_TITLE,
+        trip_brief_id: insertedBrief.data.id,
+        visibility: "private"
+      })
+      .select("id,trip_brief_id")
+      .single();
+    if (insertedTrip.error || !insertedTrip.data) {
+      await admin.from("trip_briefs").delete().eq("id", insertedBrief.data.id);
+      throw new Error(
+        `[playwright global-setup] Could not create owned trip fixture via RPC (${created.error?.message ?? "no row"}) or direct trip insert (${insertedTrip.error?.message ?? "unknown error"}).`
+      );
+    }
+    row = insertedTrip.data as { trip_id?: number | string; trip_brief_id?: number | string };
+    row.trip_id = (insertedTrip.data as { id: number | string }).id;
+  }
+
+  if (row.trip_id === undefined || row.trip_brief_id === undefined) {
+    throw new Error("[playwright global-setup] Trip fixture RPC returned an invalid row.");
+  }
+
+  return {
+    ownerUserId: traveler.id,
+    tripBriefId: String(row.trip_brief_id),
+    tripId: String(row.trip_id)
+  };
 }
 
 function unquoteCookieValue(value: string): string {
@@ -294,5 +364,10 @@ export default async function globalSetup(): Promise<void> {
     fs.writeFileSync(target, JSON.stringify(state, null, 2), "utf8");
   }
 
-  await ensureTravelerTrip(adminClient, "e2e-traveler@rota.test");
+  const travelerTrip = await ensureTravelerTrip(adminClient, "e2e-traveler@rota.test");
+  fs.writeFileSync(
+    path.join(AUTH_DIR, "traveler-trip.json"),
+    JSON.stringify(travelerTrip, null, 2),
+    "utf8"
+  );
 }

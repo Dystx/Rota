@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
+import { travelerTripPath } from "../fixtures/traveler-trip";
 
 // Stitch 1.4 — Trip workspace affordances
 //
@@ -16,7 +17,7 @@ test.describe("@smoke @trip-stitch-1-4 trip workspace Stitch 1.4 affordances", (
   test.use({ storageState: createTravelerStorageState() });
 
   test("pace & tone control renders with four options", async ({ page }) => {
-    await page.goto("/trip/3");
+    await page.goto(travelerTripPath());
 
     const control = page.getByTestId("pace-tone-control");
     await expect(control).toBeVisible();
@@ -27,7 +28,7 @@ test.describe("@smoke @trip-stitch-1-4 trip workspace Stitch 1.4 affordances", (
   });
 
   test("clicking pace options toggles aria-pressed", async ({ page }) => {
-    await page.goto("/trip/3");
+    await page.goto(travelerTripPath());
 
     const relaxed = page.getByTestId("pace-option-relaxed");
     const active = page.getByTestId("pace-option-active");
@@ -42,7 +43,7 @@ test.describe("@smoke @trip-stitch-1-4 trip workspace Stitch 1.4 affordances", (
   });
 
   test("brief card exposes Share + Download action buttons", async ({ page }) => {
-    await page.goto("/trip/3");
+    await page.goto(travelerTripPath());
 
     const actions = page.getByTestId("trip-brief-actions");
     await expect(actions).toBeVisible();
@@ -51,7 +52,7 @@ test.describe("@smoke @trip-stitch-1-4 trip workspace Stitch 1.4 affordances", (
   });
 
   test("filmstrip ends with the Add Stop card", async ({ page }) => {
-    await page.goto("/trip/3");
+    await page.goto(travelerTripPath());
 
     const filmstrip = page.locator('[data-testid="filmstrip-section"]');
     await filmstrip.scrollIntoViewIfNeeded();

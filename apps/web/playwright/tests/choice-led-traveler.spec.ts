@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
+import { getTravelerTripId, travelerCheckoutPath, travelerTripPath } from "../fixtures/traveler-trip";
 
 test.describe("@smoke choice-led traveler journey", () => {
   test.use({ storageState: createTravelerStorageState() });
@@ -30,20 +31,20 @@ test.describe("@smoke choice-led traveler journey", () => {
     await expect(page.locator("h1:visible")).toHaveCount(1);
 
     // Use the seeded traveler trip for the remaining route surfaces.
-    await page.goto("/trip/3", { waitUntil: "domcontentloaded" });
-    await expect(page).toHaveURL(/\/trip\/3$/);
+    await page.goto(travelerTripPath(), { waitUntil: "domcontentloaded" });
+    await expect(page).toHaveURL(new RegExp(`/trip/${getTravelerTripId()}$`));
     await page.getByRole("link", { name: /map/i }).first().click();
-    await expect(page).toHaveURL(/\/trip\/3\/map/);
+    await expect(page).toHaveURL(new RegExp(`/trip/${getTravelerTripId()}/map`));
 
-    await page.goto("/checkout?trip=3", { waitUntil: "domcontentloaded" });
-    await expect(page).toHaveURL(/\/checkout\?trip=3/);
+    await page.goto(travelerCheckoutPath(), { waitUntil: "domcontentloaded" });
+    await expect(page).toHaveURL(new RegExp(`/checkout\\?trip=${getTravelerTripId()}`));
     await expect(page.locator('[data-testid="checkout-package-selector"]')).toBeVisible();
     await page.getByTestId("checkout-package-core").click();
     await expect(page.getByTestId("checkout-package-core")).toHaveAttribute("aria-pressed", "true");
-    await page.goto("/trip/3");
-    await expect(page).toHaveURL(/\/trip\/3$/);
-    await page.goto("/trip/3/export");
-    await expect(page).toHaveURL(/\/trip\/3\/export/);
+    await page.goto(travelerTripPath());
+    await expect(page).toHaveURL(new RegExp(`/trip/${getTravelerTripId()}$`));
+    await page.goto(travelerTripPath("/export"));
+    await expect(page).toHaveURL(new RegExp(`/trip/${getTravelerTripId()}/export`));
     await expect(page.locator("main")).toHaveCount(1);
     await expect(page.locator("h1:visible")).toHaveCount(1);
     await expect(page.getByTestId("export-status-print")).toBeVisible();

@@ -2,13 +2,14 @@ import { expect, test } from "@playwright/test";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
 import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createAdminStorageState } from "../fixtures/admin-auth";
+import { travelerTripPath } from "../fixtures/traveler-trip";
 
 const marketingRoutes = ["/", "/portugal", "/how-it-works", "/pricing", "/human-review"];
-const travelerRoutes = [
+const travelerRoutes: Array<string | (() => string)> = [
   "/trip/new",
-  "/trip/3",
-  "/trip/3/map",
-  "/trip/3/export",
+  travelerTripPath,
+  () => travelerTripPath("/map"),
+  () => travelerTripPath("/export"),
   "/account",
   "/itineraries",
   "/planner",
@@ -107,9 +108,11 @@ test.describe("@smoke @visual Marketing baselines", () => {
 
 test.describe("@smoke @visual Traveler baselines", () => {
   test.use({ storageState: createTravelerStorageState() });
-  for (const route of travelerRoutes) {
-    const routeName = route.replace(/\//g, "-").replace(/^-/, "");
-    test(`traveler route ${route}`, async ({ page }, testInfo) => {
+  for (const [index, routeEntry] of travelerRoutes.entries()) {
+    const routeLabel = typeof routeEntry === "string" ? routeEntry : `generated trip route ${index + 1}`;
+    test(`traveler route ${routeLabel}`, async ({ page }, testInfo) => {
+      const route = typeof routeEntry === "string" ? routeEntry : routeEntry();
+      const routeName = route.replace(/\//g, "-").replace(/^-/, "");
       await page.goto(route);
       await assertRouteQuality(page, route, true);
       await disableAnimations(page);

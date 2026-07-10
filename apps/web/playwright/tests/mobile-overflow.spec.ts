@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
 import fs from "fs";
 import path from "path";
+import { travelerTripPath } from "../fixtures/traveler-trip";
 
 const routes = {
   marketing: ["/", "/portugal", "/how-it-works", "/pricing", "/human-review"],
-  traveler: ["/planner", "/trip/new", "/trip/3", "/trip/3/map", "/trip/3/export", "/checkout", "/itineraries", "/account"],
+  traveler: ["/planner", "/trip/new", "/checkout", "/itineraries", "/account"],
   reviewer: ["/reviewer/queue", "/reviewer/profile", "/reviewer/history"],
   admin: ["/admin/places", "/admin/analytics"],
 };
@@ -46,6 +47,21 @@ test.describe("@smoke @visual mobile-overflow sweep", () => {
         ok,
       });
 
+      expect(scrollWidth).toBeLessThanOrEqual(viewportWidth + 1);
+    });
+  }
+
+  for (const routeSuffix of ["", "/map", "/export"]) {
+    test(`route traveler trip${routeSuffix} should not overflow horizontally on mobile`, async ({ page, isMobile }) => {
+      test.skip(!isMobile, "Overflow sweep is only for mobile");
+      const route = travelerTripPath(routeSuffix);
+      await page.goto(route);
+      await page.waitForLoadState("domcontentloaded");
+      await page.waitForTimeout(250);
+      const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+      const viewportWidth = await page.evaluate(() => window.innerWidth);
+      const ok = scrollWidth <= viewportWidth + 1;
+      results.push({ path: route, scrollWidth, viewportWidth, ok });
       expect(scrollWidth).toBeLessThanOrEqual(viewportWidth + 1);
     });
   }
