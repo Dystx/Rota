@@ -109,6 +109,11 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
 | `playwright test public-discovery.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 8 tests |
 | `playwright test protected-routes.spec.ts --project=desktop-chrome` | PASS — 44 tests |
 
+Canonical serialized route gate (`pnpm --dir apps/web test:e2e`, 2026-07-10):
+**PASS — 229 tests passed, 19 intentionally skipped.** This is the release-gate
+run covering the complete configured desktop/mobile projects and avoids shared
+fresh-server/Supabase fixture races by running with one worker.
+
 The earlier failed rows above are retained as historical evidence of the fixture
 and stale-baseline issues that were subsequently corrected; they are superseded
 by this fresh rerun.
