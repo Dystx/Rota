@@ -68,6 +68,9 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
   operator, beta-gated, export, and messaging routes.
 - Built-server mobile smoke (`390×844`) passed for `/`, `/planner`, `/b2b`, and
   `/guide`: one `main`, one visible `h1`, and no document overflow on each.
+- Built-server authenticated smoke passed for the generated owned trip (`9` in
+  the current fixture): overview, map, export, and checkout each rendered one
+  `main`, one visible `h1`, and no mobile overflow.
 - Operator console fixtures are explicitly labeled “Demo data”, use Portugal
   content, and no longer expose the prior Kyoto/Japan/search placeholders.
 - Guide beta portraits now use an authenticated, user-prefixed private Storage
