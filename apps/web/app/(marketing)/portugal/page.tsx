@@ -1,15 +1,27 @@
-import { Metadata } from "next";
-import { getPublishedPortugalRegions } from "@/lib/content/portugal-regions";
+import * as React from "react";
+import type { Metadata } from "next";
+
+import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
+
 import { PortugalAtlas } from "./portugal-atlas";
 
 export const metadata: Metadata = {
-  title: "Curated Portugal Regions & Experiences | Portugal Travel Concierge",
-  description: "Explore Porto, Lisbon, Douro Valley, and more with our curated Portugal-first place base and expert local guidance.",
-  alternates: {
-    canonical: "/portugal"
-  }
+  title: "What to do in Portugal | Rumia",
+  description:
+    "Browse Rumia’s reviewed Portugal activity collections by the kind of day you want to have.",
+  alternates: { canonical: "/portugal" }
 };
 
 export default function PortugalPage() {
-  return <div className="mx-auto max-w-6xl px-6 py-16"><h1 className="font-display text-5xl text-primary">Portugal, with room to travel well.</h1><p className="mt-4 max-w-2xl text-on-surface-variant">Build a route that respects distance, season, and the way you want to move.</p><div className="mt-12"><PortugalAtlas regions={getPublishedPortugalRegions()} /></div></div>;
+  return (
+    <div className="mx-auto max-w-6xl px-6 py-16">
+      <h1 className="font-display text-5xl text-primary">What deserves your time in Portugal?</h1>
+      <p className="mt-4 max-w-2xl text-lg leading-relaxed text-on-surface-variant">
+        Start with a part of the country and the kind of time you have. Rumia will show the activity decisions worth considering, including when to choose something else.
+      </p>
+      <div className="mt-12">
+        <PortugalAtlas activities={REVIEWED_ACTIVITY_SEED} />
+      </div>
+    </div>
+  );
 }
