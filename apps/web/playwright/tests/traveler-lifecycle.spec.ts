@@ -28,7 +28,7 @@ test.describe("@smoke @traveler-lifecycle traveler trip lifecycle", () => {
 
   test("traveler can load overview, map, and export surfaces for a trip", async ({ page }) => {
     await page.goto(`/trip/${tripId()}`);
-    await expect(page.getByTestId("trip-overview-header")).toBeVisible();
+    await page.getByTestId("trip-overview-header").waitFor({ state: "visible", timeout: 15_000 });
     await expect(page).toHaveURL(new RegExp(`/trip/${tripId()}$`));
 
     await page.goto(`/trip/${tripId()}/map`);

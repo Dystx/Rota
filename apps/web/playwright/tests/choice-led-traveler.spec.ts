@@ -20,6 +20,7 @@ test.describe("@smoke choice-led traveler journey", () => {
     await expect(lisbon).toBeVisible();
     await lisbon.focus();
     await expect(lisbon).toBeFocused();
+    await page.waitForTimeout(500);
     await lisbon.press("Space");
     await expect(lisbon).toHaveAttribute("aria-checked", "true");
     await page.getByRole("button", { name: /Build my itinerary/i }).focus();
