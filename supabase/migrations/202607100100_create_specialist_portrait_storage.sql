@@ -35,7 +35,7 @@ alter table public.specialist_profiles
   add constraint specialist_profiles_photo_storage_path
   check (
     photo_url is null
-    or photo_url ~* '^[0-9a-f-]{36}/[0-9a-f-]{36}\\.(jpg|png|webp)$'
+    or photo_url ~* '^[0-9a-f-]{36}/[0-9a-f-]{36}[.](jpg|png|webp)$'
   );
 
 drop policy if exists specialist_portraits_select_own on storage.objects;
