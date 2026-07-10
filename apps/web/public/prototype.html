@@ -1,122 +1,13 @@
-<!DOCTYPE html>
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Rumia - Intentional Humanism in Travel</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .fill-icon {
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-</head>
-<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-x-hidden">
-<!-- TopNavBar -->
-<nav class="fixed top-0 w-full z-50 bg-glass-light/65 dark:bg-glass-dark/85 backdrop-blur-md border-b border-white/20 dark:border-olive-dark/10 shadow-sm transition-all duration-300">
-<div class="flex justify-between items-center h-header-height px-container-padding-lg max-w-7xl mx-auto">
-<!-- Brand -->
-<a class="font-headline-lg text-headline-lg italic text-primary dark:text-primary-fixed" href="#">Rumia</a>
-<!-- Desktop Navigation -->
-<ul class="hidden md:flex items-center gap-8">
-<li><a class="font-label-ui text-label-ui text-on-surface-variant dark:text-on-primary-container hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200" href="#">Itineraries</a></li>
-<li><a class="font-label-ui text-label-ui text-on-surface-variant dark:text-on-primary-container hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200" href="#">Expert Chat</a></li>
-<li><a class="font-label-ui text-label-ui text-on-surface-variant dark:text-on-primary-container hover:text-ochre-light dark:hover:text-ochre-dark transition-colors duration-200" href="#">Vault</a></li>
-</ul>
-<!-- Trailing Action & Profile -->
-<div class="flex items-center gap-6">
-<button class="hidden md:block bg-olive-light text-on-primary font-label-ui text-label-ui px-6 py-2 rounded-full hover:bg-olive-dark transition-colors duration-200 shadow-sm">Plan a Trip</button>
-<button class="w-8 h-8 rounded-full overflow-hidden border border-white/20 shadow-sm scale-95 active:opacity-80 transition-all">
-<img alt="Traveler profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJnCG5lbmqYcEas2Nf4z5hZZPtjVXDRq2TGeX3XdS4r7JVq4OGrFc0rdoTDxgd0_-MXbB4YPoDQGFjWbrRxYGdAgBQKu6_PeaXiwP6ZEx3gBpaqg-Dq7X86ueESI1-bNfV3znqVQyVKMm4FeLnC5BdGm9U1YH_9xnm1nJzp95YcKIclkYAqs6-lFU5bCBsbu10S71THbosiO6wWD4r4a4Fl0LhpERaj1ORLotenFT3_2dyOL8qp8D4BUWyVxfNVchZ9FakGOE-9f4x"/>
-</button>
-</div>
-</div>
-</nav>
-<!-- Main Content -->
-<main class="min-h-screen pt-header-height">
-<!-- Hero Section (Cinematic Gate) -->
-<section class="relative h-[819px] min-h-[600px] w-full flex flex-col justify-center items-center overflow-hidden">
-<!-- Background "Video Loop" (Mocked with image) -->
-<div class="absolute inset-0 w-full h-full">
-<div class="w-full h-full bg-cover bg-center object-cover filter brightness-[0.85] contrast-125 saturate-110" data-alt="A breathtaking, cinematic wide shot of the rugged coastline of Portugal at sunset. The ocean waves crash against dramatic cliffs. The scene is bathed in golden light, evoking a sense of awe, discovery, and serene luxury. The color palette features deep ocean blues and rich, glowing ochre skies." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCX3bKR-Xr7E_XjZsIHsO8GXIycFbn1UViEGxIXcvq3q5URIvlKF1tHXI8Q6I2K_aOmqDtA0I9xgu3nukH3AKzEV0E_ZVN-jTVndO-ZmUgFTgQ6Qja0ApRYSCmHU7_rtk4zuAXTpszEFhJntzw9Hc1PU-yQqKvq_VB1tCp5kV0RyNrRw34OBeBnei4hZhWWHXgKziQfaoH-stdy5vUUyvroiRc1Xl46gkiOU5z3CByCu7z7MeZue5KAtydhEggtzf5NL-NDqysiKt-S')"></div>
-<!-- Gradient Overlay for readability -->
-<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90"></div>
-<div class="absolute inset-0 bg-primary/20 mix-blend-multiply"></div>
-</div>
-<!-- Hero Content -->
-<div class="relative z-10 w-full max-w-4xl mx-auto px-container-padding-lg text-center flex flex-col items-center">
-<!-- Typography Mask Effect (Simulated with text clipping on background, though hard in pure standard TW without custom CSS for background-clip, using standard high contrast text here to fit design system ) -->
-<h1 class="font-display text-display text-on-secondary mb-section-gap tracking-tight drop-shadow-2xl">
-                    Discover <span class="italic text-ochre-light">Intentionally.</span>
-</h1>
-<!-- Central Search Bar (The Wizard) -->
-<div class="w-full max-w-3xl bg-glass-light backdrop-blur-[24px] border border-white/40 rounded-xl p-card-padding shadow-2xl flex flex-col items-center">
-<div class="w-full flex items-center justify-between border-b border-olive-light/20 pb-4 mb-4">
-<span class="font-headline-lg text-headline-lg text-primary text-center w-full">
-                            We are visiting <span class="text-ochre-dark border-b-2 border-ochre-dark/30 cursor-text">Portugal</span> for <span class="text-ochre-dark border-b-2 border-ochre-dark/30 cursor-text">7 days</span>...
-                        </span>
-</div>
-<button class="bg-olive-light text-on-primary font-label-ui text-label-ui px-8 py-3 rounded-full hover:bg-olive-dark transition-all duration-200 shadow-md flex items-center gap-2 group">
-                        Begin Journey <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-</button>
-</div>
-</div>
-</section>
-<!-- Discovery Bento Grid -->
-<section class="max-w-7xl mx-auto px-container-padding-lg py-section-gap relative -mt-32 z-20">
-<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[250px]">
-<!-- Bento Item 1: Lisbon (Large) -->
-<a class="md:col-span-8 row-span-2 group relative rounded-xl overflow-hidden shadow-lg border border-white/40 block" href="#">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A vibrant, sunlit street view of Lisbon, Portugal. Iconic yellow trams navigate steep, narrow cobblestone streets lined with pastel-colored historic buildings. The image conveys a lively, culturally rich atmosphere with a warm, inviting light-mode color palette featuring soft terracottas and bright skies." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvuwR3iBxSI7Dc_xUue9PlZOCxIkQdO1BKnkgj-Vq6a6JbMPr5O97KI6d0ZWxwqjhuR1vs8JPyayESizGC4kuFSrWW58tlR9jga482rLrmo0T-b4VypQQsJAaei9FZ1yDMY7XIWocnoL1SV_GZQdCU56_yCUHMLkWvsUCY0wotaS3KlSHTP951qa-BSLMipuZqD84KyB7aj3cjePoP6zdoo9Mwo3l7tSNZjLrmkXopRfAh8ZnUeya-lMseIAzgR9e4PQ6wJjrQCdf7')"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-olive-dark/80 via-olive-dark/20 to-transparent"></div>
-<div class="absolute inset-0 p-card-padding flex flex-col justify-end text-on-primary">
-<span class="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-2 bg-olive-dark/50 inline-block w-max px-2 py-1 rounded backdrop-blur-sm">Capital Region</span>
-<h3 class="font-headline-lg text-headline-lg leading-tight mb-2">Lisbon &amp; Surrounds</h3>
-<p class="font-body-md text-body-md opacity-90 max-w-md hidden md:block">Explore the steep, historic streets, vibrant culinary scene, and nearby coastal retreats of Sintra and Cascais.</p>
-</div>
-</a>
-<!-- Bento Item 2: Douro Valley (Tall) -->
-<a class="md:col-span-4 row-span-2 group relative rounded-xl overflow-hidden shadow-lg border border-white/40 block" href="#">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A serene, sweeping view of the Douro Valley in Portugal. Terraced vineyards cascade down steep hillsides to a calm, winding river. The scene is bathed in soft, early morning mist and warm golden light, emphasizing a tranquil, premium natural environment suitable for a luxury travel aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDYu4Fau7io9fH__yOAmh3NS8NfSMdk4ppABEZGMyiJwdW_dhtVGIV0Dw8kZR5lK8lak_dEo3IYDDkcBiyUHxBrqgD1OY6SCaop5fhBOUIuWLkFjpQEap2YW6UIWgEQub-GOXL6J16-h9-xPjE5k4xodT3fM956CvzZtrcH2SVBxRa4jyXhODGOllDkrFhiRZSkk1SHeyc6sg3eg112VXti1LIJwp3gJBIAT5_yX8TXauvdhmEtLcwsd8bMv72CDVKpvSHVhqM1u1-q')"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-olive-dark/90 via-olive-dark/30 to-transparent"></div>
-<div class="absolute inset-0 p-card-padding flex flex-col justify-end text-on-primary">
-<span class="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-2 bg-olive-dark/50 inline-block w-max px-2 py-1 rounded backdrop-blur-sm">Wine Country</span>
-<h3 class="font-headline-sm text-headline-sm leading-tight mb-2">Douro Valley</h3>
-<p class="font-body-md text-body-md opacity-90 text-sm">Terraced vineyards and ancient estates along the golden river.</p>
-</div>
-</a>
-<!-- Bento Item 3: Azores (Wide) -->
-<a class="md:col-span-12 row-span-1 group relative rounded-xl overflow-hidden shadow-lg border border-white/40 block" href="#">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A dramatic aerial perspective of the Azores islands. Lush, emerald-green volcanic crater lakes contrast sharply with deep blue Atlantic ocean waters. The image is striking and organic, showcasing the raw, untouched beauty of nature with high contrast and vivid, natural colors." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBVKywJbZwS5PUrrA6MTfs8d39w7yOtkJJUlakoA3aqZmMo4bLGdOn82FnKAJpUqR3Jx9CEwQqheDNpgz4SQ1c8xNuXlkUbJ6P6GIQxYDjHrjZbZrUSTiAh_dzx28ytJ4YG1qFhpPhIPg1LQ5sLWV8Qn6xUwtNOvQhOiFiGt4K6t3ek8exOSJc94DpCxSm2ZZaOX7x8CWip_O1xDmTILAQdtSnFICxCjx6GZQrksj92zpEnN4klxv2zWuS-S2otMfgk_4y9xhmDvjv0')"></div>
-<div class="absolute inset-0 bg-gradient-to-r from-olive-dark/90 via-olive-dark/50 to-transparent"></div>
-<div class="absolute inset-0 p-card-padding flex flex-col justify-center text-on-primary w-full md:w-1/2">
-<span class="font-mono-micro text-mono-micro uppercase tracking-widest text-secondary-fixed mb-2 bg-olive-dark/50 inline-block w-max px-2 py-1 rounded backdrop-blur-sm">Island Archipelago</span>
-<h3 class="font-headline-lg text-headline-lg leading-tight mb-2">The Azores</h3>
-<p class="font-body-md text-body-md opacity-90">Volcanic craters, thermal springs, and untouched Atlantic wilderness.</p>
-</div>
-</a>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="bg-linen-dark dark:bg-olive-dark w-full bottom-0 border-t border-olive-dark/5 dark:border-white/5 py-12 px-container-padding-lg flex flex-col md:flex-row justify-between items-center gap-4 mt-section-gap">
-<a class="font-headline-sm text-headline-sm italic text-primary dark:text-primary-fixed" href="#">Rumia</a>
-<p class="font-label-ui text-label-ui text-olive-light dark:text-primary-fixed-dim text-center md:text-left">
-            © 2024 Rumia. All rights reserved. Intentional Humanism in Travel.
-        </p>
-<ul class="flex flex-wrap justify-center gap-6">
-<li><a class="font-label-ui text-label-ui text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a></li>
-<li><a class="font-label-ui text-label-ui text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a></li>
-<li><a class="font-label-ui text-label-ui text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Sustainability</a></li>
-<li><a class="font-label-ui text-label-ui text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Global Support</a></li>
-</ul>
-</footer>
-</body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="0;url=/" />
+    <meta name="robots" content="noindex" />
+    <title>Rumia</title>
+    <script>window.location.replace('/');</script>
+  </head>
+  <body>
+    <p>This prototype has moved to the live Rumia experience. <a href="/">Continue to Rumia</a>.</p>
+  </body>
+</html>

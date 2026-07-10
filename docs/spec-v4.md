@@ -253,7 +253,7 @@ Every screen is designed to emphasize visual geography over tech mechanics.
   - **Center**: Specific localized experiences highlighted: *[Cascais Coast Exploration], [Private Sintra Forest Paths]*.
   - **Right**: Clear payment node: *€65/hour • Secure with Stripe*.
 
-The prototype at [`docs/prototype.html`](./prototype.html) (served at `/prototype.html`) demonstrates the editorial glass-morphism vocabulary: frosted glass cards on hero imagery, Playfair Display + Inter typography, olive + ochre + cream + sage palette.
+The reference prototype at [`docs/prototype.html`](./prototype.html) demonstrates the editorial glass-morphism vocabulary: frosted glass cards on hero imagery, Playfair Display + Inter typography, olive + ochre + cream + sage palette. The legacy public `/prototype.html` path redirects to the live app.
 
 ---
 

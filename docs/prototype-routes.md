@@ -112,7 +112,7 @@ Each step is its own commit; smallest-reviewable diff.
 |---|---|---|
 | 1. Add prototype-mapped routes as Next.js pages | ✅ **11/12 routes ported** | `c007883`, `8476954`, `af25df7`, `7bcf504` |
 | 2. Olive/ochre tokens applied to `packages/ui/src/styles.css` | ✅ Done additively | `baf0042`, `081b40f` |
-| 3. Prototype served verbatim at `/prototype.html` | ✅ Done | `061165d` |
+| 3. Legacy `/prototype.html` path redirects to the live app | ✅ Done | current release |
 | 4. `.rota-*` audit + repoint | ✅ Done (Option D: value repoint in `:root`) | `66fc9cc` |
 | 5. Replace page-level heroes in `(marketing)/(app)` | ✅ Done (marketing + trip/new) | `022b228`, `a57a45e` |
 | 6. Verify pnpm typecheck / test / build | ✅ All pass (13/13 typecheck, 131/131 @repo/ui tests, 49/49 build) | — |

@@ -10,7 +10,7 @@
 | 1 | `4591c5a` | Rewrite `packages/ui/src/styles.css` with prototype's exact tokens via `@theme` block (replaces broken `@theme inline`) |
 | 2-6 | `efac8b0` | Add Inter / Playfair Display / JetBrains Mono fonts + Material Symbols to layout; build shared TopNav / SiteFooter / DestinationBento; rewrite `/` home as prototype's HomePage |
 | 7 | `3d23441` | Add TopNav + SiteFooter to all 12 prototype ports (6 client-facing + 6 console) |
-| Sync | `b3d0e28` | Sync `docs/prototype.html` + `apps/web/public/prototype.html` to the new full version; delete unused `home-client.tsx` |
+| Sync | `b3d0e28` + current release | Keep `docs/prototype.html` as the reference artifact; redirect the legacy public path to the live app so runtime routes do not depend on remote prototype imagery |
 
 ## What changed in the visual language
 
@@ -62,7 +62,7 @@ The next concrete work (now that the visual shell is unified) is:
 ## Cross-references
 
 - `docs/prototype.html` — canonical prototype (source of truth for visual)
-- `apps/web/public/prototype.html` — same file, served at `/prototype.html`
+- `/prototype.html` — legacy redirect to the live app; the canonical prototype remains `docs/prototype.html`
 - `apps/web/app/_components/top-nav.tsx` — TopNav component
 - `apps/web/app/_components/site-footer.tsx` — SiteFooter component
 - `apps/web/app/_components/destination-bento.tsx` — DestinationBento component
