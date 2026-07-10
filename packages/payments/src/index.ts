@@ -1,3 +1,5 @@
+export * from "./catalogue";
+
 export type CheckoutTier = "free-preview" | "paid-trip" | "human-polish";
 
 export type CheckoutPurchaseKind = "unlock" | "human_review";
