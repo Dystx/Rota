@@ -71,6 +71,10 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
 - Built-server authenticated smoke passed for the generated owned trip (`9` in
   the current fixture): overview, map, export, and checkout each rendered one
   `main`, one visible `h1`, and no mobile overflow.
+- Follow-up shell smoke passed for `/how-it-works`, `/pricing`, `/human-review`,
+  and `/admin/specialists` after removing nested public landmarks and constraining
+  the specialist table to an internal horizontal region; all now have one
+  `main`, one visible `h1`, and no document overflow at 390px.
 - Operator console fixtures are explicitly labeled “Demo data”, use Portugal
   content, and no longer expose the prior Kyoto/Japan/search placeholders.
 - Guide beta portraits now use an authenticated, user-prefixed private Storage
