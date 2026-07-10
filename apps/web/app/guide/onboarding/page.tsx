@@ -5,6 +5,7 @@ import { isFeatureEnabled } from "@repo/config";
 import { GuideOnboardingForm } from "./_components/guide-onboarding-form";
 import { loadSpecialistCapabilities } from "./actions";
 import { BetaUnavailable } from "../../_components/beta-unavailable";
+import { PublicRouteLayout } from "../../_components/public-route-layout";
 
 /**
  * Specialist onboarding page. The unified
@@ -51,7 +52,8 @@ export default async function GuideOnboardingPage() {
     : { skills: [], languages: [] };
 
   return (
-    <main className="rota-page rota-page-pad">
+    <PublicRouteLayout>
+      <div className="mx-auto w-full max-w-5xl px-container-padding-sm py-16 md:px-container-padding-md">
       <header className="rota-stack-tight mb-6">
         <h1 className="font-headline text-headline-lg text-foreground">
           Specialist onboarding
@@ -69,6 +71,7 @@ export default async function GuideOnboardingPage() {
         initialCapabilities={initialCapabilities}
         userId={userId}
       />
-    </main>
+      </div>
+    </PublicRouteLayout>
   );
 }

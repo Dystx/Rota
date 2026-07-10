@@ -101,9 +101,9 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
 | `pnpm lint` | PASS |
 | `pnpm exec vitest run` | PASS — 94 files / 689 tests |
 | `pnpm --filter web build` | PASS |
-| `playwright test visual.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 62 tests |
-| `playwright test accessibility.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 52 active checks |
-| `playwright test mobile-overflow.spec.ts --project=mobile-chromium` | PASS — 29 active checks |
+| `playwright test visual.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 66 tests |
+| `playwright test accessibility.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 56 active checks |
+| `playwright test mobile-overflow.spec.ts --project=mobile-chromium` | PASS — 31 active checks |
 | `playwright test choice-led-traveler.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 2 tests |
 | `playwright test public-discovery.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 8 tests |
 | `playwright test protected-routes.spec.ts --project=desktop-chrome` | PASS — 44 tests |
@@ -123,8 +123,9 @@ traveler shell; the mobile destination bento and all affected baselines were
 refreshed after the responsive shell changes.
 
 The expanded visual/accessibility/overflow run was rerun after utility-route,
-beta-gateway shell migration, and contrast fixes: **62 visual tests passed;
-the new beta routes add 6 accessibility checks and 3 mobile-overflow checks.**
+beta-gateway shell migration, unknown-workspace handling, and contrast fixes:
+**66 visual tests passed; 56 accessibility checks and 31 mobile-overflow checks
+are active (desktop overflow projects remain intentionally skipped).**
 
 The earlier failed rows above are retained as historical evidence of the fixture
 and stale-baseline issues that were subsequently corrected; they are superseded

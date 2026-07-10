@@ -20,7 +20,9 @@ const marketingRoutes = [
   "/sign-in",
   "/expert-chat",
   "/guide",
-  "/b2b"
+  "/b2b",
+  "/guide/onboarding",
+  "/b2b/unknown-workspace"
 ];
 const travelerRoutes: Array<string | (() => string)> = [
   "/trip/new",

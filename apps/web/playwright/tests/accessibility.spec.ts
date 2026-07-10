@@ -174,7 +174,9 @@ test.describe("Accessibility Audit - Public", () => {
     "/sign-in",
     "/expert-chat",
     "/guide",
-    "/b2b"
+    "/b2b",
+    "/guide/onboarding",
+    "/b2b/unknown-workspace"
   ];
 
   for (const route of publicRoutes) {

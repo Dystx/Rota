@@ -1,8 +1,8 @@
-import { notFound } from "next/navigation";
 import { getOrgBySlug } from "@repo/db";
 import { isFeatureEnabled } from "@repo/config";
 import { OrgBrandingApplier } from "@/app/_components/org-branding";
 import { BetaUnavailable } from "@/app/_components/beta-unavailable";
+import { PublicRouteLayout } from "@/app/_components/public-route-layout";
 
 /**
  * Public white-label landing page for a B2B partner.
@@ -32,13 +32,19 @@ export default async function B2BLandingPage({
   const { orgSlug } = await params;
   const org = await getOrgBySlug(orgSlug);
   if (!org) {
-    notFound();
+    return (
+      <BetaUnavailable
+        title="That partner workspace is not available"
+        description="This workspace may be invite-only or still being configured. Return to Rumia to explore Portugal planning."
+        returnHref="/"
+      />
+    );
   }
 
   return (
-    <>
+    <PublicRouteLayout>
       <OrgBrandingApplier branding={org.branding} />
-      <main className="rota-page rota-page-pad">
+      <div className="mx-auto w-full max-w-5xl px-container-padding-sm py-16 md:px-container-padding-md">
         <header className="rota-stack-tight mb-6 flex items-center gap-4">
           {org.branding.logoUrl ? (
             <img
@@ -49,7 +55,7 @@ export default async function B2BLandingPage({
             />
           ) : (
             <div
-              className="h-10 w-10 rounded-full bg-var-[--org-primary,var(--color-ochre)]"
+              className="h-10 w-10 rounded-full bg-[var(--org-primary,var(--color-ochre-dark))]"
               aria-hidden="true"
               data-testid="b2b-logo-placeholder"
             />
@@ -60,12 +66,9 @@ export default async function B2BLandingPage({
         </header>
         <section className="rota-stack-tight max-w-2xl">
           <p className="text-sm leading-relaxed text-foreground">
-            This is a white-label landing page for
-            <strong className="font-medium"> {org.name}</strong>.
-            The branding from the partner's
-            <code className="rounded bg-surface-container px-1 py-0.5 text-xs"> organizations.branding</code>
-            field is applied to this page via CSS
-            custom properties.
+            Welcome to the private travel workspace for
+            <strong className="font-medium"> {org.name}</strong>. Your
+            partner&rsquo;s Portugal planning experience is being prepared here.
           </p>
           <dl className="mt-4 grid gap-2 text-sm">
             <div className="grid grid-cols-[8rem_1fr] gap-2 border-b border-[var(--color-border)] py-2">
@@ -73,10 +76,8 @@ export default async function B2BLandingPage({
               <dd className="font-mono text-xs">{org.slug}</dd>
             </div>
             <div className="grid grid-cols-[8rem_1fr] gap-2 border-b border-[var(--color-border)] py-2">
-              <dt className="text-[var(--color-muted-foreground)]">Logo URL</dt>
-              <dd className="font-mono text-xs">
-                {org.branding.logoUrl ?? "—"}
-              </dd>
+              <dt className="text-[var(--color-muted-foreground)]">Branding</dt>
+              <dd className="font-mono text-xs">Partner workspace theme</dd>
             </div>
             <div className="grid grid-cols-[8rem_1fr] gap-2 border-b border-[var(--color-border)] py-2">
               <dt className="text-[var(--color-muted-foreground)]">Primary</dt>
@@ -92,7 +93,7 @@ export default async function B2BLandingPage({
             </div>
           </dl>
         </section>
-      </main>
-    </>
+      </div>
+    </PublicRouteLayout>
   );
 }
