@@ -29,7 +29,7 @@ const reviewedPortoWalk: EditorialActivity = {
 
 describe("activity editorial adapter", () => {
   it("ships only source-attributable reviewed starter records", () => {
-    expect(REVIEWED_ACTIVITY_SEED.length).toBeGreaterThanOrEqual(10);
+    expect(REVIEWED_ACTIVITY_SEED.length).toBeGreaterThanOrEqual(30);
     expect(
       REVIEWED_ACTIVITY_SEED.every(
         (activity) =>
