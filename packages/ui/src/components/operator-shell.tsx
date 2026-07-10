@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "../lib/cn";
+import { Icon } from "./icon";
 
 /**
  * OperatorShell — shared layout for the /reviewer and /admin
@@ -108,15 +109,11 @@ const NavLink = ({
     )}
   >
     {item.icon ? (
-      <span
+      <Icon
         aria-hidden
-        className={cn(
-          "material-symbols-outlined text-[20px] mt-0.5 shrink-0",
-          active ? "text-ochre-dark" : "text-olive-light group-hover:text-ochre-dark"
-        )}
-      >
-        {item.icon}
-      </span>
+        className={cn("mt-0.5 text-[20px]", active ? "text-ochre-dark" : "text-olive-light group-hover:text-ochre-dark")}
+        name={item.icon}
+      />
     ) : (
       <span
         aria-hidden
@@ -240,7 +237,7 @@ export function OperatorShell({
               </span>
               <span className="flex items-center gap-2 font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
                 {meta.kicker}
-                <span aria-hidden className="material-symbols-outlined text-[20px]">menu</span>
+                <Icon aria-hidden className="text-[20px]" name="list" />
               </span>
             </summary>
             <div className="p-4 grid gap-4 border-t border-olive-light/10">

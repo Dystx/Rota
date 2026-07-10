@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BrandMark } from "@repo/ui";
+import { BrandMark, Icon } from "@repo/ui";
 
 interface NavItem {
   href: string;
@@ -100,12 +100,10 @@ export function TopNav() {
             Plan a trip
           </Link>
           <Link
-            href="/account"
-            aria-label="Traveler profile — open account"
-            aria-current={isActivePath(pathname, "/account") ? "page" : undefined}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full overflow-hidden border border-white/20 shadow-flat flex items-center justify-center bg-olive-light text-on-primary font-display text-sm scale-95 hover:scale-100 active:opacity-80 transition-all duration-base ease-standard focus-visible:outline-none focus-visible:shadow-focus"
+            href="/sign-in"
+            className="hidden min-h-11 items-center rounded-full px-3 text-sm font-medium text-primary hover:text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light md:inline-flex"
           >
-            <span aria-hidden>R</span>
+            Sign in
           </Link>
 
           {/* Mobile hamburger — only visible below `md`. */}
@@ -118,7 +116,7 @@ export function TopNav() {
             data-testid="top-nav-mobile-toggle"
             className="md:hidden w-11 h-11 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-full hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span aria-hidden className={mobileOpen ? "ph ph-x" : "ph ph-list"} />
+            <Icon aria-hidden name={mobileOpen ? "x" : "list"} />
           </button>
         </div>
       </div>

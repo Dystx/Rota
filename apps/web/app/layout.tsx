@@ -86,12 +86,6 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        {/* Phosphor Icons — regular weight, self-hosted. Replaces
-            Material Symbols Outlined (PR-A2). Phosphor's humanist
-            shapes read more like a hand-drawn mark — pairs better
-            with the brand's italic + warm-voice tone. */}
-        <link rel="preconnect" href="/brand/phosphor" crossOrigin="" />
-        <link rel="stylesheet" href="/brand/phosphor/style.css" />
       </head>
       <body className="bg-background text-on-background font-body-md text-body-md antialiased overflow-x-hidden">
         <a
