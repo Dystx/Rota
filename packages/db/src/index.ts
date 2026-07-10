@@ -1,6 +1,7 @@
 import { TripBriefSchema, type TripBrief } from "@repo/types";
 
 export * from "./analytics";
+export * from "./access-control";
 export * from "./audit";
 export * from "./booking-clicks";
 export * from "./clients";
