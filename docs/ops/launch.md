@@ -37,6 +37,7 @@ The following migrations MUST be applied to the hosted Supabase project before p
 
 - [ ] `202607040100_create_place_adjustment_log.sql` — append-only audit table for specialist swaps
 - [ ] `202607040300_create_match_hybrid_destinations.sql` — PL/pgSQL RRF combiner over HNSW + GIST + ILIKE
+- [ ] `202607100200_create_trip_export_jobs.sql` — durable owner-scoped PDF/calendar/markdown export job state
 
 ### 1.5 Verification
 

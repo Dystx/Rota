@@ -3,9 +3,11 @@ import "server-only";
 export type ExportJobState = "locked" | "queued" | "ready" | "error" | "retry" | "unavailable";
 
 /**
- * Durable storage is intentionally an explicit boundary. Until the export
- * jobs table/worker is deployed, production must report unavailable rather
- * than pretending a process-local Map survives restarts.
+ * Durable storage is intentionally an explicit boundary. The production
+ * adapter targets `public.trip_export_jobs` from migration
+ * `202607100200_create_trip_export_jobs.sql`; until that migration and its
+ * worker are deployed, production must report unavailable rather than
+ * pretending a process-local Map survives restarts.
  */
 export interface ExportJobStore {
   get(tripId: string): ExportJobState;
