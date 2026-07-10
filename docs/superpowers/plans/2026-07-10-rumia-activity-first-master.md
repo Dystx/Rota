@@ -8,6 +8,28 @@
 
 **Non-goals:** Rumia is not a booking marketplace, hotel finder, destination chooser, travel agency, global directory, generic itinerary generator, or AI-chat product.
 
+## 0. MVP validation clarification (10 July 2026)
+
+Portugal-wide coverage remains the intended launch scope. The MVP is deliberately limited by the quality and operational depth of the activity catalogue, not by a single-region restriction.
+
+It does **not** require a native mobile app, booking stack, marketplace inventory, local-expert network, or fully automated planning system. It does require a believable end-to-end website journey:
+
+**Homepage → activity situation → judged shortlist → activity detail → editable day → practical route/list → save or share → feedback.**
+
+The public catalogue begins as a small reviewed Portugal corpus and expands only where its evidence and editorial judgement remain current. Manual research, review, exception handling, and plan correction are explicitly permitted behind the product; the user-facing experience must remain clear about what is editorial judgement and what is not a booking or concierge promise.
+
+### MVP validation signals
+
+- Activity situation started and completed
+- Judged results viewed
+- Activity saved, removed, reordered, or replaced
+- Day opened, saved, shared, and used
+- Activity detail and practical route/list opened
+- Feedback and upgraded-plan interest
+- Accommodation-referral source
+
+The initial evidence targets are 100 completed activity briefs, more than 40% brief completion, more than 30% plan save/share, 15 travellers using a plan during a trip, five accommodation-partner tests, and ten people willing to pay for an upgraded plan. These are validation thresholds, not product claims.
+
 ## 1. What research changes
 
 ### Market conclusion
