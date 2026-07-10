@@ -5,8 +5,8 @@ import { SiteFooter } from "../../../_components/site-footer";
 import { TripBriefFormBoundary } from "./trip-brief-form";
 
 export const metadata: Metadata = {
-  title: "Trip Details Confirmation",
-  description: "Review or manually enter the structured details of your Portugal trip before we craft your itinerary.",
+  title: "Shape Your Portugal Route",
+  description: "Choose the details that matter to your Portugal trip before we craft your itinerary.",
   alternates: {
     canonical: "/trip/new"
   }
@@ -30,12 +30,12 @@ export default function NewTripPage() {
         </div>
 
         <div className="relative z-10 w-full max-w-3xl text-center flex flex-col items-center gap-6">
-          <StatPill label="Advanced details" value="Manual confirmation" />
+          <StatPill label="Route details" value="Choice-led planning" />
           <h1 className="font-display text-display-mobile md:text-display text-foreground drop-shadow-2xl">
-            Confirm your brief
+            Shape your brief
           </h1>
           <p className="text-on-surface-variant leading-loose text-xl max-w-2xl mx-auto">
-            Review and manually adjust the specifics of your trip. We use these structured details to craft a paced, realistic Portugal itinerary.
+            Choose the specifics that shape your trip. We use these structured details to craft a paced, realistic Portugal itinerary.
           </p>
         </div>
       </section>
