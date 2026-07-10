@@ -77,6 +77,11 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
   `main`, one visible `h1`, and no document overflow at 390px.
 - Playwright setup now also seeds the reviewer role profile and auth link; built
   reviewer smoke for queue/history/profile renders correctly on mobile.
+- Full visual Playwright execution is not yet a green release gate: the current
+  home baseline expects the obsolete 1826px shell while the current rendered
+  home is 2650px after the choice-led card expansion. Regenerate the complete
+  desktop/mobile snapshot set only after the remaining visual review pass; no
+  stale baseline is treated as a pass.
 - Operator console fixtures are explicitly labeled “Demo data”, use Portugal
   content, and no longer expose the prior Kyoto/Japan/search placeholders.
 - Guide beta portraits now use an authenticated, user-prefixed private Storage
