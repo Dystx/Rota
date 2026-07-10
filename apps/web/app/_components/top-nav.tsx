@@ -11,7 +11,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/portugal", label: "Portugal" },
+  { href: "/explore", label: "What to do" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/local-expertise", label: "Local expertise" },
   { href: "/pricing", label: "Pricing" }
@@ -28,7 +28,7 @@ function isActivePath(pathname: string | null, href: string): boolean {
  * workspace shared pattern).
  *
  * Source: docs/prototype.html (TopNavBar) + the user feedback
- * that 'Plan a trip' should match the rest of the design
+ * that the primary public action should match the rest of the design
  * language (olive-light / olive-dark, not a generic green).
  *
  * The component is "use client" because it reads the
@@ -93,11 +93,11 @@ export function TopNav() {
         {/* Trailing Action & Profile */}
         <div className="flex items-center gap-3 md:gap-6">
           <Link
-            href="/planner"
-            data-testid="top-nav-plan-a-trip"
+            href="/explore"
+            data-testid="top-nav-explore-activities"
             className="hidden md:inline-flex bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-2 rounded-full hover:bg-olive-dark transition-colors duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            Plan Portugal
+            Explore activities
           </Link>
           <Link
             href="/sign-in"
@@ -151,11 +151,11 @@ export function TopNav() {
             })}
             <li>
               <Link
-                href="/planner"
-                data-testid="top-nav-mobile-plan-a-trip"
+                href="/explore"
+                data-testid="top-nav-mobile-explore-activities"
                 className="mt-2 inline-flex w-full justify-center bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-3 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
-                Plan Portugal
+                Explore activities
               </Link>
             </li>
           </ul>
