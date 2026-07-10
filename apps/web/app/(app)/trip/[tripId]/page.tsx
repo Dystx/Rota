@@ -235,14 +235,23 @@ export default async function TripDetailPage({
                     </h3>
                   </div>
                   {trip ? (
-                    <Link
-                      href="#route"
-                      data-testid="trip-brief-view-route"
-                      className="inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-2 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-                    >
-                      View Route
-                      <span className="ph text-[16px] ph-arrow-right">arrow-right</span>
-                    </Link>
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        href="#route"
+                        data-testid="trip-brief-view-route"
+                        className="inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-2 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                      >
+                        View Route
+                        <span className="ph text-[16px] ph-arrow-right">arrow-right</span>
+                      </Link>
+                      <Link
+                        href={`/trip/${tripId}/map`}
+                        data-testid="trip-brief-open-map"
+                        className="inline-flex items-center gap-2 rounded-full border border-olive-light/40 bg-white/70 px-5 py-2 font-label-ui text-label-ui text-primary transition-colors hover:bg-olive-light/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                      >
+                        Open route map
+                      </Link>
+                    </div>
                   ) : null}
                 </div>
 
