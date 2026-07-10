@@ -90,7 +90,7 @@ async function ensurePersona(
   email: string,
   password: string,
   role: PersonaRole
-): Promise<void> {
+): Promise<string> {
   // Idempotent: try create; if exists, find and update app_metadata.
   const created = await admin.auth.admin.createUser({
     app_metadata: { role },
@@ -99,7 +99,7 @@ async function ensurePersona(
     password
   });
 
-  if (!created.error) return;
+  if (!created.error && created.data.user) return created.data.user.id;
 
   // Find existing user by paginating list (small test cohort, fine).
   let userId: string | null = null;
@@ -136,6 +136,23 @@ async function ensurePersona(
     throw new Error(
       `[playwright global-setup] Failed to update existing persona "${email}": ${updated.error.message}`
     );
+  }
+
+  return userId;
+}
+
+async function ensureProfile(admin: SupabaseClient, userId: string, email: string, role: PersonaRole): Promise<void> {
+  const profile = await admin.from("user_profiles").upsert(
+    {
+      app_role: role,
+      display_name: `E2E ${role} persona`,
+      user_id: userId
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (profile.error) {
+    throw new Error(`[playwright global-setup] Could not seed ${email} role profile: ${profile.error.message}`);
   }
 }
 
@@ -393,7 +410,8 @@ export default async function globalSetup(): Promise<void> {
   });
 
   for (const persona of PERSONAS) {
-    await ensurePersona(adminClient, persona.email, password, persona.role);
+    const userId = await ensurePersona(adminClient, persona.email, password, persona.role);
+    await ensureProfile(adminClient, userId, persona.email, persona.role);
     const state = await captureStorageStateForPersona(supabaseUrl, anonKey, persona.email, password);
     const target = path.join(AUTH_DIR, persona.fileName);
     fs.writeFileSync(target, JSON.stringify(state, null, 2), "utf8");

@@ -2,13 +2,11 @@ import "server-only";
 
 import {
   createAuthenticatedUserDataClient,
-  getReviewerIdForUser,
-  getTrustedAppRoleFromClaims,
-  getUserRoleProfile,
   type RotaDataClient
 } from "@repo/db";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createApiErrorEnvelope } from "@/lib/http/api-error";
+import { requireApiAccess } from "./authorization";
 
 export type ApiErrorCode = "unauthenticated" | "forbidden" | "validation_error" | "not_found" | "internal_error";
 
@@ -64,27 +62,25 @@ export function persistenceError(error: unknown, fallbackMessage: string) {
 }
 
 export async function requireApiRole(allowedRoles: ApiActor[]): Promise<AuthorizedApiContext | Response> {
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase.auth.getClaims();
+  const access = await requireApiAccess({ anyRole: allowedRoles });
 
-  if (error || !data?.claims?.sub) {
-    return unauthenticatedError();
+  if (access instanceof Response) {
+    return access;
   }
 
+  const supabase = await createServerSupabaseClient();
   const client = createAuthenticatedUserDataClient(supabase);
-  const claimsRole = getTrustedAppRoleFromClaims(data.claims);
-  const profile = claimsRole === "none" ? await getUserRoleProfile(data.claims.sub, { client }) : null;
-  const role = claimsRole === "none" ? profile?.appRole ?? "none" : claimsRole;
+  const role = access.roles.find((candidate): candidate is ApiActor => allowedRoles.includes(candidate));
 
-  if (role === "none" || !allowedRoles.includes(role)) {
+  if (!role) {
     return forbiddenError();
   }
 
   return {
     client,
-    reviewerId: role === "reviewer" ? await getReviewerIdForUser(data.claims.sub, { client }) : null,
+    reviewerId: access.reviewerId,
     role,
-    userId: data.claims.sub
+    userId: access.userId
   };
 }
 

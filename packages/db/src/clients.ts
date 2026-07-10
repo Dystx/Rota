@@ -6,6 +6,24 @@ export type DataClientOptions = {
   client?: RotaDataClient;
 };
 
+export type UserDataOptions = {
+  client: RotaDataClient;
+  scope: "user";
+};
+
+export type SystemDataOptions = {
+  client: RotaDataClient;
+  scope: "system";
+};
+
+export function createUserDataOptions(client: RotaDataClient): UserDataOptions {
+  return { client, scope: "user" };
+}
+
+export function createSystemDataOptions(client: RotaDataClient): SystemDataOptions {
+  return { client, scope: "system" };
+}
+
 type PublicSupabaseEnvName = "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_ANON_KEY";
 type ServerSupabaseEnvName = "SUPABASE_SERVICE_ROLE_KEY";
 

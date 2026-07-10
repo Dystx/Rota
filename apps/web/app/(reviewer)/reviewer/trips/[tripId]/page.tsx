@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { generateItineraryFromBrief } from "@repo/ai";
-import { createAuthenticatedUserDataClient, getReviewerIdForUser, getTripDraftById, getTrustedAppRoleFromClaims, getUserRoleProfile, isPersistenceConfigError, reviewerHasTripAssignment } from "@repo/db";
+import { getTripDraftById, isPersistenceConfigError, reviewerHasTripAssignment } from "@repo/db";
 import { buildRouteValidation } from "@repo/routing";
 import {
   type MapRouteWarning,
@@ -21,7 +21,7 @@ import {
   TravelTimeChip
 } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
 
 export default async function ReviewerTripPage({
   params,
@@ -42,25 +42,16 @@ export default async function ReviewerTripPage({
   let isAuthorizedReviewer = false;
 
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data, error } = await supabase.auth.getClaims();
+    const auth = await getReviewerPageAuthContext();
 
-    if (error || !data?.claims?.sub) {
+    if (!auth) {
       infoMessage = "Sign in with a reviewer account to open this reviewer trip workspace.";
     } else {
-      const client = createAuthenticatedUserDataClient(supabase);
-      const claimsRole = getTrustedAppRoleFromClaims(data.claims);
-      const profile = claimsRole === "none" ? await getUserRoleProfile(data.claims.sub, { client }) : null;
-      const role = claimsRole === "none" ? profile?.appRole ?? "none" : claimsRole;
-      const reviewerId = role === "reviewer" ? await getReviewerIdForUser(data.claims.sub, { client }) : null;
-
-      if (role !== "reviewer" || !reviewerId) {
-        infoMessage = "This reviewer workspace is only available to linked reviewer accounts.";
-      } else if (!(await reviewerHasTripAssignment(tripId, reviewerId, { client }))) {
+      if (!(await reviewerHasTripAssignment(tripId, auth.reviewerId, { client: auth.client }))) {
         infoMessage = "This trip is not assigned to your reviewer account.";
       } else {
         isAuthorizedReviewer = true;
-        trip = await getTripDraftById(tripId, { client });
+        trip = await getTripDraftById(tripId, { client: auth.client });
       }
     }
 

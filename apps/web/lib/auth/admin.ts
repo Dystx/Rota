@@ -2,12 +2,11 @@ import "server-only";
 
 import {
   createAuthenticatedUserDataClient,
-  getTrustedAppRoleFromClaims,
-  getUserRoleProfile,
   type RotaDataClient
 } from "@repo/db";
 import { cache } from "react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { loadCurrentAuthorizedActor } from "./authorization";
 
 export type AdminPageAuthContext = {
   client: RotaDataClient;
@@ -27,31 +26,22 @@ export function isAdminPageAuthContext(result: AdminPageAuthResult): result is A
 }
 
 export const getAdminPageAuthContext = cache(async (): Promise<AdminPageAuthResult> => {
+  const actor = await loadCurrentAuthorizedActor();
+
+  if (!actor) {
+    return { reason: "unauthenticated", status: 401 };
+  }
+
+  if (!actor.roles.includes("admin")) {
+    return { reason: "forbidden", status: 403 };
+  }
+
   const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase.auth.getClaims();
-
-  if (error || !data?.claims?.sub) {
-    return {
-      reason: "unauthenticated",
-      status: 401
-    };
-  }
-
   const client = createAuthenticatedUserDataClient(supabase);
-  const claimsRole = getTrustedAppRoleFromClaims(data.claims);
-  const profile = claimsRole === "none" ? await getUserRoleProfile(data.claims.sub, { client }) : null;
-  const role = claimsRole === "none" ? profile?.appRole ?? "none" : claimsRole;
-
-  if (role !== "admin") {
-    return {
-      reason: "forbidden",
-      status: 403
-    };
-  }
 
   return {
     client,
-    role,
-    userId: data.claims.sub
+    role: "admin",
+    userId: actor.userId
   };
 });

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { isPersistenceConfigError, isSchemaDriftError } from "./clients";
+import { createSystemDataOptions, createUserDataOptions, isPersistenceConfigError, isSchemaDriftError, type RotaDataClient } from "./clients";
 
 describe("isPersistenceConfigError", () => {
   test("matches missing env var error", () => {
@@ -39,5 +39,14 @@ describe("isSchemaDriftError", () => {
     expect(isSchemaDriftError("schema cache")).toBe(false);
     expect(isSchemaDriftError(undefined)).toBe(false);
     expect(isSchemaDriftError({ message: "schema cache" })).toBe(false);
+  });
+});
+
+describe("data-access client scopes", () => {
+  test("keeps user and system clients explicit at the call boundary", () => {
+    const client = {} as RotaDataClient;
+
+    expect(createUserDataOptions(client)).toEqual({ client, scope: "user" });
+    expect(createSystemDataOptions(client)).toEqual({ client, scope: "system" });
   });
 });

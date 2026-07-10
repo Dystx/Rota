@@ -1,14 +1,13 @@
 import { ConfigValidationError } from "@repo/config";
 import { type NextRequest, NextResponse } from "next/server";
-import { requireRouteAccess, isProtectedRoute } from "@/lib/auth/routes";
+
+import { isProtectedRoute, requireRouteAccess } from "@/lib/auth/routes";
 import { refreshSupabaseSession } from "@/lib/supabase/middleware";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   try {
     const { claims, response } = await refreshSupabaseSession(request);
-    const authResponse = requireRouteAccess(request, claims);
-
-    return authResponse ?? response;
+    return requireRouteAccess(request, claims) ?? response;
   } catch (error) {
     if (error instanceof ConfigValidationError && !isProtectedRoute(request.nextUrl.pathname)) {
       return NextResponse.next();
