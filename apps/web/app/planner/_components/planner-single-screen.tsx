@@ -15,6 +15,7 @@ import {
 import { draftToPlannerUrl, normalizeDraft, type TripChoiceDraft } from "../_lib/choice-model";
 import type { TransportChoice } from "./transport-step";
 import type { Vibe } from "./vibe-step";
+import type { EditorialActivity } from "@/lib/content/activities";
 
 export interface PlannerSingleScreenProps {
   initialDestination?: string;
@@ -23,6 +24,8 @@ export interface PlannerSingleScreenProps {
   initialTransport?: TransportChoice | "";
   initialVibe?: Vibe;
   initialEdit?: "destination" | "travelWindow" | "days" | "transport" | "vibe";
+  initialActivityIds?: readonly string[];
+  initialActivities?: readonly EditorialActivity[];
 }
 
 const DESTINATIONS = [
@@ -48,6 +51,8 @@ export function PlannerSingleScreen({
   initialTransport = "transit",
   initialVibe = "balanced",
   initialEdit,
+  initialActivityIds = [],
+  initialActivities = [],
 }: PlannerSingleScreenProps) {
   const router = useRouter();
   const [draft, setDraft] = React.useState<TripChoiceDraft>(() => normalizeDraft({
@@ -56,10 +61,12 @@ export function PlannerSingleScreen({
     travelWindow: initialWindow || null,
     transport: initialTransport || "transit",
     vibe: initialVibe,
+    activityIds: [...initialActivityIds],
   }));
   const [sheet, setSheet] = React.useState<"destination" | "window" | "days" | "transport" | "vibe" | null>(null);
   const [focusedGroup, setFocusedGroup] = React.useState<"destination" | "days" | "details">("destination");
   const [pending, setPending] = React.useState(false);
+  const hasChosenActivities = draft.activityIds.length > 0;
 
   React.useEffect(() => {
     if (!initialEdit) return;
@@ -106,10 +113,17 @@ export function PlannerSingleScreen({
           </div>
         <section className="grid content-start gap-6">
           <div className="grid gap-2">
-            <p className="font-mono-micro uppercase tracking-widest text-ochre-light">Compose your route</p>
-            <h1 className="font-display text-4xl leading-tight md:text-6xl">A trip that sounds like you.</h1>
-            <p className="max-w-xl text-linen-dark/75">Choose a few anchors. We&apos;ll turn them into a considered itinerary.</p>
+            <p className="font-mono-micro uppercase tracking-widest text-ochre-light">{hasChosenActivities ? "Chosen activities first" : "Advanced day planning"}</p>
+            <h1 className="font-display text-4xl leading-tight md:text-6xl">{hasChosenActivities ? "Shape your chosen day." : "Plan from the activities you have in mind."}</h1>
+            <p className="max-w-xl text-linen-dark/75">{hasChosenActivities ? "Use timing, transport, and pace to test the day without replacing the activities you chose." : "Start with Rumia’s activity explorer when you want an editorial recommendation first."}</p>
           </div>
+
+          {hasChosenActivities ? <section aria-label="Chosen activities" className="rounded-xl border border-white/15 bg-white/5 p-5">
+            <h2 className="font-headline-sm text-xl">Already chosen</h2>
+            <ul className="mt-3 space-y-2 text-sm text-linen-dark/80">
+              {initialActivities.map((activity) => <li key={activity.id}>{activity.title}</li>)}
+            </ul>
+          </section> : null}
 
           <nav aria-label="Trip choices" className="grid grid-cols-3 gap-2 md:hidden">
             {([["destination", "Where"], ["days", "How long"], ["details", "Details"]] as const).map(([value, label]) => <button key={value} type="button" aria-pressed={focusedGroup === value} onClick={() => setFocusedGroup(value)} className="min-h-11 rounded-full border border-white/20 px-3 text-sm aria-[pressed=true]:border-ochre-light aria-[pressed=true]:text-ochre-light">{label}</button>)}
@@ -141,7 +155,7 @@ export function PlannerSingleScreen({
         </section>
 
         <aside className="grid content-start gap-4 lg:col-start-2 lg:row-start-2 lg:sticky lg:top-6 lg:self-start">
-          <TripSummary draft={context} primaryAction={pending ? "Updating your route" : "Build my itinerary"} onPrimaryAction={submit} primaryActionDisabled={pending || !draft.destination.trim() || draft.days < 1} />
+          <TripSummary draft={context} primaryAction={pending ? "Updating your route" : hasChosenActivities ? "Preview this day" : "Build my itinerary"} onPrimaryAction={submit} primaryActionDisabled={pending || !draft.destination.trim() || draft.days < 1} />
           {pending ? <p role="status" className="text-center text-sm text-linen-dark/70">Updating your route</p> : null}
         </aside>
         </div>

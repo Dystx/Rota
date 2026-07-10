@@ -3,6 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import * as React from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 import { PlannerSingleScreen } from "./planner-single-screen";
 
 const push = vi.fn();
@@ -52,5 +53,21 @@ describe("PlannerSingleScreen", () => {
     expect(screen.getByRole("button", { name: "Where" }).getAttribute("aria-pressed")).toBe("true");
     fireEvent.click(screen.getByRole("button", { name: "How long" }));
     expect(screen.getByRole("button", { name: "How long" }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("shapes explicitly chosen activities without replacing them with a generic route brief", () => {
+    render(
+      <PlannerSingleScreen
+        initialActivityIds={["porto-ribeira-slow-walk"]}
+        initialActivities={[
+          REVIEWED_ACTIVITY_SEED[0]!
+        ]}
+      />
+    );
+
+    expect(screen.getByRole("heading", { name: /Shape your chosen day/i })).toBeTruthy();
+    expect(screen.getByText("Ribeira and Miragaia at walking pace")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Preview this day" }));
+    expect(push).toHaveBeenCalledWith(expect.stringContaining("activity=porto-ribeira-slow-walk"));
   });
 });

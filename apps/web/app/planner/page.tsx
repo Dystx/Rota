@@ -1,4 +1,6 @@
+import * as React from "react";
 import { Metadata } from "next";
+import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 import { PlannerClient, type PlannerInitialState } from "./planner-client";
 
 export const metadata: Metadata = {
@@ -31,11 +33,18 @@ export const metadata: Metadata = {
 export default async function PlannerPage({
   searchParams
 }: {
-  searchParams: Promise<{ destination?: string; days?: string; window?: string; transport?: string; vibe?: string; edit?: string }>;
+  searchParams: Promise<{ destination?: string; days?: string; window?: string; transport?: string; vibe?: string; edit?: string; activity?: string | readonly string[] }>;
 }) {
   const params = await searchParams;
+  const requestedActivityIds = typeof params.activity === "string" ? [params.activity] : params.activity ?? [];
+  const activitiesById = new Map(REVIEWED_ACTIVITY_SEED.map((activity) => [activity.id, activity]));
+  const initialActivities = [...new Set(requestedActivityIds.map((id) => id.trim()).filter(Boolean))]
+    .flatMap((id) => {
+      const activity = activitiesById.get(id);
+      return activity ? [activity] : [];
+    });
   const days = Math.max(1, Math.min(60, parseInt(params.days ?? "7", 10) || 7));
-  const destination = (params.destination ?? "portugal").toLowerCase();
+  const destination = (params.destination ?? initialActivities[0]?.region ?? "portugal").toLowerCase();
   const initial: PlannerInitialState = {
     initialDays: days,
     initialDestination: destination,
@@ -43,6 +52,8 @@ export default async function PlannerPage({
     ,initialTransport: params.transport === "car" || params.transport === "transit" ? params.transport : "transit"
     ,initialVibe: params.vibe === "restorative" || params.vibe === "balanced" || params.vibe === "high_energy" ? params.vibe : "balanced"
     ,initialEdit: params.edit === "destination" || params.edit === "travelWindow" || params.edit === "days" || params.edit === "transport" || params.edit === "vibe" ? params.edit : undefined
+    ,initialActivityIds: initialActivities.map((activity) => activity.id)
+    ,initialActivities
   };
 
   return <PlannerClient initial={initial} />;

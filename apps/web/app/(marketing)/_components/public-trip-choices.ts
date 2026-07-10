@@ -92,7 +92,8 @@ export function publicDraft(
     travelWindow: null,
     transport: "transit",
     vibe,
-    interests: []
+    interests: [],
+    activityIds: []
   };
 }
 

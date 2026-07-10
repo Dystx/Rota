@@ -14,6 +14,7 @@ describe("normalizeDraft", () => {
       transport: "transit",
       vibe: "balanced",
       interests: [],
+      activityIds: [],
     });
   });
 
@@ -47,11 +48,12 @@ describe("draft adapters", () => {
     transport: "car" as const,
     vibe: "balanced" as const,
     interests: ["food"],
+    activityIds: ["porto-ribeira-slow-walk", "porto-bombarda-art-walk"],
   };
 
   it("encodes destination and travel window in the planner URL", () => {
     expect(draftToPlannerUrl(draft)).toBe(
-      "/planner?destination=S%C3%A3o+Tom%C3%A9+%26+Pr%C3%ADncipe&days=5&window=May+%26+June&transport=car&vibe=balanced&interests=food",
+      "/planner?destination=S%C3%A3o+Tom%C3%A9+%26+Pr%C3%ADncipe&days=5&window=May+%26+June&transport=car&vibe=balanced&interests=food&activity=porto-ribeira-slow-walk&activity=porto-bombarda-art-walk",
     );
   });
 

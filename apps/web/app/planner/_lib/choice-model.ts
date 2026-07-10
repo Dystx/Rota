@@ -8,6 +8,7 @@ export type TripChoiceDraft = {
   transport: TransportChoice;
   vibe: Vibe;
   interests: string[];
+  activityIds: string[];
 };
 
 export type ChoiceOption = {
@@ -25,6 +26,7 @@ const DEFAULT_DRAFT: TripChoiceDraft = {
   transport: "transit",
   vibe: "balanced",
   interests: [],
+  activityIds: [],
 };
 
 function isTransportChoice(value: unknown): value is TransportChoice {
@@ -73,6 +75,11 @@ function normalizeInterests(value: unknown): string[] {
   );
 }
 
+function normalizeActivityIds(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.filter((id): id is string => typeof id === "string").map((id) => id.trim()).filter(Boolean))];
+}
+
 export function normalizeDraft(input: Partial<TripChoiceDraft>): TripChoiceDraft {
   return {
     destination: normalizeText(input.destination, DEFAULT_DRAFT.destination),
@@ -83,6 +90,7 @@ export function normalizeDraft(input: Partial<TripChoiceDraft>): TripChoiceDraft
       : DEFAULT_DRAFT.transport,
     vibe: isVibe(input.vibe) ? input.vibe : DEFAULT_DRAFT.vibe,
     interests: normalizeInterests(input.interests),
+    activityIds: normalizeActivityIds(input.activityIds),
   };
 }
 
@@ -117,6 +125,10 @@ export function draftToPlannerUrl(draft: TripChoiceDraft): string {
 
   if (draft.interests.length > 0) {
     params.set("interests", draft.interests.join(","));
+  }
+
+  for (const activityId of draft.activityIds) {
+    params.append("activity", activityId);
   }
 
   return `/planner?${params.toString()}`;
