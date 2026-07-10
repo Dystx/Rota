@@ -16,10 +16,10 @@ export default function ConsoleWorkspacePage() {
         <header className="h-header-height px-container-padding-lg flex items-center justify-between border-b border-olive-light/10 bg-surface/50 backdrop-blur-md shrink-0 z-10">
           <div className="flex items-center gap-3 min-w-0">
             <span className="font-mono-technical text-mono-technical bg-surface-container-high text-on-surface-variant px-2 py-1 rounded">
-              TRP-8924-JP
+              TRP-PT-2048
             </span>
             <h1 className="font-headline-sm text-headline-sm text-primary truncate">
-              Kyoto Autumn Residency
+              Douro & Coast Residency
             </h1>
           </div>
           <div className="flex items-center gap-3">
@@ -28,7 +28,7 @@ export default function ConsoleWorkspacePage() {
                 aria-hidden
                 className="w-2 h-2 rounded-full bg-ochre-dark animate-pulse"
               />
-              2 Pending Revisions
+              Demo data · 2 pending revisions
             </span>
             <button
               type="button"
@@ -59,30 +59,30 @@ export default function ConsoleWorkspacePage() {
               title="Culinary"
               badge={{ label: "Hard Constraint", tone: "error" }}
               body="Severe shellfish allergy. Requires strict cross-contamination protocols."
-              quote="“We cannot risk eating at any traditional sushi counter unless they are explicitly warned in advance.”"
+              quote="“Please confirm a kitchen can accommodate us before adding any seafood stop.”"
             />
             <ClientAnchorCard
               icon="directions_walk"
               title="Pacing"
               badge={{ label: "Preference", tone: "neutral" }}
               body="Max 2 scheduled activities per day. Requires afternoon downtime."
-              tags={["Slow Mornings", "Late Dinners"]}
+              tags={["Slow mornings", "Late dinners"]}
             />
             <ClientAnchorCard
               icon="hotel"
               title="Lodging"
               badge={{ label: "Flexible", tone: "olive" }}
-              body="Prefers boutique ryokans over large western chains, but requires western bedding (no futons on tatami)."
+              body="Prefers a characterful pousada or small design hotel with quiet rooms and a proper bed."
             />
           </aside>
 
           <section className="flex-1 bg-surface-container-lowest/50 overflow-y-auto p-container-padding-lg relative">
             <div className="max-w-3xl mx-auto pb-32">
               <h3 className="font-headline-lg text-headline-lg text-primary mb-2">
-                Day 3: Arashiyama Focus
+                Day 3: Douro Valley Focus
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant mb-8 border-b border-olive-light/10 pb-4">
-                Bamboo groves, river lunch, and ryokan downtime. One override
+                Vineyards, a river lunch, and unhurried downtime. One override
                 requires your attention.
               </p>
 
@@ -90,7 +90,7 @@ export default function ConsoleWorkspacePage() {
                 <TimelineItem
                   time="09:00 – 11:30"
                   status={{ label: "Confirmed", tone: "olive" }}
-                  title="Private Bamboo Grove Walk & Tenryu-ji"
+                  title="Quinta Walk & River Lookout"
                   meta={
                     <>
                       <span className="flex items-center gap-1">
@@ -109,14 +109,13 @@ export default function ConsoleWorkspacePage() {
                         >
                           groups
                         </span>
-                        Guide: Tanaka-san
+                        Guide: Inês · local host
                       </span>
                     </>
                   }
                 >
-                  Private guided tour of the Sagano bamboo grove followed by a
-                  slow walk through Tenryu-ji&apos;s garden and lunch venue
-                  recon.
+                  A private vineyard walk followed by a slow lookout loop and
+                  a confirmed lunch venue recon.
                 </TimelineItem>
 
                 <TimelineItem
@@ -124,7 +123,7 @@ export default function ConsoleWorkspacePage() {
                   overrideBanner="Logistical Override Required"
                   time="12:30 – 14:00"
                   status={{ label: "In Revision", tone: "ochre" }}
-                  title="Lunch: Yudofu Sagano"
+                  title="Lunch: riverside quinta"
                   rightAction={
                     <button
                       type="button"
@@ -138,37 +137,28 @@ export default function ConsoleWorkspacePage() {
                   }
                 >
                   <p className="line-through opacity-70 mb-4">
-                    Traditional tofu tasting menu overlooking the river.
+                    Seasonal tasting menu overlooking the Douro.
                   </p>
                   <div className="bg-surface-container-lowest border border-ochre-light/30 rounded-lg p-4 mb-4">
                     <p className="font-label-ui text-label-ui uppercase tracking-wider text-ochre-dark mb-2">
                       Editor Note: Shellfish Conflict
                     </p>
                     <p className="text-on-surface mb-3">
-                      Restaurant uses dashi containing dried sardines in their
-                      hot-pot base. Recommend a substitute property that can
-                      guarantee a vegetarian-only broth for the table.
+                      The first venue cannot guarantee an allergen-safe kitchen.
+                      Choose a substitute with a confirmed cross-contamination
+                      protocol before publishing.
                     </p>
-                    <label className="relative block">
-                      <span className="sr-only">Search alternatives</span>
-                      <span
-                        aria-hidden
-                        className="ph absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none ph-magnifying-glass"
-                      >magnifying-glass</span>
-                      <input
-                        type="search"
-                        placeholder="Find a substitute restaurant…"
-                        className="w-full font-body-md text-body-md pl-10 pr-3 py-2 rounded-lg bg-white border border-ochre-light/30 text-primary placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light"
-                      />
-                    </label>
-                    <ul className="mt-3 flex flex-col gap-2">
+                    <p className="font-label-ui text-label-ui text-on-surface-variant">
+                      Choose a verified substitute
+                    </p>
+                    <ul className="mt-3 flex flex-col gap-2" aria-label="Verified substitute restaurants">
                       <li>
                         <button
                           type="button"
                           className="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg border border-ochre-light/20 bg-white text-primary hover:border-ochre-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                         >
                           <span className="font-label-ui text-label-ui">
-                            Arashiyama Yoshimura Soba
+                            Taberna do Mercado · allergen briefed
                           </span>
                           <span
                             aria-hidden
@@ -182,7 +172,7 @@ export default function ConsoleWorkspacePage() {
                           className="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg border border-ochre-light/20 bg-white text-primary hover:border-ochre-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                         >
                           <span className="font-label-ui text-label-ui">
-                            Shigetsu Vegan Shojin Ryori
+                            Quinta da Foz · kitchen confirmed
                           </span>
                           <span
                             aria-hidden

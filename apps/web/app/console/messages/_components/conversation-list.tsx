@@ -1,6 +1,5 @@
 "use client";
 
-import type { ChangeEvent } from "react";
 import type { Day } from "../_lib/conversations";
 
 interface DayListProps {
@@ -19,9 +18,9 @@ interface DayListProps {
 /**
  * DayList — the leftmost column of the /console/messages
  * 3-column kanban. Renders the "Itinerary Days" header, a
- * client-side search filter, and a scrollable list of day
+ * finite choice filter, and a scrollable list of day
  * cards. Each card mirrors the reference's "Day 2 • Oct 13
- * — Higashiyama Exploration" pattern: date pill on the left,
+ * — Lisbon Neighbourhoods" pattern: date pill on the left,
  * title + one-line summary on the right.
  *
  * Extracted from the page so the parent can stay focused on
@@ -49,21 +48,35 @@ export function ConversationList({
         </button>
       </header>
       <div className="p-3 border-b border-olive-light/10 bg-surface-container-lowest/50">
-        <label className="relative block">
-          <span className="sr-only">Search days</span>
-          <span
-            aria-hidden
-            className="ph absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none ph-magnifying-glass"
-          >magnifying-glass</span>
-          <input
-            type="search"
-            value={search}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
-            placeholder="Search by day, title, or summary…"
-            data-testid="conversations-search"
-            className="w-full font-body-md text-body-md pl-10 pr-4 py-2 rounded-lg bg-white/60 border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light"
-          />
-        </label>
+        <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant mb-2">
+          Focus a day
+        </p>
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter itinerary days">
+          <button
+            type="button"
+            aria-pressed={search === ""}
+            onClick={() => onSearchChange("")}
+            data-testid="conversations-filter-all"
+            className={`rounded-full px-3 py-1.5 font-label-ui text-label-ui border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light ${search === "" ? "bg-primary text-on-primary border-primary" : "bg-white/50 text-primary border-outline-variant/40 hover:bg-white"}`}
+          >
+            All days
+          </button>
+          {days.map((day) => {
+            const selected = search === day.title;
+            return (
+              <button
+                key={day.id}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => onSearchChange(day.title)}
+                data-testid={`conversations-filter-${day.id}`}
+                className={`rounded-full px-3 py-1.5 font-label-ui text-label-ui border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light ${selected ? "bg-primary text-on-primary border-primary" : "bg-white/50 text-primary border-outline-variant/40 hover:bg-white"}`}
+              >
+                {day.label}
+              </button>
+            );
+          })}
+        </div>
         {incomingCount > 0 ? (
           <p
             role="status"

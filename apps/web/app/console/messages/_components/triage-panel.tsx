@@ -125,16 +125,16 @@ export function TriagePanel({
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-gutter">
           <div>
             <h4 className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant mb-2">
-              Kyoto Recommendations
+              Portugal Recommendations
             </h4>
             <div className="flex flex-col gap-2">
               <SnippetCard
-                title="Camellia Tea Ceremony"
-                body="A 90-minute intimate tea ceremony hosted in a 100-year-old machiya in Gion. Includes wagashi tasting and quiet reflection time."
+                title="Lisbon tile studio"
+                body="A quiet, host-led azulejo session in a working studio near Alfama, with time for questions and a short walk."
               />
               <SnippetCard
-                title="Arashiyama Early Morning"
-                body="Pre-dawn departure to avoid crowds. Includes private prayer at the bamboo grove before opening hours."
+                title="Douro quinta morning"
+                body="An early departure to a family-run quinta, with a slow vineyard walk and a reserved table overlooking the river."
               />
             </div>
           </div>
@@ -211,7 +211,7 @@ export function TriagePanel({
               <input
                 name="title"
                 type="text"
-                defaultValue="Camellia Tea Ceremony"
+                  defaultValue="Lisbon tile studio"
                 data-testid="push-event-title"
                 className="w-full font-body-md text-body-md bg-white/10 border border-white/20 text-on-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ochre-light"
               />

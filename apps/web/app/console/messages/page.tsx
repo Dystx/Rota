@@ -261,7 +261,7 @@ export default function ConsoleMessagesPage() {
           className="fixed inset-0 z-0 bg-cover bg-center opacity-40 blur-sm pointer-events-none"
           style={{
             backgroundImage:
-              "url(https://picsum.photos/seed/kyoto-interior/1920/1080)",
+              "url('/trip-covers/lisbon-tagus.svg')",
           }}
         />
         <div
@@ -271,6 +271,9 @@ export default function ConsoleMessagesPage() {
 
         <main id="main-content" className="relative z-10 flex-1 h-screen flex gap-gutter p-container-padding-sm overflow-hidden">
           <h1 className="sr-only">Messaging Hub</h1>
+          <p className="absolute top-2 left-1/2 -translate-x-1/2 z-20 rounded-full border border-ochre-light/40 bg-primary/90 px-3 py-1 font-mono-micro text-mono-micro uppercase tracking-wider text-ochre-light shadow-sm">
+            Demo data · Portugal sample itinerary
+          </p>
           {/* Column 1: Itinerary Days */}
           <ConversationList
             days={DAYS}

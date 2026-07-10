@@ -13,20 +13,30 @@ interface TreeNode {
 
 const HIERARCHY: TreeNode[] = [
   {
-    id: "asia",
-    label: "Asia",
+    id: "portugal",
+    label: "Portugal",
     icon: "public",
-    count: "4,291",
+    count: "1,248",
     children: [
       {
-        id: "japan",
-        label: "Japan",
+        id: "north",
+        label: "North",
         icon: "map",
-        count: "842",
+        count: "402",
         children: [
-          { id: "tokyo", label: "Tokyo", icon: "location_city" },
-          { id: "kyoto", label: "Kyoto", icon: "location_city" },
-          { id: "hokkaido", label: "Hokkaido", icon: "terrain" },
+          { id: "porto", label: "Porto", icon: "location_city" },
+          { id: "douro", label: "Douro Valley", icon: "terrain" },
+          { id: "minho", label: "Minho", icon: "terrain" },
+        ],
+      },
+      {
+        id: "lisbon-region",
+        label: "Lisbon Region",
+        icon: "map",
+        count: "528",
+        children: [
+          { id: "lisbon", label: "Lisbon", icon: "location_city" },
+          { id: "sintra", label: "Sintra", icon: "terrain" },
         ],
       },
     ],
@@ -40,9 +50,11 @@ const VECTOR_PREVIEW = Array.from({ length: 36 }, (_, index) => {
 
 export default function ConsoleGraphPage() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    asia: true,
-    japan: true,
+    portugal: true,
+    north: true,
+    "lisbon-region": true,
   });
+  const [focusedNode, setFocusedNode] = useState("portugal");
 
   const toggle = (id: string) =>
     setExpanded((current) => ({ ...current, [id]: !current[id] }));
@@ -59,7 +71,7 @@ export default function ConsoleGraphPage() {
           onClick={() => hasChildren && toggle(node.id)}
           aria-expanded={hasChildren ? isExpanded : undefined}
           className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left font-mono-technical text-mono-technical hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light ${
-            node.id === "japan"
+            node.id === focusedNode
               ? "bg-primary-container/30 border border-ochre-light/20 text-ochre-light font-medium"
               : "text-linen-dark"
           }`}
@@ -98,20 +110,29 @@ export default function ConsoleGraphPage() {
             <span aria-hidden>/</span>
             <span>Geography</span>
             <span aria-hidden>/</span>
-            <span className="text-ochre-light font-medium">Japan</span>
+            <span className="text-ochre-light font-medium">Portugal</span>
           </nav>
-          <label className="relative">
-            <span className="sr-only">Search graph nodes</span>
-            <span
-              aria-hidden
-              className="ph absolute left-3 top-1/2 -translate-y-1/2 text-linen-dark/50 pointer-events-none ph-magnifying-glass"
-            >magnifying-glass</span>
-            <input
-              type="search"
-              placeholder="Search nodes…"
-              className="w-64 font-body-md text-body-md bg-black/50 border border-white/10 rounded-full py-1.5 pl-9 pr-4 text-linen-dark placeholder:text-linen-dark/50 focus:outline-none focus:border-ochre-light/50 focus:ring-1 focus:ring-ochre-light/50"
-            />
-          </label>
+          <span className="mr-auto ml-6 rounded-full border border-ochre-light/30 bg-ochre-light/10 px-3 py-1 font-mono-micro text-mono-micro uppercase tracking-wider text-ochre-light">
+            Demo data · Portugal atlas
+          </span>
+          <div className="flex items-center gap-1" aria-label="Focus graph region">
+            <span className="sr-only">Focus graph region</span>
+            {["portugal", "lisbon", "porto", "douro"].map((id) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={focusedNode === id}
+                onClick={() => setFocusedNode(id)}
+                className={`rounded-full px-3 py-1.5 font-mono-micro text-mono-micro uppercase tracking-wider border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light ${
+                  focusedNode === id
+                    ? "border-ochre-light bg-ochre-light/15 text-ochre-light"
+                    : "border-white/10 text-linen-dark/60 hover:border-ochre-light/50 hover:text-linen-dark"
+                }`}
+              >
+                {id === "portugal" ? "All Portugal" : id}
+              </button>
+            ))}
+          </div>
         </header>
 
         <main id="main-content" className="flex-1 flex overflow-hidden">
@@ -155,10 +176,10 @@ export default function ConsoleGraphPage() {
                       </span>
                     </div>
                     <h1 className="font-headline-lg text-headline-lg text-linen-dark mb-2">
-                      Japan
+                      Portugal
                     </h1>
                     <p className="font-mono-technical text-mono-technical text-linen-dark/60">
-                      ID: node_geog_jp_0991a
+                      ID: node_geog_pt_0001a
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -219,8 +240,8 @@ export default function ConsoleGraphPage() {
                   </h3>
                   <div className="flex-1 relative bg-black/60 rounded border border-white/5 overflow-hidden min-h-[120px]">
                     <img
-                      src="https://picsum.photos/seed/japan-map/600/300"
-                      alt="Satellite reference map for Japan"
+                      src="/hero/portugal-coast-golden-hour.svg"
+                      alt="Satellite reference map for Portugal"
                       className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen"
                     />
                     <span
@@ -228,7 +249,7 @@ export default function ConsoleGraphPage() {
                       className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/60 to-transparent"
                     />
                     <span className="absolute bottom-3 left-3 font-mono-technical text-mono-technical text-ochre-light bg-black/50 border border-white/10 px-2 py-1 rounded">
-                      POINT(138.2529 36.2048)
+                      POINT(-8.496 39.500)
                     </span>
                   </div>
                 </article>

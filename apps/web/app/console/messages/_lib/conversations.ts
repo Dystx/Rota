@@ -9,8 +9,9 @@
  * The fixtures are wireframe-quality (no real backend yet) —
  * they give the UI something to render with realistic shape
  * (date badge, title, summary) so the day-cards sidebar looks
- * right during design review. The data model mirrors the
- * reference's "Day 2 • Oct 13, Higashiyama Exploration"
+ * right during design review. The data model mirrors a
+ * Portugal-first route sample and is explicitly marked as demo
+ * data by the page shell.
  * pattern: each day is a selectable card in the left rail
  * that filters the chat thread in the center column.
  *
@@ -45,45 +46,45 @@ export const DAYS: Day[] = [
     id: "day-1",
     label: "Day 1",
     date: "Oct 12",
-    title: "Arrival in Kyoto",
-    summary: "Land at KIX, transfer to the ryokan, gentle walk in Gion.",
+    title: "Arrival in Lisbon",
+    summary: "Land in Lisbon, settle in Alfama, and take an easy river walk.",
     active: true,
     accent: "#2b3e34",
     name: "Eleanor Vance",
-    avatarSrc: "https://i.pravatar.cc/40?img=5"
+    avatarSrc: "/brand/mark.svg"
   },
   {
     id: "day-2",
     label: "Day 2",
     date: "Oct 13",
-    title: "Higashiyama Exploration",
-    summary: "Pre-dawn Kiyomizu-dera, Ryoan-ji at opening, tea ceremony.",
+    title: "Lisbon Neighbourhoods",
+    summary: "A slow Baixa loop, a tile studio, and a sunset viewpoint.",
     active: false,
     accent: "#CE933F",
     name: "Eleanor Vance",
-    avatarSrc: "https://i.pravatar.cc/40?img=5"
+    avatarSrc: "/brand/mark.svg"
   },
   {
     id: "day-3",
     label: "Day 3",
     date: "Oct 14",
-    title: "Arashiyama & Bamboo",
-    summary: "Early-morning bamboo grove, Tenryu-ji, river boat to Uji.",
+    title: "Douro Valley & Vineyards",
+    summary: "A quiet quinta visit, river lunch, and an unhurried return.",
     active: false,
     accent: "#4f6358",
     name: "Eleanor Vance",
-    avatarSrc: "https://i.pravatar.cc/40?img=5"
+    avatarSrc: "/brand/mark.svg"
   },
   {
     id: "day-4",
     label: "Day 4",
     date: "Oct 15",
-    title: "Nishiki Market & Departure",
-    summary: "Last market run, craft stops, late checkout, KIX transfer.",
+    title: "Porto & Departure",
+    summary: "Market breakfast, a final craft stop, and airport transfer.",
     active: false,
     accent: "#784d00",
     name: "Eleanor Vance",
-    avatarSrc: "https://i.pravatar.cc/40?img=5"
+    avatarSrc: "/brand/mark.svg"
   }
 ];
 
