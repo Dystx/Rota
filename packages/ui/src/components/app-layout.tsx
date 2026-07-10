@@ -77,7 +77,7 @@ export function AppLayout({
       {bare ? null : (
         <>
           {topNav}
-          <main id="main-content" className="flex-1">
+          <main id="main-content" className="flex-1 pt-header-height">
             {children}
           </main>
           {siteFooter}

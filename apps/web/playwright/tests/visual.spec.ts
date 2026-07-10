@@ -4,7 +4,20 @@ import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createAdminStorageState } from "../fixtures/admin-auth";
 import { travelerTripPath } from "../fixtures/traveler-trip";
 
-const marketingRoutes = ["/", "/portugal", "/how-it-works", "/pricing", "/human-review"];
+const marketingRoutes = [
+  "/",
+  "/portugal",
+  "/explore",
+  "/explore/workspace",
+  "/how-it-works",
+  "/pricing",
+  "/human-review",
+  "/privacy",
+  "/terms",
+  "/sustainability",
+  "/support",
+  "/offline"
+];
 const travelerRoutes: Array<string | (() => string)> = [
   "/trip/new",
   travelerTripPath,

@@ -257,7 +257,7 @@ function Pill({ selected, onClick, children }: PillProps) {
       className={[
         "px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-[0.15em] transition-colors",
         selected
-          ? "bg-ochre-light text-ochre-dark border border-ochre-light shadow-sm"
+          ? "bg-olive-dark text-linen-dark border border-olive-dark shadow-sm"
           : "bg-white/50 text-on-surface-variant border border-outline-variant hover:bg-white/80"
       ].join(" ")}
     >

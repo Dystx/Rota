@@ -161,9 +161,16 @@ test.describe("Accessibility Audit - Public", () => {
   const publicRoutes = [
     "/",
     "/portugal",
+    "/explore",
+    "/explore/workspace",
     "/how-it-works",
     "/pricing",
-    "/human-review"
+    "/human-review",
+    "/privacy",
+    "/terms",
+    "/sustainability",
+    "/support",
+    "/offline"
   ];
 
   for (const route of publicRoutes) {
@@ -239,7 +246,7 @@ test("@smoke @a11y route h1 sweep", async ({ browser }) => {
 
   shouldWriteH1Audit = true;
   const sweeps: Array<{ storageState?: string; routes: string[] }> = [
-    { routes: ["/", "/portugal", "/how-it-works", "/pricing", "/human-review"] },
+    { routes: ["/", "/portugal", "/explore", "/explore/workspace", "/how-it-works", "/pricing", "/human-review", "/privacy", "/terms", "/sustainability", "/support", "/offline"] },
     { storageState: createTravelerStorageState(), routes: ["/trip/new", tripPath(), tripMapPath(), tripExportPath(), "/account"] },
     { storageState: createReviewerStorageState(), routes: ["/reviewer/queue", "/reviewer/profile", "/reviewer/history", "/reviewer/operations", `/reviewer/trips/${tripId()}`] },
     { storageState: createAdminStorageState(), routes: ["/admin/places", "/admin/analytics", "/admin/countries", "/admin/regions", "/admin/partners", "/admin/reviewers", "/admin/quality"] }

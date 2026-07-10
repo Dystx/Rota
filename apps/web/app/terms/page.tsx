@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { TopNav } from "../_components/top-nav";
-import { SiteFooter } from "../_components/site-footer";
+import { PublicRouteLayout } from "../_components/public-route-layout";
 
 export const metadata: Metadata = {
   title: "Terms of Service | Rumia",
@@ -11,12 +10,8 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <>
-      <TopNav />
-      <main
-        id="main-content"
-        className="pt-header-height min-h-screen bg-background"
-      >
+    <PublicRouteLayout>
+      <div className="min-h-screen bg-background">
         <article className="max-w-3xl mx-auto px-container-padding-sm md:px-container-padding-lg py-section-gap">
           <header className="mb-8">
             <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-2">
@@ -41,7 +36,7 @@ export default function TermsPage() {
               Stripe. Refunds follow the policy in your{" "}
               <Link
                 href="/account"
-                className="text-ochre-dark underline underline-offset-2 hover:text-primary"
+                className="font-semibold text-primary underline decoration-ochre-dark decoration-2 underline-offset-2 hover:text-olive-light"
               >
                 account
               </Link>
@@ -49,8 +44,7 @@ export default function TermsPage() {
             </p>
           </div>
         </article>
-      </main>
-      <SiteFooter />
-    </>
+      </div>
+    </PublicRouteLayout>
   );
 }

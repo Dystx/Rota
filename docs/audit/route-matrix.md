@@ -36,9 +36,9 @@ after the test runs against the fresh server configured in
 | Journey / surface | Executable source (listed) | Browser status | State coverage |
 | --- | --- | --- | --- |
 | Choice-led traveler (`/` → `/planner` → `/trip/new` → owned trip → map → checkout return → export) | `apps/web/playwright/tests/choice-led-traveler.spec.ts` | PASS fresh server, desktop + mobile (2 tests) | signed-in traveler, keyboard-only choices, reduced motion |
-| Public and traveler visual routes | `apps/web/playwright/tests/visual.spec.ts` and `visual.spec.ts-snapshots/` | PASS fresh server, desktop + mobile (42 tests) | 1440px desktop and 390px mobile; one main/visible h1; no placeholder imagery |
-| Route accessibility | `apps/web/playwright/tests/accessibility.spec.ts` | PASS fresh server, desktop + mobile (34 tests) | public/traveler/reviewer/admin, serious/critical axe gate, skip link, planner choice-only controls |
-| Mobile overflow | `apps/web/playwright/tests/mobile-overflow.spec.ts` | PASS fresh server, mobile (18 tests) | explicit 390px document width across public, traveler, reviewer, and admin routes |
+| Public and traveler visual routes | `apps/web/playwright/tests/visual.spec.ts` and `visual.spec.ts-snapshots/` | PASS fresh server, desktop + mobile (56 tests) | 1440px desktop and 390px mobile; one main/visible h1; no placeholder imagery |
+| Route accessibility | `apps/web/playwright/tests/accessibility.spec.ts` | PASS fresh server, desktop + mobile (46 active checks) | public/traveler/reviewer/admin, serious/critical axe gate, skip link, planner choice-only controls |
+| Mobile overflow | `apps/web/playwright/tests/mobile-overflow.spec.ts` | PASS fresh server, mobile (26 active checks) | explicit 390px document width across public, traveler, reviewer, and admin routes |
 
 ## Task 14 release-gate evidence (2026-07-10)
 
@@ -78,16 +78,15 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
 - Playwright setup now also seeds the reviewer role profile and auth link; built
   reviewer smoke for queue/history/profile renders correctly on mobile.
 - Full visual Playwright execution passes against the refreshed desktop and
-  mobile baselines (42 tests across public, traveler, reviewer, and operator
-  surfaces). The baselines include the expanded choice-led home and generated
-  owned trip fixture routes.
-- Full accessibility execution passes against the fresh server (34 tests across
-  public, traveler, reviewer, and admin surfaces), including axe serious/critical
-  gates, one-main/one-visible-h1 checks, keyboard brief submission, and reduced
-  motion behavior.
-- The 390px mobile overflow sweep passes for all 18 public, traveler, reviewer,
-  admin, and owned-trip route checks. Redirecting export routes wait for the final
-  settled URL before measuring the document.
+  mobile baselines (56 tests across discovery, utility, traveler, reviewer, and
+  operator surfaces). The baselines include the expanded choice-led home,
+  discovery workspace, legal/support/offline routes, and owned trip fixture.
+- Expanded accessibility execution passes against the fresh server (46 active
+  checks; 26 project-conditional skips), including axe serious/critical gates,
+  one-main/one-visible-h1 checks, keyboard brief submission, and reduced motion.
+- The 390px mobile overflow sweep passes for all 26 active public, traveler,
+  reviewer, admin, and owned-trip route checks. Redirecting export routes wait
+  for the final settled URL before measuring the document.
 - Operator console fixtures are explicitly labeled “Demo data”, use Portugal
   content, and no longer expose the prior Kyoto/Japan/search placeholders.
 - Guide beta portraits now use an authenticated, user-prefixed private Storage
@@ -102,23 +101,30 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
 | `pnpm lint` | PASS |
 | `pnpm exec vitest run` | PASS — 94 files / 689 tests |
 | `pnpm --filter web build` | PASS |
-| `playwright test visual.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 42 tests |
-| `playwright test accessibility.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 34 tests |
-| `playwright test mobile-overflow.spec.ts --project=mobile-chromium` | PASS — 18 tests |
+| `playwright test visual.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 56 tests |
+| `playwright test accessibility.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 46 active checks |
+| `playwright test mobile-overflow.spec.ts --project=mobile-chromium` | PASS — 26 active checks |
 | `playwright test choice-led-traveler.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 2 tests |
 | `playwright test public-discovery.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 8 tests |
 | `playwright test protected-routes.spec.ts --project=desktop-chrome` | PASS — 44 tests |
 
+| `playwright test accessibility.spec.ts mobile-overflow.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 72 tests, 26 intentionally skipped |
+
 Canonical serialized route gate (`pnpm --dir apps/web test:e2e`, 2026-07-10):
-**PASS — 229 tests passed, 19 intentionally skipped.** This is the release-gate
+**PASS — 264 tests passed, 26 intentionally skipped.** This is the release-gate
 run covering the complete configured desktop/mobile projects and avoids shared
 fresh-server/Supabase fixture races by running with one worker.
 
-The same canonical gate was rerun after the shared-shell consolidation and
-traveler/account route migration: **PASS — 229 tests passed, 19 intentionally
-skipped (11.2 minutes)**. Marketing, trip workspace, and account routes now
-inherit `AppLayout`; the mobile destination bento and traveler baselines were
+The same canonical gate was rerun after the shared-shell consolidation,
+utility-route coverage, and accessibility fixes: **PASS — 264 tests passed,
+26 intentionally skipped (9.3 minutes)**. Marketing, trip workspace, account,
+legal, support, offline, and discovery routes now inherit the shared public or
+traveler shell; the mobile destination bento and all affected baselines were
 refreshed after the responsive shell changes.
+
+The expanded visual/accessibility/overflow run was rerun after utility-route
+shell migration and contrast fixes: **56 visual tests passed; 72 accessibility
+and overflow tests passed with 26 intentional project skips.**
 
 The earlier failed rows above are retained as historical evidence of the fixture
 and stale-baseline issues that were subsequently corrected; they are superseded

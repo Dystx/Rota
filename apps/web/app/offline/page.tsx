@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { TopNav } from "../_components/top-nav";
-import { SiteFooter } from "../_components/site-footer";
+import { PublicRouteLayout } from "../_components/public-route-layout";
 
 /**
  * Offline fallback. Served by the PWA service worker when the
@@ -10,12 +9,8 @@ import { SiteFooter } from "../_components/site-footer";
  */
 export default function OfflinePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
-      <main
-        id="main-content"
-        className="min-h-[60vh] flex items-center justify-center px-container-padding-lg py-section-gap"
-      >
+    <PublicRouteLayout>
+      <div className="min-h-[60vh] flex items-center justify-center px-container-padding-lg py-section-gap bg-background">
         <div className="max-w-xl text-center flex flex-col items-center gap-gutter">
           <span
             aria-hidden
@@ -34,8 +29,7 @@ export default function OfflinePage() {
           </p>
           <Link href="/explore" className="rounded-full bg-olive-light px-5 py-3 text-sm font-semibold text-on-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light">Return to Discover</Link>
         </div>
-      </main>
-      <SiteFooter />
-    </div>
+      </div>
+    </PublicRouteLayout>
   );
 }

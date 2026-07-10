@@ -4,7 +4,7 @@ import path from "path";
 import { travelerTripPath } from "../fixtures/traveler-trip";
 
 const routes = {
-  marketing: ["/", "/portugal", "/how-it-works", "/pricing", "/human-review"],
+  marketing: ["/", "/portugal", "/explore", "/explore/workspace", "/how-it-works", "/pricing", "/human-review", "/privacy", "/terms", "/sustainability", "/support", "/offline"],
   traveler: ["/planner", "/trip/new", "/checkout", "/itineraries", "/account"],
   reviewer: ["/reviewer/queue", "/reviewer/profile", "/reviewer/history"],
   admin: ["/admin/places", "/admin/analytics"],
