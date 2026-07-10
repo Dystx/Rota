@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   activityExplorerUrl,
+  getReviewedActivityById,
   getReviewedActivities,
   parseSavedActivityIds,
   parseActivityIntent,
@@ -83,5 +84,12 @@ describe("activity editorial adapter", () => {
     expect(parseSavedActivityIds({ saved: ["porto-ribeira-slow-walk", "", "porto-ribeira-slow-walk"] })).toEqual([
       "porto-ribeira-slow-walk"
     ]);
+  });
+
+  it("only resolves reviewed activity detail records", () => {
+    expect(getReviewedActivityById(REVIEWED_ACTIVITY_SEED, "porto-ribeira-slow-walk")?.title).toBe(
+      "Ribeira and Miragaia at walking pace"
+    );
+    expect(getReviewedActivityById(REVIEWED_ACTIVITY_SEED, "not-a-reviewed-activity")).toBeUndefined();
   });
 });

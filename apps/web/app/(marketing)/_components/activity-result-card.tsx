@@ -1,4 +1,5 @@
 import * as React from "react";
+import Link from "next/link";
 
 import type { EditorialActivity } from "@/lib/content/activities";
 
@@ -18,7 +19,7 @@ export function ActivityResultCard({
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">Rumia verdict</p>
-          <h2 className="mt-2 font-display text-3xl text-primary">{activity.title}</h2>
+          <h2 className="mt-2 font-display text-3xl text-primary"><Link className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href={`/activities/${activity.id}`}>{activity.title}</Link></h2>
           <p className="mt-3 max-w-2xl text-base leading-7 text-on-surface-variant">{activity.verdict}</p>
         </div>
         <button

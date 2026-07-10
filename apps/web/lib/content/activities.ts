@@ -646,6 +646,18 @@ export function getReviewedActivities(
     .slice(0, 5);
 }
 
+export function getReviewedActivityById(
+  activities: readonly EditorialActivity[],
+  activityId: string
+): EditorialActivity | undefined {
+  return activities.find(
+    (activity) =>
+      activity.id === activityId &&
+      activity.editorialStatus === "reviewed" &&
+      activity.verdict.trim().length > 0
+  );
+}
+
 export function activityExplorerUrl(intent: ActivityIntent, savedIds: readonly string[] = []): string {
   const query = new URLSearchParams({
     region: intent.region,

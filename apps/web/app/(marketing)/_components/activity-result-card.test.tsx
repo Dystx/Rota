@@ -18,6 +18,9 @@ describe("ActivityResultCard", () => {
     );
 
     expect(screen.getByText("Rumia verdict")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Ribeira and Miragaia at walking pace" }).getAttribute("href")).toBe(
+      "/activities/porto-ribeira-slow-walk"
+    );
     expect(screen.getByText("Choose instead")).toBeTruthy();
     expect(screen.getByText("Miguel Bombarda for contemporary art and design")).toBeTruthy();
   });
