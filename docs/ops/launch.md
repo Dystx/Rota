@@ -1,9 +1,15 @@
 # Launch Runbook
 
-Status: **BLOCKED** on hosted Supabase schema apply (Phase 2)
-Last updated: 2026-07-04
+Status: **BLOCKED** on hosted Supabase schema apply and local Docker policy verification
+Last updated: 2026-07-10
 
 This runbook defines the pre-flight, launch, and smoke-test procedures for Rumia.pt.
+
+## Phase 0 evidence
+
+- Required local commands: `pnpm repo:safety`, `pnpm qa:assets`, `pnpm check:migrations`, `pnpm test:unit`, and `pnpm test:rls` after `pnpm exec supabase db reset`.
+- This workstation has not run the database reset or browser capture gate because Docker is unavailable and port `3105` is in use by an existing local server.
+- Stripe, live AI, transactional email, trip messaging, Guide, B2B, operator console, and configuration flags remain off until their later release gates pass.
 
 ## 1. Pre-Launch Gate (Hosted Schema Apply)
 

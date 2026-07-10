@@ -126,6 +126,9 @@ jobs:
       - name: Reset local Supabase database
         run: supabase db reset
 
+      - name: Run authorization policy contracts
+        run: pnpm test:rls
+
       - name: Discover Supabase db commands
         run: |
           mkdir -p .github/artifacts/supabase

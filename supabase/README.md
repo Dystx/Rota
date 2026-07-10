@@ -9,8 +9,8 @@ Prerequisite: Docker Desktop or a compatible container runtime must be installed
 From the repo root:
 
 ```bash
-npx supabase start
-npx supabase db reset
+pnpm exec supabase start
+pnpm exec supabase db reset
 ```
 
 Then copy the CLI output into `.env.local`. This file is ignored by git because the service key is server-only secret material:
@@ -35,13 +35,19 @@ If a hosted service-role or secret key was exposed, rotate it before production 
 
 ## Trusted roles and local personas
 
-Application roles are trusted only when read from `auth.users.raw_app_meta_data.role` through validated claims or from server-owned public tables:
+Application roles are trusted only from server-owned public tables:
 
 - `public.user_profiles.app_role`: `traveler`, `reviewer`, `admin`, or `none`
 - `public.reviewer_auth_links`: maps an auth user to a reviewer row such as local test reviewer `ines-almeida`
 - `public.trip_briefs.owner_user_id` and `public.trips.owner_user_id`: traveler ownership prerequisites for future RLS policies
 
-Do not authorize from `auth.users.raw_user_meta_data`, client-provided `user_metadata`, form fields, cookies, or localStorage. User metadata is acceptable for display-only profile details, but not for role decisions.
+Do not authorize from JWT metadata, `auth.users.raw_user_meta_data`, client-provided `user_metadata`, form fields, cookies, or localStorage. User metadata is acceptable for display-only profile details, but not for role decisions.
+
+Run the policy contracts after a reset:
+
+```bash
+pnpm test:rls
+```
 
 For deterministic local testing, run the local persona script after `npx supabase db reset` and after exporting local-only throwaway passwords:
 
