@@ -17,6 +17,7 @@ test.describe("public discovery and trust routes", () => {
   test("destination cards activate by keyboard and preserve draft URL", async ({ page }) => {
     await page.goto("/explore");
     const card = page.getByTestId("atlas-card-lisbon");
+    await card.scrollIntoViewIfNeeded();
     await card.focus();
     await expect(card).toBeFocused();
     await page.keyboard.press("Enter");
@@ -32,6 +33,6 @@ test.describe("public discovery and trust routes", () => {
 
   test("offline page offers recovery action", async ({ page }) => {
     await page.goto("/offline");
-    await expect(page.locator('a[href="/explore"]')).toBeVisible();
+    await expect(page.getByRole("link", { name: "Return to Discover", exact: true })).toBeVisible();
   });
 });
