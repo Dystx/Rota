@@ -71,7 +71,6 @@ export function PaceToneControl() {
               type="button"
               role="radio"
               aria-checked={selected}
-              aria-pressed={selected}
               data-testid={`pace-option-${opt.value.toLowerCase().replace(" ", "-")}`}
               onClick={() => setPaceTone({ ...paceTone, pace: opt.value })}
               className={
@@ -99,7 +98,6 @@ export function PaceToneControl() {
               type="button"
               role="radio"
               aria-checked={selected}
-              aria-pressed={selected}
               data-testid={`tone-option-${opt.value.toLowerCase().replace(" ", "-")}`}
               onClick={() => setPaceTone({ ...paceTone, tone: opt.value })}
               className={

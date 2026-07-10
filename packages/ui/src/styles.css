@@ -192,6 +192,13 @@
   color: var(--color-ochre-on-light);
 }
 
+/* `text-ochre-dark` is used for small editorial labels across public and
+ * operator surfaces. Keep the utility AA-safe on the default paper surface;
+ * dark canvases opt into `text-ochre-light` explicitly where needed. */
+.text-ochre-dark {
+  color: var(--color-ochre-on-light);
+}
+
 @media print {
   * {
     transform: none !important;

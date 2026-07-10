@@ -51,7 +51,7 @@ export function WhenStep({
                 data-testid={`when-days-${value}`}
                 className={cn(
                   "rounded-full px-4 py-2 font-label-ui text-label-ui transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2",
-                  isSelected ? "bg-ochre-light text-ochre-dark shadow-md" : "border border-outline-variant/30 bg-white text-primary hover:border-ochre-light/60"
+                  isSelected ? "bg-ochre-light text-primary shadow-md" : "border border-outline-variant/30 bg-white text-primary hover:border-ochre-light/60"
                 )}
               >
                 {value} days

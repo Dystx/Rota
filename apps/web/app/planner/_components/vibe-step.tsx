@@ -97,7 +97,7 @@ function SegmentedControl<T extends string>({
               className={cn(
                 "flex-1 px-2 py-1.5 rounded-full font-mono-technical text-mono-technical uppercase tracking-widest transition-colors text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-1",
                 isSelected
-                  ? "bg-ochre-light text-ochre-dark shadow-sm"
+                  ? "bg-ochre-light text-primary shadow-sm"
                   : "bg-transparent text-on-surface-variant hover:bg-ochre-light/10",
                 index > 0 && !isSelected ? "border-l border-olive-light/10" : ""
               )}

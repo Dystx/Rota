@@ -379,7 +379,7 @@ export function ChipGroup<T extends string = string>(props: ChipGroupProps<T>) {
             className={cn(
               'inline-flex items-center gap-1.5 rounded-full border px-4 py-2 min-h-[44px] text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--color-background)] disabled:opacity-50 disabled:cursor-not-allowed',
               selected
-                ? 'border-[var(--color-atlantic)] bg-[var(--color-atlantic)] text-white shadow-[var(--shadow-stat-card)]'
+                ? 'border-[var(--color-ochre-on-light)] bg-[var(--color-ochre-on-light)] text-white shadow-[var(--shadow-stat-card)]'
                 : 'border-[var(--color-border)] bg-[var(--color-cream)] text-[var(--color-ink)] hover:bg-white hover:border-[var(--color-atlantic)]'
             )}
             {...ariaProps}

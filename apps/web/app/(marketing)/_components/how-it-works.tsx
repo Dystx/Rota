@@ -82,7 +82,7 @@ export function HowItWorks() {
             {/* Step number — primary visual cue. Rendered large so it
                 reads at a glance instead of being a footnote. */}
             <div className="flex items-center justify-between mb-5 md:mb-6">
-              <span className="font-mono-technical text-base md:text-lg text-ochre-dark tracking-widest font-medium">
+              <span className="font-mono-technical text-base md:text-lg text-[var(--color-ochre-on-light)] tracking-widest font-medium">
                 {step.n}
               </span>
               <span
