@@ -1,6 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
+  // The production server and Supabase-backed persona fixture are shared by
+  // every project. A single worker keeps WebGL, streamed route shells, and
+  // fixture writes deterministic in the canonical release gate.
+  workers: 1,
+  fullyParallel: false,
   globalSetup: "./playwright/global-setup.ts",
   testDir: "./playwright/tests",
   outputDir: "./playwright/test-results",
