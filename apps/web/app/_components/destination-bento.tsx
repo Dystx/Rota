@@ -59,8 +59,7 @@ const BENTO_CARDS: BentoCardData[] = [
     caption:
       "Explore the steep, historic streets, vibrant culinary scene, and nearby coastal retreats of Sintra and Cascais.",
     region: "Capital Region",
-    backgroundImage:
-      "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvuwR3iBxSI7Dc_xUue9PlZOCxIkQdO1BKnkgj-Vq6a6JbMPr5O97KI6d0ZWxwqjhuR1vs8JPyayESizGC4kuFSrWW58tlR9jga482rLrmo0T-b4VypQQsJAaei9FZ1yDMY7XIWocnoL1SV_GZQdCU56_yCUHMLkWvsUCY0wotaS3KlSHTP951qa-BSLMipuZqD84KyB7aj3cjePoP6zdoo9Mwo3l7tSNZjLrmkXopRfAh8ZnUeya-lMseIAzgR9e4PQ6wJjrQCdf7')",
+    backgroundImage: "url('/trip-covers/lisbon-tagus.svg')",
     gridClass: "md:col-span-8 row-span-2",
     contentClass: "text-on-primary"
   },
@@ -69,8 +68,7 @@ const BENTO_CARDS: BentoCardData[] = [
     label: "Douro Valley",
     caption: "Terraced vineyards and ancient estates along the golden river.",
     region: "Wine Country",
-    backgroundImage:
-      "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDYu4Fau7io9fH__yOAmh3NS8NfSMdk4ppABEZGMyiJwdW_dhtVGIV0Dw8kZR5lK8lak_dEo3IYDDkcBiyUHxBrqgD1OY6SCaop5fhBOUIuWLkFjpQEap2YW6UIWgEQub-GOXL6J16-h9-xPjE5k4xodT3fM956CvzZtrcH2SVBxRa4jyXhODGOllDkrFhiRZSkk1SHeyc6sg3eg112VXti1LIJwp3gJBIAT5_yX8TXauvdhmEtLcwsd8bMv72CDVKpvSHVhqM1u1-q')",
+    backgroundImage: "url('/trip-covers/douro-vineyards.svg')",
     gridClass: "md:col-span-4 row-span-2",
     contentClass: "text-on-primary"
   },
@@ -80,8 +78,7 @@ const BENTO_CARDS: BentoCardData[] = [
     caption:
       "Volcanic craters, thermal springs, and untouched Atlantic wilderness.",
     region: "Island Archipelago",
-    backgroundImage:
-      "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBVKywJbZwS5PUrrA6MTfs8d39w7yOtkJJUlakoA3aqZmMo4bLGdOn82FnKAJpUqR3Jx9CEwQqheDNpgz4SQ1c8xNuXlkUbJ6P6GIQxYDjHrjZbZrUSTiAh_dzx28ytJ4YG1qFhpPhIPg1LQ5sLWV8Qn6xUwtNOvQhOiFiGt4K6t3ek8exOSJc94DpCxSm2ZZaOX7x8CWip_O1xDmTILAQdtSnFICxCjx6GZQrksj92zpEnN4klxv2zWuS-S2otMfgk_4y9xhmDvjv0')",
+    backgroundImage: "url('/trip-covers/azores-craters.svg')",
     gridClass: "md:col-span-12 row-span-1",
     contentClass: "text-on-primary w-full md:w-1/2"
   }

@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
 import { getCurrentUserId } from "@/lib/supabase/server";
 import { getSpecialistProfileByUserId } from "@repo/db";
+import { isFeatureEnabled } from "@repo/config";
 import { GuideOnboardingForm } from "./_components/guide-onboarding-form";
 import { loadSpecialistCapabilities } from "./actions";
+import { BetaUnavailable } from "../../_components/beta-unavailable";
 
 /**
  * Specialist onboarding page. The unified
@@ -26,6 +28,15 @@ import { loadSpecialistCapabilities } from "./actions";
  * by RLS (not by service-role).
  */
 export default async function GuideOnboardingPage() {
+  if (!isFeatureEnabled("guideBeta")) {
+    return (
+      <BetaUnavailable
+        title="Specialist onboarding is in private beta"
+        description="This onboarding flow opens to approved specialists as verification capacity becomes available."
+      />
+    );
+  }
+
   const userId = await getCurrentUserId();
   if (!userId) {
     redirect("/sign-in?next=/guide/onboarding");

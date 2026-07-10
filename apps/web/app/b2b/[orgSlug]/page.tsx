@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getOrgBySlug } from "@repo/db";
+import { isFeatureEnabled } from "@repo/config";
 import { OrgBrandingApplier } from "@/app/_components/org-branding";
+import { BetaUnavailable } from "@/app/_components/beta-unavailable";
 
 /**
  * Public white-label landing page for a B2B partner.
@@ -18,6 +20,15 @@ export default async function B2BLandingPage({
 }: {
   params: Promise<{ orgSlug: string }>;
 }) {
+  if (!isFeatureEnabled("b2bBeta")) {
+    return (
+      <BetaUnavailable
+        title="Partner workspaces are in private beta"
+        description="This organization workspace is not publicly available yet."
+      />
+    );
+  }
+
   const { orgSlug } = await params;
   const org = await getOrgBySlug(orgSlug);
   if (!org) {

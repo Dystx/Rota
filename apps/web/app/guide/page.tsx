@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { isFeatureEnabled } from "@repo/config";
+import { BetaUnavailable } from "../_components/beta-unavailable";
 
 /**
  * /guide — the operator onboarding index.
@@ -7,6 +9,15 @@ import { redirect } from "next/navigation";
  * onboarding flow at `/guide/onboarding`. Future guides
  * (e.g. `/guide/admin`, `/guide/concierge`) will land here.
  */
-export default function GuideIndex(): never {
+export default function GuideIndex() {
+  if (!isFeatureEnabled("guideBeta")) {
+    return (
+      <BetaUnavailable
+        title="Specialist onboarding is in private beta"
+        description="Rumia is onboarding a limited group of Portugal specialists while verification and operations are finalized."
+      />
+    );
+  }
+
   redirect("/guide/onboarding");
 }

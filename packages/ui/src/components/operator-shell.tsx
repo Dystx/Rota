@@ -223,8 +223,7 @@ export function OperatorShell({
           </div>
         </aside>
 
-        <main
-          id="main-content"
+        <div
           data-testid="operator-main"
           className="flex-1 min-w-0"
         >
@@ -275,7 +274,7 @@ export function OperatorShell({
           <div className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12 lg:px-12 lg:py-16">
             {children}
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );

@@ -2,6 +2,12 @@ export type { ConfigDiagnostics, ConfigScope, EnvironmentMode } from "./shared";
 export { ConfigValidationError, environmentModeSchema } from "./shared";
 export type { PublicConfig, PublicSupabaseConfig } from "./public";
 export { createPublicConfig, createPublicSupabaseConfig } from "./public";
+export {
+  featureFlagNames,
+  getFeatureFlagEnvironmentVariable,
+  isFeatureEnabled
+} from "./features";
+export type { FeatureFlag } from "./features";
 export type {
   HealthProvider,
   HealthRequirement,

@@ -15,9 +15,14 @@ export function PageShell({
    */
   bare?: boolean;
 }) {
+  // Public routes now use the dedicated TopNav/AppLayout chrome. Reviewer
+  // and admin routes are rendered inside OperatorShell, so PageShell must be
+  // content-only there to avoid a second navigation bar and nested layout.
+  const renderLegacyHeader = !bare && variant === "marketing";
+
   return (
     <div className={cn("min-h-screen bg-[var(--color-background)] selection:bg-[var(--color-accent)]/30", className)}>
-      {!bare && (
+      {renderLegacyHeader && (
         <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[rgba(247,250,249,0.7)] backdrop-blur-2xl">
           <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-6 lg:px-12">
             <div className="flex items-center gap-4">
