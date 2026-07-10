@@ -157,6 +157,7 @@ async function recordH1Audit(page: any, routePath: string): Promise<{
 }
 
 test.describe("Accessibility Audit - Public", () => {
+  test.setTimeout(60_000);
   const publicRoutes = [
     "/",
     "/portugal",

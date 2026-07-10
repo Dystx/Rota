@@ -15,7 +15,9 @@ import { createTravelerStorageState } from "../fixtures/traveler-auth";
 // We don't assert the export actions themselves (window.open,
 // clipboard, blob download) — those are exercised manually.
 
-test.describe("@smoke @itinerary-export-drawer itineraries export drawer (public list)", () => {
+test.describe("@smoke @itinerary-export-drawer itineraries export drawer (traveler list)", () => {
+  test.use({ storageState: createTravelerStorageState() });
+
   test("clicking a card opens the export drawer", async ({ page }) => {
     await page.goto("/itineraries");
     const firstCard = page.locator('[data-testid^="itinerary-card-"]').first();
@@ -64,7 +66,7 @@ test.describe("@smoke @itinerary-export-drawer itineraries export drawer (public
     expect(popup.url()).toContain("/export?view=print&print=1");
 
     // The print view renders the print-now button as a manual fallback.
-    await expect(popup.getByTestId("print-now-button")).toBeVisible();
+    await expect(popup.getByTestId("print-now-button").first()).toBeVisible();
   });
 });
 

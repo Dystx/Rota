@@ -16,9 +16,11 @@ test.describe("@smoke choice-led traveler journey", () => {
     await expect(page).toHaveURL(/\/planner/);
     await expect(page.locator('[data-testid="planner-single-screen"]')).toBeVisible();
 
-    const lisbon = page.getByRole("radio", { name: /Lisbon.*Tile-lined/i }).first();
+    const lisbon = page.locator("#destination-Lisbon:visible").first();
+    await expect(lisbon).toBeVisible();
     await lisbon.focus();
-    await lisbon.press("Enter");
+    await expect(lisbon).toBeFocused();
+    await lisbon.press("Space");
     await expect(lisbon).toHaveAttribute("aria-checked", "true");
     await page.getByRole("button", { name: /Build my itinerary/i }).focus();
     await page.keyboard.press("Enter");
@@ -33,7 +35,7 @@ test.describe("@smoke choice-led traveler journey", () => {
     // Use the seeded traveler trip for the remaining route surfaces.
     await page.goto(travelerTripPath(), { waitUntil: "domcontentloaded" });
     await expect(page).toHaveURL(new RegExp(`/trip/${getTravelerTripId()}$`));
-    await page.getByRole("link", { name: /map/i }).first().click();
+    await page.getByTestId("trip-brief-open-map").click();
     await expect(page).toHaveURL(new RegExp(`/trip/${getTravelerTripId()}/map`));
 
     await page.goto(travelerCheckoutPath(), { waitUntil: "domcontentloaded" });

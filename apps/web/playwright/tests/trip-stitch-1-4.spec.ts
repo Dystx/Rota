@@ -27,19 +27,19 @@ test.describe("@smoke @trip-stitch-1-4 trip workspace Stitch 1.4 affordances", (
     await expect(page.getByTestId("tone-option-classics")).toBeVisible();
   });
 
-  test("clicking pace options toggles aria-pressed", async ({ page }) => {
+  test("clicking pace options toggles radio selection", async ({ page }) => {
     await page.goto(travelerTripPath());
 
     const relaxed = page.getByTestId("pace-option-relaxed");
     const active = page.getByTestId("pace-option-active");
 
-    // Default is "Relaxed" — its aria-pressed is "true", active is "false".
-    await expect(relaxed).toHaveAttribute("aria-pressed", "true");
-    await expect(active).toHaveAttribute("aria-pressed", "false");
+    // Default is "Relaxed" — it uses radio semantics because the control is exclusive.
+    await expect(relaxed).toHaveAttribute("aria-checked", "true");
+    await expect(active).toHaveAttribute("aria-checked", "false");
 
     await active.click();
-    await expect(active).toHaveAttribute("aria-pressed", "true");
-    await expect(relaxed).toHaveAttribute("aria-pressed", "false");
+    await expect(active).toHaveAttribute("aria-checked", "true");
+    await expect(relaxed).toHaveAttribute("aria-checked", "false");
   });
 
   test("brief card exposes Share + Download action buttons", async ({ page }) => {

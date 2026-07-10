@@ -55,6 +55,7 @@ const maskLocators = (page: any) => [
 
 async function assertRouteQuality(page: any, route: string, authenticated = false) {
   await expect(page.locator("main"), `${route} should expose exactly one main landmark`).toHaveCount(1);
+  await page.locator("h1:visible").first().waitFor({ state: "visible", timeout: 15_000 });
   await expect(page.locator("h1:visible"), `${route} should expose exactly one visible h1`).toHaveCount(1);
   await expect(page.locator("img[src*='placehold'], img[src*='placeholder'], img[src*='unsplash.com']"), `${route} must not use placeholder imagery`).toHaveCount(0);
   if (authenticated) {
