@@ -46,6 +46,10 @@ export function ActivityExplorer({
   const [intent, setIntent] = useState(initialIntent);
   const [savedIds, setSavedIds] = useState<readonly string[]>(initialSavedIds);
   const activities = useMemo(() => getReviewedActivities(REVIEWED_ACTIVITY_SEED, intent), [intent]);
+  const activitiesById = useMemo(
+    () => new Map(REVIEWED_ACTIVITY_SEED.map((activity) => [activity.id, activity])),
+    []
+  );
   const savedActivities = activities.filter((activity) => savedIds.includes(activity.id));
 
   function toggle(activityId: string) {
@@ -79,7 +83,7 @@ export function ActivityExplorer({
         <div className="mt-7 rounded-sm bg-primary px-5 py-7 md:px-8"><ActivityIntentComposer initial={{ region: intent.region === "porto" ? "Porto" : intent.region === "lisbon" ? "Lisbon" : intent.region === "douro" ? "Douro" : intent.region === "algarve" ? "The Algarve" : "The Azores", timeWindow: intent.timeWindow, moods: intent.moods, group: intent.group, constraints: intent.constraints }} onSubmit={updateIntent} /></div>
 
         <section aria-label="Judged activities" className="mt-12">
-          {activities.length > 0 ? activities.map((activity) => <ActivityResultCard activity={activity} key={activity.id} saved={savedIds.includes(activity.id)} onToggle={toggle} />) : (
+          {activities.length > 0 ? activities.map((activity) => <ActivityResultCard activity={activity} alternativeTitle={activity.alternativeId ? activitiesById.get(activity.alternativeId)?.title : undefined} key={activity.id} saved={savedIds.includes(activity.id)} onToggle={toggle} />) : (
             <div className="border-t border-[var(--color-border)] py-8">
               <h2 className="font-display text-3xl text-primary">That combination is still under review.</h2>
               <p className="mt-3 max-w-xl text-on-surface-variant">Try changing one phrase. Rumia will not fill a gap with unrelated recommendations.</p>

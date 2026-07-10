@@ -4,10 +4,12 @@ import type { EditorialActivity } from "@/lib/content/activities";
 
 export function ActivityResultCard({
   activity,
+  alternativeTitle,
   saved,
   onToggle
 }: {
   activity: EditorialActivity;
+  alternativeTitle?: string;
   saved: boolean;
   onToggle: (activityId: string) => void;
 }) {
@@ -28,11 +30,12 @@ export function ActivityResultCard({
         </button>
       </div>
 
-      <dl className="mt-5 grid gap-4 text-sm text-on-surface-variant sm:grid-cols-2 lg:grid-cols-4">
+      <dl className="mt-5 grid gap-4 text-sm text-on-surface-variant sm:grid-cols-2 lg:grid-cols-5">
         <div><dt className="font-medium text-primary">Best for</dt><dd className="mt-1">{activity.bestFor.join(" · ")}</dd></div>
         <div><dt className="font-medium text-primary">Time needed</dt><dd className="mt-1">{Math.round(activity.durationMinutes / 30) / 2} hours</dd></div>
         <div><dt className="font-medium text-primary">Go when</dt><dd className="mt-1">{activity.bestTime}</dd></div>
         <div><dt className="font-medium text-primary">Pair it with</dt><dd className="mt-1">{activity.pairWith.join(" · ")}</dd></div>
+        {alternativeTitle ? <div><dt className="font-medium text-primary">Choose instead</dt><dd className="mt-1">{alternativeTitle}</dd></div> : null}
       </dl>
 
       {activity.avoidWhen ? <p className="mt-4 text-sm leading-6 text-on-surface-variant"><span className="font-medium text-primary">Avoid when: </span>{activity.avoidWhen}</p> : null}
