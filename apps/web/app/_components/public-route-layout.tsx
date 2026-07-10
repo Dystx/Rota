@@ -1,3 +1,4 @@
+import * as React from "react";
 import type { ReactNode } from "react";
 import { AppLayout } from "@repo/ui";
 import { TopNav } from "./top-nav";

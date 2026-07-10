@@ -29,6 +29,11 @@ test.describe("@smoke @trip-stitch-1-4 trip workspace Stitch 1.4 affordances", (
 
   test("clicking pace options toggles radio selection", async ({ page }) => {
     await page.goto(travelerTripPath());
+    // The trip page streams its generated itinerary after the initial HTML.
+    // Wait for that client work to settle before exercising the hydrated
+    // Zustand-backed control; otherwise a click can land in the brief
+    // server-rendered / pre-hydration window under a loaded full suite.
+    await page.waitForLoadState("networkidle");
 
     const relaxed = page.getByTestId("pace-option-relaxed");
     const active = page.getByTestId("pace-option-active");

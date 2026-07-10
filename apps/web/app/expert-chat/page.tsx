@@ -4,8 +4,7 @@ import { Button } from "@repo/ui";
 import { isFeatureEnabled } from "@repo/config";
 import { getOwnedTrip } from "@/app/lib/trip-access";
 import { BetaUnavailable } from "../_components/beta-unavailable";
-import { TopNav } from "../_components/top-nav";
-import { SiteFooter } from "../_components/site-footer";
+import { PublicRouteLayout } from "../_components/public-route-layout";
 import { ExpertChat } from "./_components/expert-chat";
 
 /**
@@ -42,12 +41,8 @@ export default async function ExpertChatPage({
 
   if (!tripId) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <TopNav />
-        <main
-          id="main-content"
-          className="flex-1 pt-header-height flex items-center justify-center"
-        >
+      <PublicRouteLayout>
+        <div className="min-h-[calc(100vh-12rem)] flex items-center justify-center">
           <div
             data-testid="expert-chat-empty"
             className="mx-auto max-w-2xl px-container-padding-sm text-center"
@@ -70,9 +65,8 @@ export default async function ExpertChatPage({
               </Button>
             </div>
           </div>
-        </main>
-        <SiteFooter />
-      </div>
+        </div>
+      </PublicRouteLayout>
     );
   }
 

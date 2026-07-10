@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { TopNav } from "../../_components/top-nav";
-import { SiteFooter } from "../../_components/site-footer";
+import { PublicRouteLayout } from "../../_components/public-route-layout";
 
 type Message = {
   id: string;
@@ -87,10 +86,9 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
   };
 
   return (
-    <>
-      <TopNav />
-      <div className="pt-header-height min-h-screen flex flex-col font-body-md text-body-md">
-        <main id="main-content" className="flex-1 flex flex-col max-w-3xl mx-auto w-full px-container-padding-sm py-8">
+    <PublicRouteLayout>
+      <div className="min-h-[calc(100vh-12rem)] flex flex-col font-body-md text-body-md">
+        <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full px-container-padding-sm py-8">
           <h1 className="font-headline-lg text-headline-lg text-primary mb-2">Expert messages</h1>
           <p className="text-on-surface-variant mb-6">Trip {tripId}</p>
           <section aria-live="polite" className="flex-1 rounded-2xl border border-olive-light/15 bg-white/70 p-5">
@@ -114,9 +112,8 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
               <button type="button" onClick={() => void send()} disabled={sending || !input.trim()} className="rounded-xl bg-primary px-5 text-white disabled:opacity-50">{sending ? "Sending…" : "Send"}</button>
             </div>
           )}
-        </main>
+        </div>
       </div>
-      <SiteFooter />
-    </>
+    </PublicRouteLayout>
   );
 }

@@ -17,7 +17,10 @@ const marketingRoutes = [
   "/sustainability",
   "/support",
   "/offline",
-  "/sign-in"
+  "/sign-in",
+  "/expert-chat",
+  "/guide",
+  "/b2b"
 ];
 const travelerRoutes: Array<string | (() => string)> = [
   "/trip/new",
