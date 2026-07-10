@@ -10,8 +10,6 @@ import {
 } from "@repo/ui";
 import { getTripsForUser, isPersistenceConfigError } from "@repo/db";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { TopNav } from "../../_components/top-nav";
-import { SiteFooter } from "../../_components/site-footer";
 import { AccountTripCard } from "./_components/trip-card";
 import { BehaviorConsentToggle } from "./_components/behavior-consent-toggle";
 import { signOutAction } from "./_actions/sign-out";
@@ -61,14 +59,7 @@ export default async function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <TopNav />
-
-      <main
-        id="main-content"
-        className="flex-1 pt-header-height"
-        data-testid="account-header"
-      >
+    <div className="min-h-screen bg-background" data-testid="account-header">
         {/* Profile strip — one Card at the top of the page so the
             traveler sees their session + a sign-out control as
             soon as the page renders. `max-w-6xl` + shared padding
@@ -184,9 +175,6 @@ export default async function AccountPage() {
             </CardContent>
           </Card>
         </section>
-      </main>
-
-      <SiteFooter />
     </div>
   );
 }

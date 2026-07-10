@@ -20,8 +20,6 @@ import {
 } from "@repo/ui";
 import { buildPartnerClickHref, selectRelevantPartners } from "@/lib/partner-enrichment";
 import { getOwnedTrip } from "@/app/lib/trip-access";
-import { TopNav } from "../../../../_components/top-nav";
-import { SiteFooter } from "../../../../_components/site-footer";
 import { PrewarmLink, RouteMap } from "./map-components";
 
 export default async function TripMapPage({
@@ -109,9 +107,7 @@ export default async function TripMapPage({
     [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
-      <main id="main-content" className="flex-1 pt-header-height">
+    <div className="min-h-screen bg-background">
       <CinematicGuide>
         <GuideProgress chapters={chapters} />
 
@@ -343,8 +339,6 @@ export default async function TripMapPage({
           </CTASection>
         </GuideChapter>
       </CinematicGuide>
-      </main>
-      <SiteFooter />
     </div>
   );
 }

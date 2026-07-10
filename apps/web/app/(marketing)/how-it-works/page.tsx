@@ -1,7 +1,5 @@
 import { Metadata } from "next";
 import { PageShell, SectionHeading } from "@repo/ui";
-import { TopNav } from "../../_components/top-nav";
-import { SiteFooter } from "../../_components/site-footer";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -33,8 +31,6 @@ const flow = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
       <PageShell bare>
         <SectionHeading
           eyebrow="The Journey"
@@ -60,7 +56,5 @@ export default function HowItWorksPage() {
           </Link>
         </div>
       </PageShell>
-      <SiteFooter />
-    </div>
   );
 }

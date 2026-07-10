@@ -4,8 +4,6 @@ import { buildEmailPreview } from "@repo/emails";
 import { getCheckoutPlan } from "@repo/payments";
 import { Button, Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading, PricingCard, TestimonialCard, FeatureGrid, FeatureGridItem } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
-import { TopNav } from "../../_components/top-nav";
-import { SiteFooter } from "../../_components/site-footer";
 
 export const metadata: Metadata = {
   title: "Human Review Trust Layer",
@@ -21,8 +19,6 @@ export default function HumanReviewPage() {
   const reviewEmail = buildEmailPreview("review-complete", "Porto & Douro / 5 days");
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
       <PageShell bare>
         <SectionHeading
           eyebrow="Trust layer"
@@ -79,7 +75,5 @@ export default function HumanReviewPage() {
           </div>
         </div>
       </PageShell>
-      <SiteFooter />
-    </div>
   );
 }

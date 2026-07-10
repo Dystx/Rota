@@ -1,8 +1,6 @@
 import * as React from "react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { TopNav } from "../../../_components/top-nav";
-import { SiteFooter } from "../../../_components/site-footer";
 import { WorkspaceCanvasClient } from "./workspace-canvas-client";
 import { WorkspaceShell } from "./workspace-shell";
 import { fixtureRouteCollection, fixtureRouteSummary } from "@repo/spatial-engine";
@@ -47,9 +45,7 @@ export default function WorkspaceDemoPage() {
   }, []);
 
   return (
-    <>
-      <TopNav />
-      <main id="main-content" className="pt-header-height min-h-screen bg-background text-on-background antialiased">
+      <div className="min-h-screen bg-background text-on-background antialiased">
         <section className="mx-auto grid max-w-7xl gap-12 px-container-padding-sm md:px-[48px] py-section-gap">
           <header className="grid gap-4 text-center md:text-left">
             <p className="font-mono-micro text-mono-micro uppercase tracking-[0.2em] text-ochre-dark">
@@ -125,8 +121,6 @@ export default function WorkspaceDemoPage() {
             </article>
           </section>
         </section>
-      </main>
-      <SiteFooter />
-    </>
+      </div>
   );
 }

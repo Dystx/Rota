@@ -10,7 +10,7 @@ import { cn } from "../lib/cn";
  *     and content max-width
  *   - `bare` opts out of the chrome for full-bleed pages (planner overlay,
  *     cinematic hero, etc.)
- *   - Includes the skip-to-content link and the page background
+ *   - Uses the root layout's single skip-to-content link and owns page background
  *
  * Backward compatible: pages that don't import AppLayout keep their
  * existing TopNav + SiteFooter imports. New pages should use AppLayout.
@@ -52,9 +52,6 @@ const variantClassName: Record<AppLayoutVariant, string> = {
   auth: "bg-paper"
 };
 
-const skipLinkClassName =
-  "sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-on-primary focus:rounded-md focus:top-4 focus:left-4";
-
 /**
  * AppLayout is a server component. The TopNav and SiteFooter are passed
  * in as children because they may need to read the session cookie.
@@ -77,10 +74,6 @@ export function AppLayout({
       )}
       {...props}
     >
-      <a href="#main-content" className={skipLinkClassName}>
-        Skip to content
-      </a>
-
       {bare ? null : (
         <>
           {topNav}

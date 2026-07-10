@@ -1,7 +1,5 @@
 import { Metadata } from "next";
 import { ArchiveLayout, TripCard } from "@repo/ui";
-import { TopNav } from "../../_components/top-nav";
-import { SiteFooter } from "../../_components/site-footer";
 import { PUBLIC_DESTINATION_ATLAS, publicDestinationDraftUrl } from "../_components/public-trip-choices";
 
 export const metadata: Metadata = {
@@ -14,9 +12,7 @@ export const metadata: Metadata = {
 
 export default function PortugalPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
-      <ArchiveLayout
+    <ArchiveLayout
         bare
         testid="portugal-header"
         header={{
@@ -39,7 +35,5 @@ export default function PortugalPage() {
           ))}
         </ul>
       </ArchiveLayout>
-      <SiteFooter />
-    </div>
   );
 }

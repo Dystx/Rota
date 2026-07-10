@@ -1,7 +1,5 @@
 import * as React from "react";
 import { Metadata } from "next";
-import { TopNav } from "../_components/top-nav";
-import { SiteFooter } from "../_components/site-footer";
 import { HeroMap } from "./hero-map";
 import { BrandMark } from "@repo/ui";
 import { HowItWorks } from "./_components/how-it-works";
@@ -23,10 +21,7 @@ export const metadata: Metadata = {
  */
 export default function HomePage() {
   return (
-    <div className="min-h-screen pt-header-height flex flex-col">
-      <TopNav />
-
-      <main className="flex-1" id="main-content">
+    <div className="min-h-screen flex flex-col">
         <section className="relative w-full flex flex-col items-center justify-start overflow-visible bg-primary pb-12 md:h-[80vh] md:min-h-[720px] md:overflow-hidden md:pb-0">
           <HeroMap initialProjection="globe" />
 
@@ -67,9 +62,6 @@ export default function HomePage() {
 
         <HowItWorks />
         <DestinationBento mode="plan" />
-      </main>
-
-      <SiteFooter />
     </div>
   );
 }

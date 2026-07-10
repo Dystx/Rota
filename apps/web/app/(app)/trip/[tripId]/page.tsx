@@ -11,8 +11,6 @@ import {
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { resolveCoverImage } from "@/lib/trip-cover";
 import { getOwnedTrip } from "@/app/lib/trip-access";
-import { TopNav } from "../../../_components/top-nav";
-import { SiteFooter } from "../../../_components/site-footer";
 import { CinematicHero } from "./_components/cinematic-hero";
 import CinematicMapSection from "./_components/cinematic-map-section";
 import { PaceToneControl } from "./_components/pace-tone-control";
@@ -186,9 +184,7 @@ export default async function TripDetailPage({
     : [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
-      <main id="main-content" className="flex-1 pt-header-height">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[1100px] px-6 pt-6">
         <Breadcrumb
           items={[
@@ -483,8 +479,6 @@ export default async function TripDetailPage({
           </CTASection>
         </GuideChapter>
       </CinematicGuide>
-      </main>
-      <SiteFooter />
     </div>
   );
 }

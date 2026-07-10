@@ -2,8 +2,6 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { listCheckoutPlans } from "@repo/payments";
 import { Badge, Button, PageShell, SectionHeading, PricingCard } from "@repo/ui";
-import { TopNav } from "../../_components/top-nav";
-import { SiteFooter } from "../../_components/site-footer";
 
 export const metadata: Metadata = {
   title: "Pricing & Unlock Tiers",
@@ -17,8 +15,6 @@ export default function PricingPage() {
   const tiers = listCheckoutPlans();
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
       <PageShell bare>
         <SectionHeading
           eyebrow="Unlock your itinerary"
@@ -50,7 +46,5 @@ export default function PricingPage() {
           ))}
         </div>
       </PageShell>
-      <SiteFooter />
-    </div>
   );
 }

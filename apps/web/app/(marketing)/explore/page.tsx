@@ -1,6 +1,4 @@
 import { Metadata } from "next";
-import { TopNav } from "../../_components/top-nav";
-import { SiteFooter } from "../../_components/site-footer";
 import { DiscoveryGlobe } from "./discovery-globe";
 import { PUBLIC_DESTINATION_ATLAS, publicDestinationDraftUrl } from "../_components/public-trip-choices";
 import Link from "next/link";
@@ -16,9 +14,7 @@ export const metadata: Metadata = {
 
 export default function ExplorePage() {
   return (
-    <>
-      <TopNav />
-      <main id="main-content" className="pt-header-height min-h-screen bg-background text-on-background antialiased">
+      <div className="min-h-screen bg-background text-on-background antialiased">
         <section className="mx-auto grid max-w-7xl gap-12 px-container-padding-sm md:px-[48px] py-section-gap">
           <header className="grid gap-4 text-center md:text-left">
             <p className="font-mono-micro text-mono-micro uppercase tracking-[0.2em] text-ochre-dark">
@@ -92,8 +88,6 @@ export default function ExplorePage() {
             </article>
           </section>
         </section>
-      </main>
-      <SiteFooter />
-    </>
+      </div>
   );
 }

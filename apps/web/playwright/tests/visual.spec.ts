@@ -81,6 +81,11 @@ test.describe("@smoke @visual Marketing baselines", () => {
       // capture mid-flight. Wait for the choreography to settle on the
       // home page before the baseline compare.
       if (route === "/") {
+        // DestinationBento is a client island. Wait for its cards before the
+        // full-page capture so a slow mobile hydration cannot produce a
+        // passing but visually empty lower half of the home page.
+        await page.getByTestId("destination-bento").waitFor({ state: "visible", timeout: 15_000 });
+        await expect(page.getByTestId("bento-card-lisbon")).toBeVisible();
         // Home page renders the GlobeWorkspace with a ~3.2s intro camera
         // choreography (earth → europe beat). The choreography is
         // non-deterministic at the pixel level because the WebGL

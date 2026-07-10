@@ -31,7 +31,7 @@ describe("HomePage hero layout", () => {
   it("keeps the mobile route choices reachable while retaining the desktop hero frame", async () => {
     const page = await HomePage();
     const { container } = render(page);
-    const hero = container.querySelector("main > section");
+    const hero = container.querySelector("section");
 
     expect(hero).not.toBeNull();
     expect(hero?.className).toContain("overflow-visible");

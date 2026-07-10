@@ -114,6 +114,12 @@ Canonical serialized route gate (`pnpm --dir apps/web test:e2e`, 2026-07-10):
 run covering the complete configured desktop/mobile projects and avoids shared
 fresh-server/Supabase fixture races by running with one worker.
 
+The same canonical gate was rerun after the shared-shell consolidation and
+traveler/account route migration: **PASS — 229 tests passed, 19 intentionally
+skipped (11.2 minutes)**. Marketing, trip workspace, and account routes now
+inherit `AppLayout`; the mobile destination bento and traveler baselines were
+refreshed after the responsive shell changes.
+
 The earlier failed rows above are retained as historical evidence of the fixture
 and stale-baseline issues that were subsequently corrected; they are superseded
 by this fresh rerun.

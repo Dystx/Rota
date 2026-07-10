@@ -20,8 +20,6 @@ import { buildEmailPreview } from "@repo/emails";
 import { buildTripSharePath, listTripExportOptions } from "@/lib/trip-export";
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { getOwnedTrip } from "@/app/lib/trip-access";
-import { TopNav } from "../../../../_components/top-nav";
-import { SiteFooter } from "../../../../_components/site-footer";
 import { PrintAutoTrigger } from "./_components/print-auto-trigger";
 import { getExportJobState } from "@/app/lib/export-jobs";
 
@@ -38,9 +36,7 @@ function renderPrintView(
   autoPrint: boolean
 ) {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
-      <main id="main-content" className="flex-1 pt-header-height">
+    <div className="min-h-screen bg-background">
       <div data-testid="print-view" className="hidden" />
       <PrintAutoTrigger auto={autoPrint} />
       <SectionHeading
@@ -86,8 +82,6 @@ function renderPrintView(
           </CardContent>
         </Card>
       </div>
-      </main>
-      <SiteFooter />
     </div>
   );
 }
@@ -149,9 +143,7 @@ export default async function TripExportPage({
   const heroDescription = "PDF, print, calendar, and share actions live here, ready when the trip is unlocked.";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
-      <main id="main-content" className="flex-1 pt-header-height">
+    <div className="min-h-screen bg-background">
       <CinematicGuide>
         <GuideProgress chapters={chapters} />
 
@@ -308,8 +300,6 @@ export default async function TripExportPage({
           </CTASection>
         </GuideChapter>
       </CinematicGuide>
-      </main>
-      <SiteFooter />
     </div>
   );
 }

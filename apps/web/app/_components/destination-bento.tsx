@@ -145,7 +145,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
 
   return (
     <section
-      className="max-w-7xl mx-auto px-container-padding-lg py-section-gap relative -mt-16 z-20"
+      className="w-full max-w-7xl mx-auto px-container-padding-sm md:px-container-padding-lg py-section-gap relative -mt-16 z-20"
       data-testid="destination-bento"
       data-mode={mode}
     >

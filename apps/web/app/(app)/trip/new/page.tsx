@@ -1,7 +1,5 @@
 import { Metadata } from "next";
 import { Card, CardContent, CardHeader, StatPill } from "@repo/ui";
-import { TopNav } from "../../../_components/top-nav";
-import { SiteFooter } from "../../../_components/site-footer";
 import { TripBriefFormBoundary } from "./trip-brief-form";
 
 export const metadata: Metadata = {
@@ -14,9 +12,7 @@ export const metadata: Metadata = {
 
 export default function NewTripPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TopNav />
-      <main id="main-content" className="flex-1 pt-header-height">
+    <div className="min-h-screen bg-background">
       <section className="relative w-full flex flex-col justify-center items-center overflow-hidden pt-12 pb-12 mb-12">
         <div className="absolute inset-0 w-full h-full -z-10">
           <div
@@ -73,8 +69,6 @@ export default function NewTripPage() {
           </Card>
         </div>
       </div>
-      </main>
-      <SiteFooter />
     </div>
   );
 }
