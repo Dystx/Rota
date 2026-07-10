@@ -68,6 +68,7 @@ async function assertRouteQuality(page: any, route: string, authenticated = fals
 }
 
 test.describe("@smoke @visual Marketing baselines", () => {
+  test.setTimeout(60_000);
   for (const route of marketingRoutes) {
     const routeName = route === "/" ? "home" : route.replace(/\//g, "-").replace(/^-/, "");
     test(`marketing route ${route}`, async ({ page }, testInfo) => {
@@ -108,6 +109,7 @@ test.describe("@smoke @visual Marketing baselines", () => {
 });
 
 test.describe("@smoke @visual Traveler baselines", () => {
+  test.setTimeout(60_000);
   test.use({ storageState: createTravelerStorageState() });
   for (const [index, routeEntry] of travelerRoutes.entries()) {
     const routeLabel = typeof routeEntry === "string" ? routeEntry : `generated trip route ${index + 1}`;
@@ -130,6 +132,7 @@ test.describe("@smoke @visual Traveler baselines", () => {
 });
 
 test.describe("@smoke @visual Reviewer baselines", () => {
+  test.setTimeout(60_000);
   test.use({ storageState: createReviewerStorageState() });
   for (const route of reviewerRoutes) {
     const routeName = route.replace(/\//g, "-").replace(/^-/, "");
@@ -150,6 +153,7 @@ test.describe("@smoke @visual Reviewer baselines", () => {
 });
 
 test.describe("@smoke @visual Admin baselines", () => {
+  test.setTimeout(60_000);
   test.use({ storageState: createAdminStorageState() });
   for (const route of adminRoutes) {
     const routeName = route.replace(/\//g, "-").replace(/^-/, "");

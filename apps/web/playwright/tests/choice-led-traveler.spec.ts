@@ -35,7 +35,11 @@ test.describe("@smoke choice-led traveler journey", () => {
     // Use the seeded traveler trip for the remaining route surfaces.
     await page.goto(travelerTripPath(), { waitUntil: "domcontentloaded" });
     await expect(page).toHaveURL(new RegExp(`/trip/${getTravelerTripId()}$`));
-    await page.getByTestId("trip-brief-open-map").click();
+    const mapLink = page.getByTestId("trip-brief-open-map");
+    await expect(mapLink).toBeVisible();
+    await expect(mapLink).toHaveAttribute("href", new RegExp(`/trip/${getTravelerTripId()}/map$`));
+    await page.waitForTimeout(750);
+    await mapLink.click();
     await expect(page).toHaveURL(new RegExp(`/trip/${getTravelerTripId()}/map`));
 
     await page.goto(travelerCheckoutPath(), { waitUntil: "domcontentloaded" });
