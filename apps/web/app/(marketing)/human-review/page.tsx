@@ -23,10 +23,6 @@ export default function HumanReviewPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <TopNav />
-      <main
-        id="main-content"
-        className="flex-1 pt-header-height"
-      >
       <PageShell bare>
         <SectionHeading
           eyebrow="Trust layer"
@@ -83,7 +79,6 @@ export default function HumanReviewPage() {
           </div>
         </div>
       </PageShell>
-      </main>
       <SiteFooter />
     </div>
   );

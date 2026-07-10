@@ -321,17 +321,19 @@ export default async function AdminSpecialistsPage() {
           <CardTitle>Specialist profiles</CardTitle>
         </CardHeader>
         <CardContent>
-          <DataTable
-            columns={columns}
-            data={data as SpecialistProfile[]}
-            getRowId={(row) => row.id}
-            emptyState={
-              <p className="py-8 text-center text-sm text-[var(--color-muted-foreground)]">
-                No specialists have onboarded yet.
-              </p>
-            }
-            ariaLabel="Specialist profiles"
-          />
+          <div className="overflow-x-auto" aria-label="Specialist profiles table region">
+            <DataTable
+              columns={columns}
+              data={data as SpecialistProfile[]}
+              getRowId={(row) => row.id}
+              emptyState={
+                <p className="py-8 text-center text-sm text-[var(--color-muted-foreground)]">
+                  No specialists have onboarded yet.
+                </p>
+              }
+              ariaLabel="Specialist profiles"
+            />
+          </div>
         </CardContent>
       </Card>
     </PageShell>

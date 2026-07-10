@@ -271,7 +271,7 @@ export function OperatorShell({
             </div>
           </details>
 
-          <div className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12 lg:px-12 lg:py-16">
+          <div className="mx-auto min-w-0 w-full max-w-6xl overflow-x-hidden px-4 py-8 md:px-8 md:py-12 lg:px-12 lg:py-16">
             {children}
           </div>
         </div>

@@ -19,10 +19,6 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <TopNav />
-      <main
-        id="main-content"
-        className="flex-1 pt-header-height"
-      >
       <PageShell bare>
         <SectionHeading
           eyebrow="Unlock your itinerary"
@@ -54,7 +50,6 @@ export default function PricingPage() {
           ))}
         </div>
       </PageShell>
-      </main>
       <SiteFooter />
     </div>
   );
