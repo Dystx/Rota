@@ -139,6 +139,7 @@ export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
           (isOpen ? "translate-x-0" : "translate-x-full")
         }
         aria-hidden={!isOpen}
+        inert={!isOpen ? true : undefined}
         aria-label="Export options"
       >
         <div className="flex justify-between items-center mb-6">

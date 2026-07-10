@@ -170,7 +170,8 @@ test.describe("Accessibility Audit - Public", () => {
     "/terms",
     "/sustainability",
     "/support",
-    "/offline"
+    "/offline",
+    "/sign-in"
   ];
 
   for (const route of publicRoutes) {
@@ -184,7 +185,7 @@ test.describe("Accessibility Audit - Public", () => {
 
 test.describe("Accessibility Audit - Traveler", () => {
   test.use({ storageState: createTravelerStorageState() });
-  const routes: Array<() => string> = [() => "/trip/new", tripPath, () => "/account"];
+  const routes: Array<() => string> = [() => "/trip/new", tripPath, () => "/account", () => "/vault"];
   
   for (const [index, routeFactory] of routes.entries()) {
     test(`@smoke @a11y traveler route ${index + 1}`, async ({ page }) => {
@@ -246,7 +247,7 @@ test("@smoke @a11y route h1 sweep", async ({ browser }) => {
 
   shouldWriteH1Audit = true;
   const sweeps: Array<{ storageState?: string; routes: string[] }> = [
-    { routes: ["/", "/portugal", "/explore", "/explore/workspace", "/how-it-works", "/pricing", "/human-review", "/privacy", "/terms", "/sustainability", "/support", "/offline"] },
+    { routes: ["/", "/portugal", "/explore", "/explore/workspace", "/how-it-works", "/pricing", "/human-review", "/privacy", "/terms", "/sustainability", "/support", "/offline", "/sign-in"] },
     { storageState: createTravelerStorageState(), routes: ["/trip/new", tripPath(), tripMapPath(), tripExportPath(), "/account"] },
     { storageState: createReviewerStorageState(), routes: ["/reviewer/queue", "/reviewer/profile", "/reviewer/history", "/reviewer/operations", `/reviewer/trips/${tripId()}`] },
     { storageState: createAdminStorageState(), routes: ["/admin/places", "/admin/analytics", "/admin/countries", "/admin/regions", "/admin/partners", "/admin/reviewers", "/admin/quality"] }

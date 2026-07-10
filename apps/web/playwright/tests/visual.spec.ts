@@ -16,7 +16,8 @@ const marketingRoutes = [
   "/terms",
   "/sustainability",
   "/support",
-  "/offline"
+  "/offline",
+  "/sign-in"
 ];
 const travelerRoutes: Array<string | (() => string)> = [
   "/trip/new",
@@ -25,6 +26,7 @@ const travelerRoutes: Array<string | (() => string)> = [
   () => travelerTripPath("/export"),
   "/account",
   "/itineraries",
+  "/vault",
   "/planner",
   "/checkout"
 ];

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { TopNav } from "../_components/top-nav";
-import { SiteFooter } from "../_components/site-footer";
+import { PublicRouteLayout } from "../_components/public-route-layout";
 import { resolveCoverImage } from "@/lib/trip-cover";
 import { getOwnedTrip } from "@/app/lib/trip-access";
 import { PackageSelector } from "./_components/package-selector";
@@ -51,13 +50,9 @@ export default async function CheckoutPage({
     : "Plan a trip first — the tier comparison below will land on the right.";
 
   return (
-    <>
-      <TopNav />
-      <div className="pt-header-height min-h-screen flex flex-col font-body-md text-body-md text-on-surface">
-        <main
-          id="main-content"
-          className="flex-grow py-12 md:py-20 px-container-padding-sm md:px-container-padding-lg"
-        >
+    <PublicRouteLayout>
+      <div className="min-h-screen flex flex-col font-body-md text-body-md text-on-surface">
+        <div className="flex-grow py-12 md:py-20 px-container-padding-sm md:px-container-padding-lg">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-section-gap items-start">
             {/* Left panel: trip summary (Stitch 1.5 left side). */}
             <aside
@@ -295,9 +290,8 @@ export default async function CheckoutPage({
               ) : null}
             </section>
           </div>
-        </main>
-        <SiteFooter />
+        </div>
       </div>
-    </>
+    </PublicRouteLayout>
   );
 }

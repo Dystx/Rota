@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { BrandMark } from "@repo/ui";
+import { AppLayout, BrandMark } from "@repo/ui";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { SignInForm } from "./_components/sign-in-form";
 import { TopNav } from "../_components/top-nav";
@@ -30,8 +30,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-paper">
-      <TopNav />
+    <AppLayout variant="auth" topNav={<TopNav />} siteFooter={<SiteFooter />}>
+      <div className="min-h-screen flex flex-col bg-paper">
 
       {/* Sign-in lock-up: mark + italic wordmark, centered above the card. */}
       <div className="flex justify-center pt-28 pb-3">
@@ -43,10 +43,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
         </div>
       </div>
 
-      <main
-        id="main-content"
-        className="flex-1 flex items-center justify-center px-6 pt-12 pb-16"
-      >
+      <div className="flex-1 flex items-center justify-center px-6 pt-12 pb-16">
         <div className="w-full max-w-md">
           <div className="text-center mb-10">
             <h1 className="font-display text-4xl text-ink mb-3">
@@ -75,8 +72,9 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             .
           </p>
         </div>
-      </main>
+      </div>
       <SiteFooter />
-    </div>
+      </div>
+    </AppLayout>
   );
 }

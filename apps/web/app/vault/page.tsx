@@ -1,5 +1,4 @@
-import { TopNav } from "../_components/top-nav";
-import { SiteFooter } from "../_components/site-footer";
+import { PublicRouteLayout } from "../_components/public-route-layout";
 import { VaultGallery } from "./_components/vault-gallery";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getTripsForUser } from "@repo/db";
@@ -17,18 +16,12 @@ export default async function VaultPage() {
   const { user } = await getCurrentUser();
   const trips = user ? await getTripsForUser(user.id) : [];
   return (
-    <>
-      <TopNav />
-      <div className="pt-header-height min-h-screen flex flex-col font-body-md text-body-md">
-        <main
-          id="main-content"
-          className="flex-grow pt-[88px] pb-section-gap px-container-padding-sm md:px-container-padding-lg max-w-[1440px] mx-auto w-full flex flex-col md:flex-row gap-section-gap relative"
-        >
+    <PublicRouteLayout>
+      <div className="min-h-screen flex flex-col font-body-md text-body-md">
+        <div className="flex-grow pt-[88px] pb-section-gap px-container-padding-sm md:px-container-padding-lg max-w-[1440px] mx-auto w-full flex flex-col md:flex-row gap-section-gap relative">
           <VaultGallery trips={trips} />
-        </main>
-
-        <SiteFooter />
+        </div>
       </div>
-    </>
+    </PublicRouteLayout>
   );
 }

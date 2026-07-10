@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { TopNav } from "../_components/top-nav";
-import { SiteFooter } from "../_components/site-footer";
+import { PublicRouteLayout } from "../_components/public-route-layout";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getTripsForUser } from "@repo/db";
 import { ItinerarySearch } from "./_components/itinerary-search";
@@ -30,13 +29,9 @@ export default async function ItinerariesPage({
   const trips = await getTripsForUser(user.id);
 
   return (
-    <>
-      <TopNav />
-      <div className="pt-header-height min-h-screen flex flex-col font-body-md">
-        <main
-          id="main-content"
-          className="flex-1 px-container-padding-sm md:px-container-padding-lg max-w-7xl mx-auto w-full pt-8 pb-24"
-        >
+    <PublicRouteLayout>
+      <div className="min-h-screen flex flex-col font-body-md">
+        <div className="flex-1 px-container-padding-sm md:px-container-padding-lg max-w-7xl mx-auto w-full pt-8 pb-24">
           <header className="mb-8">
             <h1 className="font-display-mobile text-display-mobile md:font-display md:text-display text-primary mb-2">
               Itineraries
@@ -56,10 +51,9 @@ export default async function ItinerariesPage({
           ) : (
             <ItinerarySearch trips={trips} />
           )}
-        </main>
-        <SiteFooter />
+        </div>
       </div>
-    </>
+    </PublicRouteLayout>
   );
 }
 

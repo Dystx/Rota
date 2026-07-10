@@ -1,5 +1,4 @@
-import { TopNav } from "../_components/top-nav";
-import { SiteFooter } from "../_components/site-footer";
+import { PublicRouteLayout } from "../_components/public-route-layout";
 import { MobilityTiles } from "../_components/logistics/mobility-tiles";
 import { redirect } from "next/navigation";
 import { getOwnedTrip } from "@/app/lib/trip-access";
@@ -35,9 +34,8 @@ export default async function LogisticsPage({
   const trip = tripAccess.trip;
 
   return (
-    <>
-      <TopNav />
-      <div className="pt-header-height min-h-screen relative overflow-hidden flex flex-col justify-center items-center p-container-padding-sm md:p-container-padding-lg">
+    <PublicRouteLayout>
+      <div className="min-h-screen relative overflow-hidden flex flex-col justify-center items-center p-container-padding-sm md:p-container-padding-lg">
         {/* Deep Map Blur Background */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <div
@@ -52,7 +50,7 @@ export default async function LogisticsPage({
         </div>
 
         {/* Main Card Container */}
-        <main id="main-content" className="relative z-10 w-full max-w-2xl mx-auto">
+        <div className="relative z-10 w-full max-w-2xl mx-auto">
           <div className="glass-panel-light rounded-xl p-8 md:p-12 deep-shadow flex flex-col gap-8">
             <header className="text-center">
               <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-2">Route logistics</p>
@@ -67,10 +65,8 @@ export default async function LogisticsPage({
               onChoiceChange={(choice) => persistLogisticsTransport(trip.id, choice)}
             />
           </div>
-        </main>
+        </div>
       </div>
-
-      <SiteFooter />
-    </>
+    </PublicRouteLayout>
   );
 }
