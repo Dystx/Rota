@@ -37,7 +37,9 @@ authoritative evidence is the route matrix and the committed test artifacts:
 - Task 14 local gates are complete. Production activation remains dependent on
   the external Supabase schema/RLS apply and provider credentials listed in
   `docs/ops/launch.md`; `@repo/config health:print` currently reports those
-  required-for-action providers as missing.
+  required-for-action providers as missing. The durable export-job migration
+  is now defined locally in `202607100200_create_trip_export_jobs.sql` and is
+  awaiting the same hosted migration apply.
 
 ---
 
