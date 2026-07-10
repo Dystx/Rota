@@ -21,6 +21,24 @@
 - View and scroll transitions enhance only supported, no-preference motion environments; the static experience is complete and equivalent.
 - Every touched route must retain exactly one `main`, one visible `h1`, a working skip link, and zero document-level mobile overflow.
 
+## Execution status (2026-07-10)
+
+The implementation steps in Tasks 1–13 are complete in the current tree. The
+authoritative evidence is the route matrix and the committed test artifacts:
+
+- Choice-led planner, brief review, logistics, trip lifecycle, export, archive,
+  vault, account, and truthful messaging behavior are implemented and covered
+  by unit/component tests plus the traveler journey specs.
+- Public, traveler, reviewer, admin, console, and beta gateway routes have
+  desktop/mobile visual baselines, axe checks, and mobile-overflow checks.
+- The serialized browser gate passes **289 tests with 31 intentional skips**;
+  Vitest passes **94 files / 689 tests**; lint, build, and `git diff --check`
+  pass.
+- Task 14 local gates are complete. Production activation remains dependent on
+  the external Supabase schema/RLS apply and provider credentials listed in
+  `docs/ops/launch.md`; `@repo/config health:print` currently reports those
+  required-for-action providers as missing.
+
 ---
 
 ## File Map and Responsibilities
