@@ -35,4 +35,17 @@ describe("TripBriefReview", () => {
     expect(screen.getByText("Please fix the highlighted fields.")).toBeTruthy();
     vi.unstubAllGlobals();
   });
+
+  it("keeps date and refinement sheets choice-only", () => {
+    const { container } = render(<TripBriefReview initialBrief={brief} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /dates/i }));
+    expect(screen.getByRole("radio", { name: /april 10/i })).toBeTruthy();
+    expect(container.querySelectorAll("input, select, textarea")).toHaveLength(0);
+    fireEvent.click(screen.getByRole("radio", { name: /april 10/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: /refine this plan/i }));
+    expect(screen.getByRole("group", { name: /what should the route protect/i })).toBeTruthy();
+    expect(container.querySelectorAll("input, select, textarea")).toHaveLength(0);
+  });
 });

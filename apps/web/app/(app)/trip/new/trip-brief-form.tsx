@@ -483,7 +483,10 @@ function TripBriefManualForm() {
 export function TripBriefForm() {
   const searchParams = useSearchParams();
   const incomingBrief = parseBriefFromQuery(searchParams.get("brief"));
-  return incomingBrief ? <TripBriefReview initialBrief={incomingBrief} /> : <TripBriefManualForm />;
+  // The trip handoff is intentionally choice-led. Keep the legacy manual
+  // implementation below for historical reference, but never expose it from
+  // the route: travelers should complete a brief with cards and chips only.
+  return <TripBriefReview initialBrief={incomingBrief ?? defaultState} />;
 }
 
 export function TripBriefFormBoundary() {
