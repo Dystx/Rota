@@ -1,6 +1,7 @@
 export * from "./components/icon";
 export * from "./components/accepted-phrase";
 export * from "./components/phrase-choice-rail";
+export * from "./components/activity-intent-composer";
 
 export * from "./components/brand-mark";
 export * from "./components/badge";
