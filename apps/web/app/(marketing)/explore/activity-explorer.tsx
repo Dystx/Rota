@@ -72,7 +72,7 @@ export function ActivityExplorer({
   }
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:py-16">
+    <div className="mx-auto grid max-w-6xl gap-10 px-6 pb-28 pt-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:py-16">
       <div>
         <p className="text-sm text-ochre-dark">Portugal, judged with your time in mind</p>
         <h1 className="mt-3 font-display text-5xl text-primary md:text-6xl">What deserves this day?</h1>
