@@ -278,6 +278,41 @@ async function ensureTravelerTrip(admin: SupabaseClient, travelerEmail: string):
   };
 }
 
+async function ensureReviewerLink(admin: SupabaseClient, reviewerEmail: string): Promise<void> {
+  const users = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
+  if (users.error) throw new Error(`[playwright global-setup] Could not list users for reviewer fixture: ${users.error.message}`);
+  const reviewerUser = users.data.users.find((user) => user.email === reviewerEmail);
+  if (!reviewerUser) throw new Error("[playwright global-setup] Reviewer persona missing for reviewer fixture.");
+
+  const reviewerId = "e2e-reviewer";
+  const reviewer = await admin.from("reviewers").upsert({
+    id: reviewerId,
+    name: "E2E Portugal Reviewer",
+    country: "Portugal",
+    regions: ["lisbon", "douro-valley"],
+    languages: ["en", "pt"],
+    specialties: ["Pacing", "Local food"],
+    status: "Active",
+    rating: 5,
+    bio: "Playwright-owned reviewer fixture.",
+    response_promise: "Within one business day"
+  }, { onConflict: "id" }).select("id").single();
+  if (reviewer.error || !reviewer.data) throw new Error(`[playwright global-setup] Could not seed reviewer fixture: ${reviewer.error?.message ?? "no row"}`);
+
+  const profile = await admin.from("user_profiles").upsert({
+    user_id: reviewerUser.id,
+    app_role: "reviewer",
+    display_name: "E2E Portugal Reviewer"
+  }, { onConflict: "user_id" });
+  if (profile.error) throw new Error(`[playwright global-setup] Could not seed reviewer role profile: ${profile.error.message}`);
+
+  const link = await admin.from("reviewer_auth_links").upsert({
+    user_id: reviewerUser.id,
+    reviewer_id: reviewerId
+  }, { onConflict: "user_id" });
+  if (link.error) throw new Error(`[playwright global-setup] Could not link reviewer persona: ${link.error.message}`);
+}
+
 function unquoteCookieValue(value: string): string {
   if (value.length >= 2 && value.startsWith('"') && value.endsWith('"')) {
     return value.slice(1, -1);
@@ -370,4 +405,5 @@ export default async function globalSetup(): Promise<void> {
     JSON.stringify(travelerTrip, null, 2),
     "utf8"
   );
+  await ensureReviewerLink(adminClient, "e2e-reviewer@rota.test");
 }
