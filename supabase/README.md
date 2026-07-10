@@ -33,6 +33,28 @@ If you already have a Supabase project, apply the migrations in this folder to t
 
 If a hosted service-role or secret key was exposed, rotate it before production from **Supabase Dashboard → Project Settings → API Keys**. Create a replacement secret key, update backend/runtime secret stores, verify the app boots, then delete the exposed key. Record only timestamps/key labels in evidence, never the key value.
 
+### Linked-project release gate
+
+The project is linked through the CLI. Before enabling a live data feature, run:
+
+```bash
+pnpm exec supabase migration list --linked
+pnpm exec supabase db advisors --linked --type security --level warn --fail-on error
+```
+
+Migration history must be in parity. The security advisor currently reports a
+managed-PostGIS finding for `public.spatial_ref_sys`: the extension was
+historically installed in `public`, and the migration role is not allowed to
+alter that extension-owned table. Do **not** bypass this by editing Supabase
+internal ownership or by forcing a broad table policy. Resolve it in a tested
+infrastructure change by moving/reinstalling PostGIS into a dedicated schema
+through the Supabase Dashboard/support path, then re-run the advisor. This
+also removes the related `extension_in_public` warnings. The same review
+should cover `vector` and `pg_trgm`, which were also installed in `public`.
+Enable Auth leaked-password protection in **Dashboard → Authentication →
+Security** before public sign-up is enabled; the advisor reports it when the
+setting is off.
+
 ## Trusted roles and local personas
 
 Application roles are trusted only from server-owned public tables:

@@ -62,45 +62,14 @@ create index if not exists chat_messages_conversation_id_created_at_idx
 
 -- ---------------------------------------------------------------------
 
--- RLS posture:
--- - itinerary_events: operators (role=admin in app_metadata)
---   can read/write. Travelers can read their own events
---   (where created_by = auth.uid()).
--- - chat_messages: both operator and traveler can read
---   messages for their conversations. Operators can write
---   as author_role='operator'; travelers as 'traveler'.
+-- These are internal console tables.  The browser must never receive a
+-- permissive conversation policy: the human-facing messaging model is
+-- trip-scoped and lands separately.  Keep both tables service-role only
+-- until that model exists, so a fabricated conversation id cannot expose
+-- another traveler's data.
 
 alter table public.itinerary_events enable row level security;
 alter table public.chat_messages enable row level security;
-
-create policy "itinerary_events_operator_all" on public.itinerary_events
-  for all
-  to authenticated
-  using ((select private.current_app_role()) = 'admin')
-  with check ((select private.current_app_role()) = 'admin');
-
-create policy "itinerary_events_traveler_read_own" on public.itinerary_events
-  for select
-  to authenticated
-  using (created_by = (select auth.uid()));
-
-create policy "itinerary_events_traveler_insert_own" on public.itinerary_events
-  for insert
-  to authenticated
-  with check (created_by = (select auth.uid()));
-
-create policy "chat_messages_read_all_participants" on public.chat_messages
-  for select
-  to authenticated
-  using (true);
-
-create policy "chat_messages_insert_own_role" on public.chat_messages
-  for insert
-  to authenticated
-  with check (
-    author_role = 'operator'
-      or author_role = 'traveler'
-  );
 
 -- Service role has full access (used by server actions).
 grant all on public.itinerary_events to service_role;

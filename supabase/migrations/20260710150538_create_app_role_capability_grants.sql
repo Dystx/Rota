@@ -53,7 +53,7 @@ as $$
   select exists (
     select 1
     from public.user_profiles
-    where subject_user_id = (select auth.uid())
+    where user_id = (select auth.uid())
       and app_role = required_role
   );
 $$;
@@ -68,7 +68,7 @@ as $$
   select exists (
     select 1
     from public.app_role_capability_grants
-    where user_id = (select auth.uid())
+    where subject_user_id = (select auth.uid())
       and capability = required_capability
       and revoked_at is null
       and (expires_at is null or expires_at > now())
