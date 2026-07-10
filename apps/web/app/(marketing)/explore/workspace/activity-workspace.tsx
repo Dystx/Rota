@@ -21,10 +21,28 @@ export function ActivityWorkspace({
   initialActivities: readonly EditorialActivity[];
 }) {
   const [activities, setActivities] = useState(initialActivities);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
   const totalMinutes = activities.reduce((total, activity) => total + activity.durationMinutes, 0);
 
   function remove(activityId: string) {
     setActivities((current) => current.filter((activity) => activity.id !== activityId));
+  }
+
+  async function share() {
+    const url = new URL("/explore/workspace", window.location.origin);
+    for (const activity of activities) url.searchParams.append("activity", activity.id);
+
+    if (!navigator.clipboard?.writeText) {
+      setShareStatus("Copying is unavailable here. You can copy this page address instead.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      setShareStatus("Share link copied.");
+    } catch {
+      setShareStatus("We could not copy the link. You can copy this page address instead.");
+    }
   }
 
   return (
@@ -93,6 +111,8 @@ export function ActivityWorkspace({
         <Link className="mt-7 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href="/explore">
           Keep exploring
         </Link>
+        {activities.length > 0 ? <button className="mt-3 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-left text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" type="button" onClick={share}>Share this day</button> : null}
+        {shareStatus ? <p className="mt-3 text-sm text-on-surface-variant" role="status">{shareStatus}</p> : null}
       </aside>
     </div>
   );
