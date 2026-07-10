@@ -64,4 +64,7 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
   access, commerce, export, messaging, and route API tests.
 - Operator console fixtures are explicitly labeled “Demo data”, use Portugal
   content, and no longer expose the prior Kyoto/Japan/search placeholders.
+- Guide beta portraits now use an authenticated, user-prefixed private Storage
+  bucket with MIME/signature/size validation and signed previews; legacy remote
+  portrait URLs are cleared and rejected by the migration constraint.
 | `git diff --check` | PASS | No whitespace errors. |
