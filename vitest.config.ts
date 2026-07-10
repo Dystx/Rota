@@ -71,7 +71,8 @@ export default defineConfig({
           include: [
             "packages/*/src/**/*.test.ts",
             "apps/web/app/**/*.test.ts",
-            "apps/web/lib/**/*.test.ts"
+            "apps/web/lib/**/*.test.ts",
+            "apps/web/playwright/route-matrix.test.ts"
           ],
           // packages/ui and packages/spatial-engine are picked up by the
           // `jsdom` project above. The `packages/*/src/**/*.test.ts`

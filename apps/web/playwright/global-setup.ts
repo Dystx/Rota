@@ -123,7 +123,7 @@ async function ensurePersona(
 
   if (userId === null) {
     throw new Error(
-      `[playwright global-setup] createUser failed and existing user not found for "${email}": ${created.error.message}`
+      `[playwright global-setup] createUser failed and existing user not found for "${email}": ${created.error?.message ?? "unknown error"}`
     );
   }
 
