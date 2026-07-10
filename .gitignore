@@ -1,5 +1,6 @@
 .DS_Store
 .turbo
+.worktrees/
 node_modules
 .next
 dist
