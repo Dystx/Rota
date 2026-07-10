@@ -64,6 +64,9 @@ async function runAxe(page: any, routePath: string) {
 }
 
 async function verifyLandmarksAndFocus(page: any, routePath: string) {
+  // Route-group loading UIs are intentionally non-landmark status shells. Wait
+  // for the resolved route heading before asserting the final landmark tree.
+  await page.locator("h1:visible").first().waitFor({ state: "visible" });
   const mainCount = await page.locator("main").count();
   expect(mainCount, `Route ${routePath} should have exactly one <main>`).toBe(1);
 
