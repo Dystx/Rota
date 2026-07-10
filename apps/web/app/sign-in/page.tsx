@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AppLayout, BrandMark } from "@repo/ui";
+import { getDatabaseAuthorizationContext } from "@repo/db";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { resolveRoleCompatibleNext } from "@/lib/auth/role-compatible-next";
 import { SignInForm } from "./_components/sign-in-form";
 import { TopNav } from "../_components/top-nav";
 import { safeNext } from "../auth/safe-next";
@@ -25,7 +27,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (user) {
-    redirect(next);
+    const actor = await getDatabaseAuthorizationContext(user.id);
+    redirect(actor ? resolveRoleCompatibleNext(next, actor) : "/itineraries");
   }
 
   return (

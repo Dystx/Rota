@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getDatabaseAuthorizationContext } from "@repo/db";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { resolveRoleCompatibleNext } from "@/lib/auth/role-compatible-next";
 import { safeNext } from "../safe-next";
 
 /**
@@ -22,7 +24,9 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerSupabaseClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(new URL(next, origin));
+      const { data } = await supabase.auth.getClaims();
+      const actor = data?.claims?.sub ? await getDatabaseAuthorizationContext(data.claims.sub) : null;
+      return NextResponse.redirect(new URL(actor ? resolveRoleCompatibleNext(next, actor) : "/itineraries", origin));
     }
     return NextResponse.redirect(
       new URL(`/sign-in?error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(next)}`, origin)

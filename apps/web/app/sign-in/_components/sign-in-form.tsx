@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Button, Field, Input, toast } from "@repo/ui";
+import { toast } from "@repo/ui";
 
 interface SignInFormProps {
   next: string;
@@ -63,46 +64,33 @@ export function SignInForm({ next, initialSent, initialError }: SignInFormProps)
   }
 
   return (
-    <form
-      action={handleSubmit}
-      className="grid gap-5 bg-white/80 backdrop-blur-sm rounded-2xl border border-olive-light/20 p-8 shadow-flat"
-    >
+    <form action={handleSubmit} className="max-w-xl text-xl leading-relaxed text-primary">
       <input type="hidden" name="next" value={next} />
 
-      <Field
-        label="Email address"
-        htmlFor="email"
-      >
-        {(field) => (
-          <Input
-            {...field}
-            id="email"
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        )}
-      </Field>
-
-      <Button
-        type="submit"
-        isLoading={pending}
-        loadingIndicator={null}
-        fullWidth
-        className="bg-ink text-cream"
-      >
-        {pending ? "Sending link…" : "Send magic link"}
-      </Button>
+      <label htmlFor="email" className="sr-only">Send my private sign-in link to</label>
+      <span>Send my private sign-in link to </span>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        required
+        autoComplete="email"
+        placeholder="you@example.com"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        className="inline min-w-48 border-b border-ochre-dark bg-transparent px-1 py-1 text-inherit outline-none placeholder:text-on-surface-variant focus-visible:ring-2 focus-visible:ring-ochre-light"
+      />
+      <span>, then </span>
+      <button type="submit" disabled={pending} className="inline border-b border-ochre-dark bg-transparent px-1 py-1 font-medium text-ochre-dark hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light disabled:opacity-60">
+        {pending ? "sending link…" : "send link"}
+      </button>
+      <span>.</span>
 
       {initialSent && !pending ? (
         <div
           role="status"
           aria-live="polite"
-          className="p-4 rounded-md bg-sage/30 border border-olive-light/20 text-ink text-sm"
+          className="mt-6 text-sm text-olive-dark"
         >
           <strong className="font-medium">Check your inbox.</strong> We sent a sign-in link to your email. It expires in 10 minutes.
         </div>
@@ -111,7 +99,7 @@ export function SignInForm({ next, initialSent, initialError }: SignInFormProps)
       {initialError ? (
         <div
           role="alert"
-          className="p-4 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm"
+          className="mt-6 text-sm text-red-800"
         >
           <strong className="font-medium">Sign-in failed.</strong> {decodeURIComponent(initialError)}
         </div>

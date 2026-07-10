@@ -9,4 +9,8 @@ describe("safeNext", () => {
   it.each(["/admin", "/reviewer/trips/42", "/console/messages", "/planner?destination=douro", "/account"])("preserves permitted route %s", (value) => {
     expect(safeNext(value)).toBe(value);
   });
+
+  it("keeps approved planner draft query parameters", () => {
+    expect(safeNext("/planner?draft=abc&stage=preview")).toBe("/planner?draft=abc&stage=preview");
+  });
 });
