@@ -63,6 +63,9 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
   travel windows use season chips; no editable text controls are rendered.
 - Focused Vitest coverage: 270 web tests passed, including planner, trip review,
   access, commerce, export, messaging, and route API tests.
+- Full workspace Vitest verification now passes: 94 files / 689 tests.
+- Web production build completes successfully and includes all traveler,
+  operator, beta-gated, export, and messaging routes.
 - Operator console fixtures are explicitly labeled “Demo data”, use Portugal
   content, and no longer expose the prior Kyoto/Japan/search placeholders.
 - Guide beta portraits now use an authenticated, user-prefixed private Storage
