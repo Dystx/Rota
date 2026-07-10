@@ -8,14 +8,16 @@ import { parseActivityIntent } from "@/lib/content/activities";
 import { ActivityExplorer } from "./activity-explorer";
 
 const push = vi.fn();
+const replace = vi.fn();
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push })
+  useRouter: () => ({ push, replace })
 }));
 
 afterEach(() => {
   cleanup();
   push.mockReset();
+  replace.mockReset();
 });
 
 describe("ActivityExplorer", () => {
@@ -26,6 +28,7 @@ describe("ActivityExplorer", () => {
     expect(screen.getAllByText("Rumia verdict").length).toBeGreaterThan(0);
     fireEvent.click(save);
     expect(screen.getByRole("region", { name: /Your day/i })).toBeTruthy();
+    expect(replace).toHaveBeenCalledWith(expect.stringContaining("saved=porto-ribeira-slow-walk"));
     fireEvent.click(
       screen.getAllByRole("button", { name: /Remove .* from this day/i })[0]!,
     );

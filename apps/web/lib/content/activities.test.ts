@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   activityExplorerUrl,
   getReviewedActivities,
+  parseSavedActivityIds,
   parseActivityIntent,
   type EditorialActivity
 } from "./activities";
@@ -76,5 +77,11 @@ describe("activity editorial adapter", () => {
     ).toBe(
       "/explore?region=porto&time=three+hours&mood=good+food&mood=a+walk&group=two+adults&constraint=without+a+car"
     );
+  });
+
+  it("keeps saved activity IDs in the public explorer state while dropping blanks", () => {
+    expect(parseSavedActivityIds({ saved: ["porto-ribeira-slow-walk", "", "porto-ribeira-slow-walk"] })).toEqual([
+      "porto-ribeira-slow-walk"
+    ]);
   });
 });

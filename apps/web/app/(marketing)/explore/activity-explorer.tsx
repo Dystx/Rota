@@ -24,24 +24,38 @@ function toIntent(draft: ActivityIntentDraft): ActivityIntent {
     "The Azores": "azores"
   } as const;
 
+  const customContext = draft.customContext.trim();
+
   return {
     region: regionByLabel[draft.region as keyof typeof regionByLabel] ?? "porto",
     timeWindow: draft.timeWindow || "an afternoon",
     moods: draft.moods.length > 0 ? draft.moods : ["good food"],
     group: draft.group || "two adults",
-    constraints: draft.constraints
+    constraints: customContext ? [...draft.constraints, customContext] : draft.constraints
   };
 }
 
-export function ActivityExplorer({ initialIntent }: { initialIntent: ActivityIntent }) {
+export function ActivityExplorer({
+  initialIntent,
+  initialSavedIds = []
+}: {
+  initialIntent: ActivityIntent;
+  initialSavedIds?: readonly string[];
+}) {
   const router = useRouter();
   const [intent, setIntent] = useState(initialIntent);
-  const [savedIds, setSavedIds] = useState<readonly string[]>([]);
+  const [savedIds, setSavedIds] = useState<readonly string[]>(initialSavedIds);
   const activities = useMemo(() => getReviewedActivities(REVIEWED_ACTIVITY_SEED, intent), [intent]);
   const savedActivities = activities.filter((activity) => savedIds.includes(activity.id));
 
   function toggle(activityId: string) {
-    setSavedIds((current) => current.includes(activityId) ? current.filter((id) => id !== activityId) : [...current, activityId]);
+    setSavedIds((current) => {
+      const next = current.includes(activityId)
+        ? current.filter((id) => id !== activityId)
+        : [...current, activityId];
+      router.replace(activityExplorerUrl(intent, next));
+      return next;
+    });
   }
 
   function updateIntent(draft: ActivityIntentDraft) {

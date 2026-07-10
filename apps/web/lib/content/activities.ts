@@ -620,6 +620,10 @@ export function parseActivityIntent(query: ActivityIntentQuery): ActivityIntent 
   };
 }
 
+export function parseSavedActivityIds(query: ActivityIntentQuery): readonly string[] {
+  return [...new Set(nonEmpty(values(query.saved)))];
+}
+
 function matchesIntent(activity: EditorialActivity, intent: ActivityIntent): boolean {
   if (activity.region !== intent.region) return false;
   if (intent.moods.length === 0) return true;
@@ -642,7 +646,7 @@ export function getReviewedActivities(
     .slice(0, 5);
 }
 
-export function activityExplorerUrl(intent: ActivityIntent): string {
+export function activityExplorerUrl(intent: ActivityIntent, savedIds: readonly string[] = []): string {
   const query = new URLSearchParams({
     region: intent.region,
     time: intent.timeWindow
@@ -651,6 +655,7 @@ export function activityExplorerUrl(intent: ActivityIntent): string {
   for (const mood of intent.moods) query.append("mood", mood);
   query.set("group", intent.group);
   for (const constraint of intent.constraints) query.append("constraint", constraint);
+  for (const activityId of nonEmpty(savedIds)) query.append("saved", activityId);
 
   return `/explore?${query.toString()}`;
 }

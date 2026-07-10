@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { Metadata } from "next";
 
-import { parseActivityIntent } from "@/lib/content/activities";
+import { parseActivityIntent, parseSavedActivityIds } from "@/lib/content/activities";
 
 import { ActivityExplorer } from "./activity-explorer";
 
@@ -17,7 +17,8 @@ export default async function ExplorePage({
 }: {
   searchParams: Promise<Record<string, string | readonly string[] | undefined>>;
 }) {
-  const intent = parseActivityIntent(await searchParams);
+  const query = await searchParams;
+  const intent = parseActivityIntent(query);
 
-  return <ActivityExplorer initialIntent={intent} />;
+  return <ActivityExplorer initialIntent={intent} initialSavedIds={parseSavedActivityIds(query)} />;
 }
