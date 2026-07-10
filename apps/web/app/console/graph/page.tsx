@@ -100,8 +100,8 @@ export default function ConsoleGraphPage() {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col bg-[#050806] text-linen-dark relative z-10 md:ml-64">
-        <header className="h-16 border-b border-white/5 flex items-center justify-between px-container-padding-lg shrink-0 bg-black/40 backdrop-blur-md">
+      <div className="min-h-screen min-w-0 overflow-x-hidden flex flex-col bg-[#050806] text-linen-dark relative z-10 md:ml-64">
+        <header className="min-h-16 border-b border-white/5 flex flex-wrap items-center gap-2 justify-between px-container-padding-lg py-2 shrink-0 bg-black/40 backdrop-blur-md">
           <nav
             aria-label="Graph hierarchy path"
             className="flex items-center gap-2 font-mono-technical text-mono-technical text-linen-dark/70"
@@ -135,8 +135,8 @@ export default function ConsoleGraphPage() {
           </div>
         </header>
 
-        <main id="main-content" className="flex-1 flex overflow-hidden">
-          <aside className="w-1/3 min-w-[300px] border-r border-white/5 bg-black/20 flex flex-col">
+        <main id="main-content" className="flex-1 min-w-0 flex flex-col md:flex-row overflow-hidden">
+          <aside className="w-full md:w-1/3 md:min-w-[300px] border-r border-white/5 bg-black/20 flex flex-col">
             <header className="p-gutter border-b border-white/5 flex items-center justify-between shrink-0">
               <h1 className="font-headline-sm text-headline-sm text-linen-dark uppercase tracking-wide">
                 Graph Hierarchy
@@ -154,7 +154,7 @@ export default function ConsoleGraphPage() {
             </div>
           </aside>
 
-          <section className="flex-1 overflow-y-auto p-container-padding-lg">
+          <section className="min-w-0 flex-1 overflow-y-auto p-container-padding-lg">
             <div className="max-w-4xl mx-auto space-y-section-gap">
               <article className="relative overflow-hidden bg-glass-dark border border-white/5 rounded-xl p-card-padding shadow-2xl backdrop-blur-xl">
                 <span
