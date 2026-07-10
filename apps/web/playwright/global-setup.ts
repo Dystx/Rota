@@ -139,6 +139,75 @@ async function ensurePersona(
   }
 }
 
+async function ensureTravelerTrip(admin: SupabaseClient, travelerEmail: string): Promise<void> {
+  const users = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
+  if (users.error) throw new Error(`[playwright global-setup] Could not list users for trip fixture: ${users.error.message}`);
+  const traveler = users.data.users.find((user) => user.email === travelerEmail);
+  if (!traveler) throw new Error(`[playwright global-setup] Traveler persona missing for trip fixture.`);
+
+  const existing = await admin.from("trips").select("id,owner_user_id").eq("id", 3).maybeSingle();
+  if (existing.error) throw new Error(`[playwright global-setup] Could not inspect trip fixture: ${existing.error.message}`);
+  if (existing.data) {
+    if (existing.data.owner_user_id !== traveler.id) {
+      throw new Error("[playwright global-setup] Trip id 3 exists but is not owned by the E2E traveler.");
+    }
+    return;
+  }
+
+  const brief = {
+    destination_country: "portugal",
+    destination_regions: ["lisbon", "douro-valley"],
+    start_date: "2027-04-10",
+    end_date: "2027-04-15",
+    trip_length_days: 5,
+    travelers_count: 2,
+    traveler_type: "couple",
+    budget_level: "mid-range",
+    pace: "calm",
+    interests: ["local-food", "old-streets", "sea-views"],
+    food_preferences: ["casual-local-meals"],
+    avoidances: ["rushed-schedules"],
+    transport_mode: "train-and-transfers",
+    accommodation_location: "Lisbon historic center",
+    raw_input: "A calm five-day Portugal route with local food and room to wander.",
+    normalized_json: {
+      destinationCountry: "portugal",
+      regions: ["lisbon", "douro-valley"],
+      startDate: "2027-04-10",
+      endDate: "2027-04-15",
+      tripLengthDays: 5,
+      travelersCount: 2,
+      travelerType: "couple",
+      budgetLevel: "mid-range",
+      pace: "calm",
+      interests: ["local-food", "old-streets", "sea-views"],
+      foodPreferences: ["casual-local-meals"],
+      avoidances: ["rushed-schedules"],
+      transportMode: "train-and-transfers",
+      accommodationLocation: "Lisbon historic center",
+      rawBrief: "A calm five-day Portugal route with local food and room to wander."
+    },
+    owner_user_id: traveler.id,
+    status: "submitted"
+  };
+
+  const insertedBrief = await admin.from("trip_briefs").insert(brief).select("id").single();
+  if (insertedBrief.error || !insertedBrief.data) throw new Error(`[playwright global-setup] Could not create trip brief fixture: ${insertedBrief.error?.message ?? "unknown error"}`);
+
+  const insertedTrip = await admin.from("trips").insert({
+    id: 3,
+    trip_brief_id: insertedBrief.data.id,
+    country_slug: "portugal",
+    title: "Lisbon & Douro — a considered route",
+    status: "draft",
+    visibility: "private",
+    owner_user_id: traveler.id,
+    is_paid: false,
+    has_human_review: false
+  });
+  if (insertedTrip.error) throw new Error(`[playwright global-setup] Could not create trip fixture: ${insertedTrip.error.message}`);
+}
+
 function unquoteCookieValue(value: string): string {
   if (value.length >= 2 && value.startsWith('"') && value.endsWith('"')) {
     return value.slice(1, -1);
@@ -224,4 +293,6 @@ export default async function globalSetup(): Promise<void> {
     const target = path.join(AUTH_DIR, persona.fileName);
     fs.writeFileSync(target, JSON.stringify(state, null, 2), "utf8");
   }
+
+  await ensureTravelerTrip(adminClient, "e2e-traveler@rota.test");
 }

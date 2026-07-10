@@ -45,10 +45,17 @@ export const SpecialistProfileInputSchema = z.object({
   rnaatLicenseNumber: z.string().max(100).nullable().optional(),
   hourlyRate: z.number().min(0).max(9999.99).default(0),
   bio: z.string().max(2000).nullable().optional(),
+  // Despite the historical column name, this value is now a private
+  // Supabase Storage object path (`<user uuid>/<object uuid>.<ext>`).
+  // External portrait URLs are intentionally rejected at the persistence
+  // boundary so admin/import callers cannot reintroduce remote imagery.
   photoUrl: z
     .string()
-    .max(2000)
-    .url("Photo URL must be a valid URL")
+    .max(300)
+    .regex(
+      /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/i,
+      "Photo must be an uploaded Storage object path"
+    )
     .nullable()
     .optional()
 });

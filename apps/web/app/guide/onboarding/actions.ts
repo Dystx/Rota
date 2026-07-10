@@ -44,10 +44,15 @@ const ProfileInputSchema = z
       .max(2000, "Bio must be 2000 characters or fewer")
       .nullable()
       .optional(),
-    photoUrl: z
+    /** A path returned by uploadSpecialistPortrait. External URLs are not
+     * accepted; portraits belong to the authenticated user's storage folder. */
+    photoPath: z
       .string()
-      .url("Photo URL must be a valid URL")
-      .max(2000, "Photo URL must be 2000 characters or fewer")
+      .max(300, "Portrait path is too long")
+      .regex(
+        /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/i,
+        "Upload a portrait from your device"
+      )
       .nullable()
       .optional()
       .or(z.literal("")),
@@ -110,8 +115,17 @@ export async function submitSpecialistProfile(
     };
   }
 
+  if (
+    parsed.data.photoPath &&
+    parsed.data.photoPath.length > 0 &&
+    !parsed.data.photoPath.startsWith(`${userId}/`)
+  ) {
+    return { kind: "error", message: "Portrait path is not owned by this account" };
+  }
+
   try {
-    // 1. Upsert the profile (carries bio + photo_url).
+    // 1. Upsert the profile (carries the private Storage object path in the
+    // legacy photo_url column; no external URL is accepted or persisted).
     const result = await upsertSpecialistProfile(userId, {
       fullName: parsed.data.fullName,
       regionsCovered: parsed.data.regionsCovered,
@@ -124,8 +138,8 @@ export async function submitSpecialistProfile(
       hourlyRate: parsed.data.hourlyRate,
       bio: parsed.data.bio?.length ? parsed.data.bio : null,
       photoUrl:
-        parsed.data.photoUrl && parsed.data.photoUrl.length > 0
-          ? parsed.data.photoUrl
+        parsed.data.photoPath && parsed.data.photoPath.length > 0
+          ? parsed.data.photoPath
           : null
     });
 

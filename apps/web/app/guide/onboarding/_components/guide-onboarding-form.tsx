@@ -2,6 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { submitSpecialistProfile, type ProfileInput } from "../actions";
+import {
+  uploadSpecialistPortrait,
+  type PortraitUploadResult
+} from "../portrait-upload";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
 import { RegionPicker } from "./region-picker";
 import { SkillsInput } from "./skills-input";
@@ -63,7 +67,12 @@ export function GuideOnboardingForm({
     initialProfile?.hourlyRate ?? 0
   );
   const [bio, setBio] = useState(initialProfile?.bio ?? "");
-  const [photoUrl, setPhotoUrl] = useState(initialProfile?.photoUrl ?? "");
+  const [photoPath, setPhotoPath] = useState(initialProfile?.photoUrl ?? "");
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+  const [photoUploadState, setPhotoUploadState] = useState<
+    "idle" | "uploading" | "unavailable" | "error"
+  >("idle");
+  const [photoUploadMessage, setPhotoUploadMessage] = useState<string | null>(null);
   const [skills, setSkills] = useState<string[]>(
     () => [...initialCapabilities.skills]
   );
@@ -87,7 +96,7 @@ export function GuideOnboardingForm({
       rnaatLicenseNumber: rnaatLicenseNumber.length > 0 ? rnaatLicenseNumber : null,
       hourlyRate,
       bio: bio.length > 0 ? bio : null,
-      photoUrl: photoUrl.length > 0 ? photoUrl : "",
+      photoPath: photoPath.length > 0 ? photoPath : "",
       skills,
       languages
     };
@@ -98,6 +107,28 @@ export function GuideOnboardingForm({
         setSuccess("Profile saved. Verification review takes ~48h.");
       } else {
         setError(result.message);
+      }
+    });
+  }
+
+  function onPortraitChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setPhotoUploadState("uploading");
+    setPhotoUploadMessage(null);
+    const formData = new FormData();
+    formData.set("portrait", file);
+
+    startTransition(async () => {
+      const result: PortraitUploadResult = await uploadSpecialistPortrait(formData);
+      if (result.kind === "ok") {
+        setPhotoPath(result.path);
+        setPhotoPreviewUrl(result.signedUrl);
+        setPhotoUploadState("idle");
+        setPhotoUploadMessage("Portrait uploaded. Save your profile to keep it.");
+      } else {
+        setPhotoUploadState(result.kind === "unavailable" ? "unavailable" : "error");
+        setPhotoUploadMessage(result.message);
       }
     });
   }
@@ -182,23 +213,46 @@ export function GuideOnboardingForm({
               Shown on your public profile. 2000 character ceiling.
             </span>
           </label>
-          <label className="grid gap-1.5">
-            <span className="text-sm font-medium text-foreground">
-              Photo URL
-            </span>
-            <input
-              type="url"
-              value={photoUrl}
-              onChange={(e) => setPhotoUrl(e.target.value)}
-              maxLength={2000}
-              placeholder="https://example.com/portrait.jpg"
-              className="rounded-lg border border-[var(--color-border)] bg-white/80 px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-              data-testid="guide-onboarding-photo-url"
-            />
+          <div className="grid gap-2" data-testid="guide-onboarding-photo-upload">
+            <span className="text-sm font-medium text-foreground">Portrait</span>
+            <div className="flex flex-wrap items-center gap-3">
+              {photoPreviewUrl ? (
+                <img
+                  src={photoPreviewUrl}
+                  alt="Portrait preview"
+                  className="h-16 w-16 rounded-full object-cover ring-2 ring-ochre-light/60"
+                  data-testid="guide-onboarding-photo-preview"
+                />
+              ) : photoPath ? (
+                <span className="grid h-16 w-16 place-items-center rounded-full bg-ochre-light/20 text-center text-[10px] font-medium text-ochre-dark">
+                  Portrait saved
+                </span>
+              ) : null}
+              <label className="inline-flex cursor-pointer items-center rounded-lg border border-[var(--color-border)] bg-white/80 px-3 py-2 text-sm font-medium text-foreground transition hover:border-ochre-dark focus-within:ring-2 focus-within:ring-ochre-light">
+                <span>{photoUploadState === "uploading" ? "Uploading…" : "Choose portrait"}</span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={onPortraitChange}
+                  disabled={isPending}
+                  className="sr-only"
+                  data-testid="guide-onboarding-photo-file"
+                />
+              </label>
+            </div>
             <span className="text-xs text-[var(--color-muted-foreground)]">
-              A public image URL. We don&apos;t host uploads yet.
+              JPEG, PNG, or WebP · up to 5 MB. Stored privately in your Rumia profile.
             </span>
-          </label>
+            {photoUploadMessage ? (
+              <span
+                className={`text-xs ${photoUploadState === "error" ? "text-error" : "text-ochre-dark"}`}
+                role={photoUploadState === "error" ? "alert" : "status"}
+                data-testid="guide-onboarding-photo-status"
+              >
+                {photoUploadMessage}
+              </span>
+            ) : null}
+          </div>
         </CardContent>
       </Card>
 

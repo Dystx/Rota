@@ -53,7 +53,9 @@ const DEMO_SPECIALISTS: ReadonlyArray<{
     isVerified: true,
     hourlyRate: 95,
     bio: "Licensed for Sintra, Cascais, and the Lisbon coast.",
-    photoUrl: "https://example.com/portraits/tomas.jpg",
+    // Demo mode never points at an external portrait host. Real portraits
+    // are private Storage paths returned by specialist onboarding uploads.
+    photoUrl: null,
     caps: {
       skills: ["Sintra Expert", "Coastal itineraries"],
       languages: ["pt", "en", "es"]
