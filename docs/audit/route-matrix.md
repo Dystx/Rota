@@ -52,4 +52,16 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
 | `pnpm test` | FAIL | The web test reached its API unit tests, then its fresh-server setup failed with `Another next build process is already running` because this gate's standalone `pnpm --filter web build` was still active. This is a test-environment concurrency failure; no unit-test assertion failure was reported. |
 | `pnpm --filter web build` | PASS | Next production build completed. Recorded warnings: workspace-root inference due to multiple lockfiles and deprecated `middleware` convention. |
 | `pnpm --filter web exec playwright test playwright/tests/choice-led-traveler.spec.ts playwright/tests/visual.spec.ts playwright/tests/accessibility.spec.ts playwright/tests/mobile-overflow.spec.ts --project=desktop-chrome --project=mobile-chromium` | FAIL (interrupted after partial run) | Fresh server started. Choice-led traveler failed on both projects at `/trip/3` because the seeded Supabase trip was unavailable and redirected to `/itineraries?notice=unavailable` (missing auth/data fixture). Accessibility failures covered public/traveler/reviewer/admin routes and are code/route-structure or auth-state failures (one-main/one-h1/axe assertions), not ignored. Visual failures are stale/changed screenshot baselines. Mobile overflow failures included authenticated `/itineraries` and `/account` state; classify as route/auth fixture failures until reproduced with seeded data. The run was interrupted after the failure pattern was established; no pass claim is made. |
+| Focused fresh public a11y (`/` and `/portugal`, desktop + mobile) | PASS after loading-shell/test fixes | Resolved route landmarks are now checked after the streamed page heading appears. Loading UIs use status containers rather than competing `<main>` landmarks. Full traveler/operator matrix remains pending on seeded auth/data fixtures. |
+
+## Choice-only interaction evidence (2026-07-10)
+
+- `/trip/new` always renders `TripBriefReview`; date, context, and refinement flows
+  use preset chips and option sheets, with no rendered input/select/textarea controls.
+- `/planner` destination changes use finite Portugal `ChoiceCard` options and
+  travel windows use season chips; no editable text controls are rendered.
+- Focused Vitest coverage: 270 web tests passed, including planner, trip review,
+  access, commerce, export, messaging, and route API tests.
+- Operator console fixtures are explicitly labeled “Demo data”, use Portugal
+  content, and no longer expose the prior Kyoto/Japan/search placeholders.
 | `git diff --check` | PASS | No whitespace errors. |
