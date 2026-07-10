@@ -9,20 +9,20 @@ export type ServerConfig = {
   appUrl: string;
   environmentMode: EnvironmentMode;
   mapbox: {
-    publicToken: string;
-    secretKey: string;
+    publicToken: string | undefined;
+    secretKey: string | undefined;
   };
   posthog: {
-    host: string;
-    key: string;
+    host: string | undefined;
+    key: string | undefined;
   };
   resend: {
-    apiKey: string;
+    apiKey: string | undefined;
   };
   stripe: {
-    publishableKey: string;
-    secretKey: string;
-    webhookSecret: string;
+    publishableKey: string | undefined;
+    secretKey: string | undefined;
+    webhookSecret: string | undefined;
   };
   supabase: {
     anonKey: string;
@@ -92,11 +92,6 @@ export function createServerConfig(publicConfig: PublicConfig = createPublicConf
   const mapboxSecretKey = process.env.MAPBOX_SECRET_KEY?.trim();
 
   if (!supabaseServiceRoleKey) missing.push("SUPABASE_SERVICE_ROLE_KEY");
-  if (!stripeSecretKey) missing.push("STRIPE_SECRET_KEY");
-  if (!stripeWebhookSecret) missing.push("STRIPE_WEBHOOK_SECRET");
-  if (!resendApiKey) missing.push("RESEND_API_KEY");
-  if (!mapboxSecretKey) missing.push("MAPBOX_SECRET_KEY");
-
   assertNoMissing("server", missing);
 
   return {
@@ -104,16 +99,16 @@ export function createServerConfig(publicConfig: PublicConfig = createPublicConf
     environmentMode: publicConfig.environmentMode,
     mapbox: {
       publicToken: publicConfig.mapbox.publicToken,
-      secretKey: mapboxSecretKey!
+      secretKey: mapboxSecretKey
     },
     posthog: publicConfig.posthog,
     resend: {
-      apiKey: resendApiKey!
+      apiKey: resendApiKey
     },
     stripe: {
       publishableKey: publicConfig.stripe.publishableKey,
-      secretKey: stripeSecretKey!,
-      webhookSecret: stripeWebhookSecret!
+      secretKey: stripeSecretKey,
+      webhookSecret: stripeWebhookSecret
     },
     supabase: {
       anonKey: publicConfig.supabase.anonKey,

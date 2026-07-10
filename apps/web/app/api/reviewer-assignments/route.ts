@@ -70,9 +70,7 @@ export async function handleReviewerAssignmentsPostRequest(request: Request, dep
     );
   } catch (error) {
     if (error instanceof DuplicateActiveReviewerAssignmentError) {
-      return apiError("validation_error", "Trip already has an active reviewer assignment.", 409, {
-        assignment: error.existingAssignment
-      });
+      return apiError("validation_error", "Trip already has an active reviewer assignment.", 409);
     }
 
     if (error instanceof DuplicateActiveReviewerAssignmentDatabaseError) {

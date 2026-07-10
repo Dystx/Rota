@@ -28,6 +28,7 @@ function restoreEnv(snap: Record<string, string | undefined>): void {
 }
 
 function setAllConfigured(): void {
+  process.env[HEALTH_ENV_VAR_NAMES.openAiApiKey] = "openai-key-placeholder";
   process.env[HEALTH_ENV_VAR_NAMES.stripeSecretKey] = "stripe-secret-placeholder";
   process.env[HEALTH_ENV_VAR_NAMES.stripeWebhookSecret] = "stripe-webhook-placeholder";
   process.env[HEALTH_ENV_VAR_NAMES.stripePublishableKey] = "pk_test_placeholder";
@@ -65,6 +66,7 @@ describe("getProviderHealth", () => {
   it("reports every provider as missing when no env is set", () => {
     const result = byProvider(getProviderHealth());
     expect(result("stripe").status).toBe("missing");
+    expect(result("openai").status).toBe("missing");
     expect(result("resend").status).toBe("missing");
     expect(result("posthog").status).toBe("missing");
     expect(result("mapbox").status).toBe("missing");
@@ -76,6 +78,7 @@ describe("getProviderHealth", () => {
     setAllConfigured();
     const result = byProvider(getProviderHealth());
     expect(result("stripe").status).toBe("configured");
+    expect(result("openai").status).toBe("configured");
     expect(result("resend").status).toBe("configured");
     expect(result("posthog").status).toBe("configured");
     expect(result("mapbox").status).toBe("configured");

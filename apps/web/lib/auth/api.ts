@@ -8,6 +8,7 @@ import {
   type RotaDataClient
 } from "@repo/db";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createApiErrorEnvelope } from "@/lib/http/api-error";
 
 export type ApiErrorCode = "unauthenticated" | "forbidden" | "validation_error" | "not_found" | "internal_error";
 
@@ -20,17 +21,19 @@ export type AuthorizedApiContext = {
   userId: string;
 };
 
-export function apiError(code: ApiErrorCode, message: string, status: number, details?: unknown) {
-  return Response.json(
-    {
-      error: {
-        code,
-        details,
-        message
-      }
-    },
-    { status }
-  );
+export function apiError(
+  code: ApiErrorCode,
+  message: string,
+  status: number,
+  fieldErrors?: Record<string, readonly string[] | undefined>
+) {
+  const normalizedFieldErrors = fieldErrors
+    ? Object.fromEntries(
+        Object.entries(fieldErrors).filter((entry): entry is [string, readonly string[]] => Array.isArray(entry[1]))
+      )
+    : undefined;
+
+  return Response.json(createApiErrorEnvelope(code, message, normalizedFieldErrors), { status });
 }
 
 export function unauthenticatedError(message = "Authentication required.") {
@@ -41,8 +44,8 @@ export function forbiddenError(message = "Forbidden.") {
   return apiError("forbidden", message, 403);
 }
 
-export function validationError(message: string, details?: unknown) {
-  return apiError("validation_error", message, 400, details);
+export function validationError(message: string, fieldErrors?: Record<string, readonly string[] | undefined>) {
+  return apiError("validation_error", message, 400, fieldErrors);
 }
 
 export function notFoundError(message: string) {

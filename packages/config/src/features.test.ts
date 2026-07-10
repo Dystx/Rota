@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getFeatureFlagEnvironmentVariable, isFeatureEnabled } from "./features";
+import { featureFlagNames, getFeatureFlagEnvironmentVariable, isFeatureEnabled } from "./features";
 
 describe("feature flags", () => {
   it("keeps every feature off unless it is explicitly enabled", () => {
@@ -11,5 +11,20 @@ describe("feature flags", () => {
 
   it("exposes the deployment variable name without exposing a value", () => {
     expect(getFeatureFlagEnvironmentVariable("b2bBeta")).toBe("ENABLE_B2B_BETA");
+  });
+
+  it("includes every approved gated operator surface", () => {
+    expect(featureFlagNames).toEqual([
+      "liveAi",
+      "stripe",
+      "transactionalEmail",
+      "tripMessaging",
+      "b2bBeta",
+      "guideBeta",
+      "operatorConsole",
+      "consoleConfig",
+      "apiDocs",
+      "pt"
+    ]);
   });
 });

@@ -8,14 +8,14 @@ export type PublicConfig = {
   appUrl: string;
   environmentMode: EnvironmentMode;
   mapbox: {
-    publicToken: string;
+    publicToken: string | undefined;
   };
   posthog: {
-    host: string;
-    key: string;
+    host: string | undefined;
+    key: string | undefined;
   };
   stripe: {
-    publishableKey: string;
+    publishableKey: string | undefined;
   };
   supabase: {
     anonKey: string;
@@ -56,25 +56,20 @@ export function createPublicConfig(): PublicConfig {
   if (!appUrl) missing.push("NEXT_PUBLIC_APP_URL");
   if (!supabaseUrl) missing.push("NEXT_PUBLIC_SUPABASE_URL");
   if (!supabaseAnonKey) missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
-  if (!stripePublishableKey) missing.push("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY");
-  if (!posthogKey) missing.push("NEXT_PUBLIC_POSTHOG_KEY");
-  if (!posthogHost) missing.push("NEXT_PUBLIC_POSTHOG_HOST");
-  if (!mapboxPublicToken) missing.push("NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN");
-
   assertNoMissing("public", missing);
 
   return {
     appUrl: appUrl!,
     environmentMode: environmentModeSchema.catch("development").parse(process.env.NODE_ENV),
     mapbox: {
-      publicToken: mapboxPublicToken!
+      publicToken: mapboxPublicToken
     },
     posthog: {
-      host: posthogHost!,
-      key: posthogKey!
+      host: posthogHost,
+      key: posthogKey
     },
     stripe: {
-      publishableKey: stripePublishableKey!
+      publishableKey: stripePublishableKey
     },
     supabase: createPublicSupabaseConfig()
   };

@@ -9,6 +9,9 @@ export const featureFlagNames = [
   "tripMessaging",
   "b2bBeta",
   "guideBeta",
+  "operatorConsole",
+  "consoleConfig",
+  "apiDocs",
   "pt"
 ] as const;
 
@@ -21,6 +24,9 @@ const environmentVariableFor: Record<FeatureFlag, string> = {
   tripMessaging: "ENABLE_TRIP_MESSAGING",
   b2bBeta: "ENABLE_B2B_BETA",
   guideBeta: "ENABLE_GUIDE_BETA",
+  operatorConsole: "ENABLE_OPERATOR_CONSOLE",
+  consoleConfig: "ENABLE_CONSOLE_CONFIG",
+  apiDocs: "ENABLE_API_DOCS",
   pt: "ENABLE_PT"
 };
 

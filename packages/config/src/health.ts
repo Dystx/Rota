@@ -25,6 +25,7 @@ declare const process: {
 };
 
 export type HealthProvider =
+  | "openai"
   | "stripe"
   | "resend"
   | "posthog"
@@ -55,6 +56,7 @@ export type ProviderHealthReport = {
  */
 export const HEALTH_ENV_VAR_NAMES = {
   mapboxPublicToken: "NEXT_PUBLIC_MAPBOX_PUBLIC_TOKEN",
+  openAiApiKey: "OPENAI_API_KEY",
   posthogHost: "NEXT_PUBLIC_POSTHOG_HOST",
   posthogKey: "NEXT_PUBLIC_POSTHOG_KEY",
   resendApiKey: "RESEND_API_KEY",
@@ -104,6 +106,27 @@ function checkStripe(): ProviderHealth {
     requirement,
     status: "configured",
     hint: "Stripe secret, webhook, and publishable env vars are present."
+  };
+}
+
+function checkOpenAi(): ProviderHealth {
+  const key = readEnv(HEALTH_ENV_VAR_NAMES.openAiApiKey);
+  const requirement: HealthRequirement = "required-for-action";
+
+  if (!key) {
+    return {
+      provider: "openai",
+      requirement,
+      status: "missing",
+      hint: "Custom phrase interpretation is gated; set OPENAI_API_KEY server-side. Deterministic choices remain available."
+    };
+  }
+
+  return {
+    provider: "openai",
+    requirement,
+    status: "configured",
+    hint: "OPENAI_API_KEY is present."
   };
 }
 
@@ -220,6 +243,7 @@ function checkWorkerQueue(): ProviderHealth {
 
 export function getProviderHealth(): ProviderHealth[] {
   return [
+    checkOpenAi(),
     checkStripe(),
     checkResend(),
     checkPostHog(),

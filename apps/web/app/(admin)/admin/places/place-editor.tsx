@@ -167,18 +167,16 @@ export function PlaceEditor() {
       });
 
       const payload = (await response.json()) as {
+        code?: string;
+        fieldErrors?: Record<string, string[]>;
         message?: string;
         place?: PlaceRow;
-        error?: {
-          message: string;
-          details?: Record<string, string[]>;
-        };
       };
 
       if (!response.ok) {
-        let errMsg = payload.error?.message || payload.message || "Failed to save.";
-        if (payload.error?.details) {
-          const detailStr = Object.entries(payload.error.details).map(([k, v]) => `${k}: ${v.join(", ")}`).join("; ");
+        let errMsg = payload.message || "Failed to save.";
+        if (payload.fieldErrors) {
+          const detailStr = Object.entries(payload.fieldErrors).map(([k, v]) => `${k}: ${v.join(", ")}`).join("; ");
           errMsg += " " + detailStr;
         }
         setMessage(errMsg);

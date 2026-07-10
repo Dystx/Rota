@@ -53,13 +53,8 @@ describe("reviewer assignments admin API", () => {
 
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "validation_error",
-        details: {
-          assignment: existingAssignment
-        },
-        message: "Trip already has an active reviewer assignment."
-      }
+      code: "validation_error",
+      message: "Trip already has an active reviewer assignment."
     });
   });
 
@@ -84,10 +79,8 @@ describe("reviewer assignments admin API", () => {
     expect(response.status).toBe(400);
     expect(createCalled).toBe(false);
     await expect(response.json()).resolves.toMatchObject({
-      error: {
-        code: "validation_error",
-        message: "Reviewer assignment validation failed."
-      }
+      code: "validation_error",
+      message: "Reviewer assignment validation failed."
     });
   });
 
@@ -109,10 +102,8 @@ describe("reviewer assignments admin API", () => {
 
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "validation_error",
-        message: "Trip already has an active reviewer assignment."
-      }
+      code: "validation_error",
+      message: "Trip already has an active reviewer assignment."
     });
   });
 });

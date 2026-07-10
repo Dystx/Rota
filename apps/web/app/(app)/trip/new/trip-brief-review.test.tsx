@@ -17,14 +17,12 @@ describe("TripBriefReview", () => {
     expect(screen.getByRole("button", { name: /refine this plan/i }).getAttribute("aria-expanded")).toBe("false");
   });
 
-  it("surfaces nested API field errors from error.details", async () => {
+  it("surfaces top-level API field errors", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: false,
       json: async () => ({
-        error: {
-          message: "Please fix the highlighted fields.",
-          details: { destinationCountry: ["Destination is unavailable."] }
-        }
+        message: "Please fix the highlighted fields.",
+        fieldErrors: { destinationCountry: ["Destination is unavailable."] }
       })
     }));
 

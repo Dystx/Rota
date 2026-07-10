@@ -92,13 +92,11 @@ describe("handleTripCreateRequest", () => {
     expect(response.status).toBe(400);
     expect(createDraftCalled).toBe(false);
     await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "validation_error",
-        details: {
-          rawBrief: ["Add a fuller brief so the route engine has enough context."]
-        },
-        message: "Trip brief validation failed."
-      }
+      code: "validation_error",
+      fieldErrors: {
+        rawBrief: ["Add a fuller brief so the route engine has enough context."]
+      },
+      message: "Trip brief validation failed."
     });
   });
 
@@ -125,13 +123,11 @@ describe("handleTripCreateRequest", () => {
     expect(response.status).toBe(400);
     expect(createDraftCalled).toBe(false);
     await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "validation_error",
-        details: {
-          rawBrief: ["Request body must be valid JSON."]
-        },
-        message: "Trip brief validation failed."
-      }
+      code: "validation_error",
+      fieldErrors: {
+        rawBrief: ["Request body must be valid JSON."]
+      },
+      message: "Trip brief validation failed."
     });
   });
 

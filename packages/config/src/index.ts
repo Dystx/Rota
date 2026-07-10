@@ -8,6 +8,8 @@ export {
   isFeatureEnabled
 } from "./features";
 export type { FeatureFlag } from "./features";
+export type { FeatureReadiness, ReadinessFailure } from "./readiness";
+export { resolveFeatureReadiness } from "./readiness";
 export type {
   HealthProvider,
   HealthRequirement,
