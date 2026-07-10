@@ -39,3 +39,17 @@ after the test runs against the fresh server configured in
 | Public and traveler visual routes | `apps/web/playwright/tests/visual.spec.ts` and `visual.spec.ts-snapshots/` | Pending fresh-server run | 1440px desktop and 390px mobile; one main/visible h1; no placeholder imagery |
 | Route accessibility | `apps/web/playwright/tests/accessibility.spec.ts` | Pending fresh-server run | public/traveler/reviewer/admin, serious/critical axe gate, skip link, planner choice-only controls |
 | Mobile overflow | `apps/web/playwright/tests/mobile-overflow.spec.ts` | Pending fresh-server run | explicit 390px document width across public, traveler, reviewer, and admin routes |
+
+## Task 14 release-gate evidence (2026-07-10)
+
+Commands were run from the repository root. The Playwright command used the
+fresh-server configuration in `apps/web/playwright.config.ts` with both
+`desktop-chrome` and `mobile-chromium` projects:
+
+| Command | Result | Classification / notes |
+| --- | --- | --- |
+| `pnpm lint` | PASS | Workspace TypeScript/eslint checks completed successfully. |
+| `pnpm test` | FAIL | The web test reached its API unit tests, then its fresh-server setup failed with `Another next build process is already running` because this gate's standalone `pnpm --filter web build` was still active. This is a test-environment concurrency failure; no unit-test assertion failure was reported. |
+| `pnpm --filter web build` | PASS | Next production build completed. Recorded warnings: workspace-root inference due to multiple lockfiles and deprecated `middleware` convention. |
+| `pnpm --filter web exec playwright test playwright/tests/choice-led-traveler.spec.ts playwright/tests/visual.spec.ts playwright/tests/accessibility.spec.ts playwright/tests/mobile-overflow.spec.ts --project=desktop-chrome --project=mobile-chromium` | FAIL (interrupted after partial run) | Fresh server started. Choice-led traveler failed on both projects at `/trip/3` because the seeded Supabase trip was unavailable and redirected to `/itineraries?notice=unavailable` (missing auth/data fixture). Accessibility failures covered public/traveler/reviewer/admin routes and are code/route-structure or auth-state failures (one-main/one-h1/axe assertions), not ignored. Visual failures are stale/changed screenshot baselines. Mobile overflow failures included authenticated `/itineraries` and `/account` state; classify as route/auth fixture failures until reproduced with seeded data. The run was interrupted after the failure pattern was established; no pass claim is made. |
+| `git diff --check` | PASS | No whitespace errors. |
