@@ -6,6 +6,7 @@ import {
   parseActivityIntent,
   type EditorialActivity
 } from "./activities";
+import { REVIEWED_ACTIVITY_SEED } from "./activities";
 
 const reviewedPortoWalk: EditorialActivity = {
   id: "porto-riverside-walk",
@@ -22,10 +23,24 @@ const reviewedPortoWalk: EditorialActivity = {
   alternativeId: null,
   weatherFit: ["sun", "either"],
   editorialStatus: "reviewed",
-  reviewedAt: "2026-07-10"
+  reviewedAt: "2026-07-10",
+  evidenceUrl: "https://example.test/porto-ribeira"
 };
 
 describe("activity editorial adapter", () => {
+  it("ships only source-attributable reviewed starter records", () => {
+    expect(REVIEWED_ACTIVITY_SEED.length).toBeGreaterThanOrEqual(10);
+    expect(
+      REVIEWED_ACTIVITY_SEED.every(
+        (activity) =>
+          activity.editorialStatus === "reviewed" &&
+          activity.verdict.length > 20 &&
+          activity.evidenceUrl.startsWith("https://") &&
+          activity.reviewedAt === "2026-07-10"
+      )
+    ).toBe(true);
+  });
+
   it("normalizes absent public intent to an editable Porto afternoon", () => {
     expect(parseActivityIntent({})).toEqual({
       region: "porto",
