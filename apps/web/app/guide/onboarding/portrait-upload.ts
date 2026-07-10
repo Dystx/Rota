@@ -7,8 +7,6 @@ import {
   SPECIALIST_PORTRAIT_MAX_BYTES
 } from "./portrait-upload-constants";
 
-export { SPECIALIST_PORTRAIT_BUCKET, SPECIALIST_PORTRAIT_MAX_BYTES } from "./portrait-upload-constants";
-
 /**
  * Private Supabase Storage bucket for specialist profile portraits.
  *
