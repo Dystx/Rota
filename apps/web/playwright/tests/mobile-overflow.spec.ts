@@ -33,7 +33,7 @@ test.describe("@smoke @visual mobile-overflow sweep", () => {
       test.skip(!isMobile, "Overflow sweep is only for mobile");
 
       await page.goto(route);
-      await page.waitForLoadState("domcontentloaded");
+      await page.waitForLoadState("networkidle");
       await page.waitForTimeout(250);
 
       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
@@ -56,7 +56,7 @@ test.describe("@smoke @visual mobile-overflow sweep", () => {
       test.skip(!isMobile, "Overflow sweep is only for mobile");
       const route = travelerTripPath(routeSuffix);
       await page.goto(route);
-      await page.waitForLoadState("domcontentloaded");
+      await page.waitForLoadState("networkidle");
       await page.waitForTimeout(250);
       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       const viewportWidth = await page.evaluate(() => window.innerWidth);
