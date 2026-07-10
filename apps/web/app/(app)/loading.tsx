@@ -20,8 +20,9 @@ export default function AppLoading() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <TopNav />
-      <main
-        id="main-content"
+      <div
+        role="status"
+        aria-live="polite"
         className="flex-1 pt-header-height"
         aria-busy="true"
         aria-label="Loading"
@@ -67,7 +68,7 @@ export default function AppLoading() {
             ))}
           </div>
         </section>
-      </main>
+      </div>
       <SiteFooter />
     </div>
   );

@@ -17,8 +17,9 @@ export default function MarketingLoading() {
   return (
     <div className="min-h-screen pt-header-height flex flex-col bg-background">
       <TopNav />
-      <main
-        id="main-content"
+      <div
+        role="status"
+        aria-live="polite"
         className="flex-1"
         aria-busy="true"
         aria-label="Loading"
@@ -62,7 +63,7 @@ export default function MarketingLoading() {
             ))}
           </div>
         </section>
-      </main>
+      </div>
       <SiteFooter />
     </div>
   );
