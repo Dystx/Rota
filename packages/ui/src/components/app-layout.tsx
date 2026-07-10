@@ -74,17 +74,11 @@ export function AppLayout({
       )}
       {...props}
     >
-      {bare ? null : (
-        <>
-          {topNav}
-          <main id="main-content" className="flex-1 pt-header-height">
-            {children}
-          </main>
-          {siteFooter}
-        </>
-      )}
-
-      {bare ? children : null}
+      {bare ? null : topNav}
+      <main id="main-content" className={cn("flex-1", bare ? "" : "pt-header-height")}>
+        {children}
+      </main>
+      {bare ? null : siteFooter}
     </div>
   );
 }

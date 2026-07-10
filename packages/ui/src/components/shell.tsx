@@ -49,7 +49,7 @@ export function PageShell({
           </div>
         </header>
       )}
-      {bare ? (
+      {bare || variant === "reviewer" || variant === "admin" ? (
         <div className="mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
           {children}
         </div>

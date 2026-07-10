@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { OperatorShell, PageShell, SectionHeading } from "@repo/ui";
+import { OperatorShell, SectionHeading } from "@repo/ui";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
@@ -38,14 +38,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <PageShell variant="admin">
+    <main id="main-content" className="mx-auto grid min-h-screen max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
       <div data-testid="admin-forbidden">
         <SectionHeading
           eyebrow="Admin access"
           title="Forbidden"
           description="This admin workspace is only available to trusted administrator sessions."
+          h1
         />
       </div>
-    </PageShell>
+    </main>
   );
 }

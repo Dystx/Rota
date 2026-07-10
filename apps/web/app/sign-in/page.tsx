@@ -4,7 +4,6 @@ import { AppLayout, BrandMark } from "@repo/ui";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { SignInForm } from "./_components/sign-in-form";
 import { TopNav } from "../_components/top-nav";
-import { SiteFooter } from "../_components/site-footer";
 import { safeNext } from "../auth/safe-next";
 
 export const metadata: Metadata = {
@@ -30,8 +29,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   }
 
   return (
-    <AppLayout variant="auth" topNav={<TopNav />} siteFooter={<SiteFooter />}>
-      <div className="min-h-screen flex flex-col bg-paper">
+    <AppLayout variant="auth" topNav={<TopNav />}>
+      <div className="flex min-h-full flex-col bg-paper">
 
       {/* Sign-in lock-up: mark + italic wordmark, centered above the card. */}
       <div className="flex justify-center pt-28 pb-3">
@@ -73,7 +72,6 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
           </p>
         </div>
       </div>
-      <SiteFooter />
       </div>
     </AppLayout>
   );
