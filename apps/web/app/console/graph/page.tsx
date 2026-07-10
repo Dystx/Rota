@@ -175,9 +175,9 @@ export default function ConsoleGraphPage() {
                         Active
                       </span>
                     </div>
-                    <h1 className="font-headline-lg text-headline-lg text-linen-dark mb-2">
+                    <h2 className="font-headline-lg text-headline-lg text-linen-dark mb-2">
                       Portugal
-                    </h1>
+                    </h2>
                     <p className="font-mono-technical text-mono-technical text-linen-dark/60">
                       ID: node_geog_pt_0001a
                     </p>
