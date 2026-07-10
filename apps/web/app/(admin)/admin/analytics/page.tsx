@@ -114,7 +114,7 @@ export default async function AdminAnalyticsPage() {
                 <span className="rota-dot"></span> Operational snapshot
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 overflow-x-auto">
+            <CardContent className="p-6 overflow-x-auto" role="region" aria-label="Operational metrics" tabIndex={0}>
               <div className="grid gap-3 min-w-[300px]">
                 {operationalMetrics.map(([label, value]) => (
                   <div key={label} className="flex items-center justify-between gap-4 rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface)] p-4 shadow-sm transition-colors hover:border-[var(--color-primary)]/30 hover:bg-white">
@@ -137,7 +137,7 @@ export default async function AdminAnalyticsPage() {
                 <span className="rota-dot"></span> Partner click leaderboard
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 overflow-x-auto text-sm">
+            <CardContent className="p-6 overflow-x-auto text-sm" role="region" aria-label="Partner click leaderboard" tabIndex={0}>
               {topPartners.length ? (
                 <div className="grid gap-3 min-w-[300px]">
                   {topPartners.map((partner) => (

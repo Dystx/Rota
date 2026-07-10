@@ -174,7 +174,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                   {card.caption}
                 </p>
                 {mode === "plan" ? (
-                  <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-ochre-light px-3 py-1.5 font-label-ui text-label-ui text-ochre-dark shadow-sm">
+                  <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-ochre-light px-3 py-1.5 font-label-ui text-label-ui text-primary shadow-sm">
                     {BENTO_CTA_COPY[card.slug]}
                     <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
                   </span>

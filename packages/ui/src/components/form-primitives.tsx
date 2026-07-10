@@ -389,7 +389,7 @@ export function ChipGroup<T extends string = string>(props: ChipGroupProps<T>) {
               <span
                 className={cn(
                   'text-[11px]',
-                  selected ? 'text-white/80' : 'text-[var(--color-muted-foreground)]'
+                  selected ? 'text-white' : 'text-[var(--color-muted-foreground)]'
                 )}
               >
                 {option.description}

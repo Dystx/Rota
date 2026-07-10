@@ -129,7 +129,7 @@ const NavLink = ({
     <span className="grid gap-0.5 min-w-0">
       <span className="leading-tight">{item.label}</span>
       {item.hint ? (
-        <span className="text-[11px] text-on-surface-variant/70 leading-tight font-normal truncate">
+        <span className="text-[11px] text-on-surface-variant leading-tight font-normal truncate">
           {item.hint}
         </span>
       ) : null}
@@ -234,9 +234,9 @@ export function OperatorShell({
               data-testid="operator-mobile-toggle"
               className="flex items-center justify-between gap-3 p-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
             >
-              <Link href="/" className="font-headline-md text-headline-md italic text-primary">
+              <span className="font-headline-md text-headline-md italic text-primary">
                 Rumia
-              </Link>
+              </span>
               <span className="flex items-center gap-2 font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
                 {meta.kicker}
                 <span aria-hidden className="material-symbols-outlined text-[20px]">menu</span>

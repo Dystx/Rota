@@ -298,7 +298,7 @@ test.describe("Accessibility Audits - Behavior", () => {
 
     await page.goto("/trip/new");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("h1")).toContainText("Confirm your brief");
+    await expect(page.locator("h1")).toContainText("Shape your brief");
     trace.push("Navigated to /trip/new");
 
     await page.waitForTimeout(5000);
@@ -308,7 +308,7 @@ test.describe("Accessibility Audits - Behavior", () => {
     await submitButton.focus();
     trace.push("Focused submit button via keyboard target");
     await submitButton.press("Enter");
-    trace.push("Enter (Submitted form)");
+    trace.push("Enter (Submitted choice-led brief)");
 
     try {
       // Wait for either a redirect to /trip/[id] OR a success message on the page
