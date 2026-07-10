@@ -23,9 +23,8 @@ import { publicDraftToPlannerUrl } from "../(marketing)/_components/public-trip-
  * Per-card CTAs (Stitch 1.3 "1 click to begin" pattern):
  *   - `mode="plan"` (the home) — each card has one route action
  *       backed by the same choice-draft URL adapter as the hero.
- *   - `mode="explore"` (the default, used by /explore and
- *     /portugal) — each card has a single link that covers the
- *     full card area: "View on the map" → /explore/workspace?focus=<slug>
+ *   - `mode="explore"` — each card has a single link that covers the
+ *     full card area: "See what is worth doing" → /explore?region=<slug>
  *
  * The `mode` prop is a string literal so the home (a server
  * component) can pass it across the server/client boundary
@@ -85,7 +84,7 @@ const BENTO_CARDS: BentoCardData[] = [
 ];
 
 const PLANNER_HREF_FOR = (slug: BentoSlug) => publicDraftToPlannerUrl(slug);
-const MAP_HREF_FOR = (slug: BentoSlug) => `/explore/workspace?focus=${slug}`;
+const EXPLORE_HREF_FOR = (slug: BentoSlug) => `/explore?region=${slug}`;
 
 /**
  * Destination-specific bento CTA copy. The previous "Plan this
@@ -152,7 +151,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[250px]">
         {BENTO_CARDS.map((card) => {
           const planHref = PLANNER_HREF_FOR(card.slug);
-          const mapHref = MAP_HREF_FOR(card.slug);
+          const exploreHref = EXPLORE_HREF_FOR(card.slug);
 
           const cardBody = (
             <>
@@ -186,7 +185,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                     >
                       map
                     </span>
-                    View on the map →
+                    See what is worth doing →
                   </span>
                 )}
               </div>
@@ -212,10 +211,10 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
           return (
             <Link
               key={card.slug}
-              href={mapHref}
-              onClick={() => handleBentoClick(card.slug)}
+              href={exploreHref}
               data-testid={`bento-card-${card.slug}`}
               data-slug={card.slug}
+              aria-label={`Explore judged activities in ${card.label}`}
               className={`${card.gridClass} group relative rounded-xl overflow-hidden shadow-lg border border-white/40 block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light group-focus-visible:ring-2 group-focus-visible:ring-ochre-light`}
             >
               {cardBody}

@@ -7,17 +7,16 @@ import { DestinationBento } from "../_components/destination-bento";
 import { HeroIntentCard } from "./_components/hero-intent-card";
 
 export const metadata: Metadata = {
-  title: "Discover Intentionally. | Rumia",
+  title: "What to do in Portugal, judged well | Rumia",
   description:
-    "Portugal-first AI travel planning with cinematic detail. Tell us where, when, and how you travel — we handle the rest.",
+    "A Portugal-first guide to activities genuinely worth your limited time.",
   alternates: { canonical: "/" }
 };
 
 /**
- * Rumia landing page — 3-element hero (PR-A3).
- *   1. Headline  "Discover *Intentionally*."
- *   2. Subhead   "Portugal-first itineraries, plotted with care."
- *   3. Choice-led route starter → /planner
+ * Rumia landing page: an activity situation is the first decision.
+ * The atmospheric map remains a non-interactive backdrop; the phrase-led
+ * activity composer is the meaningful task and routes to /explore.
  */
 export default function HomePage() {
   return (
@@ -48,20 +47,20 @@ export default function HomePage() {
               data-testid="home-headline"
               className="font-display-mobile text-display-mobile md:font-display md:text-display text-linen-dark tracking-tight drop-shadow-2xl"
             >
-              Your Portugal trip, <span className="italic text-ochre-light">solved.</span>
+              What is actually worth your time in <span className="italic text-ochre-light">Portugal?</span>
             </h1>
             <p
               data-testid="home-value-prop"
               className="font-body-lg md:font-body-xl text-body-lg md:text-body-xl text-linen-dark/90 max-w-xl drop-shadow-md px-2"
             >
-              AI shapes the first route. Portugal specialists verify the decisions that benefit from local judgment.
+              A small set of judged Portugal activities, with the timing and trade-offs that make a day work — not an endless list to research alone.
             </p>
             <HeroIntentCard />
           </div>
         </section>
 
         <HowItWorks />
-        <DestinationBento mode="plan" />
+        <DestinationBento mode="explore" />
     </div>
   );
 }

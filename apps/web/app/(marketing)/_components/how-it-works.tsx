@@ -6,14 +6,13 @@ function cn(...values: Array<string | false | null | undefined>): string {
 
 /**
  * HowItWorks — 3-step visual that explains the flow to a new
- * user. Placed between the hero and the bento grid on the home
- * page so the user understands what happens after they click
- * "Begin Journey" before they commit.
+ * user. It explains the activity-first path without pretending that
+ * Rumia books, dispatches specialists, or generates a finished trip.
  *
  * The three steps mirror the actual flow:
- *   1. Tell us your trip     — the hero card / planner sentence
- *   2. We craft the route    — the AI synthesizes the itinerary
- *   3. Refine with an expert — optional human curator (checkout)
+ *   1. Name the available time — the hero sentence
+ *   2. See the judgement       — reviewed activity results
+ *   3. Hold a day in view      — a reversible day tray
  *
  * Visual hierarchy (top → bottom inside each card):
  *   1. Big monospace step number (01/02/03) — primary cue
@@ -28,20 +27,20 @@ const STEPS = [
   {
     n: "01",
     icon: "edit_note",
-    title: "Tell us your trip",
-    body: "One sentence — where, when, and how you travel. No forms, no quizzes.",
+    title: "Name this slice of time",
+    body: "One sentence — the place, time, mood, and who is with you. No forms or quizzes.",
   },
   {
     n: "02",
-    icon: "auto_awesome",
-    title: "We craft the route",
-    body: "A day-by-day itinerary with curated stops, pacing, and logistics — done in seconds.",
+    icon: "format_quote",
+    title: "See the judgement",
+    body: "A small, reviewed set of activities with time costs, caveats, and better alternatives.",
   },
   {
     n: "03",
-    icon: "support_agent",
-    title: "Refine with an expert",
-    body: "Add a destination specialist to audit, refine, and personalize every stop.",
+    icon: "bookmark",
+    title: "Keep a day in view",
+    body: "Save only the activities that fit. Change or remove them without losing the decision context.",
   },
 ] as const;
 
@@ -60,10 +59,10 @@ export function HowItWorks() {
           id="how-it-works-heading"
           className="font-display-mobile md:font-display text-display-mobile md:text-display text-primary mb-4"
         >
-          Three steps. One trip.
+          A better day starts with a better choice.
         </h2>
         <p className="font-body-md md:font-body-lg text-body-md md:text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
-          From a one-line intent to a fully mapped itinerary with a human curator on call.
+          From one honest activity situation to a day you can still change.
         </p>
       </header>
       <ol className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">

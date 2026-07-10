@@ -39,5 +39,11 @@ describe("HomePage hero layout", () => {
     expect(hero?.className).toContain("md:h-[80vh]");
     expect(hero?.className).toContain("md:min-h-[720px]");
     expect(hero?.className).toContain("md:overflow-hidden");
+    expect(container.querySelector("[data-testid='home-headline']")?.textContent).toMatch(
+      /What is actually worth your time/i
+    );
+    expect(container.querySelector("[data-testid='home-value-prop']")?.textContent).toMatch(
+      /judged Portugal activities/i
+    );
   });
 });

@@ -8,19 +8,20 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 afterEach(() => cleanup());
 
 describe("HeroIntentCard", () => {
-  it("renders only three editable phrases and one action", () => {
+  it("starts with an editable activity situation instead of a route brief", () => {
     render(<HeroIntentCard />);
-    expect(screen.getByRole("button", { name: /^Destination,/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /^Duration,/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /^Pace,/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /plan portugal/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Time available,/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Region,/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Mood,/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Who is going,/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /show me what is worth doing/i })).toBeTruthy();
   });
 
-  it("hands the edited phrase choices to the planner", () => {
+  it("hands edited phrase choices to the explorer", () => {
     render(<HeroIntentCard />);
-    fireEvent.click(screen.getByRole("button", { name: /^Destination,/i }));
-    fireEvent.click(screen.getByRole("button", { name: "Porto & the North" }));
-    fireEvent.click(screen.getByRole("button", { name: /plan portugal/i }));
-    expect(push).toHaveBeenCalledWith(expect.stringContaining("destination=porto"));
+    fireEvent.click(screen.getByRole("button", { name: /^Region,/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Porto" }));
+    fireEvent.click(screen.getByRole("button", { name: /show me what is worth doing/i }));
+    expect(push).toHaveBeenCalledWith(expect.stringContaining("/explore?region=porto"));
   });
 });

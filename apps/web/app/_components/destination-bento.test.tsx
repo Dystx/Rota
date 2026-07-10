@@ -76,3 +76,13 @@ describe("DestinationBento plan mode", () => {
     );
   });
 });
+
+describe("DestinationBento activity mode", () => {
+  it("takes a region card to reviewed activities, not a planner or map workspace", () => {
+    render(<DestinationBento mode="explore" />);
+
+    const card = screen.getByTestId("bento-card-lisbon");
+    expect(card.getAttribute("href")).toBe("/explore?region=lisbon");
+    expect(card.getAttribute("aria-label")).toMatch(/judged activities/i);
+  });
+});
