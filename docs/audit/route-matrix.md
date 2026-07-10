@@ -35,10 +35,10 @@ after the test runs against the fresh server configured in
 
 | Journey / surface | Executable source (listed) | Browser status | State coverage |
 | --- | --- | --- | --- |
-| Choice-led traveler (`/` → `/planner` → `/trip/new` → `/trip/3` → map → checkout return → export) | `apps/web/playwright/tests/choice-led-traveler.spec.ts` | Failed fresh-server run: `/trip/3` redirected to `/itineraries?notice=unavailable` (seeded Supabase trip unavailable) | signed-in traveler, keyboard-only choices, reduced motion |
-| Public and traveler visual routes | `apps/web/playwright/tests/visual.spec.ts` and `visual.spec.ts-snapshots/` | Pending fresh-server run | 1440px desktop and 390px mobile; one main/visible h1; no placeholder imagery |
-| Route accessibility | `apps/web/playwright/tests/accessibility.spec.ts` | Pending fresh-server run | public/traveler/reviewer/admin, serious/critical axe gate, skip link, planner choice-only controls |
-| Mobile overflow | `apps/web/playwright/tests/mobile-overflow.spec.ts` | Pending fresh-server run | explicit 390px document width across public, traveler, reviewer, and admin routes |
+| Choice-led traveler (`/` → `/planner` → `/trip/new` → owned trip → map → checkout return → export) | `apps/web/playwright/tests/choice-led-traveler.spec.ts` | PASS fresh server, desktop + mobile (2 tests) | signed-in traveler, keyboard-only choices, reduced motion |
+| Public and traveler visual routes | `apps/web/playwright/tests/visual.spec.ts` and `visual.spec.ts-snapshots/` | PASS fresh server, desktop + mobile (42 tests) | 1440px desktop and 390px mobile; one main/visible h1; no placeholder imagery |
+| Route accessibility | `apps/web/playwright/tests/accessibility.spec.ts` | PASS fresh server, desktop + mobile (34 tests) | public/traveler/reviewer/admin, serious/critical axe gate, skip link, planner choice-only controls |
+| Mobile overflow | `apps/web/playwright/tests/mobile-overflow.spec.ts` | PASS fresh server, mobile (18 tests) | explicit 390px document width across public, traveler, reviewer, and admin routes |
 
 ## Task 14 release-gate evidence (2026-07-10)
 
@@ -77,13 +77,36 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
   `main`, one visible `h1`, and no document overflow at 390px.
 - Playwright setup now also seeds the reviewer role profile and auth link; built
   reviewer smoke for queue/history/profile renders correctly on mobile.
-- Full visual Playwright execution now passes against the refreshed desktop and
+- Full visual Playwright execution passes against the refreshed desktop and
   mobile baselines (42 tests across public, traveler, reviewer, and operator
   surfaces). The baselines include the expanded choice-led home and generated
   owned trip fixture routes.
+- Full accessibility execution passes against the fresh server (34 tests across
+  public, traveler, reviewer, and admin surfaces), including axe serious/critical
+  gates, one-main/one-visible-h1 checks, keyboard brief submission, and reduced
+  motion behavior.
+- The 390px mobile overflow sweep passes for all 18 public, traveler, reviewer,
+  admin, and owned-trip route checks. Redirecting export routes wait for the final
+  settled URL before measuring the document.
 - Operator console fixtures are explicitly labeled “Demo data”, use Portugal
   content, and no longer expose the prior Kyoto/Japan/search placeholders.
 - Guide beta portraits now use an authenticated, user-prefixed private Storage
   bucket with MIME/signature/size validation and signed previews; legacy remote
   portrait URLs are cleared and rejected by the migration constraint.
 | `git diff --check` | PASS | No whitespace errors. |
+
+## Fresh verification rerun (2026-07-10, after operator and traveler fixes)
+
+| Command | Result |
+| --- | --- |
+| `pnpm lint` | PASS |
+| `pnpm exec vitest run` | PASS — 94 files / 689 tests |
+| `pnpm --filter web build` | PASS |
+| `playwright test visual.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 42 tests |
+| `playwright test accessibility.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 34 tests |
+| `playwright test mobile-overflow.spec.ts --project=mobile-chromium` | PASS — 18 tests |
+| `playwright test choice-led-traveler.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 2 tests |
+
+The earlier failed rows above are retained as historical evidence of the fixture
+and stale-baseline issues that were subsequently corrected; they are superseded
+by this fresh rerun.
