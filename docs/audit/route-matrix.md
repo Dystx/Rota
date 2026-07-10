@@ -106,6 +106,8 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
 | `playwright test accessibility.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 34 tests |
 | `playwright test mobile-overflow.spec.ts --project=mobile-chromium` | PASS — 18 tests |
 | `playwright test choice-led-traveler.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 2 tests |
+| `playwright test public-discovery.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 8 tests |
+| `playwright test protected-routes.spec.ts --project=desktop-chrome` | PASS — 44 tests |
 
 The earlier failed rows above are retained as historical evidence of the fixture
 and stale-baseline issues that were subsequently corrected; they are superseded
