@@ -111,15 +111,13 @@ fresh-server configuration in `apps/web/playwright.config.ts` with both
 | `playwright test accessibility.spec.ts mobile-overflow.spec.ts --project=desktop-chrome --project=mobile-chromium` | PASS — 72 tests, 26 intentionally skipped |
 
 Canonical serialized route gate (`pnpm --dir apps/web test:e2e`, 2026-07-10):
-The latest full run reached **273 passed, 28 intentionally skipped**, with one
-transient failure in the existing trip-stitch pace-toggle assertion. The
-affected assertion passed in a focused desktop/mobile repeat (6/6), so the
-route-shell and visual changes themselves are green; rerun the canonical gate
-once more before production release to clear the flaky interaction result.
+**PASS — 289 tests passed, 31 intentionally skipped (9.6 minutes).** This is
+the complete configured desktop/mobile smoke suite, including the beta gateway
+routes and the hydrated trip pace-toggle interaction.
 
 The same canonical gate was rerun after the shared-shell consolidation,
-utility-route coverage, and accessibility fixes: **273 passed, 28 skipped,
-one transient trip-stitch failure (9.9 minutes)**. Marketing, trip workspace, account,
+utility-route coverage, beta-gateway shell migration, and accessibility fixes:
+**289 passed, 31 skipped (9.6 minutes)**. Marketing, trip workspace, account,
 legal, support, offline, and discovery routes now inherit the shared public or
 traveler shell; the mobile destination bento and all affected baselines were
 refreshed after the responsive shell changes.
