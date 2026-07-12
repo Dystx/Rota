@@ -1,7 +1,8 @@
 # Rumia frontend aesthetic rework and interaction plan
 
-> **Status:** Approved planning companion. The task-by-task implementation
-> documents are linked below; implementation still follows their gates.
+> **Status:** Approved frontend workstream. Core UI implementation and
+> technical map gating are recorded; production visual/provider gates remain
+> explicit and are not silently treated as complete.
 >
 > This is not a new product roadmap. It is the visual and interaction work
 > needed to make the existing activity-first product feel authored, editorial,
@@ -446,11 +447,11 @@ The rework is complete only when:
 
 ## 12. Recommended next action
 
-Approve this plan as the single frontend/aesthetic workstream. Then implement
-Phase A only: inventory, route matrix, token proposal, asset manifest, and
-approved visual references. Do not start with 3D, animation, or a homepage
-makeover. The first implementation slice should make the system measurable and
-reversible before it changes the look of every route.
+Use the linked implementation plan and launch decision record as the single
+frontend/aesthetic workstream. The shared system, public/chosen-day surfaces,
+utility/operator alignment, and technical map gates are implemented; the next
+work is only the remaining evidence and owner/provider decisions. Do not enable
+3D or a public map provider until those decisions are recorded.
 
 ## References used for the design constraints
 

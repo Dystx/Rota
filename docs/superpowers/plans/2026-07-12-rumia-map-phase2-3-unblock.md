@@ -5,6 +5,9 @@ Branch: `codex/rumia-phase0`
 Status: technical implementation and provider preflight complete; production
 enablement remains gated by owner/legal and provider decisions
 
+The remaining decisions are tracked in
+`docs/ops/rumia-map-launch-decision.md`; this packet does not grant approval.
+
 ## Goal
 
 Prepare Rumia for the optional Phase 2 itinerary camera/storytelling surface

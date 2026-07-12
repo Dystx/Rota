@@ -211,8 +211,8 @@ The detailed first slice is separately documented in:
 - [x] **Step 2: Implement Phase 1.** Lazy-load MapLibre through `@repo/spatial-engine`, use mercator/top-down defaults, render one-to-five numbered points, and mount only after explicit “View on map.”
 - [x] **Step 3: Add controls/fallback.** Provide View map, View list, Fit this day, Reset north, zoom, close, attribution, retry, and a semantic list/static fallback. Never draw an invented route line.
 - [x] **Step 4: Add selection.** Card-to-marker and marker-to-card selection update focus and live status. The list remains complete and keyboard-accessible.
-- [ ] **Step 5: Add Phase 2 behind an explicit action.** Typed `CameraPreset` data drives “Explore your plan”; reduced motion uses jumps/static stops and never auto-plays.
-- [ ] **Step 6: Gate Phase 3.** Terrain, extrusion, and Portugal atlas enhancements require Phase 1/2 performance and accessibility evidence, a feature flag, and provider/licence records. Mobile remains list/2D-first.
+- [x] **Step 5: Add Phase 2 behind an explicit action.** Typed `CameraPreset` data drives “Explore your plan”; reduced motion uses jumps/static stops and never auto-plays. The saved-day camera/story controls and focused tests are implemented; live route geometry remains a provider/owner gate.
+- [x] **Step 6: Gate Phase 3.** Terrain, extrusion, and Portugal atlas enhancements require Phase 1/2 performance and accessibility evidence, a feature flag, and provider/licence records. The 3D capability guard, inert extrusion layer, telemetry, and list/2D fallback are implemented; production enablement remains disabled pending the launch decision record.
 - [x] **Step 7: Run and commit.**
   ```bash
   pnpm exec vitest run 'apps/web/app/(marketing)/_components/activity-map-model.test.ts' packages/spatial-engine/src/adapters/maplibre/layers/activity-points.test.ts
@@ -290,15 +290,18 @@ frontend release.
 
 The full rework is complete only when Tasks 1–9 have independent gates, the first-slice plan is green, the map capability is separately licensed and feature-gated, and final browser/build evidence is recorded truthfully.
 
-**Current state (2026-07-12):** Tasks 1–9 and the Phase 1 frontend gates are
-complete. `ENABLE_ACTIVITY_MAP` is feature-gated and defaults off. The map
-provider record is attached at `docs/ops/map-provider-licensing.md`, but its
-production provider and owner/legal approval are still open; hosted
-environments must keep the flag disabled until that record is completed.
+**Current state (2026-07-12):** Tasks 1–9, the Phase 1 frontend gates, and the
+technical Phase 2/3 gating work are complete. `ENABLE_ACTIVITY_MAP`,
+`ENABLE_ACTIVITY_MAP_STORYTELLING`, and `ENABLE_ACTIVITY_MAP_3D` are
+feature-gated and default off. The map provider record and launch decision
+packet are attached at `docs/ops/map-provider-licensing.md` and
+`docs/ops/rumia-map-launch-decision.md`; production provider, quota, transit,
+and owner/legal approval remain open, so hosted environments must keep the
+flags disabled until those decisions are signed off.
 
 The Phase 2/3 unblock work is tracked separately in
 `docs/superpowers/plans/2026-07-12-rumia-map-phase2-3-unblock.md`. Its camera,
-route-contract, and inert extrusion preparation is now implemented and covered
-by focused tests, but Steps 5 and 6 remain unchecked here until route geometry,
-approved style/assets, capacity evidence, and owner/legal acceptance are
-available. This preserves the original list-first release boundary.
+route-contract, inert extrusion, telemetry, and rollback preparation is
+implemented and covered by focused tests. The original list-first release
+boundary is preserved because provider, quota, transit, and owner/legal
+acceptance remain explicit launch gates.
