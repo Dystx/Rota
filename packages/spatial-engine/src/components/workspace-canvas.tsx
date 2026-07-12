@@ -330,6 +330,24 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
           // circuit so a mount-then-unmount race doesn't leak the
           // callback to a page that's already gone.
           const map = engine.getRenderer();
+          const detachMapError = map
+            ? (() => {
+                const handler = (event: { error?: unknown }) => {
+                  if (cancelled) return;
+                  const error = event.error;
+                  const message = error instanceof Error
+                    ? error.message
+                    : typeof error === "string"
+                      ? error
+                      : "Map tiles or the renderer failed to load.";
+                  setMountError(message);
+                  callbacksRef.current.onMapError?.(message);
+                };
+                map.on("error", handler);
+                return () => map.off("error", handler);
+              })()
+            : () => undefined;
+
           if (map && callbacksRef.current.onMapReady) {
             callbacksRef.current.onMapReady(map);
           }
@@ -431,6 +449,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
           return () => {
             cancelAnimationFrame(raf);
             observer?.disconnect();
+            detachMapError();
             detachViewport();
             detachClick();
             unsubscribe();
