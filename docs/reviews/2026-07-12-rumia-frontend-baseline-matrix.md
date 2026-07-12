@@ -1,13 +1,13 @@
 # Rumia frontend baseline matrix
 
-Updated: 2026-07-12
+Updated: 2026-07-12 (post homepage/map-guard corrections)
 
 This matrix records release evidence for the approved editorial rework. A
 visual mismatch is a review item, not permission to refresh a baseline.
 
 | Route group | Desktop | Mobile | Functional/a11y evidence | Visual decision |
 | --- | --- | --- | --- | --- |
-| Public marketing and activity discovery | covered | covered | public contracts and viewport checks pass | accepted current baselines after route review |
+| Public marketing and activity discovery | covered | covered | public contracts and viewport checks pass; fresh standalone home smoke capture has no console errors and no map runtime request | prior baselines accepted; homepage manually rechecked after static-home correction |
 | Chosen-day workspace and planner | covered | covered | traveler lifecycle, viewport and a11y checks pass | accepted intentional editorial workspace composition |
 | Utility/support/offline/pricing | covered | covered | focused utility tests and a11y checks pass | accepted current copy/shell surfaces |
 | Traveler account/trips | covered | covered | protected-route and viewport checks pass | accepted after auth state was stable |
@@ -27,4 +27,6 @@ visual mismatch is a review item, not permission to refresh a baseline.
 - Mobile overflow — PASS, 32 mobile / 32 desktop skips
 - Viewport contract — PASS, 120/120
 - Activity map browser flow — PASS, 2/2 desktop + mobile with `ENABLE_ACTIVITY_MAP=true`
-- Visual — PASS, 70/70 desktop/mobile; accepted baselines committed in `5b652a4`
+- Visual — historical PASS, 70/70 desktop/mobile; accepted baselines committed in `5b652a4`
+- Fresh homepage smoke capture — PASS on 1440px and 390x844 after `410760d`/`5e25f5d`/`5147461`; full visual rerun remains pending owner E2E database credentials
+- Homepage bundle probe — PASS; no MapLibre renderer chunk requested before map intent
