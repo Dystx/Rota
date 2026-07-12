@@ -1,6 +1,6 @@
 # Rumia frontend aesthetic rework execution ledger
 
-Plan: `docs/superpowers/plans/2026-07-12-rumia-frontend-foundation-planner-slice.md`
+Plan: `docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`
 Base: `2abbfa3`
 
 - Task 1: complete (commits 707ab98..f5174ed, review clean) — editorial primitives and AA-safe contrast fix
