@@ -1,5 +1,6 @@
 export * from "./api-error";
 export * from "./access-control";
+export * from "./activity-day";
 export * from "./trip-brief";
 export * from "./itinerary";
 export * from "./place";
