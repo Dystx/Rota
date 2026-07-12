@@ -19,22 +19,21 @@ activity map.
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| Smoke E2E | PASS | 6/6 |
+| Smoke E2E | PASS | 301 passed, 33 expected skips (`pnpm --dir apps/web test:e2e`) |
 | Accessibility | PASS | 61 passed, 1 expected skip (62 total) |
 | Performance + Web Vitals | PASS | 14/14 |
 | Mobile overflow | PASS | 32 mobile checks passed; 32 desktop cases intentionally skipped |
 | Viewport contract | PASS | 120/120 `@viewport-qa` checks |
-| Visual snapshots | HISTORICAL PASS | 70/70 passed after route-by-route review; intentional redesign baselines accepted in `5b652a4` before the later static-home/map-guard corrections |
+| Visual snapshots | PASS | 102 passed, 32 expected skips (`pnpm --dir apps/web test:visual`) |
 
 The 56 mismatches from the pre-review run were intentional editorial redesign
 changes (including the activity-first homepage, chosen-day workspace, and
 operator surfaces). The accepted baselines remain historical evidence for the
-unchanged surfaces. After the later homepage corrections, a fresh standalone
-desktop/mobile smoke capture was manually reviewed: the static Portugal
+unchanged surfaces. After the later homepage corrections, the full visual suite
+was rerun with the local owner database role: desktop/mobile baselines passed,
+the expected desktop mobile-overflow skips remained, the static Portugal
 fallback rendered, no GlobeWorkspace mounted, no browser console errors were
-observed, and the 390px document width matched the viewport. The full visual
-suite was not rerun because its global E2E setup requires an owner database
-credential that is not available in this checkout.
+observed, and the 390px document width matched the viewport.
 
 ## Activity-map evidence
 
@@ -45,7 +44,7 @@ credential that is not available in this checkout.
 - Dedicated browser proof: `public-discovery.spec.ts` activity-map test passed
   2/2 on desktop Chrome and 390x844 mobile (explicit open, map-or-fallback
   surface, complete list, and close/list recovery) with
-  `ENABLE_ACTIVITY_MAP=true`.
+  `ENABLE_ACTIVITY_MAP=true` after the final map-surface fixes.
 - The workspace route now reads the typed `activityMap` feature flag; the
   default `.env.example` value remains `false`, so the map is opt-in and
   removable without changing the activity-list journey.
@@ -68,9 +67,7 @@ credential that is not available in this checkout.
 ## Status
 
 **PASS for the frontend implementation and recorded release evidence.** Static,
-functional, accessibility, performance, motion, overflow, viewport, and the
-optional Phase 1 map-flow evidence are green as recorded above. The visual
-snapshot suite is historical after the final homepage corrections; the fresh
-homepage smoke capture is green, while a full rerun remains pending the owner
-database E2E credential. Production map enablement is a separate external
-provider/licensing approval gate and remains intentionally closed.
+functional, accessibility, performance, motion, overflow, viewport, visual,
+and the optional Phase 1 map-flow evidence are green as recorded above.
+Production map enablement is a separate external provider/licensing approval
+gate and remains intentionally closed.
