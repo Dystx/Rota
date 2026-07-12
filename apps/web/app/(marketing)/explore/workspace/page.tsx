@@ -30,5 +30,11 @@ export default async function WorkspacePage({
     return reviewedActivity ? [reviewedActivity] : [];
   });
 
-  return <ActivityWorkspace initialActivities={activities} mapEnabled={isFeatureEnabled("activityMap")} />;
+  return (
+    <ActivityWorkspace
+      initialActivities={activities}
+      mapEnabled={isFeatureEnabled("activityMap")}
+      map3dEnabled={isFeatureEnabled("activityMap") && isFeatureEnabled("activityMap3d")}
+    />
+  );
 }

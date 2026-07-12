@@ -66,6 +66,12 @@ For Rumia's existing VPS architecture, the preferred production candidate is:
    glyph/sprite assets whose licenses and source revisions are recorded with
    each release.
 
+The current VPS preflight now has a loopback-only Python adapter around the
+Valhalla graph at `127.0.0.1:3012`. It accepts only a bounded stop contract and
+returns Rumia's validated `GeographicRoute` shape; it is not connected to the
+public Caddy site or the browser. Transit remains a deliberate capability gap
+until a Portugal GTFS source is approved.
+
 ### 2026-07-12 preflight evidence
 
 The first two self-hosting checks now have a reversible VPS proof. A Portugal
@@ -86,6 +92,19 @@ cutout was extracted from the official Protomaps daily build
 - ZXY probes: non-empty tiles returned `200` with
   `Content-Type: application/x-protobuf`; empty tiles returned `204` as
   expected. The service remains loopback-only on `127.0.0.1:3010`/`:3011`.
+- Preflight style: `/portugal-style.json`, generated from
+  `@protomaps/basemaps@5.7.2` (style SHA-256
+  `7854a42ee2462a04f13b4735d8654bfeea1f1583f94502620e75ff1f765ed4a9`),
+  references the local TileJSON, local Noto Sans glyph ranges, and local light
+  sprites. All 71 style source-layers are present in the 9-layer TileJSON,
+  including `buildings`; the style and representative glyph/sprite requests
+  returned `200` with visible OSM/Protomaps attribution.
+- Asset provenance: `protomaps/basemaps-assets` font commit
+  `83bc11ea49e5c024df51979d5953ee841fd06584`; OFL text SHA-256
+  `7713cfc8e3c36d5ec4aa3d6cffe7500a1b3310f8a86d914b8ea09c2a9dee7c2d`;
+  light sprite JSON/PNG SHA-256 values are
+  `bfac76cf7ed5c2aa2992695904056a1c6b07785b7fd20e6c640cb44fd6244a2e` and
+  `b6a34640917bdc57d0bd080836db33376371a3312ebe7b849045268015de3481`.
 
 This is a provider acceptance candidate, not production approval. The
 loopback Caddy fragment is stored at `ops/vps/rumia-map-preflight.caddy` and
@@ -104,12 +123,20 @@ only production dependency for a paid Rumia route surface.
 
 - [x] Build and checksum a Portugal PMTiles snapshot; record its OSM data date.
 - [x] Confirm Caddy serves byte ranges and returns the expected content type.
-- [ ] Serve one MapLibre style with visible OSM/Protomaps attribution at every
-  zoom and in the compact map fallback.
-- [ ] Run Valhalla with a Portugal extract and verify walk/drive/transit request
-  modes, timeout behavior, cache headers, and no raw provider error leaks.
-- [ ] Record storage, memory, CPU, bandwidth, update, and rollback budgets on
-  the VPS before enabling the feature flag.
+- [x] Serve one MapLibre style with visible OSM/Protomaps attribution at every
+  zoom and in the compact map fallback. **Preflight only; production approval
+  remains open.**
+- [x] Run Valhalla with a Portugal extract and verify walk/drive/cycle request
+  modes, timeout behavior, loopback isolation, and no raw provider error leaks.
+  Transit requests return a controlled `transit_unavailable` response until an
+  approved GTFS feed is provisioned.
+- [ ] Approve and provision a Portugal transit/GTFS source before claiming
+  transit routing support.
+- [x] Record current storage, memory, CPU ceilings, and an activate/rollback
+  canary on the VPS. The loopback evidence is recorded in the unblock
+  preflight.
+- [ ] Approve a production bandwidth/quota budget and refresh schedule before
+  enabling the feature flag.
 - [ ] Complete owner/legal approval for ODbL attribution and any produced-work
   obligations.
 

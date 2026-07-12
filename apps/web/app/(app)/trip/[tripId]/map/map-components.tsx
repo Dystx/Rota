@@ -27,7 +27,14 @@ import { RouteMap as SchematicMap } from "@repo/ui";
 import { useTripRoute } from "../_hooks/use-trip-route";
 import { tripRouteStatusMessage } from "../_lib/trip-to-features";
 import { useReducedMotion } from "@repo/ui";
-import { cameraPresetTarget, type CameraPreset, type SpatialFeatureCollection, type WorkspaceCanvasHandle } from "@repo/spatial-engine";
+import {
+  cameraPresetTarget,
+  type CameraPreset,
+  type MapTelemetryHandler,
+  type SpatialFeatureCollection,
+  type WorkspaceCanvasHandle
+} from "@repo/spatial-engine";
+import { captureMapTelemetry } from "@/app/_lib/map-telemetry";
 import { RouteStoryControls } from "./route-story-controls";
 
 const EMPTY_ROUTE_FEATURES: SpatialFeatureCollection = {
@@ -58,6 +65,8 @@ interface RouteMapProps extends React.ComponentProps<typeof SchematicMap> {
   storyPresets?: readonly CameraPreset[];
   /** Explicit Phase 3 building treatment; remains off until style approval. */
   showBuildingExtrusions?: boolean;
+  /** Optional additional sink for browser tests or host integrations. */
+  onMapTelemetry?: MapTelemetryHandler;
 }
 
 /**
@@ -80,6 +89,7 @@ export function RouteMap({
   storyEnabled = false,
   storyPresets = [],
   showBuildingExtrusions = false,
+  onMapTelemetry,
   ...rest
 }: RouteMapProps) {
   const { data: routeFeatures, status: routeStatus, isLoading } = useTripRoute(tripId);
@@ -87,15 +97,33 @@ export function RouteMap({
   const reducedMotion = useReducedMotion();
   const [storyIndex, setStoryIndex] = React.useState(-1);
   const storyReady = storyEnabled && routeStatus === "ready" && storyPresets.length > 0;
+  const handleMapTelemetry = React.useCallback((event: Parameters<typeof captureMapTelemetry>[0]) => {
+    captureMapTelemetry(event, tripId);
+    onMapTelemetry?.(event);
+  }, [onMapTelemetry, tripId]);
 
   const focusStoryPreset = React.useCallback((index: number) => {
     const preset = storyPresets[index];
     if (!preset) return;
     setStoryIndex(index);
+    handleMapTelemetry({
+      type: "camera-focus",
+      surface: "trip-map",
+      reason: "story",
+      targetId: preset.stopId
+    });
     void canvasRef.current?.flyTo(cameraPresetTarget(preset, reducedMotion));
-  }, [reducedMotion, storyPresets]);
+  }, [handleMapTelemetry, reducedMotion, storyPresets]);
 
-  const stopStory = React.useCallback(() => setStoryIndex(-1), []);
+  const startStory = React.useCallback(() => {
+    handleMapTelemetry({ type: "intent", surface: "trip-map", intent: "story-start" });
+    focusStoryPreset(0);
+  }, [focusStoryPreset, handleMapTelemetry]);
+
+  const stopStory = React.useCallback(() => {
+    setStoryIndex(-1);
+    handleMapTelemetry({ type: "intent", surface: "trip-map", intent: "story-stop" });
+  }, [handleMapTelemetry]);
 
   // SSR + initial render: render the schematic so the page has
   // something to display before the spatial engine has finished
@@ -138,6 +166,8 @@ export function RouteMap({
         testId="trip-workspace-canvas"
         routeFeatures={routeFeatures ?? EMPTY_ROUTE_FEATURES}
         showBuildingExtrusions={showBuildingExtrusions}
+        telemetrySurface="trip-map"
+        onMapTelemetry={handleMapTelemetry}
         disableIntro
       />
       <div className="relative z-10 h-full w-full pointer-events-none">{children}</div>
@@ -147,7 +177,7 @@ export function RouteMap({
             presets={storyPresets}
             activeIndex={storyIndex}
             started={storyIndex >= 0}
-            onStart={() => focusStoryPreset(0)}
+            onStart={startStory}
             onPrevious={() => focusStoryPreset(Math.max(0, storyIndex - 1))}
             onNext={() => focusStoryPreset(Math.min(storyPresets.length - 1, storyIndex + 1))}
             onStop={stopStory}

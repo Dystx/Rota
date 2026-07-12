@@ -31,7 +31,8 @@ export type AnalyticsEventName =
   | "cinematic_chapter_activated"
   | "cinematic_geocode_completed"
   | "cinematic_kill_switch_triggered"
-  | "cinematic_static_image_fallback_served";
+  | "cinematic_static_image_fallback_served"
+  | "map_surface_event";
 
 /**
  * Core Web Vitals metric names supported by the field reporter.
@@ -157,6 +158,32 @@ export type CinematicStaticImageFallbackServedProperties = {
   reason: "kill-switch" | "no-token" | "reduced-motion" | "no-coords";
 };
 
+export type MapSurfaceEventProperties = {
+  surface: "activity-map" | "trip-map" | "workspace";
+  action: "intent" | "camera-focus" | "three-d-opt-in" | "fallback" | "tile-failure" | "webgl-error";
+  intent?: "mount" | "explicit-open" | "story-start" | "story-stop";
+  reason?:
+    | "selection"
+    | "story"
+    | "fit"
+    | "manual"
+    | "reduced-motion"
+    | "small-viewport"
+    | "coarse-pointer"
+    | "weak-device"
+    | "webgl-unavailable"
+    | "provider-unavailable"
+    | "missing-geometry"
+    | "renderer"
+    | "style"
+    | "network"
+    | "context-unavailable"
+    | "mount-failure";
+  enabled?: boolean;
+  target_id?: string;
+  trip_id?: string;
+};
+
 export type AnalyticsEventPropertyMap = {
   trip_created: TripCreatedProperties;
   itinerary_viewed: ItineraryViewedProperties;
@@ -174,6 +201,7 @@ export type AnalyticsEventPropertyMap = {
   cinematic_geocode_completed: CinematicGeocodeCompletedProperties;
   cinematic_kill_switch_triggered: CinematicKillSwitchTriggeredProperties;
   cinematic_static_image_fallback_served: CinematicStaticImageFallbackServedProperties;
+  map_surface_event: MapSurfaceEventProperties;
 };
 
 export type AnalyticsEvent<TName extends AnalyticsEventName = AnalyticsEventName> = {

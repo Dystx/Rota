@@ -98,4 +98,25 @@ test.describe("public discovery and trust routes", () => {
     await expect(panel).toHaveCount(0);
     await expect(page.getByText("Ribeira and Miragaia at walking pace", { exact: true })).toBeVisible();
   });
+
+  test("feature-enabled 3D requests keep a device-safe fallback", async ({ page }) => {
+    test.skip(
+      process.env.ENABLE_ACTIVITY_MAP?.trim().toLowerCase() !== "true" ||
+        process.env.ENABLE_ACTIVITY_MAP_3D?.trim().toLowerCase() !== "true",
+      "Requires ENABLE_ACTIVITY_MAP=true and ENABLE_ACTIVITY_MAP_3D=true"
+    );
+
+    await page.goto("/explore/workspace?activity=porto-ribeira-slow-walk");
+    const openMap = page.getByRole("button", { name: "View on map", exact: true });
+    await openMap.click();
+
+    const panel = page.locator("#activity-map-panel");
+    const canvas = panel.locator('[data-testid="activity-map-canvas"]');
+    await expect(canvas).toBeVisible({ timeout: 15_000 });
+    await expect(canvas).toHaveAttribute("data-3d-capability", /enabled|fallback|off/);
+
+    if (test.info().project.name === "mobile-chromium") {
+      await expect(canvas).toHaveAttribute("data-3d-capability", "fallback");
+    }
+  });
 });

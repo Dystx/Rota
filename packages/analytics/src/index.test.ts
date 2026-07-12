@@ -436,6 +436,30 @@ describe("cinematic telemetry events", () => {
   });
 });
 
+describe("map surface telemetry", () => {
+  it("keeps map events within the bounded event contract", async () => {
+    const provider = createFakeAnalyticsProvider();
+    const result = await tryCapture(provider, {
+      name: "map_surface_event",
+      distinctId: "anon-map-1",
+      properties: {
+        surface: "activity-map",
+        action: "tile-failure",
+        reason: "renderer",
+        trip_id: "trip-1"
+      }
+    });
+
+    expect(result.ok).toBe(true);
+    expect(provider.outbox[0]?.properties).toEqual({
+      surface: "activity-map",
+      action: "tile-failure",
+      reason: "renderer",
+      trip_id: "trip-1"
+    });
+  });
+});
+
 describe("createNoopAnalyticsProvider", () => {
   it("returns ok without doing anything", async () => {
     const provider = createNoopAnalyticsProvider();

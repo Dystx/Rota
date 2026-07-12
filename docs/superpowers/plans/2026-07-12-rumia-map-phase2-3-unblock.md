@@ -33,6 +33,12 @@ co-hosted Lumes deployment.
   archive on the isolated Rumia VPS path.
 - [x] Verified loopback-only Caddy byte ranges, CORS, TileJSON, attribution,
   vector content type, and Lumes/Rumia listener isolation.
+- [x] Generated and served a Protomaps style with local glyphs/sprites,
+  validated source-layer coverage, and retained visible attribution; this is a
+  preflight candidate, not production approval.
+- [x] Built a bounded Portugal Valhalla graph and activated a loopback-only
+  route-contract adapter with validated WGS84 geometry for walk, drive, and
+  cycle. Transit remains explicitly unavailable pending an approved GTFS feed.
 - [x] Added opt-in Phase 2 camera-preset/story controls with unit coverage.
 - [x] Added the validated geographic-route adapter; point-only fallback remains
   truthful until server-supplied geometry is present.
@@ -43,10 +49,26 @@ co-hosted Lumes deployment.
 - [x] Passed the focused desktop trip-map browser regression (2/2) with all
   new flags disabled; the protected-route fixture now explicitly loads the
   traveler storage state.
-- [ ] Run a bounded Valhalla Portugal canary and record travel-mode, capacity,
-  privacy, update, and rollback evidence.
-- [ ] Serve an approved MapLibre style with self-hosted/approved glyphs and
-  sprites plus visible attribution.
+- [x] Run a bounded Valhalla Portugal canary and record travel-mode, capacity,
+  privacy, loopback, and atomic update/rollback evidence. Transit-feed and
+  owner/legal approval remain open.
+- [x] Serve a self-hosted Protomaps style candidate with local/approved glyphs
+  and sprites plus visible attribution. Production provider/legal approval
+  remains open.
+- [x] Add bounded map telemetry hooks for map intent, camera focus, 3D opt-in,
+  tile failure, fallback, and WebGL/device errors without sending raw map or
+  provider payloads.
+- [x] Wire the separate 3D flag through the Portugal activity-map surface;
+  device/reduced-motion policy still controls the final enhancement.
+- [x] Add focused feature-enabled unit coverage for story navigation, 3D
+  policy reasons, telemetry safety, map fallback, attribution, and list parity.
+- [x] Run a feature-enabled public browser canary without database fixture
+  writes: desktop reported `data-3d-capability="enabled"`, a mobile-width
+  reload reported `fallback`, attribution and the complete semantic list stayed
+  visible, and the browser console reported zero errors.
+- [x] Add an atomic, loopback-only map release/rollback helper and verify an
+  activate → route smoke → rollback cycle on the VPS without touching Lumes or
+  a public Caddy site.
 - [ ] Complete owner/legal approval and only then enable feature flags in a
   controlled environment.
 

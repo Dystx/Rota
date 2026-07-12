@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { RouteStoryControls } from "./route-story-controls";
 
@@ -19,6 +19,7 @@ const presets = [
 ];
 
 describe("RouteStoryControls", () => {
+  afterEach(() => cleanup());
   it("requires explicit start and exposes an exit action after starting", () => {
     const onStart = vi.fn();
     const onStop = vi.fn();
@@ -33,5 +34,30 @@ describe("RouteStoryControls", () => {
       <RouteStoryControls presets={presets} activeIndex={0} started onStart={onStart} onPrevious={vi.fn()} onNext={vi.fn()} onStop={onStop} />
     );
     expect(screen.getByRole("button", { name: "Stop exploring" })).toBeTruthy();
+  });
+
+  it("keeps previous and next navigation explicit and bounded", () => {
+    const first = { ...presets[0]!, id: "first", stopId: "first", label: "First" };
+    const second = { ...presets[0]!, id: "second", stopId: "second", label: "Second" };
+    const onPrevious = vi.fn();
+    const onNext = vi.fn();
+
+    render(
+      <RouteStoryControls
+        presets={[first, second]}
+        activeIndex={0}
+        started
+        onStart={vi.fn()}
+        onPrevious={onPrevious}
+        onNext={onNext}
+        onStop={vi.fn()}
+      />
+    );
+
+    const controls = within(screen.getByTestId("route-story-controls"));
+    expect(controls.getByRole("button", { name: "Previous" }).hasAttribute("disabled")).toBe(true);
+    expect(controls.getByRole("button", { name: "Next stop" }).hasAttribute("disabled")).toBe(false);
+    controls.getByRole("button", { name: "Next stop" }).click();
+    expect(onNext).toHaveBeenCalledTimes(1);
   });
 });

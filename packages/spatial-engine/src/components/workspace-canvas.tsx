@@ -3,6 +3,15 @@
 import * as React from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { useReducedMotion } from "@repo/ui";
+import {
+  evaluateThreeDCapability,
+  type ThreeDCapabilityFailureReason
+} from "../core/three-d-capability";
+import {
+  emitMapTelemetry,
+  type MapTelemetryHandler,
+  type MapTelemetrySurface
+} from "../core/map-telemetry";
 import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createWorkspaceEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
 import {
@@ -118,6 +127,10 @@ export interface WorkspaceCanvasProps {
   onActivitySelect?: (activityId: string) => void;
   /** Fired when MapLibre style/WebGL mounting fails. */
   onMapError?: (message: string) => void;
+  /** Optional bounded telemetry sink; the engine never sends events itself. */
+  onMapTelemetry?: MapTelemetryHandler;
+  /** Surface label used by the host analytics adapter. */
+  telemetrySurface?: MapTelemetrySurface;
   /**
    * 3D terrain. Default: DISABLED on the 2D workspace canvas (mercator
    * projection is for editing precision; mountains would obscure the
@@ -192,6 +205,8 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       onStopClick,
       onActivitySelect,
       onMapError,
+      onMapTelemetry,
+      telemetrySurface = "workspace",
       terrain,
       fog,
       projection,
@@ -205,29 +220,99 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       ? initialFocus
       : { center: initialCenter, zoom: initialZoom };
     const resolvedDisableIntro = disableIntro || initialFocus !== undefined;
+    const reducedMotion = useReducedMotion();
+    const threeDRequested = showBuildingExtrusions || Boolean(terrain && !terrain.disabled);
+    const [threeDCapable, setThreeDCapable] = React.useState(false);
+    const lastCapabilityTelemetryRef = React.useRef<string | null>(null);
+    React.useEffect(() => {
+      if (!threeDRequested) {
+        setThreeDCapable(false);
+        lastCapabilityTelemetryRef.current = null;
+        return;
+      }
+      if (reducedMotion) {
+        setThreeDCapable(false);
+        if (lastCapabilityTelemetryRef.current !== "false:reduced-motion") {
+          lastCapabilityTelemetryRef.current = "false:reduced-motion";
+          emitMapTelemetry(onMapTelemetry, {
+            type: "fallback",
+            surface: telemetrySurface,
+            reason: "reduced-motion"
+          });
+        }
+        return;
+      }
+      let webgl = false;
+      try {
+        const probe = document.createElement("canvas");
+        const context = probe.getContext("webgl2") || probe.getContext("webgl");
+        webgl = Boolean(context);
+        context?.getExtension("WEBGL_lose_context")?.loseContext();
+      } catch {
+        webgl = false;
+      }
+      const finePointer = window.matchMedia?.("(pointer: fine)").matches ?? false;
+      const capability = evaluateThreeDCapability({
+        requested: true,
+        reducedMotion,
+        viewportWidth: window.innerWidth,
+        finePointer,
+        hardwareConcurrency: navigator.hardwareConcurrency ?? 0,
+        webgl
+      });
+      setThreeDCapable(capability.enabled);
+
+      const telemetryKey = `${capability.enabled}:${capability.reason ?? "enabled"}`;
+      if (lastCapabilityTelemetryRef.current === telemetryKey) return;
+      lastCapabilityTelemetryRef.current = telemetryKey;
+      if (capability.enabled) {
+        emitMapTelemetry(onMapTelemetry, {
+          type: "three-d-opt-in",
+          surface: telemetrySurface,
+          enabled: true
+        });
+        return;
+      }
+
+      const reason: Exclude<ThreeDCapabilityFailureReason, null> = capability.reason ?? "webgl-unavailable";
+      if (reason === "webgl-unavailable") {
+        emitMapTelemetry(onMapTelemetry, {
+          type: "webgl-error",
+          surface: telemetrySurface,
+          reason: "context-unavailable"
+        });
+      }
+      emitMapTelemetry(onMapTelemetry, {
+        type: "fallback",
+        surface: telemetrySurface,
+        reason
+      });
+    }, [onMapTelemetry, reducedMotion, telemetrySurface, threeDRequested]);
+
     // Terrain + fog default to DISABLED on the 2D workspace (mercator
     // is for precision editing; sky/3D are globe-only). Pass a
     // TerrainOptions / FogOptions to opt in.
-    const resolvedTerrain: TerrainOptions = terrain ?? DISABLED_TERRAIN;
+    const resolvedTerrain: TerrainOptions = threeDCapable && terrain ? terrain : DISABLED_TERRAIN;
     const resolvedFog: FogOptions = fog ?? DISABLED_FOG;
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const engineRef = React.useRef<MapLibreSpatialEngine | null>(null);
     const activityLayerRef = React.useRef<ActivityPointsLayer | null>(null);
-    const reducedMotion = useReducedMotion();
     const [mountError, setMountError] = React.useState<string | null>(null);
     const callbacksRef = React.useRef({
       onMapReady,
       onViewportChange,
       onStopClick,
       onActivitySelect,
-      onMapError
+      onMapError,
+      onMapTelemetry
     });
     callbacksRef.current = {
       onMapReady,
       onViewportChange,
       onStopClick,
       onActivitySelect,
-      onMapError
+      onMapError,
+      onMapTelemetry
     };
     const clickableLayerIds = React.useMemo(() => [
       ...(showContextLayers ? [AMBIENT_PULSE_LAYER_ID, SYMBOL_BADGES_LAYER_ID] : []),
@@ -319,7 +404,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
         includeRoute: showRoute,
         includeContextLayers: showContextLayers,
         activityPoints: activityLayer ?? undefined,
-        includeBuildingExtrusions: showBuildingExtrusions
+        includeBuildingExtrusions: threeDCapable && showBuildingExtrusions
       });
       engineRef.current = engine;
 
@@ -358,6 +443,11 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
                       : "Map tiles or the renderer failed to load.";
                   setMountError(message);
                   callbacksRef.current.onMapError?.(message);
+                  emitMapTelemetry(callbacksRef.current.onMapTelemetry, {
+                    type: "tile-failure",
+                    surface: telemetrySurface,
+                    reason: "renderer"
+                  });
                 };
                 map.on("error", handler);
                 return () => map.off("error", handler);
@@ -367,6 +457,11 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
           if (map && callbacksRef.current.onMapReady) {
             callbacksRef.current.onMapReady(map);
           }
+          emitMapTelemetry(callbacksRef.current.onMapTelemetry, {
+            type: "intent",
+            surface: telemetrySurface,
+            intent: "mount"
+          });
 
           if (activityLayer && activityPoints) {
             engine.applyLayerUpdate(activityLayer, activityPoints);
@@ -483,6 +578,18 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
             const message = err instanceof Error ? err.message : "Failed to mount workspace";
             setMountError(message);
             callbacksRef.current.onMapError?.(message);
+            emitMapTelemetry(callbacksRef.current.onMapTelemetry, {
+              type: "tile-failure",
+              surface: telemetrySurface,
+              reason: "style"
+            });
+            if (/webgl|context/iu.test(message)) {
+              emitMapTelemetry(callbacksRef.current.onMapTelemetry, {
+                type: "webgl-error",
+                surface: telemetrySurface,
+                reason: "mount-failure"
+              });
+            }
           }
         });
 
@@ -499,7 +606,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
     // target is captured on first mount, and route features are
     // re-seeded by the dedicated effect below when the prop changes.
     // This stops the engine from remounting on every parent render.
-    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, projection, showRoute, showContextLayers, clickableLayerIds]);
+    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, projection, showRoute, showContextLayers, clickableLayerIds, showBuildingExtrusions, telemetrySurface, threeDCapable]);
 
     // Runtime projection switch (post-mount). The mount effect above
     // handles the initial value; this effect fires on every subsequent
@@ -556,6 +663,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
         tabIndex={0}
         data-projection={projection ?? "mercator"}
         data-reduced-motion={reducedMotion ? "true" : "false"}
+        data-3d-capability={threeDCapable ? "enabled" : threeDRequested ? "fallback" : "off"}
         data-intro={disableIntro ? "off" : "on"}
         className={
           className ??

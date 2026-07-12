@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import type { EditorialActivity } from "@/lib/content/activities";
 import { StatusRegion, useReducedMotion } from "@repo/ui";
+import { captureMapTelemetry } from "@/app/_lib/map-telemetry";
 
 const ActivityMap = dynamic(
   () => import("../../_components/activity-map").then((module) => module.ActivityMap),
@@ -39,10 +40,12 @@ function workspaceUrl(activities: readonly EditorialActivity[]): string {
 
 export function ActivityWorkspace({
   initialActivities,
-  mapEnabled = false
+  mapEnabled = false,
+  map3dEnabled = false
 }: {
   initialActivities: readonly EditorialActivity[];
   mapEnabled?: boolean;
+  map3dEnabled?: boolean;
 }) {
   const router = useRouter();
   const reducedMotion = useReducedMotion();
@@ -53,6 +56,9 @@ export function ActivityWorkspace({
   const [mapOpen, setMapOpen] = useState(false);
   const [mapSelectedActivityId, setMapSelectedActivityId] = useState<string | null>(initialActivities[0]?.id ?? null);
   const mapTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const handleMapTelemetry = React.useCallback((event: Parameters<typeof captureMapTelemetry>[0]) => {
+    captureMapTelemetry(event);
+  }, []);
   const totalMinutes = activities.reduce((total, activity) => total + activity.durationMinutes, 0);
   const activitiesMotionKey = activities.map((activity) => activity.id).join("|") || "empty";
   const feedbackParams = new URLSearchParams({ source: "activity-day" });
@@ -187,6 +193,8 @@ export function ActivityWorkspace({
               selectedActivityId={mapSelectedActivityId}
               onSelectActivity={selectMapActivity}
               onClose={closeMap}
+              showBuildingExtrusions={map3dEnabled}
+              onMapTelemetry={handleMapTelemetry}
             />
           </div>
         ) : null}

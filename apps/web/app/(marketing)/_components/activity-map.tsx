@@ -2,8 +2,10 @@
 
 import * as React from "react";
 import {
+  emitMapTelemetry,
   WorkspaceCanvas,
   type WorkspaceCanvasHandle,
+  type MapTelemetryHandler,
   type SpatialFeatureCollection
 } from "@repo/spatial-engine";
 import { useReducedMotion } from "@repo/ui";
@@ -24,6 +26,10 @@ export interface ActivityMapProps {
   selectedActivityId: string | null;
   onSelectActivity: (activityId: string) => void;
   onClose?: () => void;
+  /** Phase 3 remains opt-in and is still guarded by the spatial engine. */
+  showBuildingExtrusions?: boolean;
+  /** Optional host analytics sink; no raw provider details are emitted. */
+  onMapTelemetry?: MapTelemetryHandler;
 }
 
 type MapViewport = {
@@ -92,12 +98,16 @@ function ActivityMapSurface({
   model,
   selectedActivityId,
   onSelectActivity,
-  onClose
+  onClose,
+  showBuildingExtrusions,
+  onMapTelemetry
 }: {
   model: ActivityMapModel;
   selectedActivityId: string | null;
   onSelectActivity: (activityId: string) => void;
   onClose: () => void;
+  showBuildingExtrusions: boolean;
+  onMapTelemetry?: MapTelemetryHandler;
 }) {
   const reducedMotion = useReducedMotion();
   const canvasRef = React.useRef<WorkspaceCanvasHandle | null>(null);
@@ -111,6 +121,14 @@ function ActivityMapSurface({
   const [mapError, setMapError] = React.useState<string | null>(null);
   const [retryKey, setRetryKey] = React.useState(0);
   const previousSelection = React.useRef<string | null | undefined>(undefined);
+
+  React.useEffect(() => {
+    emitMapTelemetry(onMapTelemetry, {
+      type: "intent",
+      surface: "activity-map",
+      intent: "explicit-open"
+    });
+  }, [onMapTelemetry]);
   const handleViewportChange = React.useCallback((next: { center: readonly [number, number]; zoom: number; pitch: number; bearing: number }) => {
     setViewport({
       center: [next.center[0], next.center[1]],
@@ -142,18 +160,29 @@ function ActivityMapSurface({
   const handleActivitySelect = React.useCallback((activityId: string) => {
     if (!model.list.some((item) => item.activityId === activityId)) return;
     onSelectActivity(activityId);
+    emitMapTelemetry(onMapTelemetry, {
+      type: "camera-focus",
+      surface: "activity-map",
+      reason: "selection",
+      targetId: activityId
+    });
     const point = model.byActivityId.get(activityId);
     if (point) cameraFocus(canvasRef.current, point, reducedMotion);
     window.requestAnimationFrame(() => {
       document.getElementById(`activity-map-item-${activityId}`)?.focus();
     });
-  }, [model.byActivityId, onSelectActivity, reducedMotion]);
+  }, [model.byActivityId, onMapTelemetry, onSelectActivity, reducedMotion]);
 
   const handleFit = React.useCallback(() => {
     const bounds = getActivityMapBounds(model.points);
     if (!bounds || !canvasRef.current) return;
+    emitMapTelemetry(onMapTelemetry, {
+      type: "camera-focus",
+      surface: "activity-map",
+      reason: "fit"
+    });
     void canvasRef.current.fitBounds(bounds);
-  }, [model.points]);
+  }, [model.points, onMapTelemetry]);
 
   const handleZoom = React.useCallback((delta: number) => {
     const target = {
@@ -194,6 +223,9 @@ function ActivityMapSurface({
               disableIntro
               testId="activity-map-canvas"
               ariaLabel="Activity map of the selected day"
+              telemetrySurface="activity-map"
+              onMapTelemetry={onMapTelemetry}
+              showBuildingExtrusions={showBuildingExtrusions}
               className="relative h-[420px] w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 sm:h-[520px]"
               onViewportChange={handleViewportChange}
               onActivitySelect={handleActivitySelect}
@@ -227,12 +259,23 @@ export function ActivityMap({
   activities,
   selectedActivityId,
   onSelectActivity,
-  onClose = () => undefined
+  onClose = () => undefined,
+  showBuildingExtrusions = false,
+  onMapTelemetry
 }: ActivityMapProps) {
   const model = React.useMemo(() => buildActivityMapModel(activities), [activities]);
   const selected = model.list.some((item) => item.activityId === selectedActivityId)
     ? selectedActivityId
     : model.points[0]?.activityId ?? selectedActivityId;
+
+  React.useEffect(() => {
+    if (!model.fallback.required) return;
+    emitMapTelemetry(onMapTelemetry, {
+      type: "fallback",
+      surface: "activity-map",
+      reason: model.fallback.reason === "invalid-or-missing-geometry" ? "missing-geometry" : "provider-unavailable"
+    });
+  }, [model.fallback.reason, model.fallback.required, onMapTelemetry]);
 
   if (model.fallback.required || model.points.length === 0) {
     return (
@@ -251,6 +294,8 @@ export function ActivityMap({
         selectedActivityId={selected}
         onSelectActivity={onSelectActivity}
         onClose={onClose}
+        showBuildingExtrusions={showBuildingExtrusions}
+        onMapTelemetry={onMapTelemetry}
       />
     </section>
   );

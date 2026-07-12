@@ -57,4 +57,23 @@ test.describe("Trip Map (Spatial Engine)", () => {
       fullPage: false
     });
   });
+
+  test("feature-enabled story controls remain explicit and list-parallel", async ({ page }) => {
+    test.skip(
+      process.env.ENABLE_ACTIVITY_MAP?.trim().toLowerCase() !== "true" ||
+        process.env.ENABLE_ACTIVITY_MAP_STORYTELLING?.trim().toLowerCase() !== "true",
+      "Requires ENABLE_ACTIVITY_MAP=true and ENABLE_ACTIVITY_MAP_STORYTELLING=true"
+    );
+
+    await page.goto(travelerTripPath("/map"));
+    const story = page.getByTestId("route-story-controls");
+    if ((await story.count()) === 0) {
+      test.skip(true, "Saved trip has no ready server-supplied route geometry");
+    }
+
+    await story.getByRole("button", { name: "Start exploring" }).click();
+    await expect(story.getByRole("button", { name: "Stop exploring" })).toBeVisible();
+    await story.getByRole("button", { name: "Stop exploring" }).click();
+    await expect(story.getByRole("button", { name: "Start exploring" })).toBeVisible();
+  });
 });

@@ -1,16 +1,17 @@
 [Unit]
-Description=Rumia loopback PMTiles tile endpoint (preflight)
+Description=Rumia loopback route contract adapter (preflight)
 Documentation=file:///opt/apps/rumia/current/docs/ops/rumia-map-unblock-preflight.md
 Wants=network-online.target
 After=network-online.target
-ConditionPathExists=/opt/rumia-map/tools/pmtiles
-ConditionPathExists=/opt/rumia-map/current/portugal.pmtiles
+ConditionPathExists=/opt/rumia-map/valhalla-venv/bin/python
+ConditionPathExists=/opt/rumia-map/valhalla/valhalla.json
+ConditionPathExists=/opt/rumia-map/valhalla/tiles
 
 [Service]
 Type=simple
 User=rumia
 Group=rumia
-ExecStart=/opt/rumia-map/tools/pmtiles serve /opt/rumia-map/current --interface=127.0.0.1 --port=3011 --cache-size=64 --cors=http://127.0.0.1:3302 --public-url=http://127.0.0.1:3010/tiles
+ExecStart=/opt/rumia-map/valhalla-venv/bin/python /opt/rumia-map/valhalla/rumia-valhalla-api.py --config /opt/rumia-map/valhalla/valhalla.json --host 127.0.0.1 --port 3012
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=true
@@ -23,8 +24,9 @@ ProtectControlGroups=true
 RestrictSUIDSGID=true
 LockPersonality=true
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
-MemoryMax=512M
-CPUQuota=100%
+ReadOnlyPaths=/opt/rumia-map/valhalla
+MemoryMax=2G
+CPUQuota=200%
 
 [Install]
 WantedBy=multi-user.target

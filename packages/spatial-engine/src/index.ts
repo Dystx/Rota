@@ -25,6 +25,8 @@ export * from "./core/types";
 export * from "./core/map-style-provider";
 export * from "./core/camera-controller";
 export * from "./core/camera-presets";
+export * from "./core/map-telemetry";
+export * from "./core/three-d-capability";
 export * from "./core/telemetry-service";
 export { setupMapLibreErrorSuppression } from "./core/maplibre-error-suppression";
 

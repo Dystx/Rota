@@ -2,7 +2,7 @@
 # Do not expose this listener publicly or merge it into the Lumes site.
 http://127.0.0.1:3010 {
 	bind 127.0.0.1
-	root * /opt/rumia-map/archives/20260712
+	root * /opt/rumia-map/current
 	header {
 		Access-Control-Allow-Origin "http://127.0.0.1:3302"
 		Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
@@ -10,6 +10,8 @@ http://127.0.0.1:3010 {
 		Access-Control-Expose-Headers "Accept-Ranges, Content-Length, Content-Range, ETag"
 		Cache-Control "public, max-age=86400, immutable"
 	}
+	@pbf path *.pbf
+	header @pbf Content-Type "application/x-protobuf"
 	@options method OPTIONS
 	respond @options 204
 	handle_path /tiles/* {

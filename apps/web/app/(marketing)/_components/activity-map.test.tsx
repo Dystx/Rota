@@ -33,13 +33,24 @@ const reviewedPoint: ActivityMapPoint = {
 };
 
 vi.mock("@repo/spatial-engine", () => ({
+  emitMapTelemetry: (handler: ((event: unknown) => void) | undefined, event: unknown) => handler?.(event),
   WorkspaceCanvas: React.forwardRef(function MockWorkspaceCanvas(
-    props: { onActivitySelect?: (activityId: string) => void; testId?: string },
+    props: {
+      onActivitySelect?: (activityId: string) => void;
+      onMapTelemetry?: (event: unknown) => void;
+      showBuildingExtrusions?: boolean;
+      testId?: string;
+    },
     ref: React.ForwardedRef<{ fitBounds: () => Promise<void>; resetNorth: () => void }>
   ) {
     React.useImperativeHandle(ref, () => ({ fitBounds: async () => undefined, resetNorth: () => undefined }), []);
     return (
-      <div data-testid={props.testId ?? "workspace-canvas"} role="application" aria-label="Mock activity map">
+      <div
+        data-testid={props.testId ?? "workspace-canvas"}
+        data-3d-requested={props.showBuildingExtrusions ? "true" : "false"}
+        role="application"
+        aria-label="Mock activity map"
+      >
         <button type="button" onClick={() => props.onActivitySelect?.("porto-ribeira-slow-walk")}>Select marker</button>
       </div>
     );
@@ -89,6 +100,27 @@ describe("ActivityMap", () => {
     expect(onSelect).toHaveBeenCalledWith(reviewedPoint.activityId);
     fireEvent.click(screen.getByRole("button", { name: /View list/i }));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("forwards the optional 3D request and bounded map telemetry", () => {
+    const telemetry = vi.fn();
+    render(
+      <ActivityMap
+        activities={[reviewedPoint]}
+        selectedActivityId={reviewedPoint.activityId}
+        onSelectActivity={vi.fn()}
+        onClose={vi.fn()}
+        showBuildingExtrusions
+        onMapTelemetry={telemetry}
+      />
+    );
+
+    expect(screen.getByTestId("activity-map-canvas").getAttribute("data-3d-requested")).toBe("true");
+    expect(telemetry).toHaveBeenCalledWith({
+      type: "intent",
+      surface: "activity-map",
+      intent: "explicit-open"
+    });
   });
 
   it("uses the complete semantic fallback when a selected point cannot be mapped", () => {
