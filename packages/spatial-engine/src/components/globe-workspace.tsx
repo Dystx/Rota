@@ -18,15 +18,6 @@ import type {
 } from "../core/types";
 
 /**
- * Default terrain config for the Discovery globe. AWS Terrarium tiles
- * (free, no API key) at 1.4x vertical exaggeration — same as the
- * Mapbox-era baseline so mountains feel familiar, not cartoonish.
- */
-const DEFAULT_TERRAIN: TerrainOptions = {
-  exaggeration: 1.4
-};
-
-/**
  * Default fog / sky for the Discovery globe. Soft slate blue at the
  * horizon fading to deep indigo up high; soft horizon blend (0.8) so
  * the basemap isn't washed out at the visible edge. `space-color` and
@@ -39,6 +30,11 @@ const DEFAULT_FOG: FogOptions = {
   horizonBlend: 0.8,
   fogGroundBlend: 0.5
 };
+
+// Keep the fallback object stable across renders. This value participates in
+// the mount effect dependency list; an inline object would look changed on
+// every parent render and tear down/recreate the MapLibre engine.
+const DISABLED_TERRAIN: TerrainOptions = { disabled: true };
 
 /**
  * Default atmosphere — soft radial-gradient halo + ~26k Fibonacci-sphere
@@ -82,9 +78,9 @@ export interface GlobeWorkspaceProps {
   /** Disable the intro camera choreography (world → Portugal zoom). */
   disableIntro?: boolean;
   /**
-   * 3D terrain via raster DEM. Default: enabled (AWS Terrarium tiles,
-   * 1.4x exaggeration). Pass `{ disabled: true }` to opt out, or a
-   * partial `TerrainOptions` to override specific fields.
+   * 3D terrain via raster DEM. Default: disabled. Terrain is a later,
+   * explicitly gated enhancement because it adds an external tile source
+   * and WebGL work; pass a `TerrainOptions` object to opt in.
    */
   terrain?: TerrainOptions;
   /**
@@ -104,9 +100,9 @@ export interface GlobeWorkspaceProps {
    * Override the projection. Default: `"globe"`. The engine factory
    * (`createDiscoveryEngine`) sets the initial projection from this
    * prop; runtime changes after mount call `engine.setProjectionType`
-   * so the engine itself does not remount. The `hero-map.tsx` 2D ↔ 3D
-   * toggle relies on this to avoid rebuilding the layer registry and
-   * re-allocating the WebGL custom layers on every projection switch.
+   * so the engine itself does not remount. Map-capable surfaces can rely on
+   * this to avoid rebuilding the layer registry and re-allocating WebGL
+   * custom layers on every projection switch.
    */
   projection?: "globe" | "mercator";
   className?: string;
@@ -175,9 +171,11 @@ export function GlobeWorkspace({
     [initialFocus, initialCenter, initialZoom]
   );
   const resolvedDisableIntro = disableIntro || initialFocus !== undefined;
-  // Terrain + fog default to ON with the soft defaults above. Pass
-  // `{ disabled: true }` to opt out, or a partial object to override.
-  const resolvedTerrain: TerrainOptions = terrain ?? DEFAULT_TERRAIN;
+  // Terrain is intentionally opt-in. The homepage globe is a quiet
+  // context layer, and the current activity-first release must not fetch
+  // external DEM tiles before a later map/3D capability is explicitly
+  // enabled. Pass a TerrainOptions object to opt in.
+  const resolvedTerrain: TerrainOptions = terrain ?? DISABLED_TERRAIN;
   const resolvedFog: FogOptions = fog ?? DEFAULT_FOG;
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const engineRef = React.useRef<MapLibreSpatialEngine | null>(null);
@@ -419,10 +417,7 @@ export function GlobeWorkspace({
   // handles the initial value; this effect fires on every subsequent
   // change to `projection` and calls `engine.setProjectionType` so
   // MapLibre re-projects in place — no canvas teardown, no layer
-  // registry rebuild, no WebGL buffer churn. The 2D ↔ 3D toggle in
-  // `hero-map.tsx` is the primary consumer; it used to remount the
-  // component (forcing a full WebGL lifecycle) and now just flips
-  // this prop. The dependency list intentionally omits `engineRef`
+  // registry rebuild, no WebGL buffer churn. The dependency list intentionally omits `engineRef`
   // and `projection` (the engine mutates those internally, and
   // `projection` is the trigger we want to react to).
   React.useEffect(() => {
@@ -443,7 +438,7 @@ export function GlobeWorkspace({
       data-testid={testId}
       data-map-container=""
       role="application"
-      aria-label={`Interactive globe map of ${initialFocus ? "the selected destination" : "Portugal"} — use arrow keys to pan, plus and minus to zoom`}
+      aria-label={`Interactive ${projection === "globe" ? "globe" : "2D"} map of ${initialFocus ? "the selected destination" : "Portugal"} — use arrow keys to pan, plus and minus to zoom`}
       tabIndex={0}
       data-theme={theme}
       data-reduced-motion={reducedMotion ? "true" : "false"}
