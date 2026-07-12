@@ -22,7 +22,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
         <section className="relative w-full flex flex-col items-center justify-start overflow-visible bg-primary pb-12 md:h-[80vh] md:min-h-[720px] md:overflow-hidden md:pb-0">
-          <HeroMap initialProjection="globe" />
+          <HeroMap initialProjection="mercator" />
 
           <div
             aria-hidden
