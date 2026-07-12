@@ -7,6 +7,8 @@ import {
   type RadialGradientAtmosphereOptions
 } from "./layers/radial-gradient-atmosphere";
 import { StarfieldLayer, type StarfieldOptions } from "./layers/starfield";
+import { bindLayerToChannel, getLayerChannel } from "./layer-channel";
+import { ActivityPointsLayer } from "./layers/activity-points";
 import { mountMapLibreInstance } from "./map-instance";
 import { SpatialCameraController } from "../../core/camera-controller";
 import { InMemoryTelemetryService } from "../../core/telemetry-service";
@@ -35,13 +37,8 @@ interface AtmosphereRegistration {
   starfield: StarfieldLayer | null;
 }
 
-/** Channels a layer listens to; defaults to "travelers" when omitted. */
-const LAYER_CHANNEL_BINDINGS = new WeakMap<SpatialLayer, Parameters<TelemetryService["subscribe"]>[0]>();
-
 /** Bind a layer to a specific telemetry channel (call from layer factory). */
-export function bindLayerToChannel(layer: SpatialLayer, channel: Parameters<TelemetryService["subscribe"]>[0]): void {
-  LAYER_CHANNEL_BINDINGS.set(layer, channel);
-}
+export { bindLayerToChannel } from "./layer-channel";
 
 /** Ordered list of registered layer ids, in render order. */
 function layerIdsInOrder(layers: Map<string, LayerRegistration>): string[] {
@@ -278,7 +275,7 @@ export class MapLibreSpatialEngine implements SpatialEngine {
    * any seeded data so the layer has content from the first frame.
    */
   private attachLayer(layer: SpatialLayer): void {
-    const channel = LAYER_CHANNEL_BINDINGS.get(layer) ?? "travelers";
+    const channel = getLayerChannel(layer) ?? "travelers";
     layer.onAttach(this.makeContext());
     const unsubscribe = this.telemetry.subscribe(channel, (collection) => {
       layer.onUpdate(this.makeContext(), collection);
@@ -371,12 +368,27 @@ export function createDiscoveryEngine(options: SpatialEngineOptions): MapLibreSp
   return engine;
 }
 
-/** WorkspaceCanvas engine: 2D, no globe projection, all three standard layers + itinerary route. */
-export function createWorkspaceEngine(options: SpatialEngineOptions): MapLibreSpatialEngine {
+export interface WorkspaceEngineFeatures {
+  /** Keep the existing itinerary route layer for trip/workspace surfaces. */
+  includeRoute?: boolean;
+  /** Optional reviewed activity marker layer for the progressive map facade. */
+  activityPoints?: ActivityPointsLayer;
+}
+
+/** WorkspaceCanvas engine: 2D, with optional route and reviewed activity layers. */
+export function createWorkspaceEngine(
+  options: SpatialEngineOptions,
+  features: WorkspaceEngineFeatures = {}
+): MapLibreSpatialEngine {
   const engine = new MapLibreSpatialEngine(options);
   engine.register(new AmbientPulseLayer({ palette: DEFAULT_PALETTE }));
   engine.register(new SymbolBadgesLayer({ palette: DEFAULT_PALETTE }));
-  engine.register(new RouteLayer({ palette: DEFAULT_PALETTE }));
+  if (features.includeRoute !== false) {
+    engine.register(new RouteLayer({ palette: DEFAULT_PALETTE }));
+  }
+  if (features.activityPoints) {
+    engine.register(features.activityPoints);
+  }
   return engine;
 }
 

@@ -29,5 +29,5 @@ export default async function WorkspacePage({
     return reviewedActivity ? [reviewedActivity] : [];
   });
 
-  return <ActivityWorkspace initialActivities={activities} />;
+  return <ActivityWorkspace initialActivities={activities} mapEnabled />;
 }

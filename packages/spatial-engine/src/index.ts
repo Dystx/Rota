@@ -19,6 +19,7 @@
 import { AMBIENT_PULSE_LAYER_ID } from "./adapters/maplibre/layers/ambient-pulse";
 import { SYMBOL_BADGES_LAYER_ID } from "./adapters/maplibre/layers/symbol-badges";
 import { ROUTE_STOPS_LAYER_ID } from "./adapters/maplibre/layers/route-layer";
+import { ACTIVITY_POINTS_LAYER_ID, ACTIVITY_POINTS_LABEL_LAYER_ID } from "./adapters/maplibre/layers/activity-points";
 
 export * from "./core/types";
 export * from "./core/map-style-provider";
@@ -28,15 +29,24 @@ export { setupMapLibreErrorSuppression } from "./core/maplibre-error-suppression
 
 export {
   createDiscoveryEngine,
+  createWorkspaceEngine,
   MapLibreSpatialEngine,
   type CameraTarget,
   type SpatialEngineOptions,
-  type SpatialPalette
+  type SpatialPalette,
+  type WorkspaceEngineFeatures
 } from "./adapters/maplibre/spatial-engine";
 export { mountMapLibreInstance, type MapLibreInstanceOptions } from "./adapters/maplibre/map-instance";
 export { AmbientPulseLayer, AMBIENT_PULSE_LAYER_ID, type AmbientPulseLayerOptions } from "./adapters/maplibre/layers/ambient-pulse";
 export { SymbolBadgesLayer, SYMBOL_BADGES_LAYER_ID, type SymbolBadgesLayerOptions } from "./adapters/maplibre/layers/symbol-badges";
 export { RouteLayer, ROUTE_LINE_LAYER_ID, ROUTE_STOPS_LAYER_ID, type RouteLayerOptions } from "./adapters/maplibre/layers/route-layer";
+export {
+  ActivityPointsLayer,
+  ACTIVITY_POINTS_LAYER_ID,
+  ACTIVITY_POINTS_LABEL_LAYER_ID,
+  ACTIVITY_POINTS_SOURCE_ID,
+  type ActivityPointsLayerOptions
+} from "./adapters/maplibre/layers/activity-points";
 export {
   RadialGradientAtmosphereLayer,
   RADIAL_GRADIENT_ATMOSPHERE_LAYER_ID,
@@ -55,7 +65,9 @@ export {
 export const CLICKABLE_LAYER_IDS: readonly string[] = [
   AMBIENT_PULSE_LAYER_ID,
   SYMBOL_BADGES_LAYER_ID,
-  ROUTE_STOPS_LAYER_ID
+  ROUTE_STOPS_LAYER_ID,
+  ACTIVITY_POINTS_LAYER_ID,
+  ACTIVITY_POINTS_LABEL_LAYER_ID
 ] as const;
 
 export { GlobeWorkspace, DEFAULT_ATMOSPHERE, type GlobeWorkspaceProps } from "./components/globe-workspace";

@@ -5,6 +5,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { useReducedMotion } from "@repo/ui";
 import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createWorkspaceEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
+import { ActivityPointsLayer } from "../adapters/maplibre/layers/activity-points";
 import { CameraChoreography } from "../core/camera-choreography";
 import { fixtureRouteCollection } from "../fixtures/routes";
 import { fixtureTravelerCollection, fixtureSpecialistCollection } from "../fixtures/travelers";
@@ -37,6 +38,10 @@ export interface WorkspaceCanvasHandle {
    * far-away chapter. No-op when the engine isn't mounted.
    */
   jumpTo: (target: CameraTarget) => void;
+  /** Fit a reviewed activity set or itinerary bounds into the viewport. */
+  fitBounds: (bounds: [[number, number], [number, number]]) => Promise<void>;
+  /** Return the camera to a north-up orientation without changing selection. */
+  resetNorth: () => void;
   /**
    * Replace the route features in the `trips` telemetry channel
    * without remounting the engine. Pass `null` to fall back to the
@@ -78,8 +83,16 @@ export interface WorkspaceCanvasProps {
    * need to render real (AI-enriched) coordinates.
    */
   routeFeatures?: SpatialFeatureCollection | null;
+  /** Render the legacy itinerary route layer. Activity maps keep this false. */
+  showRoute?: boolean;
+  /** Validated, reviewed activity points for the optional activity map layer. */
+  activityPoints?: SpatialFeatureCollection | null;
+  /** Controlled marker/card selection for activity points. */
+  selectedActivityId?: string | null;
   className?: string;
   testId?: string;
+  /** Accessible label override for product facades such as the activity map. */
+  ariaLabel?: string;
   /**
    * Fired on every `moveend`. Lets a Zustand store mirror the live
    * viewport without prop-drilling through the cinematic trip page.
@@ -91,6 +104,10 @@ export interface WorkspaceCanvasProps {
    * click's `lngLat`. Wire this to `selectStop` in the Zustand store.
    */
   onStopClick?: (stopId: string, coordinates: readonly [number, number]) => void;
+  /** Fired when a reviewed activity marker is clicked. */
+  onActivitySelect?: (activityId: string) => void;
+  /** Fired when MapLibre style/WebGL mounting fails. */
+  onMapError?: (message: string) => void;
   /**
    * 3D terrain. Default: DISABLED on the 2D workspace canvas (mercator
    * projection is for editing precision; mountains would obscure the
@@ -133,6 +150,11 @@ const INTRO_FIT_ZOOM = 6.4;
 const INTRO_STOP_CENTER: readonly [number, number] = [-8.6291, 41.1579];
 const INTRO_STOP_ZOOM = 11;
 
+// These defaults participate in the mount effect dependency list. Keep them
+// stable so an ordinary parent render cannot remount the MapLibre engine.
+const DISABLED_TERRAIN: TerrainOptions = { disabled: true };
+const DISABLED_FOG: FogOptions = { disabled: true };
+
 /**
  * WorkspaceCanvas — the 2D counterpart to GlobeWorkspace. Renders an
  * itinerary in flat mercator projection so editing precision is not
@@ -148,10 +170,16 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       initialZoom = DEFAULT_HOME_ZOOM,
       disableIntro = false,
       routeFeatures,
+      showRoute = true,
+      activityPoints,
+      selectedActivityId = null,
       className,
       testId = "workspace-canvas",
+      ariaLabel,
       onViewportChange,
       onStopClick,
+      onActivitySelect,
+      onMapError,
       terrain,
       fog,
       projection,
@@ -168,10 +196,11 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
     // Terrain + fog default to DISABLED on the 2D workspace (mercator
     // is for precision editing; sky/3D are globe-only). Pass a
     // TerrainOptions / FogOptions to opt in.
-    const resolvedTerrain: TerrainOptions = terrain ?? { disabled: true };
-    const resolvedFog: FogOptions = fog ?? { disabled: true };
+    const resolvedTerrain: TerrainOptions = terrain ?? DISABLED_TERRAIN;
+    const resolvedFog: FogOptions = fog ?? DISABLED_FOG;
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const engineRef = React.useRef<MapLibreSpatialEngine | null>(null);
+    const activityLayerRef = React.useRef<ActivityPointsLayer | null>(null);
     const reducedMotion = useReducedMotion();
     const [mountError, setMountError] = React.useState<string | null>(null);
 
@@ -201,6 +230,24 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
             // engine unmounted mid-call — safe to ignore.
           }
         },
+        fitBounds: (bounds) => {
+          const engine = engineRef.current;
+          if (!engine) return Promise.resolve();
+          try {
+            return engine.getCamera().fitBounds(bounds);
+          } catch {
+            return Promise.resolve();
+          }
+        },
+        resetNorth: () => {
+          const engine = engineRef.current;
+          if (!engine) return;
+          try {
+            void engine.getCamera().focus({ bearing: 0, duration: 0 });
+          } catch {
+            // engine unmounted mid-call — safe to ignore.
+          }
+        },
         seedRoute: (collection) => {
           const engine = engineRef.current;
           if (!engine) return;
@@ -222,6 +269,10 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       let cancelled = false;
       const styleProvider = new CartoBasemapStyleProvider();
       const style = styleOverride ?? styleProvider.getStyle("light");
+      const activityLayer = activityPoints
+        ? new ActivityPointsLayer({ selectedActivityId })
+        : null;
+      activityLayerRef.current = activityLayer;
       const engine = createWorkspaceEngine({
         style,
         initialTarget: resolvedInitialTarget,
@@ -232,12 +283,15 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
         projection: projection ?? "mercator",
         terrain: resolvedTerrain,
         fog: resolvedFog
+      }, {
+        includeRoute: showRoute,
+        activityPoints: activityLayer ?? undefined
       });
       engineRef.current = engine;
 
       // Prefer the caller-supplied route features, fall back to the
       // deterministic Porto→Lisbon fixture used by `/explore/workspace`.
-      const initialRoute = routeFeatures ?? fixtureRouteCollection();
+      const initialRoute = showRoute ? routeFeatures ?? fixtureRouteCollection() : { type: "FeatureCollection" as const, features: [] };
       engine.seedTelemetry("travelers", fixtureTravelerCollection());
       engine.seedTelemetry("specialists", fixtureSpecialistCollection());
       engine.seedTelemetry("trips", initialRoute);
@@ -258,6 +312,10 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
           const map = engine.getRenderer();
           if (map && onMapReady) {
             onMapReady(map);
+          }
+
+          if (activityLayer && activityPoints) {
+            engine.applyLayerUpdate(activityLayer, activityPoints);
           }
 
           const unsubscribe = engine.getTelemetry().subscribe("trips", () => undefined);
@@ -281,7 +339,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
               })()
             : () => undefined;
 
-          const detachClick = map && onStopClick
+          const detachClick = map && (onStopClick || onActivitySelect)
             ? (() => {
                 const handler = (event: { point: { x: number; y: number }; lngLat: { lng: number; lat: number } }) => {
                   const features = map.queryRenderedFeatures(
@@ -290,11 +348,17 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
                   );
                   const feature = features[0];
                   if (!feature) return;
+                  const properties = (feature.properties as Record<string, unknown> | null) ?? null;
+                  const activityId = properties?.activityId;
+                  if (typeof activityId === "string" && onActivitySelect) {
+                    onActivitySelect(activityId);
+                    return;
+                  }
                   const rawId =
                     (feature as { id?: unknown }).id ??
-                    (feature.properties as Record<string, unknown> | null)?.id;
+                    properties?.id;
                   if (rawId === undefined || rawId === null) return;
-                  onStopClick(String(rawId), [event.lngLat.lng, event.lngLat.lat]);
+                  onStopClick?.(String(rawId), [event.lngLat.lng, event.lngLat.lat]);
                 };
                 map.on("click", handler);
                 return () => map.off("click", handler);
@@ -350,7 +414,9 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
         })
         .catch((err: unknown) => {
           if (!cancelled) {
-            setMountError(err instanceof Error ? err.message : "Failed to mount workspace");
+            const message = err instanceof Error ? err.message : "Failed to mount workspace";
+            setMountError(message);
+            onMapError?.(message);
           }
         });
 
@@ -358,13 +424,14 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
         cancelled = true;
         engine.unmount();
         engineRef.current = null;
+        activityLayerRef.current = null;
       };
     // We intentionally do not depend on `resolvedInitialTarget` /
     // `resolvedDisableIntro` / `routeFeatures` here — the initial
     // target is captured on first mount, and route features are
     // re-seeded by the dedicated effect below when the prop changes.
     // This stops the engine from remounting on every parent render.
-    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, onViewportChange, onStopClick, projection]);
+    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, onViewportChange, onStopClick, onActivitySelect, onMapError, projection, showRoute]);
 
     // Runtime projection switch (post-mount). The mount effect above
     // handles the initial value; this effect fires on every subsequent
@@ -400,15 +467,26 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       lastSeededRef.current = routeFeatures ?? null;
     }, [routeFeatures]);
 
+    React.useEffect(() => {
+      const engine = engineRef.current;
+      const activityLayer = activityLayerRef.current;
+      if (!engine || !activityLayer || !activityPoints) return;
+      engine.applyLayerUpdate(activityLayer, activityPoints);
+    }, [activityPoints]);
+
+    React.useEffect(() => {
+      activityLayerRef.current?.setSelectedActivityId(selectedActivityId);
+    }, [selectedActivityId]);
+
     return (
       <div
         ref={containerRef}
         data-testid={testId}
         data-map-container=""
         role="application"
-        aria-label={`Interactive workspace map of ${initialFocus ? "the selected route" : "Portugal"} — use arrow keys to pan, plus and minus to zoom`}
+        aria-label={ariaLabel ?? `Interactive workspace map of ${initialFocus ? "the selected route" : "Portugal"} — use arrow keys to pan, plus and minus to zoom`}
         tabIndex={0}
-        data-projection="mercator"
+        data-projection={projection ?? "mercator"}
         data-reduced-motion={reducedMotion ? "true" : "false"}
         data-intro={disableIntro ? "off" : "on"}
         className={

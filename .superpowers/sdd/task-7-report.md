@@ -1,25 +1,68 @@
-# Task 7 — Planner choice composition canvas
+# Task 7 — Progressive activity-map capability
+
+Date: 2026-07-12
+Scope: optional, list-first activity map in `/explore/workspace`.
+
+## Implementation
+
+- Added a pure `ActivityMapModel` adapter with reviewed-status checks, stable
+  activity IDs, coordinate/privacy validation, approximate-area labelling,
+  five-point map cap, complete semantic list fallback, bounds, and top-down
+  view-state helpers.
+- Added `ActivityPointsLayer` with stable GeoJSON source/feature IDs,
+  numbered circle/symbol markers, selected feature state, lifecycle teardown,
+  and no route-line generation. The shared layer-channel registry keeps the
+  layer isolated from traveller/route fixture channels.
+- Extended `WorkspaceCanvas` with optional activity points, controlled
+  selection, activity-marker callbacks, map error callback, fit/reset camera
+  handle methods, accessible label override, and a `showRoute={false}` path so
+  the activity map cannot render an invented itinerary line.
+- Added the client `ActivityMap` facade and `ActivityMapFallback`. The map is
+  dynamically imported by `ActivityWorkspace` only after an explicit `View on
+  map` action. The list stays complete beside the map and in every error/static
+  state; attribution, retry, fit, north reset, zoom, close/list, controlled
+  selection, and reduced-motion camera behavior are included.
+- Wired the workspace page through `mapEnabled` without changing homepage or
+  backend behavior.
+
+## Changed files
+
+- `apps/web/app/(marketing)/_components/activity-map-model.ts`
+- `apps/web/app/(marketing)/_components/activity-map-model.test.ts`
+- `apps/web/app/(marketing)/_components/activity-map.tsx`
+- `apps/web/app/(marketing)/_components/activity-map.test.tsx`
+- `apps/web/app/(marketing)/_components/activity-map-fallback.tsx`
+- `apps/web/app/(marketing)/explore/workspace/activity-workspace.tsx`
+- `apps/web/app/(marketing)/explore/workspace/page.tsx`
+- `packages/spatial-engine/src/adapters/maplibre/layer-channel.ts`
+- `packages/spatial-engine/src/adapters/maplibre/layers/activity-points.ts`
+- `packages/spatial-engine/src/adapters/maplibre/layers/activity-points.test.ts`
+- `packages/spatial-engine/src/adapters/maplibre/spatial-engine.ts`
+- `packages/spatial-engine/src/components/workspace-canvas.tsx`
+- `packages/spatial-engine/src/index.ts`
 
 ## Verification
 
-- `pnpm --filter web exec vitest run app/planner/_components/planner-single-screen.test.tsx` — PASS (2 focused tests).
-- `pnpm --filter web typecheck` — PASS.
+| Command | Result |
+| --- | --- |
+| `pnpm exec vitest run 'apps/web/app/(marketing)/_components/activity-map-model.test.ts' 'apps/web/app/(marketing)/_components/activity-map.test.tsx' 'apps/web/app/(marketing)/explore/workspace/activity-workspace.test.tsx' 'apps/web/app/(marketing)/explore/workspace/page.test.tsx' packages/spatial-engine/src/adapters/maplibre/layers/activity-points.test.ts` | PASS — 5 files, 17 tests |
+| `pnpm --filter @repo/spatial-engine test` | PASS — 2 files, 6 tests |
+| `pnpm --dir apps/web typecheck` | PASS |
+| `pnpm --filter @repo/spatial-engine typecheck` | PASS |
+| `pnpm lint:eslint` | PASS |
+| `git diff --check` | PASS |
+| `pnpm --dir apps/web test:e2e -- --grep "map\|spatial"` | BLOCKED — web server build could not start because `DATABASE_URL` is missing while collecting `/api/auth/[...all]`; no browser assertions ran |
+| `pnpm --dir apps/web test:a11y` | BLOCKED — same missing `DATABASE_URL` web-server startup failure |
+| `pnpm --dir apps/web test:perf` | BLOCKED — same missing `DATABASE_URL` web-server startup failure |
 
-The focused tests cover destination, duration, transport, summary updates, URL handoff, Escape-to-close travel-window sheet, and the zero `<input>`/`<textarea>` assertion. ChoiceCard and ChoiceChipGroup provide keyboard activation and roving keyboard behavior; all controls use buttons, so pointer and keyboard paths share the same handlers.
+No visual snapshots were refreshed. The browser gates remain incomplete until
+the local release environment supplies the required database/auth variables.
 
-## Notes / concerns
+## Regression risk
 
-The rendered planner main path no longer contains inputs, textareas, or a form submit. Legacy `WhereStep` and `WhenStep` components still contain their original input controls, but they are not imported or rendered by `PlannerClient`; they remain available for the older step flow and are intentionally out of Task 7's rendered path.
+The activity surface is opt-in and dynamically loaded; initial list/workspace
+renders do not import the map facade or request tiles. The existing route layer
+remains the default for legacy workspace/trip consumers. The provider remains
+the documented CARTO candidate with visible OpenStreetMap/CARTO attribution;
+production enablement still depends on the licensing record.
 
-## Review follow-up
-
-- Mobile now exposes a focused choice rail and renders one active option group before the consequence and primary action; desktop keeps the two-column layout.
-- Every TripContextBar edit button opens a corresponding destination, days, window, transport, or vibe sheet and commits the selected value.
-- TripSummary accepts `primaryActionDisabled`, preventing duplicate navigation while the route handoff is pending.
-- Planner URL parsing now preserves transport and vibe as well as destination, days, and travel window.
-- Focused coverage expanded to five tests for context edits, pending CTA state, mobile focus rail, URL handoff, and sheet dismissal.
-
-Follow-up verification:
-
-- `pnpm --filter web exec vitest run app/planner/_components/planner-single-screen.test.tsx` — PASS (5 tests).
-- `pnpm --filter web typecheck` — PASS.
