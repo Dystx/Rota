@@ -1,12 +1,13 @@
 import * as React from "react";
 import type { Metadata } from "next";
+import { isFeatureEnabled } from "@repo/config";
 
 import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 
 import { ActivityWorkspace } from "./activity-workspace";
 
 export const metadata: Metadata = {
-  title: "Your Portugal day | Rumia",
+  title: "Your Portugal day",
   description: "A flexible collection of Portugal activities that Rumia judges worth your time.",
   alternates: { canonical: "/explore/workspace" }
 };
@@ -29,5 +30,5 @@ export default async function WorkspacePage({
     return reviewedActivity ? [reviewedActivity] : [];
   });
 
-  return <ActivityWorkspace initialActivities={activities} mapEnabled />;
+  return <ActivityWorkspace initialActivities={activities} mapEnabled={isFeatureEnabled("activityMap")} />;
 }

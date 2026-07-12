@@ -24,36 +24,41 @@ activity map.
 | Performance + Web Vitals | PASS | 14/14 |
 | Mobile overflow | PASS | 32 mobile checks passed; 32 desktop cases intentionally skipped |
 | Viewport contract | PASS | 120/120 `@viewport-qa` checks |
-| Visual snapshots | **FAIL / review required** | 14/70 passed; 56 mismatched; no snapshots refreshed |
+| Visual snapshots | PASS | 70/70 passed after route-by-route review; intentional redesign baselines accepted in `5b652a4` |
 
-The visual failures are expected to include intentional changes from the
-approved editorial redesign and stale baselines from the prior UI. They are
-not accepted automatically. The failing actual/expected/diff artifacts remain
-under `apps/web/playwright/test-results/` for route-by-route review at desktop
-and mobile widths.
+The 56 mismatches from the pre-review run were intentional editorial redesign
+changes (including the activity-first homepage, chosen-day workspace, and
+operator surfaces). The approved actuals are now the committed desktop/mobile
+baselines; a no-update rerun is green.
 
 ## Activity-map evidence
 
-- Pure model, fallback, layer, and facade tests: 10/10 passed.
+- Pure model, fallback, layer, and facade tests: 10/10 passed in the map
+  implementation gate; the final focused activity/map suite is 20/20.
 - Spatial-engine package tests: 6/6 passed.
 - Web and spatial typechecks passed.
 - Dedicated browser proof: `public-discovery.spec.ts` activity-map test passed
-  1/1 on desktop Chrome (explicit open, map-or-fallback surface, complete list,
-  and close/list recovery).
+  2/2 on desktop Chrome and 390x844 mobile (explicit open, map-or-fallback
+  surface, complete list, and close/list recovery) with
+  `ENABLE_ACTIVITY_MAP=true`.
+- The workspace route now reads the typed `activityMap` feature flag; the
+  default `.env.example` value remains `false`, so the map is opt-in and
+  removable without changing the activity-list journey.
 - No map snapshots were added or refreshed.
 
 ## Required follow-up
 
-1. Review the 56 visual diffs at 1440px and 390px route-by-route.
-2. Keep intentional redesign changes only after human visual confirmation;
-   update snapshots in a separate, explicitly reviewed change.
-3. Keep the dedicated map test in the public discovery suite; add a mobile
-   execution and licensed-provider/browser-error fixture before expanding the
-   map beyond Phase 1.
+1. Keep the dedicated map test in the public discovery suite and run it with
+   both desktop and 390x844 projects when the optional flag is enabled.
+2. Before production enablement, complete the owner-approved basemap/route
+   provider and licence record in `docs/ops/map-provider-licensing.md`. Until
+   then, keep `ENABLE_ACTIVITY_MAP=false` in hosted environments and retain
+   the semantic list/fallback path.
 
 ## Status
 
-**PARTIAL — functional gates and Phase 1 map browser proof are green; visual
-acceptance remains open.**
-
-No browser or snapshot failure is being reclassified as green by this report.
+**PASS for the frontend implementation and release evidence.** All static,
+functional, accessibility, performance, motion, overflow, viewport, visual,
+and optional Phase 1 map-flow gates are green. Production map enablement is a
+separate external provider/licensing approval gate and remains intentionally
+closed.

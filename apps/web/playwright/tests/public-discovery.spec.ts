@@ -79,6 +79,8 @@ test.describe("public discovery and trust routes", () => {
   });
 
   test("activity map is explicit and keeps the complete list equivalent", async ({ page }) => {
+    test.skip(process.env.ENABLE_ACTIVITY_MAP?.trim().toLowerCase() !== "true", "Requires ENABLE_ACTIVITY_MAP=true");
+
     await page.goto("/explore/workspace?activity=porto-ribeira-slow-walk");
     await expect(page.getByRole("heading", { name: "Your tentative day", exact: true })).toBeVisible();
 
