@@ -2,6 +2,28 @@
 @source "../../../packages/ui/src";
 @source "../../../packages/maps/src";
 
+/* Editorial tone hooks intentionally stay semantic. Components use these
+   classes alongside the Tailwind text aliases so a surface can change
+   context without introducing a one-off colour at the call site. */
+@layer components {
+  .editorial-tone-linen,
+  .editorial-tone-sage {
+    color: var(--color-midnight);
+  }
+
+  .editorial-tone-midnight {
+    color: var(--color-linen);
+  }
+
+  .editorial-tone-ochre {
+    color: var(--color-ochre);
+  }
+
+  .editorial-rule {
+    border-color: color-mix(in srgb, var(--color-midnight) 20%, transparent);
+  }
+}
+
 body {
   min-height: 100vh;
 }

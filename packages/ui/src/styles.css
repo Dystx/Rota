@@ -100,6 +100,14 @@
      labels, links) where the regular ochre-light is decorative-only
      on dark bg. */
   --color-ochre-on-light: #8a5a1f;
+
+  /* Editorial surface aliases. Keep these names stable so authored pages can
+     move between the light reading field, discovery sage, dark planning
+     chapter, and ochre judgement accent without inventing ad-hoc colours. */
+  --color-linen: #efece6;
+  --color-sage: #e8fff0;
+  --color-midnight: #16281f;
+  --color-ochre: #ce933f;
   --cinematic-overlay-hero: linear-gradient(
     to top,
     rgba(22, 40, 31, 0.72) 0%,
@@ -230,6 +238,10 @@
   --color-surface-tint: #4f6358;
   --color-on-secondary-container: #784d00;
   --color-ochre-dark: #ce933f;
+  --color-linen: #efece6;
+  --color-sage: #e8fff0;
+  --color-midnight: #16281f;
+  --color-ochre: #ce933f;
   --color-on-tertiary-fixed: #1c1c1a;
   --color-on-secondary: #ffffff;
   --color-on-surface: #0c1f16;
@@ -350,6 +362,13 @@
   --text-headline-lg--font-weight: 700;
 }
 
+/* Editorial aliases keep call sites readable while preserving the existing
+ * body and metadata stacks used by the older component set. */
+@theme {
+  --font-body: var(--font-body-md);
+  --font-metadata: var(--font-mono-micro);
+}
+
 /* ==============================================================================
  * PR-1 TOKEN POLISH — additive; preserves every existing class name.
  * Source: docs/visual-review/polish-plan-2026-q3.md
@@ -367,6 +386,7 @@
   --spacing-px: 1px;
   --spacing-0\.5: 2px;
   --spacing-1: 4px;
+  --spacing-2: 8px;
   --spacing-1\.5: 6px;
   --spacing-3: 12px;
   --spacing-4: 16px;
@@ -407,6 +427,11 @@
   --text-body--line-height: 1.6;
   --text-body--letter-spacing: 0;
   --text-body--font-weight: 400;
+
+  --text-metadata: 11px;
+  --text-metadata--line-height: 1.3;
+  --text-metadata--letter-spacing: 0.08em;
+  --text-metadata--font-weight: 600;
 
   --text-label: 13px;
   --text-label--line-height: 1.3;

@@ -54,3 +54,4 @@ export * from "./components/option-sheet";
 export * from "./components/trip-context-bar";
 export * from "./components/route-consequence";
 export * from "./components/trip-summary";
+export * from "./components/editorial";
