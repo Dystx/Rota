@@ -10,8 +10,8 @@
 
 Implementation documents:
 
-- Full A–H roadmap: `docs/superpowers/plans/2026-07-12-rumia-frontend-aesthetic-rework-implementation.md`
-- First slice: `docs/superpowers/plans/2026-07-12-rumia-frontend-foundation-planner-slice.md`
+- Full A–H roadmap: `docs/superpowers/archive/plans/2026-07-12-rumia-frontend-aesthetic-rework-implementation.md`
+- First slice: `docs/superpowers/archive/plans/2026-07-12-rumia-frontend-foundation-planner-slice.md`
 - Approved design: `docs/superpowers/specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md`
 
 ## 1. Plan reconciliation
@@ -22,7 +22,7 @@ This document does not replace them:
 | Document | Authority | How this plan uses it |
 | --- | --- | --- |
 | `docs/superpowers/plans/2026-07-10-rumia-activity-first-master.md` | Canonical product/release plan | Owns the activity-first promise, Portugal-wide scope, release order, and non-goals. |
-| `docs/superpowers/plans/2026-07-11-rumia-full-redesign-and-ui-plan.md` | Existing UI baseline | Owns the shared shell, component-state, responsive, accessibility, and map sequencing contract. |
+| `docs/superpowers/archive/plans/2026-07-11-rumia-full-redesign-and-ui-plan.md` | Existing UI baseline | Historical UI correctness baseline, superseded by the canonical deep redesign plan. |
 | `docs/superpowers/specs/2026-07-10-rumia-activity-curation-design.md` | Activity domain contract | Owns the editorial activity fields, judgement model, and user-facing boundaries. |
 | `docs/superpowers/specs/2026-07-11-rumia-activity-map-capability.md` | Spatial capability | Owns map phases, route truth, fallback, licensing, and list-first behavior. |
 | `docs/superpowers/specs/2026-07-11-rumia-vps-platform-design.md` | Runtime/deployment | Owns the VPS-native stack; this plan must not introduce a frontend hosting or database change. |

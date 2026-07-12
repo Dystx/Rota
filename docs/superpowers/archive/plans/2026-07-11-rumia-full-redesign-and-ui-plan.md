@@ -8,7 +8,7 @@
 >
 > The broader frontend component/art-direction/texture/motion/3D rework is now
 > planned in the bounded companion
-> `docs/superpowers/plans/2026-07-12-rumia-frontend-aesthetic-rework.md`.
+> `docs/superpowers/archive/plans/2026-07-12-rumia-frontend-aesthetic-rework.md`.
 
 ## Goal
 
@@ -438,7 +438,7 @@ the list-safe fallback.
 
 For the complete component inventory, background/asset direction, motion
 vocabulary, 3D hero decision, and phased frontend refactor, use the dedicated
-[`frontend aesthetic rework plan`](2026-07-12-rumia-frontend-aesthetic-rework.md).
+[`frontend aesthetic rework plan`](../2026-07-12-rumia-frontend-aesthetic-rework.md).
 
 1. Bring the direct `/planner` entry into the same activity-first vocabulary:
    “Shape a day,” “chosen activities,” and pacing consequences; remove the

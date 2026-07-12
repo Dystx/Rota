@@ -970,6 +970,7 @@ timing class.
 - `ENABLE_OPERATOR_CONSOLE`
 - `ENABLE_CONSOLE_CONFIG`
 - `ENABLE_API_DOCS`
+- `ENABLE_ACTIVITY_MAP`
 - `ENABLE_PT`
 
 Flags default off outside an explicitly approved environment. `ENABLE_PT`

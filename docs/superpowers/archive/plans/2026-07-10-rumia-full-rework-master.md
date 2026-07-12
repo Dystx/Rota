@@ -35,20 +35,20 @@
 
 ## Approved source
 
-- Product and interaction contract: `docs/superpowers/specs/2026-07-10-rumia-full-product-rework-design.md`
-- This plan supersedes `docs/superpowers/plans/2026-07-09-choice-led-traveler-experience.md`; preserve its history but do not execute its remaining unchecked tasks.
+- Product and interaction contract: `docs/superpowers/archive/specs/2026-07-10-rumia-full-product-rework-design.md`
+- This plan supersedes `docs/superpowers/archive/plans/2026-07-09-choice-led-traveler-experience.md`; preserve its history but do not execute its remaining unchecked tasks.
 
 ## Plan set
 
 | Order | Plan | Working release |
 | --- | --- | --- |
-| 0 | `docs/superpowers/plans/2026-07-10-rumia-phase-0-foundations.md` | Safe shells, exact routes, readiness, capabilities, phrase primitive, and executable evidence matrix |
-| 1 | `docs/superpowers/plans/2026-07-10-rumia-phase-1-public-discovery.md` | Complete public proposition, Portugal atlas, trust, pricing, legal, offline, and sign-in surfaces |
-| 2 | `docs/superpowers/plans/2026-07-10-rumia-phase-2-living-brief.md` | Living Brief Composer, deterministic choices, custom parsing, anonymous preview, claim, and route version 1 |
-| 3 | `docs/superpowers/plans/2026-07-10-rumia-phase-3-traveler-commerce.md` | Trip workspace, route editing, independent entitlements, Stripe, export, library, Vault, review, and sharing |
-| 4 | `docs/superpowers/plans/2026-07-10-rumia-phase-4-specialist-operations.md` | Specialist applications, assigned-reviewer queue, revision workspace, proposals, history, profile, and messaging |
-| 5 | `docs/superpowers/plans/2026-07-10-rumia-phase-5-admin-control-plane.md` | Content, quality, operations cases, knowledge, metrics, configuration, and organization-isolated B2B |
-| 6 | `docs/superpowers/plans/2026-07-10-rumia-phase-6-production-hardening.md` | Hosted reconciliation, durable workers, observability, analytics, complete matrix, canaries, and controlled rollout |
+| 0 | `docs/superpowers/archive/plans/2026-07-10-rumia-phase-0-foundations.md` | Safe shells, exact routes, readiness, capabilities, phrase primitive, and executable evidence matrix |
+| 1 | `docs/superpowers/archive/plans/2026-07-10-rumia-phase-1-public-discovery.md` | Complete public proposition, Portugal atlas, trust, pricing, legal, offline, and sign-in surfaces |
+| 2 | `docs/superpowers/archive/plans/2026-07-10-rumia-phase-2-living-brief.md` | Living Brief Composer, deterministic choices, custom parsing, anonymous preview, claim, and route version 1 |
+| 3 | `docs/superpowers/archive/plans/2026-07-10-rumia-phase-3-traveler-commerce.md` | Trip workspace, route editing, independent entitlements, Stripe, export, library, Vault, review, and sharing |
+| 4 | `docs/superpowers/archive/plans/2026-07-10-rumia-phase-4-specialist-operations.md` | Specialist applications, assigned-reviewer queue, revision workspace, proposals, history, profile, and messaging |
+| 5 | `docs/superpowers/archive/plans/2026-07-10-rumia-phase-5-admin-control-plane.md` | Content, quality, operations cases, knowledge, metrics, configuration, and organization-isolated B2B |
+| 6 | `docs/superpowers/archive/plans/2026-07-10-rumia-phase-6-production-hardening.md` | Hosted reconciliation, durable workers, observability, analytics, complete matrix, canaries, and controlled rollout |
 
 ## Page-by-page visual and execution ownership
 

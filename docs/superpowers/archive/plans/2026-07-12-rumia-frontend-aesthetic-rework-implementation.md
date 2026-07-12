@@ -31,13 +31,13 @@ Read these before changing code:
 
 - `docs/superpowers/specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md`
 - `docs/superpowers/plans/2026-07-10-rumia-activity-first-master.md`
-- `docs/superpowers/plans/2026-07-11-rumia-full-redesign-and-ui-plan.md`
+- `docs/superpowers/archive/plans/2026-07-11-rumia-full-redesign-and-ui-plan.md`
 - `docs/superpowers/specs/2026-07-10-rumia-activity-curation-design.md`
 - `docs/superpowers/specs/2026-07-11-rumia-activity-map-capability.md`
 - `docs/reviews/2026-07-11-rumia-browser-ui-review.md`
 
 The detailed first slice is separately documented in:
-`docs/superpowers/plans/2026-07-12-rumia-frontend-foundation-planner-slice.md`
+`docs/superpowers/archive/plans/2026-07-12-rumia-frontend-foundation-planner-slice.md`
 
 ## File map
 
