@@ -67,18 +67,23 @@ export async function mountMapLibreInstance(options: MapLibreInstanceOptions): P
   map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
 
-  await new Promise<void>((resolve, reject) => {
-    const onLoad = () => {
-      map.off("error", onError);
-      resolve();
-    };
-    const onError = (event: { error?: Error }) => {
-      map.off("load", onLoad);
-      reject(event.error ?? new Error("MapLibre style failed to load"));
-    };
-    map.once("load", onLoad);
-    map.once("error", onError);
-  });
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const onLoad = () => {
+        map.off("error", onError);
+        resolve();
+      };
+      const onError = (event: { error?: Error }) => {
+        map.off("load", onLoad);
+        reject(event.error ?? new Error("MapLibre style failed to load"));
+      };
+      map.once("load", onLoad);
+      map.once("error", onError);
+    });
+  } catch (error) {
+    map.remove();
+    throw error;
+  }
 
   // Globe projection is opt-in. Workspace mode (mercator) keeps the flat
   // canvas so editing precision is not lost to curvature.

@@ -301,6 +301,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
         ? new ActivityPointsLayer({ selectedActivityId })
         : null;
       activityLayerRef.current = activityLayer;
+      let mountedCleanup: (() => void) | null = null;
       const engine = createWorkspaceEngine({
         style,
         initialTarget: resolvedInitialTarget,
@@ -457,14 +458,20 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
             }
           }
 
-          return () => {
+          let cleanedUp = false;
+          const cleanup = () => {
+            if (cleanedUp) return;
+            cleanedUp = true;
             cancelAnimationFrame(raf);
             observer?.disconnect();
             detachMapError();
             detachViewport();
             detachClick();
             unsubscribe();
+            if (mountedCleanup === cleanup) mountedCleanup = null;
           };
+          mountedCleanup = cleanup;
+          return cleanup;
         })
         .catch((err: unknown) => {
           if (!cancelled) {
@@ -476,6 +483,8 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
 
       return () => {
         cancelled = true;
+        mountedCleanup?.();
+        mountedCleanup = null;
         engine.unmount();
         engineRef.current = null;
         activityLayerRef.current = null;
