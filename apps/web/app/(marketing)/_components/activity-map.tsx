@@ -244,7 +244,7 @@ export function ActivityMap({
   }
 
   return (
-    <section aria-label="Activity map" data-map-mode="map" className="space-y-4">
+    <section aria-label="Activity map" data-map-mode="map" data-map-capable="true" className="space-y-4">
       <p className="sr-only">{model.points.length} selected activities in {model.points[0]?.locality ?? "Portugal"}; the list beside this map contains the same stops.</p>
       <ActivityMapSurface
         model={model}

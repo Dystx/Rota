@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { setupMapLibreErrorSuppression } from "@repo/spatial-engine";
 
 /**
  * Installs a `window.error` and `unhandledrejection` handler that
@@ -23,7 +22,23 @@ import { setupMapLibreErrorSuppression } from "@repo/spatial-engine";
  */
 export function MapLibreErrorSuppressor(): null {
   useEffect(() => {
-    setupMapLibreErrorSuppression();
+    // The suppressor itself must not make the homepage download the map
+    // runtime. Map-capable consumers mark their rendered surface explicitly;
+    // public list-first routes leave this absent and stay MapLibre-free.
+    if (!document.querySelector("[data-map-capable]")) return;
+
+    let cancelled = false;
+
+    // Keep the activity-first homepage and initial public routes free of the
+    // MapLibre bundle. The suppressor is only relevant after a map-capable
+    // surface is mounted, so load its tiny helper lazily with the renderer.
+    void import("@repo/spatial-engine").then(({ setupMapLibreErrorSuppression }) => {
+      if (!cancelled) setupMapLibreErrorSuppression();
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
   return null;
 }

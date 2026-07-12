@@ -207,6 +207,7 @@ export const WorkspaceTripCanvas = React.forwardRef<
         data-testid="trip-workspace-canvas-frame"
         data-trip-id={tripId}
         data-mode="schematic"
+        data-map-capable="true"
         data-route-status={routeStatus}
         className={["relative", className].filter(Boolean).join(" ")}
       >
@@ -236,6 +237,7 @@ export const WorkspaceTripCanvas = React.forwardRef<
       data-testid="trip-workspace-canvas-frame"
       data-trip-id={tripId}
       data-mode="trip"
+      data-map-capable="true"
       data-route-status={routeStatus}
       className={["relative", className].filter(Boolean).join(" ")}
     >

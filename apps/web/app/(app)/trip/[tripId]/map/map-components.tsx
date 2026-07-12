@@ -86,6 +86,7 @@ export function RouteMap({
         days={days}
         warnings={warnings}
         {...rest}
+        data-map-capable="true"
         data-route-status={routeStatus}
       >
         <p
@@ -105,6 +106,7 @@ export function RouteMap({
       data-testid="trip-workspace-canvas-frame"
       data-trip-id={tripId}
       data-mode="trip"
+      data-map-capable="true"
       data-route-status={routeStatus}
       className="relative flex h-[600px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.96)] shadow-[0_24px_60px_rgba(7,17,19,0.06)]"
     >
