@@ -39,7 +39,7 @@ The following documents retain their existing authority:
 | Document | Authority | This design's relationship |
 | --- | --- | --- |
 | `docs/superpowers/plans/2026-07-10-rumia-activity-first-master.md` | Product and release authority | Owns Portugal-wide coverage, activity-first positioning, non-goals, and release order. |
-| `docs/superpowers/plans/2026-07-11-rumia-full-redesign-and-ui-plan.md` | UI correctness baseline | Owns route responsibilities, accessibility, responsive rules, component state coverage, and existing UI release gates. |
+| `docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md` | Frontend execution authority | Owns route responsibilities, visual polish sequencing, accessibility, responsive rules, component state coverage, and release gates. |
 | `docs/superpowers/specs/2026-07-10-rumia-activity-curation-design.md` | Activity domain contract | Owns editorial fields, review status, judgement semantics, and user-facing boundaries. |
 | `docs/superpowers/specs/2026-07-11-rumia-activity-map-capability.md` | Spatial capability contract | Owns map phases, route truth, fallback behavior, and licensing constraints. |
 | `docs/superpowers/specs/2026-07-11-rumia-vps-platform-design.md` | Runtime and deployment authority | Owns the VPS-native stack; this design introduces no hosting or database change. |
