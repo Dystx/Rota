@@ -12,6 +12,7 @@ export const featureFlagNames = [
   "operatorConsole",
   "consoleConfig",
   "apiDocs",
+  "activityMap",
   "pt"
 ] as const;
 
@@ -27,6 +28,7 @@ const environmentVariableFor: Record<FeatureFlag, string> = {
   operatorConsole: "ENABLE_OPERATOR_CONSOLE",
   consoleConfig: "ENABLE_CONSOLE_CONFIG",
   apiDocs: "ENABLE_API_DOCS",
+  activityMap: "ENABLE_ACTIVITY_MAP",
   pt: "ENABLE_PT"
 };
 
