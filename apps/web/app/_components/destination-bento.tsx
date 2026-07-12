@@ -3,11 +3,11 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getDestinationPreset } from "@repo/spatial-engine";
 import {
   runViewTransition,
   setTransitionName,
-  supportsViewTransitions
+  supportsViewTransitions,
+  Icon
 } from "@repo/ui";
 import { useMapStore } from "@/store/useMapStore";
 import { publicDraftToPlannerUrl } from "../(marketing)/_components/public-trip-choices";
@@ -33,6 +33,15 @@ import { publicDraftToPlannerUrl } from "../(marketing)/_components/public-trip-
  */
 const BENTO_SLUGS = ["lisbon", "douro", "azores"] as const;
 type BentoSlug = (typeof BENTO_SLUGS)[number];
+
+// Keep the legacy plan-mode handoff lightweight. Importing the spatial-engine
+// barrel here would pull MapLibre into the homepage bundle even though the
+// default explore surface is intentionally map-free.
+const BENTO_CAMERA_CENTERS: Record<BentoSlug, readonly [number, number]> = {
+  lisbon: [-9.1393, 38.7223],
+  douro: [-7.5458, 41.1832],
+  azores: [-25.7903, 37.8602]
+};
 
 export type DestinationBentoMode = "explore" | "plan";
 
@@ -103,10 +112,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
   const selectStop = useMapStore((state) => state.selectStop);
 
   const handleBentoClick = (slug: BentoSlug) => {
-    const preset = getDestinationPreset(slug);
-    if (preset && preset.camera.center) {
-      selectStop(slug, [preset.camera.center[0], preset.camera.center[1]]);
-    }
+    selectStop(slug, BENTO_CAMERA_CENTERS[slug]);
   };
 
   const handlePlanNavigation = (
@@ -175,16 +181,11 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                 {mode === "plan" ? (
                   <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-ochre-light px-3 py-1.5 font-label-ui text-label-ui text-primary shadow-sm">
                     {BENTO_CTA_COPY[card.slug]}
-                    <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
+                    <Icon name="arrow_forward" className="text-[16px]" />
                   </span>
                 ) : (
                   <span className="mt-3 inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-light opacity-0 motion-safe:group-hover:opacity-100 transition-opacity">
-                    <span
-                      aria-hidden
-                      className="ph text-base"
-                    >
-                      map
-                    </span>
+                    <Icon name="map" className="text-base" />
                     See what is worth doing →
                   </span>
                 )}
