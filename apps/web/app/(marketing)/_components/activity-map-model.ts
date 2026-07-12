@@ -157,6 +157,15 @@ function list(value: unknown): readonly string[] {
   return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0) : [];
 }
 
+function evidenceSourceLabel(value: string | null): string | null {
+  if (!value) return null;
+  try {
+    return new URL(value).hostname.replace(/^www\./u, "");
+  } catch {
+    return null;
+  }
+}
+
 function validRegion(value: unknown): value is ActivityRegion {
   return typeof value === "string" && (ACTIVITY_REGIONS as readonly string[]).includes(value);
 }
@@ -174,7 +183,11 @@ function fallbackItem(input: ActivityMapInput, index: number): ActivityMapListIt
     bestTime: text(input.bestTime) ?? "Timing to be confirmed",
     durationMinutes: number(input.durationMinutes),
     evidenceUrl: text(input.evidenceUrl),
-    evidenceAttribution: text(input.evidenceAttribution) ?? (isEditorialActivity(input) ? text(input.evidenceUrl) : null),
+    evidenceAttribution: text(input.evidenceAttribution) ?? (
+      isEditorialActivity(input) && input.evidenceAttribution === undefined
+        ? evidenceSourceLabel(text(input.evidenceUrl))
+        : null
+    ),
     geometryLabel: "Location details are not available for the map yet."
   };
 }
@@ -194,7 +207,11 @@ function projectPoint(input: ActivityMapInput, index: number): { point?: Activit
   const bestTime = text(input.bestTime);
   const durationMinutes = number(input.durationMinutes);
   const evidenceUrl = text(input.evidenceUrl);
-  const evidenceAttribution = text(input.evidenceAttribution) ?? (editorialInput ? evidenceUrl : null);
+  const evidenceAttribution = text(input.evidenceAttribution) ?? (
+    editorialInput && input.evidenceAttribution === undefined
+      ? evidenceSourceLabel(evidenceUrl)
+      : null
+  );
   const geometryPrecision = input.geometryPrecision ?? (editorialInput ? hint?.geometryPrecision : undefined);
   const locationPrivacy = input.locationPrivacy ?? (editorialInput ? hint?.locationPrivacy : undefined);
 

@@ -60,6 +60,7 @@ describe("ActivityMapFallback", () => {
     expect(screen.getByRole("button", { name: /Ribeira and Miragaia/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /Second stop/i })).toBeTruthy();
     expect(screen.getAllByText(/approximate public area/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Source: Visit Portugal; Rumia editorial review/i).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("button", { name: /Second stop/i }));
     expect(onSelect).toHaveBeenCalledWith("second");
   });

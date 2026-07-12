@@ -70,6 +70,7 @@ export function ActivityMapFallback({
                     <span className="block font-medium text-primary">{item.title}</span>
                     <span className="mt-1 block text-sm leading-relaxed text-on-surface-variant">{item.verdict}</span>
                     <span className="mt-2 block text-xs uppercase tracking-[0.12em] text-ochre-dark">{geometryLabel} · {item.bestTime}{item.durationMinutes ? ` · ${item.durationMinutes} min` : ""}</span>
+                    {item.evidenceAttribution ? <span className="mt-2 block text-xs text-on-surface-variant">Source: {item.evidenceAttribution}</span> : null}
                   </span>
                 </span>
               </button>
