@@ -25,6 +25,8 @@ export function ActivityResultCard({
         <button
           className="min-h-11 border-b border-ochre-dark px-1 py-2 text-left text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light md:text-right"
           type="button"
+          aria-pressed={saved}
+          data-saved={saved ? "true" : "false"}
           onClick={() => onToggle(activity.id)}
         >
           {saved ? `Remove ${activity.title} from this day` : `Save ${activity.title} to this day`}
