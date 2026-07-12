@@ -9,7 +9,7 @@ import { TopNav } from "../_components/top-nav";
 import { safeNext } from "../auth/safe-next";
 
 export const SIGN_IN_HELP_LINK_CLASS =
-  "text-ochre-dark underline underline-offset-2 hover:text-ochre-dark transition-colors duration-fast ease-standard";
+  "text-ochre-dark underline underline-offset-2 hover:text-[var(--color-ochre-on-light)] transition-colors duration-fast ease-standard";
 
 export const metadata: Metadata = {
   title: "Sign in | Rumia",
