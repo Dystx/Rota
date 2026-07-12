@@ -52,16 +52,17 @@ export function ActivityWorkspace({
   const [lastRemoved, setLastRemoved] = useState<{ activity: EditorialActivity; index: number } | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
   const [mapSelectedActivityId, setMapSelectedActivityId] = useState<string | null>(initialActivities[0]?.id ?? null);
+  const mapTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   const totalMinutes = activities.reduce((total, activity) => total + activity.durationMinutes, 0);
   const activitiesMotionKey = activities.map((activity) => activity.id).join("|") || "empty";
   const feedbackParams = new URLSearchParams({ source: "activity-day" });
   for (const activity of activities) feedbackParams.append("activity", activity.id);
   const feedbackHref = `/feedback?${feedbackParams.toString()}`;
 
-  function announce(nextStatus: string) {
+  const announce = React.useCallback((nextStatus: string) => {
     setStatus(nextStatus);
     setStatusRevision((revision) => revision + 1);
-  }
+  }, []);
 
   function replaceWorkspaceUrl(nextActivities: readonly EditorialActivity[]) {
     const href = workspaceUrl(nextActivities);
@@ -95,10 +96,22 @@ export function ActivityWorkspace({
     announce("Map opened. The activity list remains available below.");
   }
 
-  function closeMap() {
+  const closeMap = React.useCallback(() => {
     setMapOpen(false);
     announce("Map closed. The activity list remains available.");
-  }
+    mapTriggerRef.current?.focus();
+  }, [announce]);
+
+  React.useEffect(() => {
+    if (!mapOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      closeMap();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [closeMap, mapOpen]);
 
   const selectMapActivity = React.useCallback((activityId: string) => {
     setMapSelectedActivityId(activityId);
@@ -155,6 +168,7 @@ export function ActivityWorkspace({
               <p className="mt-1 text-sm leading-relaxed text-on-surface-variant">The map is optional and list-equivalent. It only loads after you ask to view these selected activities spatially.</p>
             </div>
             <button
+              ref={mapTriggerRef}
               type="button"
               aria-controls="activity-map-panel"
               aria-expanded={mapOpen}

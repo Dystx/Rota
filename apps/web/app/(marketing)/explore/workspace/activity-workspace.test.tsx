@@ -56,6 +56,20 @@ describe("ActivityWorkspace", () => {
     expect(screen.getByRole("link", { name: /Give feedback on this day/i }).getAttribute("href")).toContain("activity=porto-bombarda-art-walk");
   });
 
+  it("closes the optional map with Escape and restores focus to its trigger", async () => {
+    render(<ActivityWorkspace initialActivities={REVIEWED_ACTIVITY_SEED.slice(0, 2)} mapEnabled />);
+
+    const trigger = screen.getByRole("button", { name: "View on map" });
+    fireEvent.click(trigger);
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    await waitFor(() => expect(trigger.getAttribute("aria-expanded")).toBe("false"));
+    expect(document.activeElement).toBe(trigger);
+    expect(screen.getByTestId("workspace-status").textContent).toMatch(/Map closed/i);
+  });
+
   it("restarts save and status motion when the chosen-day state changes", () => {
     render(<ActivityWorkspace initialActivities={REVIEWED_ACTIVITY_SEED.slice(0, 2)} />);
 
