@@ -5,11 +5,17 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { useReducedMotion } from "@repo/ui";
 import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createWorkspaceEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
-import { ActivityPointsLayer } from "../adapters/maplibre/layers/activity-points";
+import {
+  ActivityPointsLayer,
+  ACTIVITY_POINTS_LABEL_LAYER_ID,
+  ACTIVITY_POINTS_LAYER_ID
+} from "../adapters/maplibre/layers/activity-points";
+import { AMBIENT_PULSE_LAYER_ID } from "../adapters/maplibre/layers/ambient-pulse";
+import { ROUTE_STOPS_LAYER_ID } from "../adapters/maplibre/layers/route-layer";
+import { SYMBOL_BADGES_LAYER_ID } from "../adapters/maplibre/layers/symbol-badges";
 import { CameraChoreography } from "../core/camera-choreography";
 import { fixtureRouteCollection } from "../fixtures/routes";
 import { fixtureTravelerCollection, fixtureSpecialistCollection } from "../fixtures/travelers";
-import { CLICKABLE_LAYER_IDS } from "../index";
 import type { ViewportState } from "../core/viewport";
 import type {
   CameraTarget,
@@ -220,6 +226,11 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       onActivitySelect,
       onMapError
     };
+    const clickableLayerIds = React.useMemo(() => [
+      ...(showContextLayers ? [AMBIENT_PULSE_LAYER_ID, SYMBOL_BADGES_LAYER_ID] : []),
+      ...(showRoute ? [ROUTE_STOPS_LAYER_ID] : []),
+      ...(activityPoints ? [ACTIVITY_POINTS_LAYER_ID, ACTIVITY_POINTS_LABEL_LAYER_ID] : [])
+    ], [activityPoints, showContextLayers, showRoute]);
 
     // Track which route collection we last seeded so we only re-publish
     // when the prop actually changes (otherwise every parent render
@@ -386,7 +397,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
                   if (!callbacks.onStopClick && !callbacks.onActivitySelect) return;
                   const features = map.queryRenderedFeatures(
                     [event.point.x, event.point.y],
-                    { layers: CLICKABLE_LAYER_IDS as string[] }
+                    { layers: clickableLayerIds }
                   );
                   const feature = features[0];
                   if (!feature) return;
@@ -474,7 +485,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
     // target is captured on first mount, and route features are
     // re-seeded by the dedicated effect below when the prop changes.
     // This stops the engine from remounting on every parent render.
-    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, projection, showRoute, showContextLayers]);
+    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, projection, showRoute, showContextLayers, clickableLayerIds]);
 
     // Runtime projection switch (post-mount). The mount effect above
     // handles the initial value; this effect fires on every subsequent
