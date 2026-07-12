@@ -21,7 +21,7 @@ import { publicDraftToPlannerUrl } from "../(marketing)/_components/public-trip-
  *   - The Azores (12-col, 1-row) — Island Archipelago
  *
  * Per-card CTAs (Stitch 1.3 "1 click to begin" pattern):
- *   - `mode="plan"` (the home) — each card has one route action
+ *   - `mode="plan"` (legacy planner surface) — each card has one route action
  *       backed by the same choice-draft URL adapter as the hero.
  *   - `mode="explore"` — each card has a single link that covers the
  *     full card area: "See what is worth doing" → /explore?region=<slug>
