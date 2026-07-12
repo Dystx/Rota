@@ -10,7 +10,7 @@ export default function ConsoleWorkspacePage() {
   return (
     <>
       <div
-        className="md:ml-64 min-h-screen flex flex-col bg-background relative"
+        className="md:ml-64 min-w-0 min-h-screen flex flex-col bg-background relative overflow-x-hidden"
         style={{ backgroundImage: AMBIENT_PATTERN }}
       >
         <header className="h-header-height px-container-padding-lg flex items-center justify-between border-b border-olive-light/10 bg-surface/50 backdrop-blur-md shrink-0 z-10">

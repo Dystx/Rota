@@ -4,6 +4,15 @@ import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createAdminStorageState } from "../fixtures/admin-auth";
 import { travelerTripPath } from "../fixtures/traveler-trip";
 
+// Keep the assertion compatible with both the committed Supabase fixture and
+// the current Better Auth fixture while limiting accepted names to known
+// session-cookie shapes.
+const authSessionCookieName = /^(?:better-auth\.session_token|sb-[a-z0-9]+(?:-[a-z0-9]+)*-auth-token(?:\.\d+)?)$/i;
+
+function hasAuthSessionCookie(cookies: ReadonlyArray<{ name: string }>): boolean {
+  return cookies.some((cookie) => authSessionCookieName.test(cookie.name));
+}
+
 const marketingRoutes = [
   "/",
   "/portugal",
@@ -80,7 +89,7 @@ async function assertRouteQuality(page: any, route: string, authenticated = fals
   await expect(page.locator("img[src*='placehold'], img[src*='placeholder'], img[src*='unsplash.com']"), `${route} must not use placeholder imagery`).toHaveCount(0);
   if (authenticated) {
     const authCookies = await page.context().cookies();
-    expect(authCookies.some((cookie: { name: string }) => cookie.name === "better-auth.session_token"), `${route} requires an authenticated storage-state marker`).toBe(true);
+    expect(hasAuthSessionCookie(authCookies), `${route} requires an authenticated storage-state marker`).toBe(true);
     // A happy-path capture must never silently become an auth redirect.
     await expect(page).not.toHaveURL(/\/sign-in/);
     await expect(page.locator("body")).not.toContainText("Sign in to");

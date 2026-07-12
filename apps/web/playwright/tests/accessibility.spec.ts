@@ -8,6 +8,14 @@ import { createTravelerStorageState } from "../fixtures/traveler-auth";
 import { getTravelerTripId, travelerTripPath } from "../fixtures/traveler-trip";
 
 const axeResults: { path: string; violations: any[] }[] = [];
+
+// Accept the committed Supabase fixture cookie as well as the current Better
+// Auth fixture without treating arbitrary cookie names as proof of a session.
+const authSessionCookieName = /^(?:better-auth\.session_token|sb-[a-z0-9]+(?:-[a-z0-9]+)*-auth-token(?:\.\d+)?)$/i;
+
+function hasAuthSessionCookie(cookies: ReadonlyArray<{ name: string }>): boolean {
+  return cookies.some((cookie) => authSessionCookieName.test(cookie.name));
+}
 const h1AuditResults: {
   path: string;
   status: "ok" | "auth-redirect" | "permission-blocked" | "unexpected";
@@ -202,7 +210,7 @@ test.describe("Accessibility Audit - Traveler", () => {
     test(`@smoke @a11y traveler route ${index + 1}`, async ({ page }) => {
       const route = routeFactory();
       const authCookies = await page.context().cookies();
-      expect(authCookies.some((cookie) => cookie.name === "better-auth.session_token"), "traveler storage state must be loaded before auditing protected routes").toBe(true);
+      expect(hasAuthSessionCookie(authCookies), "traveler storage state must be loaded before auditing protected routes").toBe(true);
       await page.goto(route);
       await expect(page).not.toHaveURL(/\/sign-in/);
       await verifyLandmarksAndFocus(page, route);

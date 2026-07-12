@@ -255,7 +255,7 @@ export default function ConsoleMessagesPage() {
 
   return (
     <>
-      <div className="md:ml-64 min-h-screen flex flex-col bg-background relative">
+      <div className="md:ml-64 min-w-0 min-h-screen flex flex-col bg-background relative overflow-x-hidden">
         <div
           aria-hidden
           className="fixed inset-0 z-0 bg-cover bg-center opacity-40 blur-sm pointer-events-none"

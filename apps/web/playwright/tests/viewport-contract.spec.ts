@@ -1,5 +1,5 @@
 import { mkdirSync } from "node:fs";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { createAdminStorageState } from "../fixtures/admin-auth";
 import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
@@ -67,6 +67,20 @@ function routeName(route: string): string {
   return route.replace(/[^a-z0-9]+/giu, "-").replace(/^-|-$/gu, "") || "home";
 }
 
+function evidencePath(testInfo: TestInfo, viewportName: string, scope: string, route: string): string {
+  const directory = `${evidenceRoot}/${testInfo.project.name}/${viewportName}`;
+  mkdirSync(directory, { recursive: true });
+  return `${directory}/${scope}-${routeName(route)}.png`;
+}
+
+async function waitForRouteReady(page: Page): Promise<void> {
+  await page.locator("main").waitFor({ state: "visible", timeout: 15_000 });
+  await page.locator("h1:visible").first().waitFor({ state: "visible", timeout: 15_000 });
+  // Let hydration and route-level effects emit their diagnostics before the
+  // browser-error assertion; this remains short and deterministic.
+  await page.waitForTimeout(150);
+}
+
 function isKnownChromiumWebGlDiagnostic(message: string): boolean {
   return /GL Driver Message.*GPU stall due to ReadPixels/iu.test(message);
 }
@@ -102,7 +116,7 @@ for (const viewport of viewportRows) {
     test.setTimeout(60_000);
 
     for (const route of publicRoutes) {
-      test(`route ${route}`, async ({ page }) => {
+      test(`route ${route}`, async ({ page }, testInfo) => {
         const browserErrors: string[] = [];
         page.on("pageerror", (error) => browserErrors.push(`pageerror: ${error.message}`));
         page.on("console", (message) => {
@@ -110,12 +124,13 @@ for (const viewport of viewportRows) {
         });
 
         await page.goto(route, { waitUntil: "domcontentloaded" });
-        await page.locator("main").waitFor({ state: "visible", timeout: 15_000 });
+        await waitForRouteReady(page);
         await assertTabletContract(page, route);
         await page.screenshot({
-          path: `${evidenceRoot}/${viewport.name}/public-${routeName(route)}.png`,
+          path: evidencePath(testInfo, viewport.name, "public", route),
           fullPage: false
         });
+        await page.waitForTimeout(100);
         expect(browserErrors, `${route} should not emit browser errors at ${viewport.name}px`).toEqual([]);
       });
     }
@@ -126,7 +141,7 @@ for (const viewport of viewportRows) {
     test.setTimeout(60_000);
 
     for (const [routeIndex, routeEntry] of travelerRoutes.entries()) {
-      test(`route ${typeof routeEntry === "string" ? routeEntry : `generated-trip-${routeIndex + 1}`}`, async ({ page }) => {
+      test(`route ${typeof routeEntry === "string" ? routeEntry : `generated-trip-${routeIndex + 1}`}`, async ({ page }, testInfo) => {
         const route = typeof routeEntry === "string" ? routeEntry : routeEntry();
         const browserErrors: string[] = [];
         page.on("pageerror", (error) => browserErrors.push(`pageerror: ${error.message}`));
@@ -136,11 +151,13 @@ for (const viewport of viewportRows) {
 
         await page.goto(route, { waitUntil: "domcontentloaded" });
         await expect(page).not.toHaveURL(/\/sign-in/);
+        await waitForRouteReady(page);
         await assertTabletContract(page, route);
         await page.screenshot({
-          path: `${evidenceRoot}/${viewport.name}/traveler-${routeName(route)}.png`,
+          path: evidencePath(testInfo, viewport.name, "traveler", route),
           fullPage: false
         });
+        await page.waitForTimeout(100);
         expect(browserErrors, `${route} should not emit browser errors at ${viewport.name}px`).toEqual([]);
       });
     }
@@ -151,7 +168,7 @@ for (const viewport of viewportRows) {
     test.setTimeout(60_000);
 
     for (const route of reviewerRoutes) {
-      test(`route ${route}`, async ({ page }) => {
+      test(`route ${route}`, async ({ page }, testInfo) => {
         const browserErrors: string[] = [];
         page.on("pageerror", (error) => browserErrors.push(`pageerror: ${error.message}`));
         page.on("console", (message) => {
@@ -160,11 +177,13 @@ for (const viewport of viewportRows) {
 
         await page.goto(route, { waitUntil: "domcontentloaded" });
         await expect(page).not.toHaveURL(/\/sign-in/);
+        await waitForRouteReady(page);
         await assertTabletContract(page, route);
         await page.screenshot({
-          path: `${evidenceRoot}/${viewport.name}/reviewer-${routeName(route)}.png`,
+          path: evidencePath(testInfo, viewport.name, "reviewer", route),
           fullPage: false
         });
+        await page.waitForTimeout(100);
         expect(browserErrors, `${route} should not emit browser errors at ${viewport.name}px`).toEqual([]);
       });
     }
@@ -175,7 +194,7 @@ for (const viewport of viewportRows) {
     test.setTimeout(60_000);
 
     for (const route of adminRoutes) {
-      test(`route ${route}`, async ({ page }) => {
+      test(`route ${route}`, async ({ page }, testInfo) => {
         const browserErrors: string[] = [];
         page.on("pageerror", (error) => browserErrors.push(`pageerror: ${error.message}`));
         page.on("console", (message) => {
@@ -184,11 +203,13 @@ for (const viewport of viewportRows) {
 
         await page.goto(route, { waitUntil: "domcontentloaded" });
         await expect(page).not.toHaveURL(/\/sign-in/);
+        await waitForRouteReady(page);
         await assertTabletContract(page, route);
         await page.screenshot({
-          path: `${evidenceRoot}/${viewport.name}/admin-${routeName(route)}.png`,
+          path: evidencePath(testInfo, viewport.name, "admin", route),
           fullPage: false
         });
+        await page.waitForTimeout(100);
         expect(browserErrors, `${route} should not emit browser errors at ${viewport.name}px`).toEqual([]);
       });
     }
