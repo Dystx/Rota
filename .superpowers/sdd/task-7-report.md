@@ -65,4 +65,3 @@ renders do not import the map facade or request tiles. The existing route layer
 remains the default for legacy workspace/trip consumers. The provider remains
 the documented CARTO candidate with visible OpenStreetMap/CARTO attribution;
 production enablement still depends on the licensing record.
-

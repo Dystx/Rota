@@ -10,4 +10,3 @@ export function bindLayerToChannel(layer: SpatialLayer, channel: TelemetryChanne
 export function getLayerChannel(layer: SpatialLayer): TelemetryChannel | undefined {
   return bindings.get(layer);
 }
-
