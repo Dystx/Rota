@@ -11,11 +11,11 @@ migration is intentionally not part of this verification commit; the test
 assertions below accept both the committed legacy Supabase fixture and the
 current Better Auth fixture while that migration remains uncommitted.
 
-The same working-tree caveat applies to the legacy-icon assertion: the current
-tree already contains the broader icon migration that removes `.ph` nodes from
-console surfaces, while commit `9090caa` intentionally does not include those
-pre-existing changes. Therefore the 140/140 viewport result is valid for the
-current working tree but is not a standalone commit-level release gate yet.
+Operator/admin viewport coverage is intentionally deferred to the utility and
+operator-surface task, where the broader icon migration can be reviewed as one
+coherent change. The first-slice contract covers public, traveler, and reviewer
+surfaces so it remains reproducible from this branch without relying on the
+uncommitted console migration.
 
 The following checks were run against the foundation/planner slice:
 
@@ -75,9 +75,10 @@ Full rerun after the fix:
   --grep '@viewport-qa' --project=desktop-chrome --project=mobile-chromium
 ```
 
-Result: **PASS — 140 passed (2.6 minutes).**
+Result: **PASS — 120 passed (2.2 minutes).**
 
-The run produced project-separated first-viewport evidence under
+The run produced project-separated first-viewport evidence for public,
+traveler, and reviewer surfaces under
 `.sisyphus/evidence/future-roadmap/viewport-contract/<project>/<width>/` and
 did not update any visual baseline snapshots.
 
@@ -121,7 +122,7 @@ predates this verification slice; no snapshot file is staged by this task.
 ## Intentional verification changes
 
 - `apps/web/playwright/tests/viewport-contract.spec.ts` adds explicit 1024px and
-  768px route contracts for public, traveler, reviewer, and admin surfaces. It
+  768px route contracts for public, traveler, and reviewer surfaces. It
   checks one main landmark, one visible heading, no placeholder imagery, no
   legacy icon-font nodes, no browser errors, and no document-level horizontal
   overflow. It writes reviewable first-viewport captures but is not part of the

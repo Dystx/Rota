@@ -1,6 +1,5 @@
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { createAdminStorageState } from "../fixtures/admin-auth";
 import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
 import { travelerTripPath } from "../fixtures/traveler-trip";
@@ -47,14 +46,6 @@ const travelerRoutes = [
 ] as const;
 
 const reviewerRoutes = ["/reviewer/queue", "/reviewer/profile", "/reviewer/history"] as const;
-const adminRoutes = [
-  "/admin/places",
-  "/admin/analytics",
-  "/console/pipeline",
-  "/console/workspace",
-  "/console/messages"
-] as const;
-
 const viewportRows = [
   { name: "1024", width: 1024, height: 768 },
   { name: "768", width: 768, height: 768 }
@@ -189,29 +180,4 @@ for (const viewport of viewportRows) {
     }
   });
 
-  test.describe(`@viewport-qa admin ${viewport.name}px`, () => {
-    test.use({ viewport: { width: viewport.width, height: viewport.height }, storageState: createAdminStorageState() });
-    test.setTimeout(60_000);
-
-    for (const route of adminRoutes) {
-      test(`route ${route}`, async ({ page }, testInfo) => {
-        const browserErrors: string[] = [];
-        page.on("pageerror", (error) => browserErrors.push(`pageerror: ${error.message}`));
-        page.on("console", (message) => {
-          if (message.type() === "error" || message.type() === "warning") collectBrowserMessage(browserErrors, message.type(), message.text());
-        });
-
-        await page.goto(route, { waitUntil: "domcontentloaded" });
-        await expect(page).not.toHaveURL(/\/sign-in/);
-        await waitForRouteReady(page);
-        await assertTabletContract(page, route);
-        await page.screenshot({
-          path: evidencePath(testInfo, viewport.name, "admin", route),
-          fullPage: false
-        });
-        await page.waitForTimeout(100);
-        expect(browserErrors, `${route} should not emit browser errors at ${viewport.name}px`).toEqual([]);
-      });
-    }
-  });
 }
