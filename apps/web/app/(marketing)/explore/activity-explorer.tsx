@@ -20,6 +20,14 @@ import {
 import { ActivityDayTray } from "../_components/activity-day-tray";
 import { ActivityResultCard } from "../_components/activity-result-card";
 
+const REGION_LABELS: Record<ActivityIntent["region"], string> = {
+  porto: "Porto",
+  lisbon: "Lisbon",
+  douro: "Douro",
+  algarve: "The Algarve",
+  azores: "The Azores"
+};
+
 function toIntent(draft: ActivityIntentDraft): ActivityIntent {
   const regionByLabel = {
     Porto: "porto",
@@ -52,6 +60,7 @@ export function ActivityExplorer({
   const [intent, setIntent] = useState(initialIntent);
   const [savedIds, setSavedIds] = useState<readonly string[]>(initialSavedIds);
   const [status, setStatus] = useState("");
+  const [statusRevision, setStatusRevision] = useState(0);
   const activities = useMemo(() => getReviewedActivities(REVIEWED_ACTIVITY_SEED, intent), [intent]);
   const activitiesById = useMemo(
     () => new Map(REVIEWED_ACTIVITY_SEED.map((activity) => [activity.id, activity])),
@@ -61,6 +70,19 @@ export function ActivityExplorer({
     const activity = activities.find((candidate) => candidate.id === savedId);
     return activity ? [activity] : [];
   });
+  const intentMotionKey = [
+    intent.region,
+    intent.timeWindow,
+    intent.moods.join(","),
+    intent.group,
+    intent.constraints.join("|")
+  ].join(":");
+  const savedMotionKey = savedIds.join("|") || "empty";
+
+  function announce(nextStatus: string) {
+    setStatus(nextStatus);
+    setStatusRevision((revision) => revision + 1);
+  }
 
   function toggle(activityId: string) {
     const activity = activitiesById.get(activityId);
@@ -74,7 +96,7 @@ export function ActivityExplorer({
 
     if (activity) {
       const count = nextSavedIds.length;
-      setStatus(
+      announce(
         removing
           ? `${activity.title} removed from your day.`
           : `${activity.title} added to your day; ${count} ${count === 1 ? "activity" : "activities"} selected.`
@@ -86,7 +108,8 @@ export function ActivityExplorer({
     const next = toIntent(draft);
     setIntent(next);
     setSavedIds([]);
-    setStatus(`Activity suggestions updated for ${draft.region || "your selected region"}; your saved day was cleared.`);
+    const savedDaySuffix = savedIds.length > 0 ? "; your saved day was cleared" : "";
+    announce(`Activity suggestions updated for ${REGION_LABELS[next.region]}${savedDaySuffix}.`);
     router.replace(activityExplorerUrl(next));
   }
 
@@ -102,13 +125,23 @@ export function ActivityExplorer({
       data-reduced-motion={reducedMotion ? "true" : "false"}
       className="mx-auto grid max-w-6xl gap-10 px-6 pb-[calc(12rem+env(safe-area-inset-bottom))] pt-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:pb-28 lg:py-16"
     >
-      <div className={`sr-only ${reducedMotion ? "transition-none" : "rumia-status-transition"}`}>
+      <div
+        key={`${statusRevision}:${status}`}
+        data-motion-key={statusRevision}
+        data-testid="activity-status-motion"
+        className={`sr-only ${reducedMotion ? "transition-none" : "rumia-status-transition"}`}
+      >
         <StatusRegion testId="activity-status">{status}</StatusRegion>
       </div>
       <div>
         <p className="text-sm text-ochre-dark">Portugal, judged with your time in mind</p>
         <h1 className="mt-3 font-display text-5xl text-primary md:text-6xl">What deserves this day?</h1>
-        <div className={`mt-7 rounded-sm bg-primary px-5 py-7 md:px-8 ${reducedMotion ? "transition-none" : "rumia-phrase-transition"}`}>
+        <div
+          key={intentMotionKey}
+          data-motion-key={intentMotionKey}
+          data-testid="activity-phrase-motion"
+          className={`mt-7 rounded-sm bg-primary px-5 py-7 md:px-8 ${reducedMotion ? "transition-none" : "rumia-phrase-transition"}`}
+        >
           <ActivityIntentComposer initial={{ region: intent.region === "porto" ? "Porto" : intent.region === "lisbon" ? "Lisbon" : intent.region === "douro" ? "Douro" : intent.region === "algarve" ? "The Algarve" : "The Azores", timeWindow: intent.timeWindow, moods: intent.moods, group: intent.group, constraints: intent.constraints }} onSubmit={updateIntent} />
         </div>
 
@@ -121,8 +154,12 @@ export function ActivityExplorer({
           )}
         </section>
       </div>
-      <div className={`lg:sticky lg:top-24 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`}>
-        <ActivityDayTray activities={savedActivities} onRemove={toggle} onContinue={continueToWorkspace} />
+      <div
+        key={savedMotionKey}
+        data-motion-key={savedMotionKey}
+        className={`lg:sticky lg:top-24 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`}
+      >
+        <ActivityDayTray key={savedMotionKey} activities={savedActivities} onRemove={toggle} onContinue={continueToWorkspace} />
       </div>
     </div>
   );

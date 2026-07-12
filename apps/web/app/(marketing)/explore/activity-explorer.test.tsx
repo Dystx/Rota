@@ -50,6 +50,7 @@ describe("ActivityExplorer", () => {
   it("announces a phrase replacement through the authoritative status region", () => {
     render(<ActivityExplorer initialIntent={parseActivityIntent({ region: "porto" })} />);
 
+    const initialPhraseMotionKey = screen.getByTestId("activity-phrase-motion").getAttribute("data-motion-key");
     const regionPhrase = screen.getByRole("button", { name: /Region, Porto/i });
     fireEvent.click(regionPhrase);
     fireEvent.click(screen.getByRole("button", { name: "Lisbon" }));
@@ -60,6 +61,39 @@ describe("ActivityExplorer", () => {
     expect(status.getAttribute("aria-live")).toBe("polite");
     expect(status.textContent).toMatch(/updated/i);
     expect(status.textContent).toMatch(/Lisbon/i);
+    expect(status.textContent).not.toMatch(/saved day was cleared/i);
+    expect(screen.getByTestId("activity-phrase-motion").getAttribute("data-motion-key")).not.toBe(initialPhraseMotionKey);
+  });
+
+  it("restarts status and tray motion contracts after a saved-day update", () => {
+    render(<ActivityExplorer initialIntent={parseActivityIntent({ region: "porto", mood: "a walk" })} />);
+
+    const initialStatusMotionKey = screen.getByTestId("activity-status-motion").getAttribute("data-motion-key");
+    const save = screen.getAllByRole("button", { name: /Save .* to this day/i })[0]!;
+    fireEvent.click(save);
+
+    const statusMotion = screen.getByTestId("activity-status-motion");
+    const tray = screen.getByRole("region", { name: /Your day/i });
+    expect(statusMotion.className).toContain("rumia-status-transition");
+    expect(statusMotion.getAttribute("data-motion-key")).not.toBe(initialStatusMotionKey);
+    expect(tray.className).toContain("rumia-save-transition");
+    expect(tray.getAttribute("data-motion-key")).toBe("porto-ribeira-slow-walk");
+  });
+
+  it("only reports clearing the saved day when the replacement starts with saved activities", () => {
+    render(
+      <ActivityExplorer
+        initialIntent={parseActivityIntent({ region: "porto" })}
+        initialSavedIds={["porto-ribeira-slow-walk"]}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /Region, Porto/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Lisbon" }));
+    fireEvent.click(screen.getByRole("button", { name: /Show me what is worth doing/i }));
+
+    expect(screen.getByTestId("activity-status").textContent).toMatch(/updated for Lisbon/i);
+    expect(screen.getByTestId("activity-status").textContent).toMatch(/saved day was cleared/i);
   });
 
   it("keeps reversed saved IDs in query order when showing and handing off the day", () => {

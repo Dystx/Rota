@@ -55,6 +55,23 @@ describe("ActivityWorkspace", () => {
     expect(screen.getByRole("link", { name: /Give feedback on this day/i }).getAttribute("href")).toContain("activity=porto-bombarda-art-walk");
   });
 
+  it("restarts save and status motion when the chosen-day state changes", () => {
+    render(<ActivityWorkspace initialActivities={REVIEWED_ACTIVITY_SEED.slice(0, 2)} />);
+
+    const initialListMotionKey = screen.getByRole("list", { name: "Chosen activities" }).getAttribute("data-motion-key");
+    const initialStatusMotionKey = screen.getByTestId("workspace-status").parentElement?.getAttribute("data-motion-key");
+    fireEvent.click(
+      screen.getByRole("button", { name: /Remove Ribeira and Miragaia at walking pace/i })
+    );
+
+    const list = screen.getByRole("list", { name: "Chosen activities" });
+    expect(list.className).toContain("rumia-save-transition");
+    expect(list.getAttribute("data-motion-key")).not.toBe(initialListMotionKey);
+    const statusMotion = screen.getByTestId("workspace-status").parentElement;
+    expect(statusMotion?.className).toContain("rumia-status-transition");
+    expect(statusMotion?.getAttribute("data-motion-key")).not.toBe(initialStatusMotionKey);
+  });
+
   it("shares the current chosen activities through a stable workspace link", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", {

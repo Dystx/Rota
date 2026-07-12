@@ -146,6 +146,7 @@ export function ToastViewport({ position = "bottom-right" }: ToastViewportProps 
       {items.map((t) => (
         <div
           key={t.id}
+          data-motion-key={t.id}
           role="status"
           className={cn(
             "flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-sm",

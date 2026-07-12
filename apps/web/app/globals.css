@@ -24,13 +24,15 @@
   }
 
   /* Rumia feedback motion is deliberately limited to opacity and position.
-   * State is committed by React first; these classes only soften the visual
-   * handoff after the activity/day state has changed. */
+   * React commits state first; keyed state surfaces then mount these short
+   * animations as a visual handoff. */
   .rumia-phrase-transition,
   .rumia-status-transition,
   .rumia-save-transition {
     transition-property: opacity, transform;
     transition-timing-function: var(--ease-standard, cubic-bezier(0.2, 0, 0, 1));
+    animation-fill-mode: both;
+    animation-timing-function: var(--ease-standard, cubic-bezier(0.2, 0, 0, 1));
   }
 
   .rumia-phrase-transition,
@@ -38,8 +40,53 @@
     transition-duration: 160ms;
   }
 
+  .rumia-phrase-transition {
+    animation: rumia-phrase-enter 160ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)) both;
+  }
+
+  .rumia-status-transition {
+    animation: rumia-status-enter 160ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)) both;
+  }
+
   .rumia-save-transition {
     transition-duration: 200ms;
+    animation: rumia-save-enter 200ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)) both;
+  }
+}
+
+@keyframes rumia-phrase-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rumia-save-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rumia-status-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.15rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -47,8 +94,12 @@
   .rumia-phrase-transition,
   .rumia-status-transition,
   .rumia-save-transition {
+    animation-duration: 0ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0ms !important;
     transition-delay: 0ms !important;
+    opacity: 1 !important;
     transform: none !important;
   }
 }

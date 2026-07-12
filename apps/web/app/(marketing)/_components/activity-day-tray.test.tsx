@@ -20,6 +20,8 @@ describe("ActivityDayTray", () => {
     expect(tray.className).toContain("fixed");
     expect(tray.className).toContain("safe-area-inset-bottom");
     expect(tray.className).toContain("md:static");
+    expect(tray.className).toContain("rumia-save-transition");
+    expect(tray.getAttribute("data-motion-key")).toBe("porto-ribeira-slow-walk");
     expect(screen.getByRole("button", { name: /See this day/i }).className).toContain("min-h-11");
   });
 });

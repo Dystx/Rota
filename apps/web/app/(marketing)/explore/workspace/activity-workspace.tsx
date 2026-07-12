@@ -33,11 +33,18 @@ export function ActivityWorkspace({
   const reducedMotion = useReducedMotion();
   const [activities, setActivities] = useState(initialActivities);
   const [status, setStatus] = useState("");
+  const [statusRevision, setStatusRevision] = useState(0);
   const [lastRemoved, setLastRemoved] = useState<{ activity: EditorialActivity; index: number } | null>(null);
   const totalMinutes = activities.reduce((total, activity) => total + activity.durationMinutes, 0);
+  const activitiesMotionKey = activities.map((activity) => activity.id).join("|") || "empty";
   const feedbackParams = new URLSearchParams({ source: "activity-day" });
   for (const activity of activities) feedbackParams.append("activity", activity.id);
   const feedbackHref = `/feedback?${feedbackParams.toString()}`;
+
+  function announce(nextStatus: string) {
+    setStatus(nextStatus);
+    setStatusRevision((revision) => revision + 1);
+  }
 
   function replaceWorkspaceUrl(nextActivities: readonly EditorialActivity[]) {
     const href = workspaceUrl(nextActivities);
@@ -53,7 +60,7 @@ export function ActivityWorkspace({
     setActivities(nextActivities);
     replaceWorkspaceUrl(nextActivities);
     setLastRemoved({ activity, index });
-    setStatus(`${activity.title} removed from your day.`);
+    announce(`${activity.title} removed from your day.`);
   }
 
   function undoRemove() {
@@ -66,7 +73,7 @@ export function ActivityWorkspace({
     setActivities(nextActivities);
     replaceWorkspaceUrl(nextActivities);
     setLastRemoved(null);
-    setStatus(`${activity.title} restored to your day.`);
+    announce(`${activity.title} restored to your day.`);
   }
 
   async function share() {
@@ -74,15 +81,15 @@ export function ActivityWorkspace({
     for (const activity of activities) url.searchParams.append("activity", activity.id);
 
     if (!navigator.clipboard?.writeText) {
-      setStatus("Copying is unavailable here. You can copy this page address instead.");
+      announce("Copying is unavailable here. You can copy this page address instead.");
       return;
     }
 
     try {
       await navigator.clipboard.writeText(url.toString());
-      setStatus("Share link copied.");
+      announce("Share link copied.");
     } catch {
-      setStatus("We could not copy the link. You can copy this page address instead.");
+      announce("We could not copy the link. You can copy this page address instead.");
     }
   }
 
@@ -99,7 +106,7 @@ export function ActivityWorkspace({
         </p>
 
         {activities.length > 0 ? (
-          <ol className={`mt-10 space-y-8 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`} aria-label="Chosen activities">
+          <ol key={activitiesMotionKey} data-motion-key={activitiesMotionKey} className={`mt-10 space-y-8 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`} aria-label="Chosen activities">
             {activities.map((activity, index) => (
               <li className={reducedMotion ? "transition-none" : "rumia-save-transition"} key={activity.id}>
                 <article className="border-t border-[var(--color-border)] py-7">
@@ -139,7 +146,7 @@ export function ActivityWorkspace({
             ))}
           </ol>
         ) : (
-          <section className="mt-10 border-t border-[var(--color-border)] py-8" aria-label="No chosen activities">
+          <section key="empty" data-motion-key="empty" className={`mt-10 border-t border-[var(--color-border)] py-8 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`} aria-label="No chosen activities">
             <h2 className="font-display text-3xl text-primary">Choose again, with the day still yours.</h2>
             <p className="mt-3 max-w-xl text-on-surface-variant">Nothing is locked in. Start with one good decision, then leave room for the day to breathe.</p>
             <div className="mt-7 border-y border-[var(--color-border)] py-5" role="group" aria-label="Empty day preview">
@@ -177,7 +184,7 @@ export function ActivityWorkspace({
         </Link> : null}
         {activities.length > 0 ? <button className="mt-3 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-left text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" type="button" onClick={share}>Share this day</button> : null}
         {activities.length > 0 ? <Link className="mt-3 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href={feedbackHref}>Give feedback on this day</Link> : null}
-        <div className={status ? `mt-3 text-sm text-on-surface-variant ${reducedMotion ? "transition-none" : "rumia-status-transition"}` : "sr-only"}>
+        <div key={`${statusRevision}:${status}`} data-motion-key={statusRevision} className={status ? `mt-3 text-sm text-on-surface-variant ${reducedMotion ? "transition-none" : "rumia-status-transition"}` : "sr-only"}>
           <StatusRegion testId="workspace-status">{status}</StatusRegion>
         </div>
         {lastRemoved ? <button className="mt-2 min-h-11 border-b border-ochre-dark px-1 py-2 text-left text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" type="button" onClick={undoRemove}>Undo remove</button> : null}
