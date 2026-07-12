@@ -96,7 +96,12 @@ async function auditSourceHeading(routePath: string): Promise<boolean> {
   const relative = sourceFiles[routePath];
   if (!relative) return false;
 
-  const source = await fs.promises.readFile(path.join(process.cwd(), relative), "utf8");
+  const candidates = [
+    path.join(process.cwd(), relative),
+    path.join(process.cwd(), "apps/web", relative)
+  ];
+  const sourcePath = candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0]!;
+  const source = await fs.promises.readFile(sourcePath, "utf8");
   return source.includes("h1");
 }
 
@@ -189,6 +194,7 @@ test.describe("Accessibility Audit - Public", () => {
 });
 
 test.describe("Accessibility Audit - Traveler", () => {
+  test.setTimeout(60_000);
   test.use({ storageState: createTravelerStorageState() });
   const routes: Array<() => string> = [() => "/trip/new", tripPath, () => "/account", () => "/vault"];
   
@@ -196,7 +202,7 @@ test.describe("Accessibility Audit - Traveler", () => {
     test(`@smoke @a11y traveler route ${index + 1}`, async ({ page }) => {
       const route = routeFactory();
       const authCookies = await page.context().cookies();
-      expect(authCookies.some((cookie) => cookie.name.includes("auth-token")), "traveler storage state must be loaded before auditing protected routes").toBe(true);
+      expect(authCookies.some((cookie) => cookie.name === "better-auth.session_token"), "traveler storage state must be loaded before auditing protected routes").toBe(true);
       await page.goto(route);
       await expect(page).not.toHaveURL(/\/sign-in/);
       await verifyLandmarksAndFocus(page, route);

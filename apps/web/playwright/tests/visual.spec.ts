@@ -80,7 +80,7 @@ async function assertRouteQuality(page: any, route: string, authenticated = fals
   await expect(page.locator("img[src*='placehold'], img[src*='placeholder'], img[src*='unsplash.com']"), `${route} must not use placeholder imagery`).toHaveCount(0);
   if (authenticated) {
     const authCookies = await page.context().cookies();
-    expect(authCookies.some((cookie: { name: string }) => cookie.name.includes("auth-token")), `${route} requires an authenticated storage-state marker`).toBe(true);
+    expect(authCookies.some((cookie: { name: string }) => cookie.name === "better-auth.session_token"), `${route} requires an authenticated storage-state marker`).toBe(true);
     // A happy-path capture must never silently become an auth redirect.
     await expect(page).not.toHaveURL(/\/sign-in/);
     await expect(page.locator("body")).not.toContainText("Sign in to");
