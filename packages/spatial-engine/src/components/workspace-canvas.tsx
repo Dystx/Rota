@@ -446,18 +446,6 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
             observer.observe(container);
           }
 
-          if (!resolvedDisableIntro) {
-            const intro = new CameraChoreography()
-              .beat("iberian-context", { center: INTRO_CONTEXT_CENTER, zoom: INTRO_CONTEXT_ZOOM }, { duration: reducedMotion ? 0 : 1500 })
-              .beat("fit-route", { center: INTRO_FIT_CENTER, zoom: INTRO_FIT_ZOOM, duration: reducedMotion ? 0 : 1400 })
-              .beat("first-stop", { center: INTRO_STOP_CENTER, zoom: INTRO_STOP_ZOOM, duration: reducedMotion ? 0 : 900 });
-            try {
-              await engine.playChoreography(intro);
-            } catch {
-              // Choreography is best-effort; never let it block the page.
-            }
-          }
-
           let cleanedUp = false;
           const cleanup = () => {
             if (cleanedUp) return;
@@ -471,6 +459,19 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
             if (mountedCleanup === cleanup) mountedCleanup = null;
           };
           mountedCleanup = cleanup;
+
+          if (!resolvedDisableIntro) {
+            const intro = new CameraChoreography()
+              .beat("iberian-context", { center: INTRO_CONTEXT_CENTER, zoom: INTRO_CONTEXT_ZOOM }, { duration: reducedMotion ? 0 : 1500 })
+              .beat("fit-route", { center: INTRO_FIT_CENTER, zoom: INTRO_FIT_ZOOM, duration: reducedMotion ? 0 : 1400 })
+              .beat("first-stop", { center: INTRO_STOP_CENTER, zoom: INTRO_STOP_ZOOM, duration: reducedMotion ? 0 : 900 });
+            try {
+              await engine.playChoreography(intro);
+            } catch {
+              // Choreography is best-effort; never let it block the page.
+            }
+          }
+
           return cleanup;
         })
         .catch((err: unknown) => {
