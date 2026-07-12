@@ -40,6 +40,7 @@ describe("ActivityWorkspace", () => {
     expect(screen.getByRole("heading", { name: /Your tentative day/i })).toBeTruthy();
     expect(screen.getByText("Ribeira and Miragaia at walking pace")).toBeTruthy();
     expect(screen.getAllByText(/Rumia's judgement/i).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("button", { name: "View on map" })).toBeNull();
 
     fireEvent.click(
       screen.getByRole("button", { name: /Remove Ribeira and Miragaia at walking pace/i })

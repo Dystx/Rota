@@ -39,7 +39,7 @@ function workspaceUrl(activities: readonly EditorialActivity[]): string {
 
 export function ActivityWorkspace({
   initialActivities,
-  mapEnabled = true
+  mapEnabled = false
 }: {
   initialActivities: readonly EditorialActivity[];
   mapEnabled?: boolean;
