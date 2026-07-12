@@ -97,6 +97,8 @@ export interface WorkspaceCanvasProps {
   activityPoints?: SpatialFeatureCollection | null;
   /** Controlled marker/card selection for activity points. */
   selectedActivityId?: string | null;
+  /** Phase 3 only: opt-in building treatment for an approved basemap. */
+  showBuildingExtrusions?: boolean;
   className?: string;
   testId?: string;
   /** Accessible label override for product facades such as the activity map. */
@@ -182,6 +184,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       showContextLayers = true,
       activityPoints,
       selectedActivityId = null,
+      showBuildingExtrusions = false,
       className,
       testId = "workspace-canvas",
       ariaLabel,
@@ -315,7 +318,8 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       }, {
         includeRoute: showRoute,
         includeContextLayers: showContextLayers,
-        activityPoints: activityLayer ?? undefined
+        activityPoints: activityLayer ?? undefined,
+        includeBuildingExtrusions: showBuildingExtrusions
       });
       engineRef.current = engine;
 

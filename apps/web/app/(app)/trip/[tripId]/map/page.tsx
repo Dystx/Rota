@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { generateItineraryFromBrief } from "@repo/ai";
+import { isFeatureEnabled } from "@repo/config";
 import { listPartners } from "@repo/db";
 import { buildRouteValidation } from "@repo/routing";
+import { buildCameraPresets } from "@repo/spatial-engine";
 import {
   type MapRouteWarning,
   Badge,
@@ -65,6 +67,20 @@ export default async function TripMapPage({
 
   const activeDay = routeValidation?.days.find((routeDay) => routeDay.dayIndex === selectedDayIndex) ?? routeValidation?.days[0];
   const activeItineraryDay = itinerary?.days.find((routeDay) => routeDay.dayIndex === activeDay?.dayIndex) ?? itinerary?.days[0];
+  const activityMapEnabled = isFeatureEnabled("activityMap");
+  const storyPresets = buildCameraPresets(
+    (activeItineraryDay?.stops ?? []).map((stop, index) => {
+      if (typeof stop === "string") {
+        return { id: `stop-${index + 1}`, label: stop, center: null };
+      }
+      return {
+        id: `stop-${index + 1}`,
+        label: stop.placeName,
+        center: stop.lng !== undefined && stop.lat !== undefined ? [stop.lng, stop.lat] as const : null,
+        startTime: stop.startTime
+      };
+    })
+  );
   const activeWarnings = routeValidation?.warnings.filter(
     (warning) => warning.dayIndex === activeDay?.dayIndex || warning.dayIndex === undefined
   );
@@ -208,7 +224,15 @@ export default async function TripMapPage({
             </RevealSection>
 
             <RevealSection delayMs={160}>
-              <RouteMap tripId={tripId} selectedDayId={activeDay ? String(activeDay.dayIndex) : undefined} days={mapDays} warnings={mapWarnings}>
+              <RouteMap
+                tripId={tripId}
+                selectedDayId={activeDay ? String(activeDay.dayIndex) : undefined}
+                days={mapDays}
+                warnings={mapWarnings}
+                storyEnabled={activityMapEnabled && isFeatureEnabled("activityMapStorytelling")}
+                storyPresets={storyPresets}
+                showBuildingExtrusions={activityMapEnabled && isFeatureEnabled("activityMap3d")}
+              >
                 <MapPanel position="right" className="w-[380px] p-6">
                   <div className="flex flex-col gap-6">
                     <div>

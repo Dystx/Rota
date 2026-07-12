@@ -1,0 +1,30 @@
+[Unit]
+Description=Rumia loopback PMTiles tile endpoint (preflight)
+Documentation=file:///opt/apps/rumia/current/docs/ops/rumia-map-unblock-preflight.md
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/opt/rumia-map/tools/pmtiles
+ConditionPathExists=/opt/rumia-map/archives/20260712/portugal.pmtiles
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/opt/rumia-map/tools/pmtiles serve /opt/rumia-map/archives/20260712 --interface=127.0.0.1 --port=3011 --cache-size=64 --cors=http://127.0.0.1:3302 --public-url=http://127.0.0.1:3010/tiles
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=512M
+CPUQuota=100%
+
+[Install]
+WantedBy=multi-user.target

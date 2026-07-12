@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { travelerTripPath } from "../../fixtures/traveler-trip";
+import { createTravelerStorageState } from "../../fixtures/traveler-auth";
 
 /**
  * Trip map integration tests.
@@ -17,7 +18,7 @@ import { travelerTripPath } from "../../fixtures/traveler-trip";
  * the route collection is genuinely empty.
  */
 test.describe("Trip Map (Spatial Engine)", () => {
-  test.use({ viewport: { width: 1280, height: 800 } });
+  test.use({ viewport: { width: 1280, height: 800 }, storageState: createTravelerStorageState() });
 
   test("trip page map renders the spatial-engine canvas frame", async ({ page }) => {
     await page.goto(travelerTripPath("/map"));

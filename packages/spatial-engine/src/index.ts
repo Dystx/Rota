@@ -5,7 +5,7 @@
  *  - Core abstractions: SpatialEngine, SpatialLayer, CameraController,
  *    TelemetryService, MapStyleProvider (see ./core/types)
  *  - MapLibre GL JS adapter with globe projection + soft fog
- *  - CartoBasemapStyleProvider for open-source vector tiles
+ *  - CartoBasemapStyleProvider as a development/provider-candidate adapter
  *  - InMemoryTelemetryService for deterministic fixtures
  *  - Two reference layers: AmbientPulseLayer, SymbolBadgesLayer
  *  - GlobeWorkspace React component for the Discovery Hub
@@ -24,6 +24,7 @@ import { ACTIVITY_POINTS_LAYER_ID, ACTIVITY_POINTS_LABEL_LAYER_ID } from "./adap
 export * from "./core/types";
 export * from "./core/map-style-provider";
 export * from "./core/camera-controller";
+export * from "./core/camera-presets";
 export * from "./core/telemetry-service";
 export { setupMapLibreErrorSuppression } from "./core/maplibre-error-suppression";
 
@@ -47,6 +48,11 @@ export {
   ACTIVITY_POINTS_SOURCE_ID,
   type ActivityPointsLayerOptions
 } from "./adapters/maplibre/layers/activity-points";
+export {
+  BuildingExtrusionLayer,
+  BUILDING_EXTRUSION_LAYER_ID,
+  type BuildingExtrusionLayerOptions
+} from "./adapters/maplibre/layers/building-extrusions";
 export {
   RadialGradientAtmosphereLayer,
   RADIAL_GRADIENT_ATMOSPHERE_LAYER_ID,

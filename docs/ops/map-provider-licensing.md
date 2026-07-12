@@ -66,6 +66,31 @@ For Rumia's existing VPS architecture, the preferred production candidate is:
    glyph/sprite assets whose licenses and source revisions are recorded with
    each release.
 
+### 2026-07-12 preflight evidence
+
+The first two self-hosting checks now have a reversible VPS proof. A Portugal
+cutout was extracted from the official Protomaps daily build
+`https://build.protomaps.com/20260712.pmtiles` with
+`--bbox=-31.3,30.0,-6.0,42.3 --maxzoom=14`.
+
+- OSM replication time in source metadata: `2026-07-12T04:00:00Z`
+- Archive: `/opt/rumia-map/archives/20260712/portugal.pmtiles`
+- Size: `469224974` bytes
+- SHA-256: `8368ff2029904f0228523872e2eab674c0f5730e8623001c38af756583ef06ee`
+- Isolated Caddy preflight listener: `127.0.0.1:3010`
+- `HEAD`: `200`, `Accept-Ranges: bytes`, `Content-Length: 469224974`
+- `Range: bytes=0-63`: `206`, correct `Content-Range`, CORS, and attribution
+  headers
+- TileJSON: `200`, a single-slash ZXY template, OSM attribution, and vector
+  layers including `buildings`.
+- ZXY probes: non-empty tiles returned `200` with
+  `Content-Type: application/x-protobuf`; empty tiles returned `204` as
+  expected. The service remains loopback-only on `127.0.0.1:3010`/`:3011`.
+
+This is a provider acceptance candidate, not production approval. The
+loopback Caddy fragment is stored at `ops/vps/rumia-map-preflight.caddy` and
+does not change the public Lumes site.
+
 This removes a per-tile commercial API dependency, but it does not remove
 operations or legal responsibility. The provider gate remains open until the
 owner accepts the data license, attribution, update schedule, VPS storage and
@@ -77,8 +102,8 @@ only production dependency for a paid Rumia route surface.
 
 ### Self-hosted acceptance checks
 
-- [ ] Build and checksum a Portugal PMTiles snapshot; record its OSM data date.
-- [ ] Confirm Caddy serves byte ranges and returns the expected content type.
+- [x] Build and checksum a Portugal PMTiles snapshot; record its OSM data date.
+- [x] Confirm Caddy serves byte ranges and returns the expected content type.
 - [ ] Serve one MapLibre style with visible OSM/Protomaps attribution at every
   zoom and in the compact map fallback.
 - [ ] Run Valhalla with a Portugal extract and verify walk/drive/transit request

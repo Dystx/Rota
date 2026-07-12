@@ -9,11 +9,15 @@ describe("feature flags", () => {
     expect(isFeatureEnabled("tripMessaging", { ENABLE_TRIP_MESSAGING: " TRUE " })).toBe(true);
     expect(isFeatureEnabled("activityMap", {})).toBe(false);
     expect(isFeatureEnabled("activityMap", { ENABLE_ACTIVITY_MAP: "true" })).toBe(true);
+    expect(isFeatureEnabled("activityMapStorytelling", {})).toBe(false);
+    expect(isFeatureEnabled("activityMap3d", {})).toBe(false);
   });
 
   it("exposes the deployment variable name without exposing a value", () => {
     expect(getFeatureFlagEnvironmentVariable("b2bBeta")).toBe("ENABLE_B2B_BETA");
     expect(getFeatureFlagEnvironmentVariable("activityMap")).toBe("ENABLE_ACTIVITY_MAP");
+    expect(getFeatureFlagEnvironmentVariable("activityMapStorytelling")).toBe("ENABLE_ACTIVITY_MAP_STORYTELLING");
+    expect(getFeatureFlagEnvironmentVariable("activityMap3d")).toBe("ENABLE_ACTIVITY_MAP_3D");
   });
 
   it("includes every approved gated operator surface", () => {
@@ -28,6 +32,8 @@ describe("feature flags", () => {
       "consoleConfig",
       "apiDocs",
       "activityMap",
+      "activityMapStorytelling",
+      "activityMap3d",
       "pt"
     ]);
   });

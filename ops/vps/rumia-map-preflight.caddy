@@ -1,0 +1,19 @@
+# Loopback-only PMTiles endpoint for Rumia provider acceptance tests.
+# Do not expose this listener publicly or merge it into the Lumes site.
+http://127.0.0.1:3010 {
+	bind 127.0.0.1
+	root * /opt/rumia-map/archives/20260712
+	header {
+		Access-Control-Allow-Origin "http://127.0.0.1:3302"
+		Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+		Access-Control-Allow-Headers "Range, If-Match"
+		Access-Control-Expose-Headers "Accept-Ranges, Content-Length, Content-Range, ETag"
+		Cache-Control "public, max-age=86400, immutable"
+	}
+	@options method OPTIONS
+	respond @options 204
+	handle_path /tiles/* {
+		reverse_proxy 127.0.0.1:3011
+	}
+	file_server
+}

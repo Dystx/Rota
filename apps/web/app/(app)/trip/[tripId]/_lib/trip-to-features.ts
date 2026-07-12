@@ -37,7 +37,7 @@ import type {
   SpatialFeature,
   SpatialFeatureCollection
 } from "@repo/spatial-engine";
-import type { GeographicCoordinate } from "@repo/types";
+import type { GeographicCoordinate, GeographicRoute } from "@repo/types";
 
 /**
  * DB-shaped row. Mirrors what the eventual `trip_stops` table will look
@@ -76,7 +76,7 @@ export interface TripStop {
  * yet sourced. A trip can have usable stop points (`partial`) without having
  * a drawable route; an empty or missing trip is `unavailable`.
  */
-export type TripRouteStatus = "partial" | "unavailable";
+export type TripRouteStatus = "ready" | "partial" | "unavailable";
 
 /** Property bag attached to each Point feature. Matches `fixtureRouteCollection`. */
 type TripStopProperties = Record<string, unknown> & {
@@ -128,9 +128,19 @@ export function tripStopsToRouteStatus(stops: readonly TripStopRow[]): TripRoute
 
 /** Human-readable fallback copy for route surfaces and assistive technology. */
 export function tripRouteStatusMessage(status: TripRouteStatus): string {
+  if (status === "ready") return "Validated route geometry is shown for this day.";
   return status === "partial"
     ? "Stops are shown. Validated route geometry is not available yet, so no route line is drawn."
     : "Validated route geometry is unavailable for this trip.";
+}
+
+/** Returns ready only when the collection contains a sourced LineString. */
+export function tripRouteStatusFromFeatures(
+  stops: readonly TripStopRow[],
+  collection: SpatialFeatureCollection
+): TripRouteStatus {
+  if (collection.features.some((feature) => feature.geometry.type === "LineString")) return "ready";
+  return tripStopsToRouteStatus(stops);
 }
 
 /**
@@ -153,6 +163,57 @@ export function tripStopsToRouteCollection(
     type: "FeatureCollection",
     features: pointFeatures
   };
+}
+
+/**
+ * Convert the validated geographic route contract into renderer features.
+ * Only sourced segments with geometry reach the LineString layer; an
+ * unavailable/unsourced segment remains represented by the stop points and
+ * truthful status copy.
+ */
+export function geographicRouteToFeatureCollection(route: GeographicRoute): SpatialFeatureCollection {
+  const stopFeatures: SpatialFeature[] = route.stops
+    .filter((stop) => stop.coordinates !== null)
+    .map((stop) => ({
+      type: "Feature",
+      id: stop.id,
+      geometry: { type: "Point", coordinates: [...stop.coordinates!] },
+      properties: {
+        order: stop.order + 1,
+        label: stop.title,
+        activityId: stop.activityId,
+        dayIndex: stop.dayIndex
+      }
+    }));
+  const segmentFeatures: SpatialFeature[] = route.segments.flatMap((segment) => {
+    if (
+      segment.source === "none" ||
+      segment.geometry === null ||
+      segment.checkedAt === null ||
+      segment.attribution === null
+    ) return [];
+    return [{
+      type: "Feature",
+      id: `segment:${segment.fromStopId}:${segment.toStopId}:${segment.mode}`,
+      geometry: {
+        type: "LineString",
+        coordinates: segment.geometry.coordinates.map(([lng, lat]) => [lng, lat])
+      },
+      properties: {
+        routeSegment: true,
+        fromStopId: segment.fromStopId,
+        toStopId: segment.toStopId,
+        mode: segment.mode,
+        durationMinutes: segment.durationMinutes,
+        distanceMeters: segment.distanceMeters,
+        source: segment.source,
+        checkedAt: segment.checkedAt,
+        attribution: segment.attribution
+      }
+    } satisfies SpatialFeature];
+  });
+
+  return { type: "FeatureCollection", features: [...stopFeatures, ...segmentFeatures] };
 }
 
 /**

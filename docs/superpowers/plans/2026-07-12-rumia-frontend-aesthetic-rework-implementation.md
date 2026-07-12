@@ -295,3 +295,10 @@ complete. `ENABLE_ACTIVITY_MAP` is feature-gated and defaults off. The map
 provider record is attached at `docs/ops/map-provider-licensing.md`, but its
 production provider and owner/legal approval are still open; hosted
 environments must keep the flag disabled until that record is completed.
+
+The Phase 2/3 unblock work is tracked separately in
+`docs/superpowers/plans/2026-07-12-rumia-map-phase2-3-unblock.md`. Its camera,
+route-contract, and inert extrusion preparation is now implemented and covered
+by focused tests, but Steps 5 and 6 remain unchecked here until route geometry,
+approved style/assets, capacity evidence, and owner/legal acceptance are
+available. This preserves the original list-first release boundary.

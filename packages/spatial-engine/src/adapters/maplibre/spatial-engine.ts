@@ -9,6 +9,7 @@ import {
 import { StarfieldLayer, type StarfieldOptions } from "./layers/starfield";
 import { bindLayerToChannel, getLayerChannel } from "./layer-channel";
 import { ActivityPointsLayer } from "./layers/activity-points";
+import { BuildingExtrusionLayer } from "./layers/building-extrusions";
 import { mountMapLibreInstance } from "./map-instance";
 import { SpatialCameraController } from "../../core/camera-controller";
 import { InMemoryTelemetryService } from "../../core/telemetry-service";
@@ -179,8 +180,8 @@ export class MapLibreSpatialEngine implements SpatialEngine {
    * Switch the MapLibre projection in place. The renderer handles the
    * visual transition (mercator ↔ globe) without re-creating the
    * canvas, so the layer registry, telemetry wiring, and camera state
-   * survive the switch. This is what makes the 2D ↔ 3D toggle in
-   * `hero-map.tsx` cheap — the engine does not remount.
+   * survive the switch. Map-capable surfaces can use this without
+   * remounting the engine.
    *
    * MapLibre's `setProjection` triggers a 'projectiontransition' event
    * on the map; the rendering engine re-uses the cached tile/source
@@ -375,6 +376,8 @@ export interface WorkspaceEngineFeatures {
   includeContextLayers?: boolean;
   /** Optional reviewed activity marker layer for the progressive map facade. */
   activityPoints?: ActivityPointsLayer;
+  /** Phase 3 only: opt-in extrusion against an approved basemap source. */
+  includeBuildingExtrusions?: boolean;
 }
 
 /** WorkspaceCanvas engine: 2D, with optional route and reviewed activity layers. */
@@ -392,6 +395,9 @@ export function createWorkspaceEngine(
   }
   if (features.activityPoints) {
     engine.register(features.activityPoints);
+  }
+  if (features.includeBuildingExtrusions) {
+    engine.register(new BuildingExtrusionLayer());
   }
   return engine;
 }

@@ -26,7 +26,9 @@ import { RouteMap as SchematicMap } from "@repo/ui";
 
 import { useTripRoute } from "../_hooks/use-trip-route";
 import { tripRouteStatusMessage } from "../_lib/trip-to-features";
-import type { SpatialFeatureCollection, WorkspaceCanvasHandle } from "@repo/spatial-engine";
+import { useReducedMotion } from "@repo/ui";
+import { cameraPresetTarget, type CameraPreset, type SpatialFeatureCollection, type WorkspaceCanvasHandle } from "@repo/spatial-engine";
+import { RouteStoryControls } from "./route-story-controls";
 
 const EMPTY_ROUTE_FEATURES: SpatialFeatureCollection = {
   type: "FeatureCollection",
@@ -51,6 +53,11 @@ function WorkspaceCanvasSkeleton() {
 interface RouteMapProps extends React.ComponentProps<typeof SchematicMap> {
   /** Trip id used to fetch the live route via `useTripRoute`. */
   tripId: string;
+  /** Explicit Phase 2 story capability; remains off until route geometry is ready. */
+  storyEnabled?: boolean;
+  storyPresets?: readonly CameraPreset[];
+  /** Explicit Phase 3 building treatment; remains off until style approval. */
+  showBuildingExtrusions?: boolean;
 }
 
 /**
@@ -70,10 +77,25 @@ export function RouteMap({
   days,
   warnings,
   children,
+  storyEnabled = false,
+  storyPresets = [],
+  showBuildingExtrusions = false,
   ...rest
 }: RouteMapProps) {
   const { data: routeFeatures, status: routeStatus, isLoading } = useTripRoute(tripId);
   const canvasRef = React.useRef<WorkspaceCanvasHandle | null>(null);
+  const reducedMotion = useReducedMotion();
+  const [storyIndex, setStoryIndex] = React.useState(-1);
+  const storyReady = storyEnabled && routeStatus === "ready" && storyPresets.length > 0;
+
+  const focusStoryPreset = React.useCallback((index: number) => {
+    const preset = storyPresets[index];
+    if (!preset) return;
+    setStoryIndex(index);
+    void canvasRef.current?.flyTo(cameraPresetTarget(preset, reducedMotion));
+  }, [reducedMotion, storyPresets]);
+
+  const stopStory = React.useCallback(() => setStoryIndex(-1), []);
 
   // SSR + initial render: render the schematic so the page has
   // something to display before the spatial engine has finished
@@ -115,9 +137,23 @@ export function RouteMap({
         className="absolute inset-0 h-full w-full"
         testId="trip-workspace-canvas"
         routeFeatures={routeFeatures ?? EMPTY_ROUTE_FEATURES}
+        showBuildingExtrusions={showBuildingExtrusions}
         disableIntro
       />
       <div className="relative z-10 h-full w-full pointer-events-none">{children}</div>
+      {storyReady ? (
+        <div className="pointer-events-auto absolute left-4 top-4 z-30 w-[min(25rem,calc(100%-2rem))]">
+          <RouteStoryControls
+            presets={storyPresets}
+            activeIndex={storyIndex}
+            started={storyIndex >= 0}
+            onStart={() => focusStoryPreset(0)}
+            onPrevious={() => focusStoryPreset(Math.max(0, storyIndex - 1))}
+            onNext={() => focusStoryPreset(Math.min(storyPresets.length - 1, storyIndex + 1))}
+            onStop={stopStory}
+          />
+        </div>
+      ) : null}
       {routeStatus === "partial" ? (
         <p
           role="status"

@@ -13,6 +13,8 @@ export const featureFlagNames = [
   "consoleConfig",
   "apiDocs",
   "activityMap",
+  "activityMapStorytelling",
+  "activityMap3d",
   "pt"
 ] as const;
 
@@ -29,6 +31,8 @@ const environmentVariableFor: Record<FeatureFlag, string> = {
   consoleConfig: "ENABLE_CONSOLE_CONFIG",
   apiDocs: "ENABLE_API_DOCS",
   activityMap: "ENABLE_ACTIVITY_MAP",
+  activityMapStorytelling: "ENABLE_ACTIVITY_MAP_STORYTELLING",
+  activityMap3d: "ENABLE_ACTIVITY_MAP_3D",
   pt: "ENABLE_PT"
 };
 
