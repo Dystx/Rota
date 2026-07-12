@@ -40,6 +40,6 @@ describe("trip stop geographic projection", () => {
     expect(tripStopsToRouteStatus(stops)).toBe("partial");
     expect(tripStopsToRouteStatus([])).toBe("unavailable");
     expect(tripRouteStatusMessage("partial")).toContain("no route line is drawn");
-    expect(tripRouteStatusMessage("unavailable")).toContain("stop list remains available");
+    expect(tripRouteStatusMessage("unavailable")).toContain("unavailable for this trip");
   });
 });

@@ -130,7 +130,7 @@ export function tripStopsToRouteStatus(stops: readonly TripStopRow[]): TripRoute
 export function tripRouteStatusMessage(status: TripRouteStatus): string {
   return status === "partial"
     ? "Stops are shown. Validated route geometry is not available yet, so no route line is drawn."
-    : "Route geometry is unavailable. The stop list remains available above.";
+    : "Validated route geometry is unavailable for this trip.";
 }
 
 /**
