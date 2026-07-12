@@ -65,7 +65,7 @@
 - `EditorialRule({ className })`
 - `StatusRegion({ children, politeness, testId })`
 
-- [ ] **Step 1: Write failing tests.**
+- [x] **Step 1: Write failing tests.**
   ```tsx
   it("renders the editorial heading grammar", () => {
     render(
@@ -85,20 +85,20 @@
     expect(screen.getByTestId("status")).toHaveAttribute("aria-live", "assertive");
   });
   ```
-- [ ] **Step 2: Run the focused test and verify failure.**
+- [x] **Step 2: Run the focused test and verify failure.**
   ```bash
   pnpm --dir packages/ui test -- src/components/editorial.test.tsx
   ```
   Expected: FAIL because `editorial.tsx` does not yet export the primitives.
-- [ ] **Step 3: Implement the minimum primitives.** Keep the heading element selectable through `as`, use the semantic surface tone only for classes, and render `StatusRegion` with `role="status"` and the requested `aria-live` value.
-- [ ] **Step 4: Add the token aliases.** Add named display/body/metadata aliases, the 4/8 spacing rhythm, linen/sage/midnight/ochre semantic surface aliases, and retain the existing global reduced-motion reset.
-- [ ] **Step 5: Run tests and typecheck.**
+- [x] **Step 3: Implement the minimum primitives.** Keep the heading element selectable through `as`, use the semantic surface tone only for classes, and render `StatusRegion` with `role="status"` and the requested `aria-live` value.
+- [x] **Step 4: Add the token aliases.** Add named display/body/metadata aliases, the 4/8 spacing rhythm, linen/sage/midnight/ochre semantic surface aliases, and retain the existing global reduced-motion reset.
+- [x] **Step 5: Run tests and typecheck.**
   ```bash
   pnpm --dir packages/ui test -- src/components/editorial.test.tsx
   pnpm --dir packages/ui typecheck
   ```
   Expected: PASS.
-- [ ] **Step 6: Commit.**
+- [x] **Step 6: Commit.**
   ```bash
   git add packages/ui/src/styles.css apps/web/app/globals.css packages/ui/src/components/editorial.tsx packages/ui/src/components/editorial.test.tsx packages/ui/src/index.ts
   git commit -m "feat: add rumia editorial primitives"
@@ -113,7 +113,7 @@
 - Modify: `apps/web/app/_components/top-nav.test.tsx`
 - Create: `apps/web/app/_components/site-footer.test.tsx`
 
-- [ ] **Step 1: Write the footer regression test.**
+- [x] **Step 1: Write the footer regression test.**
   ```tsx
   it("renders five groups and only one Support link", () => {
     render(<SiteFooter />);
@@ -122,19 +122,19 @@
     expect(screen.getByTestId("site-footer-grid")).toHaveClass("md:grid-cols-5");
   });
   ```
-- [ ] **Step 2: Run the test and verify failure** if the test IDs/grid contract are not present.
+- [x] **Step 2: Run the test and verify failure** if the test IDs/grid contract are not present.
   ```bash
   pnpm exec vitest run apps/web/app/_components/site-footer.test.tsx
   ```
-- [ ] **Step 3: Implement shell semantics.** Keep the public `main` and skip-link target, make the footer grid five columns at `md`, remove duplicate Support from Legal, and retain mobile stacking.
-- [ ] **Step 4: Normalize navigation focus.** Ensure menu open/close has an accessible name, Escape closes it, focus returns to the trigger, and all icon-only controls use `Icon` with a visible focus ring.
-- [ ] **Step 5: Run shell tests.**
+- [x] **Step 3: Implement shell semantics.** Keep the public `main` and skip-link target, make the footer grid five columns at `md`, remove duplicate Support from Legal, and retain mobile stacking.
+- [x] **Step 4: Normalize navigation focus.** Ensure menu open/close has an accessible name, Escape closes it, focus returns to the trigger, and all icon-only controls use `Icon` with a visible focus ring.
+- [x] **Step 5: Run shell tests.**
   ```bash
   pnpm exec vitest run apps/web/app/_components/top-nav.test.tsx apps/web/app/_components/site-footer.test.tsx
   pnpm --dir apps/web test:a11y -- --grep "navigation|footer"
   ```
   Expected: PASS with one Support link and no literal icon-font text.
-- [ ] **Step 6: Commit.**
+- [x] **Step 6: Commit.**
   ```bash
   git add apps/web/app/_components/top-nav.tsx apps/web/app/_components/site-footer.tsx 'apps/web/app/(marketing)/layout.tsx' apps/web/app/globals.css apps/web/app/_components/top-nav.test.tsx apps/web/app/_components/site-footer.test.tsx
   git commit -m "feat: align rumia public shell"
@@ -156,7 +156,7 @@
 - Selected mode consumes `initialActivities: readonly EditorialActivity[]`.
 - Direct mode continues to consume `TripChoiceDraft` and `draftToPlannerUrl`.
 
-- [ ] **Step 1: Add failing copy/continuity assertions.**
+- [x] **Step 1: Add failing copy/continuity assertions.**
   ```tsx
   it("uses chosen-day language for selected activities", () => {
     render(
@@ -169,19 +169,19 @@
     expect(screen.queryByRole("button", { name: "Build my itinerary" })).toBeNull();
   });
   ```
-- [ ] **Step 2: Run focused planner tests and verify the new assertion fails** against the legacy selected-mode copy.
+- [x] **Step 2: Run focused planner tests and verify the new assertion fails** against the legacy selected-mode copy.
   ```bash
   pnpm exec vitest run apps/web/app/planner/_components/planner-single-screen.test.tsx
   ```
-- [ ] **Step 3: Change selected-mode hierarchy.** Render the selected activities first, use `EditorialHeading` with “Shape your chosen day,” keep timing/transport controls after the selection, and remove “Advanced day planning” and “Build my itinerary” from this branch.
-- [ ] **Step 4: Preserve the direct path.** Keep destination, duration, travel window, transport, vibe, option sheets, and direct `draftToPlannerUrl` behavior. Use “Start with an activity decision” as the direct-mode explanation.
-- [ ] **Step 5: Preserve URL state.** Keep `router.replace(activityDayPlannerHref(...), { scroll: false })` when day time or transport changes. Do not introduce a server write.
-- [ ] **Step 6: Run planner tests.**
+- [x] **Step 3: Change selected-mode hierarchy.** Render the selected activities first, use `EditorialHeading` with “Shape your chosen day,” keep timing/transport controls after the selection, and remove “Advanced day planning” and “Build my itinerary” from this branch.
+- [x] **Step 4: Preserve the direct path.** Keep destination, duration, travel window, transport, vibe, option sheets, and direct `draftToPlannerUrl` behavior. Use “Start with an activity decision” as the direct-mode explanation.
+- [x] **Step 5: Preserve URL state.** Keep `router.replace(activityDayPlannerHref(...), { scroll: false })` when day time or transport changes. Do not introduce a server write.
+- [x] **Step 6: Run planner tests.**
   ```bash
   pnpm exec vitest run apps/web/app/planner/_components/planner-single-screen.test.tsx apps/web/app/planner/_components/activity-day-planner.test.ts
   ```
   Expected: PASS for selected mode, direct mode, feasibility states, cross-region refusal, URL persistence, and sign-in return.
-- [ ] **Step 7: Commit.**
+- [x] **Step 7: Commit.**
   ```bash
   git add apps/web/app/planner
   git commit -m "feat: reframe rumia planner around chosen days"
@@ -202,7 +202,7 @@
 - Preserve `onRemove(activityId)` and `onContinue()`.
 - Preserve the current status strings and undo semantics unless copy is made more explicit.
 
-- [ ] **Step 1: Add failing empty-state assertions.**
+- [x] **Step 1: Add failing empty-state assertions.**
   ```tsx
   it("makes an empty day recoverable", () => {
     render(<ActivityWorkspace initialActivities={[]} />);
@@ -210,15 +210,15 @@
     expect(screen.getByRole("link", { name: "Keep exploring" })).toBeInTheDocument();
   });
   ```
-- [ ] **Step 2: Run workspace tests and verify the new expectation fails** if the empty state lacks the action/preview.
+- [x] **Step 2: Run workspace tests and verify the new expectation fails** if the empty state lacks the action/preview.
   ```bash
   pnpm exec vitest run 'apps/web/app/(marketing)/explore/workspace/activity-workspace.test.tsx' 'apps/web/app/(marketing)/_components/activity-day-tray.test.tsx'
   ```
-- [ ] **Step 3: Implement the empty state.** Use a short editorial explanation, show the shape of a selected day (time, judgement, and practical space), and make “Keep exploring” the primary recovery action.
-- [ ] **Step 4: Implement the selected state.** Keep numbered order, verdict, best-time, planning, avoid-when, evidence link, total time, share, feedback, remove, and undo visible without hover.
-- [ ] **Step 5: Keep mobile safe.** Preserve the safe-area bottom offset, add enough page bottom padding for the fixed tray, keep the tray action at least 44px, and ensure the tray never covers the main content action.
-- [ ] **Step 6: Test status and reversal.** Assert remove, undo, share fallback, clipboard success/failure, feedback link, and `aria-live` status text.
-- [ ] **Step 7: Commit.**
+- [x] **Step 3: Implement the empty state.** Use a short editorial explanation, show the shape of a selected day (time, judgement, and practical space), and make “Keep exploring” the primary recovery action.
+- [x] **Step 4: Implement the selected state.** Keep numbered order, verdict, best-time, planning, avoid-when, evidence link, total time, share, feedback, remove, and undo visible without hover.
+- [x] **Step 5: Keep mobile safe.** Preserve the safe-area bottom offset, add enough page bottom padding for the fixed tray, keep the tray action at least 44px, and ensure the tray never covers the main content action.
+- [x] **Step 6: Test status and reversal.** Assert remove, undo, share fallback, clipboard success/failure, feedback link, and `aria-live` status text.
+- [x] **Step 7: Commit.**
   ```bash
   git add 'apps/web/app/(marketing)/explore/workspace' 'apps/web/app/(marketing)/_components/activity-day-tray.tsx'
   git commit -m "feat: improve rumia workspace states"
@@ -236,18 +236,18 @@
 - Modify: `apps/web/app/globals.css`
 - Test: activity explorer/workspace tests and `apps/web/scripts/check-motion-imports.mjs`
 
-- [ ] **Step 1: Add failing status assertions.** Saving, removing, restoring, replacing, and failed sharing must update the live status region with text that identifies the activity or recovery action.
-- [ ] **Step 2: Implement status-first feedback.** Keep the existing `status` state and expose it through `StatusRegion`. Toasts may mirror the message, but the page status remains authoritative.
-- [ ] **Step 3: Add short transitions.** Use opacity/position changes only after state updates. Keep phrase/rail changes within 120–180ms and save/remove cues within 160–220ms.
-- [ ] **Step 4: Preserve reduced motion.** Use `useReducedMotion` and the existing CSS reset so transitions become immediate and no map/card camera work is introduced.
-- [ ] **Step 5: Run gates.**
+- [x] **Step 1: Add failing status assertions.** Saving, removing, restoring, replacing, and failed sharing must update the live status region with text that identifies the activity or recovery action.
+- [x] **Step 2: Implement status-first feedback.** Keep the existing `status` state and expose it through `StatusRegion`. Toasts may mirror the message, but the page status remains authoritative.
+- [x] **Step 3: Add short transitions.** Use opacity/position changes only after state updates. Keep phrase/rail changes within 120–180ms and save/remove cues within 160–220ms.
+- [x] **Step 4: Preserve reduced motion.** Use `useReducedMotion` and the existing CSS reset so transitions become immediate and no map/card camera work is introduced.
+- [x] **Step 5: Run gates.**
   ```bash
   pnpm qa:motion-gate
   pnpm exec vitest run 'apps/web/app/(marketing)/explore/activity-explorer.test.tsx' 'apps/web/app/(marketing)/explore/workspace/activity-workspace.test.tsx'
   pnpm --dir apps/web test:a11y
   ```
   Expected: PASS with no forbidden motion imports and all state changes announced.
-- [ ] **Step 6: Commit.**
+- [x] **Step 6: Commit.**
   ```bash
   git add 'apps/web/app/(marketing)/explore' 'apps/web/app/(marketing)/_components/activity-day-tray.tsx' packages/ui/src/components/toast.tsx apps/web/app/globals.css
   git commit -m "feat: add rumia feedback states"
@@ -264,7 +264,7 @@
 - Modify: `apps/web/playwright/tests/viewport-contract.spec.ts`
 - Modify: `docs/reviews/2026-07-12-rumia-frontend-baseline-matrix.md`
 
-- [ ] **Step 1: Run static gates.**
+- [x] **Step 1: Run static gates.**
   ```bash
   pnpm --dir apps/web typecheck
   pnpm lint:eslint
@@ -272,16 +272,16 @@
   git diff --check
   ```
   Expected: PASS.
-- [ ] **Step 2: Run focused browser gates.**
+- [x] **Step 2: Run focused browser gates.**
   ```bash
   pnpm --dir apps/web test:e2e -- --grep "planner|workspace|public discovery"
   pnpm --dir apps/web test:a11y
   pnpm --dir apps/web test:e2e -- --grep "mobile overflow|viewport"
   ```
   Expected: PASS at 1440x900 and 390x844 with no document-level horizontal overflow.
-- [ ] **Step 3: Review visual baselines.** Capture homepage, explore, workspace, planner, sign-in, support, and one activity detail route. Compare route-by-route; update only intentional screenshots and record each decision in the baseline matrix.
-- [ ] **Step 4: Confirm no map dependency entered the critical path.** Inspect the route bundle/build output and verify the homepage remains static and map-free.
-- [ ] **Step 5: Commit evidence.**
+- [x] **Step 3: Review visual baselines.** Capture homepage, explore, workspace, planner, sign-in, support, and one activity detail route. Compare route-by-route; update only intentional screenshots and record each decision in the baseline matrix.
+- [x] **Step 4: Confirm no map dependency entered the critical path.** Inspect the route bundle/build output and verify the homepage remains static and map-free.
+- [x] **Step 5: Commit evidence.**
   ```bash
   git add apps/web/playwright/tests docs/reviews/2026-07-12-rumia-frontend-baseline-matrix.md
   git commit -m "test: verify rumia foundation planner slice"
@@ -290,3 +290,10 @@
 ## Handoff to the full roadmap
 
 This slice is complete when Tasks 1–6 pass. Only then should the full roadmap continue to public editorial surfaces, spatial Phase 1, camera storytelling, and optional 3D. The map plan must not be used to reopen the homepage or backend scope.
+
+**Execution status (2026-07-12):** Tasks 1–6 are complete. Static, browser,
+accessibility, motion, overflow, viewport, and visual evidence is recorded in
+`.superpowers/sdd/task-9-release-gates-report.md` and
+`docs/reviews/2026-07-12-rumia-frontend-baseline-matrix.md`. Spatial Phase 1
+was implemented only after this slice cleared; camera storytelling and richer
+3D remain separate deferred phases.
