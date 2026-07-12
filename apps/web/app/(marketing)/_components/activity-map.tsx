@@ -187,6 +187,7 @@ function ActivityMapSurface({
               activityPoints={activityFeatures}
               selectedActivityId={selectedActivityId}
               showRoute={false}
+              showContextLayers={false}
               projection="mercator"
               initialCenter={initialView.center}
               initialZoom={initialView.zoom}

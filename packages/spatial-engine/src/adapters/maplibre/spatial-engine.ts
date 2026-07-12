@@ -371,6 +371,8 @@ export function createDiscoveryEngine(options: SpatialEngineOptions): MapLibreSp
 export interface WorkspaceEngineFeatures {
   /** Keep the existing itinerary route layer for trip/workspace surfaces. */
   includeRoute?: boolean;
+  /** Keep the discovery-only pulse and specialist overlays for legacy surfaces. */
+  includeContextLayers?: boolean;
   /** Optional reviewed activity marker layer for the progressive map facade. */
   activityPoints?: ActivityPointsLayer;
 }
@@ -381,8 +383,10 @@ export function createWorkspaceEngine(
   features: WorkspaceEngineFeatures = {}
 ): MapLibreSpatialEngine {
   const engine = new MapLibreSpatialEngine(options);
-  engine.register(new AmbientPulseLayer({ palette: DEFAULT_PALETTE }));
-  engine.register(new SymbolBadgesLayer({ palette: DEFAULT_PALETTE }));
+  if (features.includeContextLayers !== false) {
+    engine.register(new AmbientPulseLayer({ palette: DEFAULT_PALETTE }));
+    engine.register(new SymbolBadgesLayer({ palette: DEFAULT_PALETTE }));
+  }
   if (features.includeRoute !== false) {
     engine.register(new RouteLayer({ palette: DEFAULT_PALETTE }));
   }

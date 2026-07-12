@@ -85,6 +85,8 @@ export interface WorkspaceCanvasProps {
   routeFeatures?: SpatialFeatureCollection | null;
   /** Render the legacy itinerary route layer. Activity maps keep this false. */
   showRoute?: boolean;
+  /** Render discovery-only traveler/specialist overlays. Activity maps keep this false. */
+  showContextLayers?: boolean;
   /** Validated, reviewed activity points for the optional activity map layer. */
   activityPoints?: SpatialFeatureCollection | null;
   /** Controlled marker/card selection for activity points. */
@@ -171,6 +173,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       disableIntro = false,
       routeFeatures,
       showRoute = true,
+      showContextLayers = true,
       activityPoints,
       selectedActivityId = null,
       className,
@@ -203,6 +206,20 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
     const activityLayerRef = React.useRef<ActivityPointsLayer | null>(null);
     const reducedMotion = useReducedMotion();
     const [mountError, setMountError] = React.useState<string | null>(null);
+    const callbacksRef = React.useRef({
+      onMapReady,
+      onViewportChange,
+      onStopClick,
+      onActivitySelect,
+      onMapError
+    });
+    callbacksRef.current = {
+      onMapReady,
+      onViewportChange,
+      onStopClick,
+      onActivitySelect,
+      onMapError
+    };
 
     // Track which route collection we last seeded so we only re-publish
     // when the prop actually changes (otherwise every parent render
@@ -285,6 +302,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
         fog: resolvedFog
       }, {
         includeRoute: showRoute,
+        includeContextLayers: showContextLayers,
         activityPoints: activityLayer ?? undefined
       });
       engineRef.current = engine;
@@ -292,8 +310,10 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
       // Prefer the caller-supplied route features, fall back to the
       // deterministic Porto→Lisbon fixture used by `/explore/workspace`.
       const initialRoute = showRoute ? routeFeatures ?? fixtureRouteCollection() : { type: "FeatureCollection" as const, features: [] };
-      engine.seedTelemetry("travelers", fixtureTravelerCollection());
-      engine.seedTelemetry("specialists", fixtureSpecialistCollection());
+      if (showContextLayers) {
+        engine.seedTelemetry("travelers", fixtureTravelerCollection());
+        engine.seedTelemetry("specialists", fixtureSpecialistCollection());
+      }
       engine.seedTelemetry("trips", initialRoute);
       lastSeededRef.current = routeFeatures ?? null;
 
@@ -310,8 +330,8 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
           // circuit so a mount-then-unmount race doesn't leak the
           // callback to a page that's already gone.
           const map = engine.getRenderer();
-          if (map && onMapReady) {
-            onMapReady(map);
+          if (map && callbacksRef.current.onMapReady) {
+            callbacksRef.current.onMapReady(map);
           }
 
           if (activityLayer && activityPoints) {
@@ -324,10 +344,12 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
           // Zustand store stays in lock-step with what the user sees.
           // `map` is already declared above (for the onMapReady
           // callback); reuse it here.
-          const detachViewport = map && onViewportChange
+          const detachViewport = map
             ? (() => {
                 const handler = () => {
-                  onViewportChange({
+                  const callback = callbacksRef.current.onViewportChange;
+                  if (!callback) return;
+                  callback({
                     center: map.getCenter().toArray() as [number, number],
                     zoom: map.getZoom(),
                     pitch: map.getPitch(),
@@ -339,9 +361,11 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
               })()
             : () => undefined;
 
-          const detachClick = map && (onStopClick || onActivitySelect)
+          const detachClick = map
             ? (() => {
                 const handler = (event: { point: { x: number; y: number }; lngLat: { lng: number; lat: number } }) => {
+                  const callbacks = callbacksRef.current;
+                  if (!callbacks.onStopClick && !callbacks.onActivitySelect) return;
                   const features = map.queryRenderedFeatures(
                     [event.point.x, event.point.y],
                     { layers: CLICKABLE_LAYER_IDS as string[] }
@@ -350,15 +374,15 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
                   if (!feature) return;
                   const properties = (feature.properties as Record<string, unknown> | null) ?? null;
                   const activityId = properties?.activityId;
-                  if (typeof activityId === "string" && onActivitySelect) {
-                    onActivitySelect(activityId);
+                  if (typeof activityId === "string" && callbacks.onActivitySelect) {
+                    callbacks.onActivitySelect(activityId);
                     return;
                   }
                   const rawId =
                     (feature as { id?: unknown }).id ??
                     properties?.id;
                   if (rawId === undefined || rawId === null) return;
-                  onStopClick?.(String(rawId), [event.lngLat.lng, event.lngLat.lat]);
+                  callbacks.onStopClick?.(String(rawId), [event.lngLat.lng, event.lngLat.lat]);
                 };
                 map.on("click", handler);
                 return () => map.off("click", handler);
@@ -416,7 +440,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
           if (!cancelled) {
             const message = err instanceof Error ? err.message : "Failed to mount workspace";
             setMountError(message);
-            onMapError?.(message);
+            callbacksRef.current.onMapError?.(message);
           }
         });
 
@@ -431,7 +455,7 @@ export const WorkspaceCanvas = React.forwardRef<WorkspaceCanvasHandle, Workspace
     // target is captured on first mount, and route features are
     // re-seeded by the dedicated effect below when the prop changes.
     // This stops the engine from remounting on every parent render.
-    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, onViewportChange, onStopClick, onActivitySelect, onMapError, projection, showRoute]);
+    }, [reducedMotion, resolvedTerrain, resolvedFog, styleOverride, projection, showRoute, showContextLayers]);
 
     // Runtime projection switch (post-mount). The mount effect above
     // handles the initial value; this effect fires on every subsequent
