@@ -21,17 +21,28 @@ afterEach(() => {
 });
 
 describe("ActivityExplorer", () => {
+  it("reserves mobile space for the fixed day tray and restores desktop spacing", () => {
+    render(<ActivityExplorer initialIntent={parseActivityIntent({ region: "porto" })} />);
+
+    const shell = screen.getByTestId("activity-explorer");
+    expect(shell.className).toContain("pb-[calc(12rem+env(safe-area-inset-bottom))]");
+    expect(shell.className).toContain("lg:pb-28");
+  });
+
   it("renders a reviewed verdict and keeps a saved activity reversible", () => {
     render(<ActivityExplorer initialIntent={parseActivityIntent({ region: "porto", mood: "a walk" })} />);
 
     const save = screen.getAllByRole("button", { name: /Save .* to this day/i })[0]!;
     expect(screen.getAllByText("Rumia verdict").length).toBeGreaterThan(0);
     fireEvent.click(save);
+    expect(screen.getByTestId("activity-status").textContent).toMatch(/added to your day/i);
+    expect(save.getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByRole("region", { name: /Your day/i })).toBeTruthy();
     expect(replace).toHaveBeenCalledWith(expect.stringContaining("saved=porto-ribeira-slow-walk"));
     fireEvent.click(
       screen.getAllByRole("button", { name: /Remove .* from this day/i })[0]!,
     );
+    expect(screen.getByTestId("activity-status").textContent).toMatch(/removed from your day/i);
     expect(screen.queryByRole("region", { name: /Your day/i })).toBeNull();
   });
 

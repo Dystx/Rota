@@ -6,7 +6,23 @@ import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 
 import { ActivityWorkspace } from "./activity-workspace";
 
-afterEach(cleanup);
+const replace = vi.fn((href: string) => {
+  window.history.replaceState({}, "", href);
+});
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace })
+}));
+
+afterEach(() => {
+  cleanup();
+  replace.mockClear();
+  window.history.replaceState({}, "", "/");
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: undefined
+  });
+});
 
 describe("ActivityWorkspace", () => {
   it("makes an empty day recoverable with a useful shape preview", () => {
@@ -72,5 +88,50 @@ describe("ActivityWorkspace", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /Share this day/i }));
     await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/could not copy/i));
+  });
+
+  it("keeps the fallback address truthful after removal and restores it on undo", async () => {
+    const [first, second] = REVIEWED_ACTIVITY_SEED.slice(0, 2);
+    window.history.replaceState(
+      {},
+      "",
+      `/explore/workspace?activity=${first!.id}&activity=${second!.id}`
+    );
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: undefined
+    });
+    render(<ActivityWorkspace initialActivities={[first!, second!]} />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /Remove Ribeira and Miragaia at walking pace/i })
+    );
+
+    expect(replace).toHaveBeenCalledWith("/explore/workspace?activity=porto-bombarda-art-walk");
+    expect(window.location.search).toBe("?activity=porto-bombarda-art-walk");
+
+    fireEvent.click(screen.getByRole("button", { name: /Share this day/i }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/copy this page address/i));
+    expect(window.location.href).not.toContain(first!.id);
+
+    const writeText = vi.fn().mockRejectedValue(new Error("clipboard denied"));
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText }
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Share this day/i }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/could not copy/i));
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining("/explore/workspace?activity=porto-bombarda-art-walk")
+    );
+    expect(window.location.href).not.toContain(first!.id);
+
+    fireEvent.click(screen.getByRole("button", { name: "Undo remove" }));
+    expect(replace).toHaveBeenLastCalledWith(
+      "/explore/workspace?activity=porto-ribeira-slow-walk&activity=porto-bombarda-art-walk"
+    );
+    expect(window.location.search).toBe(
+      "?activity=porto-ribeira-slow-walk&activity=porto-bombarda-art-walk"
+    );
   });
 });

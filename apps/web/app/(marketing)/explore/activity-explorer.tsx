@@ -45,6 +45,7 @@ export function ActivityExplorer({
   const router = useRouter();
   const [intent, setIntent] = useState(initialIntent);
   const [savedIds, setSavedIds] = useState<readonly string[]>(initialSavedIds);
+  const [status, setStatus] = useState("");
   const activities = useMemo(() => getReviewedActivities(REVIEWED_ACTIVITY_SEED, intent), [intent]);
   const activitiesById = useMemo(
     () => new Map(REVIEWED_ACTIVITY_SEED.map((activity) => [activity.id, activity])),
@@ -53,6 +54,8 @@ export function ActivityExplorer({
   const savedActivities = activities.filter((activity) => savedIds.includes(activity.id));
 
   function toggle(activityId: string) {
+    const activity = activitiesById.get(activityId);
+    const removing = savedIds.includes(activityId);
     setSavedIds((current) => {
       const next = current.includes(activityId)
         ? current.filter((id) => id !== activityId)
@@ -60,12 +63,20 @@ export function ActivityExplorer({
       router.replace(activityExplorerUrl(intent, next));
       return next;
     });
+    if (activity) {
+      setStatus(
+        removing
+          ? `${activity.title} removed from your day.`
+          : `${activity.title} added to your day; ${savedIds.length + 1} ${savedIds.length + 1 === 1 ? "activity" : "activities"} selected.`
+      );
+    }
   }
 
   function updateIntent(draft: ActivityIntentDraft) {
     const next = toIntent(draft);
     setIntent(next);
     setSavedIds([]);
+    setStatus("Activity suggestions updated.");
     router.replace(activityExplorerUrl(next));
   }
 
@@ -76,7 +87,8 @@ export function ActivityExplorer({
   }
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-10 px-6 pb-28 pt-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:py-16">
+    <div data-testid="activity-explorer" className="mx-auto grid max-w-6xl gap-10 px-6 pb-[calc(12rem+env(safe-area-inset-bottom))] pt-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:pb-28 lg:py-16">
+      <p className="sr-only" role="status" aria-live="polite" data-testid="activity-status">{status}</p>
       <div>
         <p className="text-sm text-ochre-dark">Portugal, judged with your time in mind</p>
         <h1 className="mt-3 font-display text-5xl text-primary md:text-6xl">What deserves this day?</h1>

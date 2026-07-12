@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import type { EditorialActivity } from "@/lib/content/activities";
@@ -15,11 +16,19 @@ function durationLabel(minutes: number): string {
   return `${hours} hr ${remainder} min`;
 }
 
+function workspaceUrl(activities: readonly EditorialActivity[]): string {
+  const query = new URLSearchParams();
+  for (const activity of activities) query.append("activity", activity.id);
+  const search = query.toString();
+  return search ? `/explore/workspace?${search}` : "/explore/workspace";
+}
+
 export function ActivityWorkspace({
   initialActivities
 }: {
   initialActivities: readonly EditorialActivity[];
 }) {
+  const router = useRouter();
   const [activities, setActivities] = useState(initialActivities);
   const [status, setStatus] = useState("");
   const [lastRemoved, setLastRemoved] = useState<{ activity: EditorialActivity; index: number } | null>(null);
@@ -32,7 +41,9 @@ export function ActivityWorkspace({
     const index = activities.findIndex((activity) => activity.id === activityId);
     const activity = index >= 0 ? activities[index] : undefined;
     if (!activity) return;
-    setActivities((current) => current.filter((candidate) => candidate.id !== activityId));
+    const nextActivities = activities.filter((candidate) => candidate.id !== activityId);
+    setActivities(nextActivities);
+    router.replace(workspaceUrl(nextActivities));
     setLastRemoved({ activity, index });
     setStatus(`${activity.title} removed from your day.`);
   }
@@ -40,12 +51,12 @@ export function ActivityWorkspace({
   function undoRemove() {
     if (!lastRemoved) return;
     const { activity, index } = lastRemoved;
-    setActivities((current) => {
-      if (current.some((candidate) => candidate.id === activity.id)) return current;
-      const next = [...current];
-      next.splice(Math.min(index, next.length), 0, activity);
-      return next;
-    });
+    const nextActivities = [...activities];
+    if (!activities.some((candidate) => candidate.id === activity.id)) {
+      nextActivities.splice(Math.min(index, nextActivities.length), 0, activity);
+    }
+    setActivities(nextActivities);
+    router.replace(workspaceUrl(nextActivities));
     setLastRemoved(null);
     setStatus(`${activity.title} restored to your day.`);
   }
