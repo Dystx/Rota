@@ -60,9 +60,28 @@ describe("editorial primitives", () => {
       </>
     );
 
-    expect(screen.getByText("A considered choice")).toHaveClass("text-ochre");
+    expect(screen.getByText("A considered choice")).toHaveClass("text-ochre-dark");
     expect(container.querySelector("hr")).toBeInTheDocument();
   });
+
+  it.each(["light", "default", "linen", "sage", "ochre"] as const)(
+    "keeps %s kickers on the AA-safe light-surface token",
+    (tone) => {
+      render(<EditorialKicker tone={tone}>{tone} kicker</EditorialKicker>);
+
+      expect(screen.getByText(`${tone} kicker`)).toHaveClass("text-ochre-dark");
+      expect(screen.getByText(`${tone} kicker`)).not.toHaveClass("text-ochre");
+    }
+  );
+
+  it.each(["midnight", "dark", "inverse"] as const)(
+    "keeps %s kickers on the dark-surface token",
+    (tone) => {
+      render(<EditorialKicker tone={tone}>{tone} kicker</EditorialKicker>);
+
+      expect(screen.getByText(`${tone} kicker`)).toHaveClass("text-ochre-light");
+    }
+  );
 
   it("renders a live status region with requested politeness", () => {
     render(

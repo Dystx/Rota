@@ -8,6 +8,9 @@ import { SignInForm } from "./_components/sign-in-form";
 import { TopNav } from "../_components/top-nav";
 import { safeNext } from "../auth/safe-next";
 
+export const SIGN_IN_HELP_LINK_CLASS =
+  "text-ochre-dark underline underline-offset-2 hover:text-ochre-dark transition-colors duration-fast ease-standard";
+
 export const metadata: Metadata = {
   title: "Sign in | Rumia",
   description: "Sign in to Rumia to access your curated Portugal travel routes."
@@ -67,7 +70,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             <br />
             <a
               href="/how-it-works"
-              className="text-ochre-dark underline underline-offset-2 hover:text-ochre transition-colors duration-fast ease-standard"
+              className={SIGN_IN_HELP_LINK_CLASS}
             >
               How it works
             </a>

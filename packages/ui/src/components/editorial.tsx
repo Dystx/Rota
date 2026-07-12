@@ -24,13 +24,13 @@ const headingToneClassName: Record<EditorialTone, string> = {
 };
 
 const kickerToneClassName: Record<EditorialTone, string> = {
-  linen: "editorial-tone-linen text-ochre",
-  sage: "editorial-tone-sage text-ochre",
+  linen: "editorial-tone-linen text-ochre-dark",
+  sage: "editorial-tone-sage text-ochre-dark",
   midnight: "editorial-tone-midnight text-ochre-light",
-  ochre: "editorial-tone-ochre text-ochre",
-  default: "editorial-tone-linen text-ochre",
+  ochre: "editorial-tone-ochre text-ochre-dark",
+  default: "editorial-tone-linen text-ochre-dark",
   inverse: "editorial-tone-midnight text-ochre-light",
-  light: "editorial-tone-linen text-ochre",
+  light: "editorial-tone-linen text-ochre-dark",
   dark: "editorial-tone-midnight text-ochre-light"
 };
 
