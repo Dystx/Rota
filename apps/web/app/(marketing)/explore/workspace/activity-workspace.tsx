@@ -21,11 +21,33 @@ export function ActivityWorkspace({
   initialActivities: readonly EditorialActivity[];
 }) {
   const [activities, setActivities] = useState(initialActivities);
-  const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const [status, setStatus] = useState("");
+  const [lastRemoved, setLastRemoved] = useState<{ activity: EditorialActivity; index: number } | null>(null);
   const totalMinutes = activities.reduce((total, activity) => total + activity.durationMinutes, 0);
+  const feedbackParams = new URLSearchParams({ source: "activity-day" });
+  for (const activity of activities) feedbackParams.append("activity", activity.id);
+  const feedbackHref = `/feedback?${feedbackParams.toString()}`;
 
   function remove(activityId: string) {
-    setActivities((current) => current.filter((activity) => activity.id !== activityId));
+    const index = activities.findIndex((activity) => activity.id === activityId);
+    const activity = index >= 0 ? activities[index] : undefined;
+    if (!activity) return;
+    setActivities((current) => current.filter((candidate) => candidate.id !== activityId));
+    setLastRemoved({ activity, index });
+    setStatus(`${activity.title} removed from your day.`);
+  }
+
+  function undoRemove() {
+    if (!lastRemoved) return;
+    const { activity, index } = lastRemoved;
+    setActivities((current) => {
+      if (current.some((candidate) => candidate.id === activity.id)) return current;
+      const next = [...current];
+      next.splice(Math.min(index, next.length), 0, activity);
+      return next;
+    });
+    setLastRemoved(null);
+    setStatus(`${activity.title} restored to your day.`);
   }
 
   async function share() {
@@ -33,15 +55,15 @@ export function ActivityWorkspace({
     for (const activity of activities) url.searchParams.append("activity", activity.id);
 
     if (!navigator.clipboard?.writeText) {
-      setShareStatus("Copying is unavailable here. You can copy this page address instead.");
+      setStatus("Copying is unavailable here. You can copy this page address instead.");
       return;
     }
 
     try {
       await navigator.clipboard.writeText(url.toString());
-      setShareStatus("Share link copied.");
+      setStatus("Share link copied.");
     } catch {
-      setShareStatus("We could not copy the link. You can copy this page address instead.");
+      setStatus("We could not copy the link. You can copy this page address instead.");
     }
   }
 
@@ -96,8 +118,28 @@ export function ActivityWorkspace({
           </ol>
         ) : (
           <section className="mt-10 border-t border-[var(--color-border)] py-8" aria-label="No chosen activities">
-            <h2 className="font-display text-3xl text-primary">Clear it and choose again.</h2>
-            <p className="mt-3 max-w-xl text-on-surface-variant">A good day starts with the activities you are genuinely excited to make time for.</p>
+            <h2 className="font-display text-3xl text-primary">Choose again, with the day still yours.</h2>
+            <p className="mt-3 max-w-xl text-on-surface-variant">Nothing is locked in. Start with one good decision, then leave room for the day to breathe.</p>
+            <div className="mt-7 border-y border-[var(--color-border)] py-5" role="group" aria-label="Empty day preview">
+              <p className="text-sm text-on-surface-variant">A considered day has a shape before it has a schedule.</p>
+              <dl className="mt-5 grid gap-5 text-sm leading-relaxed text-on-surface-variant sm:grid-cols-3">
+                <div>
+                  <dt className="font-medium text-primary">Time</dt>
+                  <dd className="mt-1">One or two activities, with a little air between them.</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-primary">Judgement</dt>
+                  <dd className="mt-1">Rumia&apos;s verdict and best time stay visible for every choice.</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-primary">Practical space</dt>
+                  <dd className="mt-1">Leave room for travel, food, and whatever the day brings.</dd>
+                </div>
+              </dl>
+            </div>
+            <Link className="mt-7 inline-flex min-h-11 items-center bg-primary px-4 py-3 text-sm font-medium text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href="/explore">
+              Keep exploring
+            </Link>
           </section>
         )}
       </div>
@@ -108,11 +150,13 @@ export function ActivityWorkspace({
         <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
           {activities.length === 0 ? "Choose an activity to start again." : `${activities.length} ${activities.length === 1 ? "activity" : "activities"}, with space left for the unplanned parts.`}
         </p>
-        <Link className="mt-7 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href="/explore">
+        {activities.length > 0 ? <Link className="mt-7 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href="/explore">
           Keep exploring
-        </Link>
+        </Link> : null}
         {activities.length > 0 ? <button className="mt-3 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-left text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" type="button" onClick={share}>Share this day</button> : null}
-        {shareStatus ? <p className="mt-3 text-sm text-on-surface-variant" role="status">{shareStatus}</p> : null}
+        {activities.length > 0 ? <Link className="mt-3 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href={feedbackHref}>Give feedback on this day</Link> : null}
+        <p className={status ? "mt-3 text-sm text-on-surface-variant" : "sr-only"} role="status" aria-live="polite" aria-atomic="true" data-testid="workspace-status">{status}</p>
+        {lastRemoved ? <button className="mt-2 min-h-11 border-b border-ochre-dark px-1 py-2 text-left text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" type="button" onClick={undoRemove}>Undo remove</button> : null}
       </aside>
     </div>
   );

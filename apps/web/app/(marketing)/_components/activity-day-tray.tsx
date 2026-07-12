@@ -16,7 +16,7 @@ export function ActivityDayTray({
   const totalMinutes = activities.reduce((total, activity) => total + activity.durationMinutes, 0);
 
   return (
-    <aside aria-label="Your day" className="fixed inset-x-3 bottom-3 z-40 flex items-center gap-3 border border-[var(--color-border)] bg-surface p-3 shadow-[0_12px_28px_rgba(43,62,52,0.16)] md:static md:inset-auto md:z-auto md:block md:p-5 md:shadow-[0_12px_28px_rgba(43,62,52,0.08)]" role="region">
+    <aside aria-label="Your day" className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex min-h-16 items-center gap-3 border border-[var(--color-border)] bg-surface p-3 shadow-[0_12px_28px_rgba(43,62,52,0.16)] md:static md:inset-auto md:z-auto md:block md:p-5 md:shadow-[0_12px_28px_rgba(43,62,52,0.08)]" role="region">
       <p className="min-w-0 text-sm text-primary md:hidden">
         <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">Your day</span>
         {activities.length} {activities.length === 1 ? "activity" : "activities"} · {Math.round(totalMinutes / 30) / 2} hr

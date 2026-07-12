@@ -9,6 +9,17 @@ import { ActivityWorkspace } from "./activity-workspace";
 afterEach(cleanup);
 
 describe("ActivityWorkspace", () => {
+  it("makes an empty day recoverable with a useful shape preview", () => {
+    render(<ActivityWorkspace initialActivities={[]} />);
+
+    expect(screen.getByRole("heading", { name: /choose again/i })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Keep exploring" })).toBeTruthy();
+    expect(screen.getByRole("group", { name: /empty day preview/i })).toBeTruthy();
+    expect(screen.getByText("Time")).toBeTruthy();
+    expect(screen.getByText("Judgement")).toBeTruthy();
+    expect(screen.getByText("Practical space")).toBeTruthy();
+  });
+
   it("keeps a chosen day specific and makes removing an activity reversible", () => {
     render(<ActivityWorkspace initialActivities={REVIEWED_ACTIVITY_SEED.slice(0, 2)} />);
 
@@ -21,7 +32,12 @@ describe("ActivityWorkspace", () => {
     );
 
     expect(screen.queryByText("Ribeira and Miragaia at walking pace")).toBeNull();
+    expect(screen.getByTestId("workspace-status").textContent).toMatch(/removed from your day/i);
+    fireEvent.click(screen.getByRole("button", { name: "Undo remove" }));
+    expect(screen.getByText("Ribeira and Miragaia at walking pace")).toBeTruthy();
+    expect(screen.getByTestId("workspace-status").textContent).toMatch(/restored to your day/i);
     expect(screen.getByText(/Keep exploring/i)).toBeTruthy();
+    expect(screen.getByRole("link", { name: /Give feedback on this day/i }).getAttribute("href")).toContain("activity=porto-bombarda-art-walk");
   });
 
   it("shares the current chosen activities through a stable workspace link", async () => {
@@ -36,5 +52,25 @@ describe("ActivityWorkspace", () => {
 
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining("/explore/workspace?activity=porto-ribeira-slow-walk")));
     expect(screen.getByRole("status").textContent).toMatch(/Share link copied/i);
+  });
+
+  it("explains when sharing is unavailable or fails", async () => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: undefined
+    });
+    render(<ActivityWorkspace initialActivities={REVIEWED_ACTIVITY_SEED.slice(0, 1)} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Share this day/i }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/Copying is unavailable/i));
+    expect(screen.getByRole("status").getAttribute("aria-live")).toBe("polite");
+
+    const writeText = vi.fn().mockRejectedValue(new Error("clipboard denied"));
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText }
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Share this day/i }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/could not copy/i));
   });
 });

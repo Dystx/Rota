@@ -18,7 +18,8 @@ describe("ActivityDayTray", () => {
 
     const tray = screen.getByRole("region", { name: /Your day/i });
     expect(tray.className).toContain("fixed");
+    expect(tray.className).toContain("safe-area-inset-bottom");
     expect(tray.className).toContain("md:static");
-    expect(screen.getByRole("button", { name: /See this day/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /See this day/i }).className).toContain("min-h-11");
   });
 });
