@@ -22,22 +22,33 @@ import { useEffect } from "react";
  */
 export function MapLibreErrorSuppressor(): null {
   useEffect(() => {
+    let cancelled = false;
+    let installed = false;
+
     // The suppressor itself must not make the homepage download the map
     // runtime. Map-capable consumers mark their rendered surface explicitly;
-    // public list-first routes leave this absent and stay MapLibre-free.
-    if (!document.querySelector("[data-map-capable]")) return;
+    // public list-first routes leave this absent and stay MapLibre-free. A
+    // mutation observer keeps the guard correct when a user opens a deferred
+    // activity map after the root effect has already run.
+    const installIfMapIsPresent = () => {
+      if (cancelled || installed || !document.querySelector("[data-map-capable]")) return;
+      installed = true;
 
-    let cancelled = false;
+      // Keep the activity-first homepage and initial public routes free of the
+      // MapLibre bundle. Load the helper only after a map-capable surface is
+      // actually mounted.
+      void import("@repo/spatial-engine").then(({ setupMapLibreErrorSuppression }) => {
+        if (!cancelled) setupMapLibreErrorSuppression();
+      });
+    };
 
-    // Keep the activity-first homepage and initial public routes free of the
-    // MapLibre bundle. The suppressor is only relevant after a map-capable
-    // surface is mounted, so load its tiny helper lazily with the renderer.
-    void import("@repo/spatial-engine").then(({ setupMapLibreErrorSuppression }) => {
-      if (!cancelled) setupMapLibreErrorSuppression();
-    });
+    installIfMapIsPresent();
+    const observer = new MutationObserver(installIfMapIsPresent);
+    observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       cancelled = true;
+      observer.disconnect();
     };
   }, []);
   return null;
