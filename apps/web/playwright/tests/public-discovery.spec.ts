@@ -10,10 +10,6 @@ test.describe("public discovery and trust routes", () => {
       await expect(mobileToggle).toHaveAttribute("aria-expanded", "false");
       const mobilePanel = page.getByTestId("top-nav-mobile-panel");
       await mobileToggle.click();
-      await mobilePanel.waitFor({ state: "visible", timeout: 1000 }).catch(() => undefined);
-      if (!(await mobilePanel.isVisible())) {
-        await mobileToggle.click();
-      }
       await expect(mobilePanel).toBeVisible();
       await expect(mobilePanel.getByRole("link", { name: "What to do", exact: true })).toBeVisible();
       for (const label of ["How it works", "Local expertise", "Pricing", "Explore activities"]) {
@@ -28,17 +24,33 @@ test.describe("public discovery and trust routes", () => {
   });
 
   test("reviewed activities activate by keyboard and preserve the chosen-day URL", async ({ page }) => {
-    await page.goto("/explore");
+    await page.goto("/explore?region=porto&mood=a%20walk");
     const explorer = page.getByTestId("activity-explorer");
-    const save = explorer.getByRole("button", { name: /^Save .* to this day$/ }).first();
+    const activityTitle = "Ribeira and Miragaia at walking pace";
+    const save = explorer.getByRole("button", { name: `Save ${activityTitle} to this day` });
     await save.scrollIntoViewIfNeeded();
     await save.focus();
     await expect(save).toBeFocused();
     await page.keyboard.press("Enter");
-    const saved = explorer.getByRole("button", { name: /^Remove .* from this day$/ }).first();
+    const saved = explorer
+      .locator('section[aria-label="Judged activities"]')
+      .getByRole("button", { name: `Remove ${activityTitle} from this day` });
     await expect(saved).toHaveAttribute("aria-pressed", "true");
     await expect(page).toHaveURL(/\/explore\?.*saved=porto-ribeira-slow-walk/);
     await expect(page.getByTestId("activity-status")).toContainText(/added to your day/i);
+
+    await saved.focus();
+    await page.keyboard.press("Enter");
+    const restored = explorer
+      .locator('section[aria-label="Judged activities"]')
+      .getByRole("button", { name: `Save ${activityTitle} to this day` });
+    await expect(restored).toHaveAttribute("aria-pressed", "false");
+    await expect(page).not.toHaveURL(/saved=/);
+    await expect(page.getByTestId("activity-status")).toContainText(/removed from your day/i);
+
+    await restored.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/explore\?.*saved=porto-ribeira-slow-walk/);
 
     const chosenDay = page.getByRole("button", { name: "See this day", exact: true });
     await chosenDay.focus();
