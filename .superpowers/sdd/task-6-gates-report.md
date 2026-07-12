@@ -11,6 +11,12 @@ migration is intentionally not part of this verification commit; the test
 assertions below accept both the committed legacy Supabase fixture and the
 current Better Auth fixture while that migration remains uncommitted.
 
+The same working-tree caveat applies to the legacy-icon assertion: the current
+tree already contains the broader icon migration that removes `.ph` nodes from
+console surfaces, while commit `9090caa` intentionally does not include those
+pre-existing changes. Therefore the 140/140 viewport result is valid for the
+current working tree but is not a standalone commit-level release gate yet.
+
 The following checks were run against the foundation/planner slice:
 
 | Check | Result |
@@ -74,6 +80,31 @@ Result: **PASS — 140 passed (2.6 minutes).**
 The run produced project-separated first-viewport evidence under
 `.sisyphus/evidence/future-roadmap/viewport-contract/<project>/<width>/` and
 did not update any visual baseline snapshots.
+
+## Focused planner/public/visual rerun
+
+Command:
+
+```text
+... pnpm --dir apps/web exec playwright test --config playwright.config.ts \
+  --grep 'planner|workspace|public discovery' \
+  --project=desktop-chrome --project=mobile-chromium
+```
+
+Result: **RED — 39 passed, 12 failed, 3 skipped, 54 total (2.7 minutes).**
+
+The failures are existing contract drift, not snapshot refreshes:
+
+- `public-discovery.spec.ts` still expects the former `Discover`,
+  `Destinations`, and `Plan a trip` navigation labels, the removed Lisbon
+  atlas-card flow, and the former offline CTA.
+- Visual baselines for `/explore/workspace`, `/b2b/unknown-workspace`, and
+  `/console/workspace` have intentional height/layout drift against the current
+  working-tree design and were not refreshed.
+
+The planner, workspace accessibility, mobile-overflow, and viewport checks in
+this run passed. The stale public contracts and visual review remain open for
+the later public/utility surface tasks.
 
 ## Accessibility and visual gates
 
