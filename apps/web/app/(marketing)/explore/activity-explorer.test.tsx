@@ -46,6 +46,26 @@ describe("ActivityExplorer", () => {
     expect(screen.queryByRole("region", { name: /Your day/i })).toBeNull();
   });
 
+  it("keeps reversed saved IDs in query order when showing and handing off the day", () => {
+    render(
+      <ActivityExplorer
+        initialIntent={parseActivityIntent({ region: "porto", mood: "a walk" })}
+        initialSavedIds={["porto-bombarda-art-walk", "porto-ribeira-slow-walk"]}
+      />
+    );
+
+    const items = screen.getByRole("region", { name: /Your day/i }).querySelectorAll("li");
+    expect([...items].map((item) => item.textContent)).toEqual([
+      expect.stringContaining("Miguel Bombarda for contemporary art and design"),
+      expect.stringContaining("Ribeira and Miragaia at walking pace")
+    ]);
+
+    fireEvent.click(screen.getByRole("button", { name: /See this day/i }));
+    expect(push).toHaveBeenCalledWith(
+      "/explore/workspace?activity=porto-bombarda-art-walk&activity=porto-ribeira-slow-walk"
+    );
+  });
+
   it("names an uncovered activity situation instead of substituting a fixture", () => {
     render(
       <ActivityExplorer

@@ -51,7 +51,10 @@ export function ActivityExplorer({
     () => new Map(REVIEWED_ACTIVITY_SEED.map((activity) => [activity.id, activity])),
     []
   );
-  const savedActivities = activities.filter((activity) => savedIds.includes(activity.id));
+  const savedActivities = savedIds.flatMap((savedId) => {
+    const activity = activities.find((candidate) => candidate.id === savedId);
+    return activity ? [activity] : [];
+  });
 
   function toggle(activityId: string) {
     const activity = activitiesById.get(activityId);

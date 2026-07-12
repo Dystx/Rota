@@ -37,13 +37,19 @@ export function ActivityWorkspace({
   for (const activity of activities) feedbackParams.append("activity", activity.id);
   const feedbackHref = `/feedback?${feedbackParams.toString()}`;
 
+  function replaceWorkspaceUrl(nextActivities: readonly EditorialActivity[]) {
+    const href = workspaceUrl(nextActivities);
+    window.history.replaceState(window.history.state, "", href);
+    router.replace(href);
+  }
+
   function remove(activityId: string) {
     const index = activities.findIndex((activity) => activity.id === activityId);
     const activity = index >= 0 ? activities[index] : undefined;
     if (!activity) return;
     const nextActivities = activities.filter((candidate) => candidate.id !== activityId);
     setActivities(nextActivities);
-    router.replace(workspaceUrl(nextActivities));
+    replaceWorkspaceUrl(nextActivities);
     setLastRemoved({ activity, index });
     setStatus(`${activity.title} removed from your day.`);
   }
@@ -56,7 +62,7 @@ export function ActivityWorkspace({
       nextActivities.splice(Math.min(index, nextActivities.length), 0, activity);
     }
     setActivities(nextActivities);
-    router.replace(workspaceUrl(nextActivities));
+    replaceWorkspaceUrl(nextActivities);
     setLastRemoved(null);
     setStatus(`${activity.title} restored to your day.`);
   }

@@ -6,9 +6,7 @@ import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 
 import { ActivityWorkspace } from "./activity-workspace";
 
-const replace = vi.fn((href: string) => {
-  window.history.replaceState({}, "", href);
-});
+const replace = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace })
@@ -81,10 +79,10 @@ describe("ActivityWorkspace", () => {
     await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/Copying is unavailable/i));
     expect(screen.getByRole("status").getAttribute("aria-live")).toBe("polite");
 
-    const writeText = vi.fn().mockRejectedValue(new Error("clipboard denied"));
+    const writeTextAfterUndo = vi.fn().mockRejectedValue(new Error("clipboard denied"));
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
-      value: { writeText }
+      value: { writeText: writeTextAfterUndo }
     });
     fireEvent.click(screen.getByRole("button", { name: /Share this day/i }));
     await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/could not copy/i));
@@ -132,6 +130,28 @@ describe("ActivityWorkspace", () => {
     );
     expect(window.location.search).toBe(
       "?activity=porto-ribeira-slow-walk&activity=porto-bombarda-art-walk"
+    );
+
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: undefined
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Share this day/i }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/copy this page address/i));
+    expect(window.location.href).toContain(first!.id);
+    expect(window.location.href).toContain(second!.id);
+
+    const writeTextAfterUndo = vi.fn().mockRejectedValue(new Error("clipboard denied"));
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: writeTextAfterUndo }
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Share this day/i }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/could not copy/i));
+    expect(writeTextAfterUndo).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "/explore/workspace?activity=porto-ribeira-slow-walk&activity=porto-bombarda-art-walk"
+      )
     );
   });
 });
