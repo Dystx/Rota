@@ -4,6 +4,7 @@ import { PlannerSingleScreen } from "./_components/planner-single-screen";
 import type { EditorialActivity } from "@/lib/content/activities";
 import type { TransportChoice } from "./_components/transport-step";
 import type { Vibe } from "./_components/vibe-step";
+import type { ActivityDayTime, ActivityDayTransport } from "./_components/activity-day-planner";
 
 export interface PlannerInitialState {
   /**
@@ -20,16 +21,16 @@ export interface PlannerInitialState {
   initialEdit?: "destination" | "travelWindow" | "days" | "transport" | "vibe";
   initialActivityIds?: readonly string[];
   initialActivities?: readonly EditorialActivity[];
+  /** Browser-only preferences for a selected activity day. */
+  initialDayTime?: ActivityDayTime;
+  initialActivityTransport?: ActivityDayTransport;
 }
 
 /**
- * PlannerClient — single-screen wizard.
+ * PlannerClient — routes selected activities into a day-scale check.
  *
- * Replaces the previous 5-step sequential wizard. All questions
- * (destination, days, window, transport, vibe) live on one
- * screen with choice cards, chips, and sheets.
- * One click on "Synthesize Itinerary" sends the user to
- * /trip/new with a prompt.
+ * Direct visits retain advanced multi-day choices. A known reviewed activity
+ * selection never gets converted into a generic itinerary request.
  */
 export function PlannerClient({ initial }: { initial?: PlannerInitialState } = {}) {
   return (
@@ -42,6 +43,8 @@ export function PlannerClient({ initial }: { initial?: PlannerInitialState } = {
       initialEdit={initial?.initialEdit}
       initialActivityIds={initial?.initialActivityIds}
       initialActivities={initial?.initialActivities}
+      initialDayTime={initial?.initialDayTime}
+      initialActivityTransport={initial?.initialActivityTransport}
     />
   );
 }

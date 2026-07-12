@@ -16,6 +16,7 @@ import { draftToPlannerUrl, normalizeDraft, type TripChoiceDraft } from "../_lib
 import type { TransportChoice } from "./transport-step";
 import type { Vibe } from "./vibe-step";
 import type { EditorialActivity } from "@/lib/content/activities";
+import { ActivityDayPlanner, type ActivityDayTime, type ActivityDayTransport } from "./activity-day-planner";
 
 export interface PlannerSingleScreenProps {
   initialDestination?: string;
@@ -26,6 +27,8 @@ export interface PlannerSingleScreenProps {
   initialEdit?: "destination" | "travelWindow" | "days" | "transport" | "vibe";
   initialActivityIds?: readonly string[];
   initialActivities?: readonly EditorialActivity[];
+  initialDayTime?: ActivityDayTime;
+  initialActivityTransport?: ActivityDayTransport;
 }
 
 const DESTINATIONS = [
@@ -44,7 +47,15 @@ function destinationLabel(value: string): string {
   return value.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function PlannerSingleScreen({
+export function PlannerSingleScreen(props: PlannerSingleScreenProps) {
+  if (props.initialActivities && props.initialActivities.length > 0) {
+    return <ActivityDayPlanner activities={props.initialActivities} initialDayTime={props.initialDayTime} initialTransport={props.initialActivityTransport} />;
+  }
+
+  return <TripPlannerSingleScreen {...props} />;
+}
+
+function TripPlannerSingleScreen({
   initialDestination = "Portugal",
   initialDays = 7,
   initialWindow = "",
@@ -52,7 +63,6 @@ export function PlannerSingleScreen({
   initialVibe = "balanced",
   initialEdit,
   initialActivityIds = [],
-  initialActivities = [],
 }: PlannerSingleScreenProps) {
   const router = useRouter();
   const [draft, setDraft] = React.useState<TripChoiceDraft>(() => normalizeDraft({
@@ -66,7 +76,6 @@ export function PlannerSingleScreen({
   const [sheet, setSheet] = React.useState<"destination" | "window" | "days" | "transport" | "vibe" | null>(null);
   const [focusedGroup, setFocusedGroup] = React.useState<"destination" | "days" | "details">("destination");
   const [pending, setPending] = React.useState(false);
-  const hasChosenActivities = draft.activityIds.length > 0;
 
   React.useEffect(() => {
     if (!initialEdit) return;
@@ -113,17 +122,10 @@ export function PlannerSingleScreen({
           </div>
         <section className="grid content-start gap-6">
           <div className="grid gap-2">
-            <p className="font-mono-micro uppercase tracking-widest text-ochre-light">{hasChosenActivities ? "Chosen activities first" : "Advanced day planning"}</p>
-            <h1 className="font-display text-4xl leading-tight md:text-6xl">{hasChosenActivities ? "Shape your chosen day." : "Plan from the activities you have in mind."}</h1>
-            <p className="max-w-xl text-linen-dark/75">{hasChosenActivities ? "Use timing, transport, and pace to test the day without replacing the activities you chose." : "Start with Rumia’s activity explorer when you want an editorial recommendation first."}</p>
+            <p className="font-mono-micro uppercase tracking-widest text-ochre-light">Start with an activity decision</p>
+            <h1 className="font-display text-4xl leading-tight md:text-6xl">Plan from the activities you have in mind.</h1>
+            <p className="max-w-xl text-linen-dark/75">Choose an activity situation first, then return here when you have a day worth shaping.</p>
           </div>
-
-          {hasChosenActivities ? <section aria-label="Chosen activities" className="rounded-xl border border-white/15 bg-white/5 p-5">
-            <h2 className="font-headline-sm text-xl">Already chosen</h2>
-            <ul className="mt-3 space-y-2 text-sm text-linen-dark/80">
-              {initialActivities.map((activity) => <li key={activity.id}>{activity.title}</li>)}
-            </ul>
-          </section> : null}
 
           <nav aria-label="Trip choices" className="grid grid-cols-3 gap-2 md:hidden">
             {([["destination", "Where"], ["days", "How long"], ["details", "Details"]] as const).map(([value, label]) => <button key={value} type="button" aria-pressed={focusedGroup === value} onClick={() => setFocusedGroup(value)} className="min-h-11 rounded-full border border-white/20 px-3 text-sm aria-[pressed=true]:border-ochre-light aria-[pressed=true]:text-ochre-light">{label}</button>)}
@@ -147,15 +149,15 @@ export function PlannerSingleScreen({
             <button type="button" onClick={() => setSheet("window")} className="flex min-h-11 items-center justify-between text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" aria-label="Choose travel window">
               <span><span className="block text-xs uppercase tracking-widest text-ochre-light">Travel window</span><span className="block text-lg">{draft.travelWindow ?? "Any time"}</span></span><span aria-hidden>⌄</span>
             </button>
-            <ChoiceChipGroup label="Transport" multiple={false} selected={[draft.transport]} onChange={(values) => values[0] && update("transport", values[0] as TransportChoice)} options={[{ value: "transit", label: "Transit & walking" }, { value: "car", label: "Rental car" }]} />
-            <ChoiceChipGroup label="Vibe" multiple={false} selected={[draft.vibe]} onChange={(values) => values[0] && update("vibe", values[0] as Vibe)} options={[{ value: "restorative", label: "Restorative" }, { value: "balanced", label: "Balanced" }, { value: "high_energy", label: "High energy" }]} />
+            <ChoiceChipGroup label="Transport" labelClassName="text-linen-dark" multiple={false} selected={[draft.transport]} onChange={(values) => values[0] && update("transport", values[0] as TransportChoice)} options={[{ value: "transit", label: "Transit & walking" }, { value: "car", label: "Rental car" }]} />
+            <ChoiceChipGroup label="Vibe" labelClassName="text-linen-dark" multiple={false} selected={[draft.vibe]} onChange={(values) => values[0] && update("vibe", values[0] as Vibe)} options={[{ value: "restorative", label: "Restorative" }, { value: "balanced", label: "Balanced" }, { value: "high_energy", label: "High energy" }]} />
           </div>
 
           <RouteConsequence status="ready" transportLabel={draft.transport === "transit" ? "Transit keeps the route to two bases" : "Car opens the Douro interior"} stopCount={draft.transport === "transit" ? 2 : 4} />
         </section>
 
         <aside className="grid content-start gap-4 lg:col-start-2 lg:row-start-2 lg:sticky lg:top-6 lg:self-start">
-          <TripSummary draft={context} primaryAction={pending ? "Updating your route" : hasChosenActivities ? "Preview this day" : "Build my itinerary"} onPrimaryAction={submit} primaryActionDisabled={pending || !draft.destination.trim() || draft.days < 1} />
+          <TripSummary draft={context} primaryAction={pending ? "Updating your route" : "Build my itinerary"} onPrimaryAction={submit} primaryActionDisabled={pending || !draft.destination.trim() || draft.days < 1} />
           {pending ? <p role="status" className="text-center text-sm text-linen-dark/70">Updating your route</p> : null}
         </aside>
         </div>
