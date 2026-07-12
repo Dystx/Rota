@@ -47,6 +47,7 @@ describe("ActivityWorkspace", () => {
 
     expect(screen.queryByText("Ribeira and Miragaia at walking pace")).toBeNull();
     expect(screen.getByTestId("workspace-status").textContent).toMatch(/removed from your day/i);
+    expect(screen.getByTestId("workspace-status").getAttribute("aria-atomic")).toBe("true");
     fireEvent.click(screen.getByRole("button", { name: "Undo remove" }));
     expect(screen.getByText("Ribeira and Miragaia at walking pace")).toBeTruthy();
     expect(screen.getByTestId("workspace-status").textContent).toMatch(/restored to your day/i);

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import type { EditorialActivity } from "@/lib/content/activities";
+import { StatusRegion, useReducedMotion } from "@repo/ui";
 
 function durationLabel(minutes: number): string {
   const hours = Math.floor(minutes / 60);
@@ -29,6 +30,7 @@ export function ActivityWorkspace({
   initialActivities: readonly EditorialActivity[];
 }) {
   const router = useRouter();
+  const reducedMotion = useReducedMotion();
   const [activities, setActivities] = useState(initialActivities);
   const [status, setStatus] = useState("");
   const [lastRemoved, setLastRemoved] = useState<{ activity: EditorialActivity; index: number } | null>(null);
@@ -85,7 +87,10 @@ export function ActivityWorkspace({
   }
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:py-16">
+    <div
+      data-reduced-motion={reducedMotion ? "true" : "false"}
+      className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:py-16"
+    >
       <div>
         <p className="text-sm text-ochre-dark">A Rumia day, still yours to change</p>
         <h1 className="mt-3 font-display text-5xl text-primary md:text-6xl">Your tentative day</h1>
@@ -94,9 +99,9 @@ export function ActivityWorkspace({
         </p>
 
         {activities.length > 0 ? (
-          <ol className="mt-10 space-y-8" aria-label="Chosen activities">
+          <ol className={`mt-10 space-y-8 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`} aria-label="Chosen activities">
             {activities.map((activity, index) => (
-              <li key={activity.id}>
+              <li className={reducedMotion ? "transition-none" : "rumia-save-transition"} key={activity.id}>
                 <article className="border-t border-[var(--color-border)] py-7">
                   <div className="flex flex-wrap items-baseline justify-between gap-3">
                     <p className="text-sm font-medium text-ochre-dark">{String(index + 1).padStart(2, "0")} · {durationLabel(activity.durationMinutes)}</p>
@@ -161,7 +166,7 @@ export function ActivityWorkspace({
         )}
       </div>
 
-      <aside className="border-t border-[var(--color-border)] pt-6 lg:sticky lg:top-24">
+      <aside className={`border-t border-[var(--color-border)] pt-6 lg:sticky lg:top-24 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`}>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">The shape of the day</p>
         <p className="mt-3 font-display text-4xl text-primary">{activities.length === 0 ? "Open" : durationLabel(totalMinutes)}</p>
         <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
@@ -172,7 +177,9 @@ export function ActivityWorkspace({
         </Link> : null}
         {activities.length > 0 ? <button className="mt-3 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-left text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" type="button" onClick={share}>Share this day</button> : null}
         {activities.length > 0 ? <Link className="mt-3 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href={feedbackHref}>Give feedback on this day</Link> : null}
-        <p className={status ? "mt-3 text-sm text-on-surface-variant" : "sr-only"} role="status" aria-live="polite" aria-atomic="true" data-testid="workspace-status">{status}</p>
+        <div className={status ? `mt-3 text-sm text-on-surface-variant ${reducedMotion ? "transition-none" : "rumia-status-transition"}` : "sr-only"}>
+          <StatusRegion testId="workspace-status">{status}</StatusRegion>
+        </div>
         {lastRemoved ? <button className="mt-2 min-h-11 border-b border-ochre-dark px-1 py-2 text-left text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" type="button" onClick={undoRemove}>Undo remove</button> : null}
       </aside>
     </div>

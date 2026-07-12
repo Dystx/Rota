@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import { cn } from "../lib/cn";
+import { useReducedMotion } from "../hooks/use-reduced-motion";
+import { Icon } from "./icon";
 
 /**
  * Lightweight toast system — a single global provider + a
@@ -130,6 +132,7 @@ const positionClassName: Record<Required<ToastViewportProps>["position"], string
 
 export function ToastViewport({ position = "bottom-right" }: ToastViewportProps = {}) {
   const items = useToasts();
+  const reducedMotion = useReducedMotion();
   if (items.length === 0) return null;
   return (
     <div
@@ -145,13 +148,12 @@ export function ToastViewport({ position = "bottom-right" }: ToastViewportProps 
           key={t.id}
           role="status"
           className={cn(
-            "flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-sm animate-[slide-up_200ms_ease-out]",
+            "flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-sm",
+            reducedMotion ? "transition-none" : "rumia-save-transition",
             variantStyles[t.variant]
           )}
         >
-          <span aria-hidden className="material-symbols-outlined text-[20px] mt-0.5 shrink-0">
-            {variantIcons[t.variant]}
-          </span>
+          <Icon name={variantIcons[t.variant]} className="mt-0.5 shrink-0 text-[20px]" />
           <div className="flex-1 min-w-0">
             <p className="font-medium text-sm leading-snug">{t.title}</p>
             {t.description ? (
@@ -164,7 +166,7 @@ export function ToastViewport({ position = "bottom-right" }: ToastViewportProps 
             onClick={() => dismissToast(t.id)}
             className="shrink-0 -mr-1 -mt-1 p-1 rounded opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
           >
-            <span aria-hidden className="material-symbols-outlined text-[18px]">close</span>
+            <Icon name="close" className="text-[18px]" />
           </button>
         </div>
       ))}

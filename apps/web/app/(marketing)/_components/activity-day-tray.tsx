@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import type { EditorialActivity } from "@/lib/content/activities";
+import { useReducedMotion } from "@repo/ui";
 
 export function ActivityDayTray({
   activities,
@@ -11,12 +12,15 @@ export function ActivityDayTray({
   onRemove: (activityId: string) => void;
   onContinue: () => void;
 }) {
+  const reducedMotion = useReducedMotion();
+
   if (activities.length === 0) return null;
 
   const totalMinutes = activities.reduce((total, activity) => total + activity.durationMinutes, 0);
+  const transitionClass = reducedMotion ? "transition-none" : "rumia-save-transition";
 
   return (
-    <aside aria-label="Your day" className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex min-h-16 items-center gap-3 border border-[var(--color-border)] bg-surface p-3 shadow-[0_12px_28px_rgba(43,62,52,0.16)] md:static md:inset-auto md:z-auto md:block md:p-5 md:shadow-[0_12px_28px_rgba(43,62,52,0.08)]" role="region">
+    <aside aria-label="Your day" data-reduced-motion={reducedMotion ? "true" : "false"} className={`fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex min-h-16 items-center gap-3 border border-[var(--color-border)] bg-surface p-3 shadow-[0_12px_28px_rgba(43,62,52,0.16)] md:static md:inset-auto md:z-auto md:block md:p-5 md:shadow-[0_12px_28px_rgba(43,62,52,0.08)] ${transitionClass}`} role="region">
       <p className="min-w-0 text-sm text-primary md:hidden">
         <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">Your day</span>
         {activities.length} {activities.length === 1 ? "activity" : "activities"} · {Math.round(totalMinutes / 30) / 2} hr
@@ -27,7 +31,7 @@ export function ActivityDayTray({
         <p className="mt-2 text-sm text-on-surface-variant">About {Math.round(totalMinutes / 30) / 2} hours before travel, pauses, or a meal.</p>
         <ul className="mt-4 space-y-3">
           {activities.map((activity) => (
-            <li className="flex items-start justify-between gap-3" key={activity.id}>
+            <li className={`flex items-start justify-between gap-3 ${transitionClass}`} key={activity.id}>
               <span className="text-sm text-primary">{activity.title}</span>
               <button
                 aria-label={`Remove ${activity.title} from this day`}

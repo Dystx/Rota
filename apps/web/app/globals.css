@@ -22,6 +22,35 @@
   .editorial-rule {
     border-color: color-mix(in srgb, var(--color-midnight) 20%, transparent);
   }
+
+  /* Rumia feedback motion is deliberately limited to opacity and position.
+   * State is committed by React first; these classes only soften the visual
+   * handoff after the activity/day state has changed. */
+  .rumia-phrase-transition,
+  .rumia-status-transition,
+  .rumia-save-transition {
+    transition-property: opacity, transform;
+    transition-timing-function: var(--ease-standard, cubic-bezier(0.2, 0, 0, 1));
+  }
+
+  .rumia-phrase-transition,
+  .rumia-status-transition {
+    transition-duration: 160ms;
+  }
+
+  .rumia-save-transition {
+    transition-duration: 200ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rumia-phrase-transition,
+  .rumia-status-transition,
+  .rumia-save-transition {
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+    transform: none !important;
+  }
 }
 
 body {
