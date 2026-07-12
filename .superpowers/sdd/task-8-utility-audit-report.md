@@ -12,8 +12,9 @@ before this turn, as was `apps/web/app/support/layout.tsx`. They were treated
 as user work and were not staged or rewritten. Account/reviewer data-access
 diffs were also excluded because Task 8 forbids auth/data-contract changes.
 
-No source-code changes were made in this turn. This report is the only scoped
-artifact produced by the audit.
+The initial audit made no source-code changes. A follow-up fix was then
+authorized for the pre-existing support page only; no auth, data, route, map,
+console, or reviewer workflow files were changed.
 
 ## Contract review
 
@@ -27,27 +28,28 @@ artifact produced by the audit.
 - Current public controls expose visible focus styles through shared `Button`
   primitives or explicit `focus-visible` classes. Offline recovery controls
   have 44px minimum targets and an announced status region.
+- Support now exposes explicit payment/access and exports/saved-day recovery
+  paths, while retaining Explore activities as its single primary action.
+- Support now states that Rumia is not emergency or on-trip support and points
+  urgent requests to local emergency services.
 - Account remains under the traveler `AppLayout`; reviewer pages remain under
   the dense `OperatorShell` and preserve reviewer route ownership. Their
   current auth-context edits are migration work, not Task 8 UI work.
 - No map files, console workflow redesign, auth contract, or Task 9 evidence
   was touched.
 
-## Remaining gap
+## Follow-up closure
 
-The existing support page has a clear primary action and recovery cards, but it
-does not yet expose explicit payment/export help or the emergency-support
-limitation required by the approved full-product support contract
-(`docs/superpowers/specs/2026-07-10-rumia-full-product-rework-design.md` §7.6).
-Because the page is pre-existing user work and the requested change boundary
-for this turn is audit-only, this gap is recorded rather than silently
-rewriting the dirty hunk.
+The support gap from the initial audit is closed in
+`apps/web/app/support/page.tsx`. The page still uses the existing anonymous
+public shell and route ownership; only support content was extended.
 
 ## Verification run in this turn
 
 | Check | Result |
 | --- | --- |
 | Focused Vitest: pricing, offline status, feature grid, editorial primitives | **PASS** — 4 files, 18 tests |
+| Support content contract (`rg` for payment/export and emergency copy) | **PASS** |
 | `pnpm --dir apps/web typecheck` | **PASS** |
 | `pnpm lint:eslint` | **PASS** |
 | `git diff --check` | **PASS** |
@@ -55,6 +57,6 @@ rewriting the dirty hunk.
 
 ## Status
 
-**PARTIAL / AUDIT ONLY.** Existing dirty utility work is statically healthy,
-but no Task 8 source changes were authored or committed here, and the support
-contract gap above remains for the owner of the pre-existing hunk.
+**CLOSED FOR THE RECORDED GAP.** The scoped support content fix is complete and
+statically verified. Full browser/a11y/overflow evidence remains a separate
+follow-up because those gates were not run in this turn.
