@@ -2,8 +2,8 @@
 
 Date: 2026-07-12
 Branch: `codex/rumia-phase0`
-Status: implementation and provider preflight in progress; production
-enablement remains gated
+Status: technical implementation and provider preflight complete; production
+enablement remains gated by owner/legal and provider decisions
 
 ## Goal
 
