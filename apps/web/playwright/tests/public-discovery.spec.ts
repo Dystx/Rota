@@ -77,4 +77,23 @@ test.describe("public discovery and trust routes", () => {
     await expect(recovery).toHaveAttribute("href", "/offline");
     await expect(page.getByRole("button", { name: "Try again", exact: true })).toBeVisible();
   });
+
+  test("activity map is explicit and keeps the complete list equivalent", async ({ page }) => {
+    await page.goto("/explore/workspace?activity=porto-ribeira-slow-walk");
+    await expect(page.getByRole("heading", { name: "Your tentative day", exact: true })).toBeVisible();
+
+    const openMap = page.getByRole("button", { name: "View on map", exact: true });
+    await expect(openMap).toHaveAttribute("aria-expanded", "false");
+    await openMap.click();
+
+    const panel = page.locator("#activity-map-panel");
+    await expect(panel).toHaveAttribute("data-map-intent", "explicit");
+    await expect(panel.locator('[data-map-mode="map"], [data-map-mode="fallback"]')).toHaveCount(1, { timeout: 15_000 });
+    await expect(panel.getByText("Ribeira and Miragaia at walking pace", { exact: true })).toBeVisible();
+
+    await expect(openMap).toHaveAttribute("aria-expanded", "true");
+    await panel.getByRole("button", { name: "View list", exact: true }).click();
+    await expect(panel).toHaveCount(0);
+    await expect(page.getByText("Ribeira and Miragaia at walking pace", { exact: true })).toBeVisible();
+  });
 });

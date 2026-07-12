@@ -13,7 +13,7 @@ visual mismatch is a review item, not permission to refresh a baseline.
 | Traveler account/trips | covered | covered | protected-route and viewport checks pass | review only after auth state is stable |
 | Reviewer/operator surfaces | covered | covered | a11y and viewport checks pass where configured | review dense shell separately |
 | Admin/console surfaces | covered | covered | viewport contract covers operator routes | do not refresh without route-owner review |
-| Optional activity map | manual follow-up | manual follow-up | 10 facade + 6 spatial tests; typechecks pass | no snapshot yet; add dedicated browser proof |
+| Optional activity map | explicit desktop proof | manual mobile follow-up | 10 facade + 6 spatial tests, 1/1 browser map-flow test, typechecks pass | no snapshot yet; keep mobile/provider-error proof open |
 
 ## Evidence commands
 
@@ -26,4 +26,5 @@ visual mismatch is a review item, not permission to refresh a baseline.
 - Performance/Web Vitals — PASS, 14/14
 - Mobile overflow — PASS, 32 mobile / 32 desktop skips
 - Viewport contract — PASS, 120/120
+- Activity map browser flow — PASS, 1/1 desktop Chrome
 - Visual — 14/70 pass, 56 review mismatches; snapshots unchanged
