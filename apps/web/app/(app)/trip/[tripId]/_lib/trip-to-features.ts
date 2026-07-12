@@ -6,8 +6,8 @@
  * spatial-engine-native types (`SpatialFeature` / `SpatialFeatureCollection`)
  * that RouteLayer.bindFeatures can ingest unchanged.
  *
- * Schema mapping (current state of the Supabase schema — see
- * `supabase/migrations/202604291900_create_trip_briefs_and_trips.sql`):
+ * Schema mapping for the self-hosted PostgreSQL schema (see
+ * `drizzle/0000_initial_rumia.sql`):
  *
  *   The migrations ship `trips` + `trip_briefs` only. Stops are not yet
  *   persisted as a relational table; they live inside the generated
@@ -37,6 +37,7 @@ import type {
   SpatialFeature,
   SpatialFeatureCollection
 } from "@repo/spatial-engine";
+import type { GeographicCoordinate } from "@repo/types";
 
 /**
  * DB-shaped row. Mirrors what the eventual `trip_stops` table will look
@@ -67,8 +68,15 @@ export interface TripStop {
   label: string;
   note: string;
   /** GeoJSON `[lng, lat]` tuple. */
-  coordinates: readonly [number, number];
+  coordinates: GeographicCoordinate;
 }
+
+/**
+ * Status exposed by the legacy trip-map adapter while route geometry is not
+ * yet sourced. A trip can have usable stop points (`partial`) without having
+ * a drawable route; an empty or missing trip is `unavailable`.
+ */
+export type TripRouteStatus = "partial" | "unavailable";
 
 /** Property bag attached to each Point feature. Matches `fixtureRouteCollection`. */
 type TripStopProperties = Record<string, unknown> & {
@@ -110,44 +118,40 @@ export function tripStopRowToFeature(row: TripStopRow): SpatialFeature {
 }
 
 /**
- * Build a complete route `SpatialFeatureCollection`: one LineString
- * feature (the trip outline) plus one Point feature per stop. The
- * collection is the same shape `fixtureRouteCollection` produces so
- * `RouteLayer` / `applyLayerUpdate(layer, collection)` ingests it
- * without modification.
+ * Return the truthful status for a trip whose stop points are known but whose
+ * geographic route segments have not been sourced yet. Stop points are useful
+ * map context, but they do not authorize a direct stop-to-stop connector.
+ */
+export function tripStopsToRouteStatus(stops: readonly TripStopRow[]): TripRouteStatus {
+  return stops.some(isCoordinateUsable) ? "partial" : "unavailable";
+}
+
+/** Human-readable fallback copy for route surfaces and assistive technology. */
+export function tripRouteStatusMessage(status: TripRouteStatus): string {
+  return status === "partial"
+    ? "Stops are shown. Validated route geometry is not available yet, so no route line is drawn."
+    : "Route geometry is unavailable. The stop list remains available above.";
+}
+
+/**
+ * Build the legacy trip-map feature collection from stop points only.
  *
- * Stops with missing or out-of-range coordinates are filtered out of
- * the LineString; the resulting collection may legitimately have only
- * Point features if fewer than two stops have usable coordinates (a
- * single Point can't form a LineString per the GeoJSON spec).
+ * This adapter deliberately does not derive a LineString by joining adjacent
+ * stops. A straight connector is not a route and would violate the geographic
+ * route contract unless it came from a validated, licensed provider or
+ * editorial segment. A future sourced-route adapter can append only those
+ * validated segment features; until then the map keeps the points and the
+ * consumer exposes the `partial`/`unavailable` status.
  */
 export function tripStopsToRouteCollection(
   stops: readonly TripStopRow[]
 ): SpatialFeatureCollection {
   const usableStops = stops.filter(isCoordinateUsable);
-
-  const lineFeature: SpatialFeature | null =
-    usableStops.length >= 2
-      ? {
-          type: "Feature",
-          geometry: {
-            type: "LineString",
-            coordinates: usableStops.map((stop) => [stop.lng, stop.lat])
-          },
-          properties: { kind: "itinerary-line" } satisfies Record<string, unknown>
-        }
-      : null;
-
   const pointFeatures: SpatialFeature[] = usableStops.map(tripStopRowToFeature);
-
-  const features: SpatialFeature[] = [
-    ...(lineFeature ? [lineFeature] : []),
-    ...pointFeatures
-  ];
 
   return {
     type: "FeatureCollection",
-    features
+    features: pointFeatures
   };
 }
 

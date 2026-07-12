@@ -10,15 +10,15 @@
  * (`stopsToChapters(days)`), drives the camera via an imperative
  * handle so scroll-progress changes feel like the Mapbox `flyTo`,
  * and re-seeds the route layer when the underlying trip data
- * changes (so a specialist edit re-renders the line + stops
+ * changes (so a specialist edit re-renders the stop points
  * without remounting the engine).
  *
  * Architecture:
  *   1. `useTripRoute(tripId)` resolves the trip's
- *      `SpatialFeatureCollection` (one LineString + one Point per
- *      geocoded stop). Returns `null` when the trip doesn't exist
- *      or hasn't been geocoded yet — the consumer falls back to
- *      a static schematic in that case.
+ *      `SpatialFeatureCollection` (one Point per geocoded stop). The
+ *      legacy source has no validated route segments, so it never
+ *      fabricates a direct stop-to-stop LineString; `status` drives
+ *      the truthful fallback copy.
  *   2. `WorkspaceCanvas` (dynamic-imported) owns the MapLibre
  *      engine. The `routeFeatures` prop re-seeds the `trips`
  *      telemetry channel without remounting.
@@ -33,9 +33,15 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 import { useTripRoute } from "../_hooks/use-trip-route";
+import { tripRouteStatusMessage } from "../_lib/trip-to-features";
 import type { ChapterCameraTarget } from "../_lib/chapter-mapping";
 import { IntersectionObserverGate } from "./intersection-observer-gate";
-import type { WorkspaceCanvasHandle } from "@repo/spatial-engine";
+import type { SpatialFeatureCollection, WorkspaceCanvasHandle } from "@repo/spatial-engine";
+
+const EMPTY_ROUTE_FEATURES: SpatialFeatureCollection = {
+  type: "FeatureCollection",
+  features: []
+};
 
 export interface WorkspaceTripCanvasProps {
   tripId: string;
@@ -128,7 +134,7 @@ export const WorkspaceTripCanvas = React.forwardRef<
   ref
 ) {
   const canvasRef = React.useRef<WorkspaceCanvasHandle | null>(null);
-  const { data: routeFeatures, isLoading, error } = useTripRoute(tripId);
+  const { data: routeFeatures, status: routeStatus, isLoading, error } = useTripRoute(tripId);
 
   // Map `reducedMotion` (prop) to MapLibre's `duration: 0` so the
   // imperative calls below automatically jump instead of flying.
@@ -195,13 +201,14 @@ export const WorkspaceTripCanvas = React.forwardRef<
   // rendered a static image in this state, and the spatial
   // engine has no equivalent, so the schematic is the closest
   // graceful-degradation path.
-  if (!isLoading && (error || routeFeatures === null) && chapters.length === 0) {
+  if (!isLoading && (error || routeStatus === "unavailable")) {
     return (
       <div
         data-testid="trip-workspace-canvas-frame"
         data-trip-id={tripId}
         data-mode="schematic"
-        className={className}
+        data-route-status={routeStatus}
+        className={["relative", className].filter(Boolean).join(" ")}
       >
         <div
           data-static-schematic=""
@@ -213,6 +220,13 @@ export const WorkspaceTripCanvas = React.forwardRef<
               "radial-gradient(120% 80% at 50% 35%, var(--color-aqua, #cfeae3) 0%, var(--color-cream, #f3ede1) 55%, var(--color-paper, #f7faf9) 100%)"
           }}
         />
+        <p
+          role="status"
+          data-testid="trip-route-status"
+          className="absolute bottom-4 left-4 right-4 z-10 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.92)] px-4 py-3 text-sm text-[var(--color-muted-foreground)] shadow-sm"
+        >
+          {tripRouteStatusMessage(routeStatus)}
+        </p>
       </div>
     );
   }
@@ -222,7 +236,8 @@ export const WorkspaceTripCanvas = React.forwardRef<
       data-testid="trip-workspace-canvas-frame"
       data-trip-id={tripId}
       data-mode="trip"
-      className={className}
+      data-route-status={routeStatus}
+      className={["relative", className].filter(Boolean).join(" ")}
     >
       <IntersectionObserverGate
         forceMount
@@ -248,11 +263,20 @@ export const WorkspaceTripCanvas = React.forwardRef<
             className="h-[600px] w-full"
             testId="trip-workspace-canvas"
             initialFocus={initialFocus}
-            routeFeatures={routeFeatures}
+            routeFeatures={routeFeatures ?? EMPTY_ROUTE_FEATURES}
             disableIntro
           />
         </React.Suspense>
       </IntersectionObserverGate>
+      {routeStatus === "partial" ? (
+        <p
+          role="status"
+          data-testid="trip-route-status"
+          className="pointer-events-none absolute bottom-4 left-4 right-4 z-10 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.92)] px-4 py-3 text-sm text-[var(--color-muted-foreground)] shadow-sm"
+        >
+          {tripRouteStatusMessage(routeStatus)}
+        </p>
+      ) : null}
     </div>
   );
 });

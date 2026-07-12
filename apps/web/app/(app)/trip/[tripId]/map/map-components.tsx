@@ -7,11 +7,11 @@
  * `<ProviderMap>` and `<CinematicMap>` from `@repo/maps` were
  * absorbed into the spatial engine. `<RouteMap>` below now
  * reads trip data via `useTripRoute(tripId)` and renders a
- * `<WorkspaceCanvas>` from `@repo/spatial-engine` when the route
- * is non-null. When `useTripRoute` returns `null` (no trip,
- * loading, error) we fall back to the `@repo/ui` schematic
- * `RouteMap` so the panel + warnings still have a host to
- * render into.
+ * `<WorkspaceCanvas>` from `@repo/spatial-engine` when stop points
+ * are available. The legacy source has no validated route segments,
+ * so the canvas never receives a fabricated connector. When the
+ * route status is unavailable we fall back to the `@repo/ui`
+ * schematic `RouteMap` so the panel + warnings still have a host.
  *
  * The schematic fallback keeps the same `data-testid`
  * (`schematic-map-fallback`) so existing visual tests still
@@ -25,7 +25,13 @@ import Link from "next/link";
 import { RouteMap as SchematicMap } from "@repo/ui";
 
 import { useTripRoute } from "../_hooks/use-trip-route";
-import type { WorkspaceCanvasHandle } from "@repo/spatial-engine";
+import { tripRouteStatusMessage } from "../_lib/trip-to-features";
+import type { SpatialFeatureCollection, WorkspaceCanvasHandle } from "@repo/spatial-engine";
+
+const EMPTY_ROUTE_FEATURES: SpatialFeatureCollection = {
+  type: "FeatureCollection",
+  features: []
+};
 
 const WorkspaceCanvas = dynamic(
   () => import("@repo/spatial-engine").then((mod) => mod.WorkspaceCanvas),
@@ -50,10 +56,11 @@ interface RouteMapProps extends React.ComponentProps<typeof SchematicMap> {
 /**
  * `<RouteMap>` — the live-or-schematic facade for the trip map
  * page. Reads the trip route via `useTripRoute(tripId)`. When the
- * spatial engine has data, renders a `WorkspaceCanvas` with the
- * route features seeded. Otherwise falls back to the static
- * schematic from `@repo/ui` so the warnings / panel still have a
- * host. `selectedDayId`, `days`, and `warnings` are passed
+ * spatial engine has stop-point data, renders a `WorkspaceCanvas`
+ * with those points seeded and exposes the partial-route status.
+ * Otherwise it falls back to the static schematic from `@repo/ui`
+ * so the warnings / panel still have a host. `selectedDayId`, `days`,
+ * and `warnings` are passed
  * through to the schematic only — the spatial engine ignores
  * them and builds its own features from the trip itinerary.
  */
@@ -65,21 +72,29 @@ export function RouteMap({
   children,
   ...rest
 }: RouteMapProps) {
-  const { data: routeFeatures, isLoading } = useTripRoute(tripId);
+  const { data: routeFeatures, status: routeStatus, isLoading } = useTripRoute(tripId);
   const canvasRef = React.useRef<WorkspaceCanvasHandle | null>(null);
 
   // SSR + initial render: render the schematic so the page has
   // something to display before the spatial engine has finished
   // mounting. Once the route is non-null (or the trip is
   // confirmed missing / errored) we swap to the live canvas.
-  if (routeFeatures === null && !isLoading) {
+  if (routeStatus === "unavailable" && !isLoading) {
     return (
       <SchematicMap
         selectedDayId={selectedDayId}
         days={days}
         warnings={warnings}
         {...rest}
+        data-route-status={routeStatus}
       >
+        <p
+          role="status"
+          data-testid="trip-route-status"
+          className="absolute bottom-16 left-4 right-4 z-20 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.94)] px-4 py-3 text-sm text-[var(--color-muted-foreground)] shadow-sm"
+        >
+          {tripRouteStatusMessage(routeStatus)}
+        </p>
         {children}
       </SchematicMap>
     );
@@ -90,16 +105,26 @@ export function RouteMap({
       data-testid="trip-workspace-canvas-frame"
       data-trip-id={tripId}
       data-mode="trip"
+      data-route-status={routeStatus}
       className="relative flex h-[600px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.96)] shadow-[0_24px_60px_rgba(7,17,19,0.06)]"
     >
       <WorkspaceCanvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full"
         testId="trip-workspace-canvas"
-        routeFeatures={routeFeatures}
+        routeFeatures={routeFeatures ?? EMPTY_ROUTE_FEATURES}
         disableIntro
       />
       <div className="relative z-10 h-full w-full pointer-events-none">{children}</div>
+      {routeStatus === "partial" ? (
+        <p
+          role="status"
+          data-testid="trip-route-status"
+          className="pointer-events-none absolute bottom-4 left-4 right-4 z-20 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.94)] px-4 py-3 text-sm text-[var(--color-muted-foreground)] shadow-sm"
+        >
+          {tripRouteStatusMessage(routeStatus)}
+        </p>
+      ) : null}
     </div>
   );
 }
