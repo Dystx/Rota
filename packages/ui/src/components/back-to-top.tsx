@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { cn } from "../lib/cn";
+import { Icon } from "./icon";
 
 /**
  * BackToTop — a small floating button that appears once the user
@@ -53,7 +54,7 @@ export function BackToTop() {
       aria-hidden={!visible}
       tabIndex={visible ? 0 : -1}
     >
-      <span aria-hidden className="material-symbols-outlined text-[20px]">arrow_upward</span>
+      <Icon name="arrow_upward" className="text-[20px]" />
     </button>
   );
 }

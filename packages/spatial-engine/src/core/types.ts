@@ -108,10 +108,9 @@ export interface SpatialEngine {
    * Switch the projection at runtime. Avoids a full canvas teardown —
    * MapLibre re-projects the existing tile/source data in place so the
    * layer registry, telemetry, and camera state survive the switch.
-   * No-op if not mounted. The 2D ↔ 3D toggle in `hero-map.tsx` uses
-   * this so toggling does not remount the engine (which would
-   * re-download the style, recreate every custom WebGL layer, and
-   * leak buffers if not torn down cleanly).
+   * No-op if not mounted. Map-capable surfaces may use this to switch
+   * projection without remounting the engine (which would re-download the
+   * style, recreate custom WebGL layers, and risk leaking buffers).
    */
   setProjectionType(type: "globe" | "mercator"): void;
   /**
@@ -197,9 +196,9 @@ export interface SpatialEngineOptions {
    * (precision editing — Workspace). Default: `globe`.
    */
   projection?: "globe" | "mercator";
-  /** Enable 3D terrain via a raster DEM. Disabled by default on Workspace (mercator); enabled on Discovery (globe). */
+  /** Enable 3D terrain via a raster DEM. Disabled by default; callers opt in only after the provider/licence gate. */
   terrain?: TerrainOptions;
-  /** Atmospheric fog + starfield on the globe. Default: enabled with soft config. */
+  /** Atmospheric fog + starfield on the globe. Default: disabled unless explicitly configured. */
   fog?: FogOptions;
   /** Opt-in radial gradient halo + starfield custom WebGL layers. Default: undefined (off). */
   atmosphere?: AtmosphereOptions;

@@ -146,7 +146,7 @@ export function ActivityExplorer({
         </div>
 
         <section aria-label="Judged activities" className="mt-12">
-          {activities.length > 0 ? activities.map((activity) => <ActivityResultCard activity={activity} alternativeTitle={activity.alternativeId ? activitiesById.get(activity.alternativeId)?.title : undefined} key={activity.id} saved={savedIds.includes(activity.id)} onToggle={toggle} />) : (
+          {activities.length > 0 ? activities.map((activity, index) => <ActivityResultCard activity={activity} index={index} alternativeTitle={activity.alternativeId ? activitiesById.get(activity.alternativeId)?.title : undefined} key={activity.id} saved={savedIds.includes(activity.id)} onToggle={toggle} />) : (
             <div className="border-t border-[var(--color-border)] py-8">
               <h2 className="font-display text-3xl text-primary">That combination is still under review.</h2>
               <p className="mt-3 max-w-xl text-on-surface-variant">Try changing one phrase. Rumia will not fill a gap with unrelated recommendations.</p>

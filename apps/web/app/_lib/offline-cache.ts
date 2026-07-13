@@ -133,7 +133,7 @@ export async function clearOfflineCache(): Promise<void> {
 //   2. On `pagehide`: drain the ring buffer, write to IDB.
 //   3. On `pageshow`: read from IDB, push events back into
 //      the ring buffer (so the live UI sees them).
-//   4. A future PR adds the Supabase flush (the
+//   4. A future PR adds the PostgreSQL flush (the
 //      `user_behavior_events` table added in
 //      `202607031800_create_user_behavior_events.sql`).
 

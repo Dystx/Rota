@@ -36,7 +36,7 @@ export type OperatorSection = "reviewer" | "admin";
 interface NavItem {
   href: string;
   label: string;
-  /** Optional Material Symbols icon name. Falls back to a
+  /** Optional shared icon name. Falls back to a
    *  small dot if omitted. */
   icon?: string;
   /** Optional short description under the label. */
@@ -156,7 +156,11 @@ export function OperatorShell({
   const initial = user.name.trim().charAt(0).toUpperCase() || "?";
 
   return (
-    <div className="min-h-screen bg-background text-primary">
+    <div
+      data-surface="linen"
+      data-surface-texture="none"
+      className="min-h-screen rumia-surface rumia-surface-linen text-primary"
+    >
       {/* Desktop layout: sidebar + content */}
       <div className="lg:flex lg:min-h-screen">
         {/* Sidebar — visible from `lg` up. Below `lg` it becomes
@@ -165,7 +169,7 @@ export function OperatorShell({
         <aside
           aria-label={`${meta.kicker} navigation`}
           data-testid="operator-sidebar"
-          className="hidden lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-olive-light/15 lg:bg-paper/40"
+          className="hidden lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-olive-light/15 lg:bg-white/45"
         >
           <div className="flex flex-1 flex-col gap-6 p-6 sticky top-0 h-screen">
             <Link
@@ -227,7 +231,7 @@ export function OperatorShell({
         >
           {/* Mobile top-bar — visible below `lg`. Uses a
               native <details> for zero-JS disclosure. */}
-          <details className="lg:hidden border-b border-olive-light/15 bg-paper/40">
+          <details className="lg:hidden border-b border-olive-light/15 bg-white/45">
             <summary
               data-testid="operator-mobile-toggle"
               className="flex items-center justify-between gap-3 p-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"

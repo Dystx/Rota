@@ -35,7 +35,15 @@
 
 import { z } from "zod";
 import type { DataClientOptions } from "./index";
-import { resolveDataClient } from "./index";
+import { resolveLegacyDataClient } from "./clients";
+import {
+  getPostgresSpecialistCapabilities,
+  getPostgresSpecialistProfileByUserId,
+  listPostgresSpecialists,
+  setPostgresSpecialistCapabilities,
+  setPostgresSpecialistVerified,
+  upsertPostgresSpecialistProfile
+} from "./specialists-postgres";
 
 export const SpecialistProfileInputSchema = z.object({
   fullName: z.string().min(1).max(255),
@@ -46,7 +54,7 @@ export const SpecialistProfileInputSchema = z.object({
   hourlyRate: z.number().min(0).max(9999.99).default(0),
   bio: z.string().max(2000).nullable().optional(),
   // Despite the historical column name, this value is now a private
-  // Supabase Storage object path (`<user uuid>/<object uuid>.<ext>`).
+  // Object-storage path (`<user uuid>/<object uuid>.<ext>`).
   // External portrait URLs are intentionally rejected at the persistence
   // boundary so admin/import callers cannot reintroduce remote imagery.
   photoUrl: z
@@ -116,7 +124,11 @@ export async function getSpecialistProfileByUserId(
   userId: string,
   options?: DataClientOptions
 ): Promise<SpecialistProfile | null> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) {
+    return getPostgresSpecialistProfileByUserId(userId, options.actor);
+  }
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("specialist_profiles")
     .select(SELECT_COLUMNS)
     .eq("user_id", userId)
@@ -134,6 +146,10 @@ export async function upsertSpecialistProfile(
   input: SpecialistProfileInput,
   options?: DataClientOptions
 ): Promise<SpecialistProfile | null> {
+  if (options?.actor) {
+    return upsertPostgresSpecialistProfile(userId, input, options.actor);
+  }
+
   // DB CHECK constraint mirror: tier 4 requires a license.
   if (
     input.tier4LicensedGuide &&
@@ -142,7 +158,7 @@ export async function upsertSpecialistProfile(
     throw new Error("Tier 4 requires an RNAAT license number");
   }
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("specialist_profiles")
     .upsert(
       {
@@ -176,7 +192,11 @@ export async function listSpecialists(
   limit = 100,
   options?: DataClientOptions
 ): Promise<SpecialistProfile[]> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) {
+    return listPostgresSpecialists(limit, options.actor);
+  }
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("specialist_profiles")
     .select(SELECT_COLUMNS)
     .order("created_at", { ascending: false })
@@ -207,6 +227,10 @@ export async function setSpecialistVerified(
   verified: boolean,
   options?: DataClientOptions
 ): Promise<SpecialistProfile | null> {
+  if (options?.actor) {
+    return setPostgresSpecialistVerified(specialistId, verified, options.actor);
+  }
+
   // Pre-flight read so we can fail with a friendly message
   // before the DB CHECK rejects the write.
   const current = await getSpecialistProfileById(specialistId, options);
@@ -219,7 +243,7 @@ export async function setSpecialistVerified(
     );
   }
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("specialist_profiles")
     .update({ is_verified: verified })
     .eq("id", specialistId)
@@ -237,7 +261,7 @@ async function getSpecialistProfileById(
   id: string,
   options?: DataClientOptions
 ): Promise<SpecialistProfile | null> {
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("specialist_profiles")
     .select(SELECT_COLUMNS)
     .eq("id", id)
@@ -272,7 +296,11 @@ export async function getSpecialistCapabilities(
   specialistId: string,
   options?: DataClientOptions
 ): Promise<SpecialistCapabilities> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) {
+    return getPostgresSpecialistCapabilities(specialistId, options.actor);
+  }
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("specialist_capabilities")
     .select("type,value")
     .eq("specialist_id", specialistId)
@@ -305,7 +333,11 @@ export async function setSpecialistCapabilities(
   values: readonly string[],
   options?: DataClientOptions
 ): Promise<void> {
-  const client = resolveDataClient(options);
+  if (options?.actor) {
+    return setPostgresSpecialistCapabilities(specialistId, type, values, options.actor);
+  }
+
+  const client = resolveLegacyDataClient(options);
   // Fetch current values so the delete is precise.
   const { data: current, error: readError } = await client
     .from("specialist_capabilities")
@@ -324,7 +356,7 @@ export async function setSpecialistCapabilities(
   const toInsert = [...nextValues].filter((v) => !currentValues.has(v));
 
   if (toDelete.length > 0) {
-    // Supabase Postgrest doesn't have a clean
+    // The legacy client adapter doesn't have a clean
     // in/not-in filter in a single call; we delete by
     // value list using a per-value loop. For typical
     // counts (1-10 skills, 1-6 languages) the round-trip

@@ -2,10 +2,10 @@ import { describe, expect, test } from "vitest";
 import type { TripDraftDetail } from "@repo/db";
 import type { CheckoutProvider } from "@repo/payments";
 import type { AuthorizedApiContext } from "@/lib/auth/api";
-import { handleUnlockCheckoutRequest } from "./route";
+import { handleUnlockCheckoutRequest } from "./handler";
 
 const travelerAuth = {
-  client: {},
+  actor: { capabilities: [], reviewerId: null, roles: ["traveler"], userId: "traveler-user-123" },
   reviewerId: null,
   role: "traveler",
   userId: "traveler-user-123"
@@ -74,10 +74,8 @@ describe("handleUnlockCheckoutRequest", () => {
     expect(response.status).toBe(403);
     expect(checkoutCalled).toBe(false);
     await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "forbidden",
-        message: "Trip does not belong to this traveler."
-      }
+      code: "forbidden",
+      message: "Trip does not belong to this traveler."
     });
   });
 

@@ -21,6 +21,7 @@
  */
 
 import * as React from "react";
+import { Icon } from "@repo/ui";
 import { useMapStore } from "@/store/useMapStore";
 
 const PACE_OPTIONS = [
@@ -80,9 +81,7 @@ export function PaceToneControl() {
                   : "bg-white/70 text-primary border border-olive-light/40 hover:bg-olive-light/15")
               }
             >
-              <span aria-hidden="true" className="ph text-[16px]">
-                {opt.icon}
-              </span>
+              <Icon name={opt.icon} className="text-[16px]" />
               {opt.value}
             </button>
           );
@@ -107,9 +106,7 @@ export function PaceToneControl() {
                   : "bg-white/70 text-primary border border-olive-light/40 hover:bg-olive-light/15")
               }
             >
-              <span aria-hidden="true" className="ph text-[16px]">
-                {opt.icon}
-              </span>
+              <Icon name={opt.icon} className="text-[16px]" />
               {opt.value}
             </button>
           );

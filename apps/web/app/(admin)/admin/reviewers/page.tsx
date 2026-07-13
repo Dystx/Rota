@@ -9,11 +9,11 @@ export default async function AdminReviewersPage() {
 
   try {
     if (isAdminPageAuthContext(auth)) {
-      reviewers = await listReviewers(100, { client: auth.client });
+      reviewers = await listReviewers(100, { actor: auth.actor });
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load persisted reviewers here."
+      ? "Configure PostgreSQL and Better Auth to load persisted reviewers here."
       : "Could not load admin reviewers.";
   }
 

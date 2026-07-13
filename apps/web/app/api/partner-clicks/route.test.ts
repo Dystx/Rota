@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { createFakeAnalyticsProvider } from "@repo/analytics";
 import type { BookingClick } from "@repo/db";
-import { handlePartnerClickRequest } from "./route";
+import { handlePartnerClickRequest } from "./handler";
 
 function clickRequest(
   query: Record<string, string>,

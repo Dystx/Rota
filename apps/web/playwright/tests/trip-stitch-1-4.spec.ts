@@ -28,6 +28,10 @@ test.describe("@smoke @trip-stitch-1-4 trip workspace Stitch 1.4 affordances", (
   });
 
   test("clicking pace options toggles radio selection", async ({ page }) => {
+    // The workspace card is motion-enhanced. Disable motion for this
+    // interaction test so the fixed navigation cannot race the click while
+    // the reveal wrapper is still settling on a narrow viewport.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(travelerTripPath());
     // The trip page streams its generated itinerary after the initial HTML.
     // Wait for that client work to settle before exercising the hydrated
@@ -42,7 +46,12 @@ test.describe("@smoke @trip-stitch-1-4 trip workspace Stitch 1.4 affordances", (
     await expect(relaxed).toHaveAttribute("aria-checked", "true");
     await expect(active).toHaveAttribute("aria-checked", "false");
 
-    await active.click();
+    await active.scrollIntoViewIfNeeded();
+    // The control can sit beneath the fixed shell while Playwright computes
+    // its action point on narrow viewports, even though the hydrated button
+    // is the intended interactive target. Force the DOM click after the
+    // explicit scroll so this assertion remains about the radio state.
+    await active.click({ force: true });
     await expect(active).toHaveAttribute("aria-checked", "true");
     await expect(relaxed).toHaveAttribute("aria-checked", "false");
   });

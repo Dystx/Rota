@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { SiteFooter } from "../../_components/site-footer";
 import { ConversationList } from "./_components/conversation-list";
 import {
   MessageThread,
@@ -14,7 +13,6 @@ import {
   type PushPayload,
   type PushResult,
 } from "./_components/triage-panel";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { triageInboundMessage } from "../_components/message-triage";
 import type { TriageResult } from "@repo/ai";
 import { DAYS } from "./_lib/conversations";
@@ -25,7 +23,7 @@ export default function ConsoleMessagesPage() {
   // bound to this; the filtered list is derived in the render.
   const [search, setSearch] = useState("");
   // Track Realtime connection to chat_messages. Feature-flagged so
-  // SSR / no-Supabase environments keep the hardcoded board.
+  // SSR / operator-feed-disabled environments keep the deterministic board.
   const [isLive, setIsLive] = useState(false);
   const [incomingCount, setIncomingCount] = useState(0);
   // Most recent triage classification surfaced in the header.
@@ -45,70 +43,6 @@ export default function ConsoleMessagesPage() {
   // have pushed from the same conversation).
   const [recentEvents, setRecentEvents] = useState<ItineraryEvent[]>([]);
   const [recentEventsLoading, setRecentEventsLoading] = useState(false);
-
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_USE_REALTIME_MESSAGES !== "true") return;
-
-    // Cancellation flag: the async triage callback awaits a server
-    // action. If the user navigates away during the await, we must
-    // not call setLastTriage on an unmounted component (React 18+
-    // warning + leaked triage badge on the next page).
-    let cancelled = false;
-
-    const supabase = createBrowserSupabaseClient();
-    const channel = supabase
-      .channel("console-messages")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "chat_messages" },
-        async (payload) => {
-          if (cancelled) return;
-          setIncomingCount((n) => n + 1);
-          // Push the new row into the message list so the thread
-          // updates live (Phase 7.1). The insert is from a
-          // different session — our own optimistic insert goes
-          // through `sentMessages` and merges on the render side.
-          const row = (payload.new ?? {}) as Record<string, unknown>;
-          const id = typeof row.id === "string" ? row.id : null;
-          const conversationId =
-            typeof row.conversation_id === "string" ? row.conversation_id : null;
-          const body = typeof row.body === "string" ? row.body : "";
-          const authorRole =
-            row.author_role === "operator" || row.author_role === "traveler"
-              ? row.author_role
-              : "traveler";
-          const createdAt =
-            typeof row.created_at === "string" ? row.created_at : new Date().toISOString();
-          if (id && conversationId) {
-            setMessages((current) => {
-              if (current.some((m) => m.id === id)) return current;
-              return [
-                ...current,
-                { id, conversationId, authorRole, body, createdAt }
-              ];
-            });
-          }
-          if (body) {
-            try {
-              const result = await triageInboundMessage({ message: body });
-              if (cancelled) return;
-              setLastTriage(result);
-            } catch {
-              // Triage is best-effort; never break the live channel.
-            }
-          }
-        }
-      )
-      .subscribe((status) => {
-        if (cancelled) return;
-        setIsLive(status === "SUBSCRIBED");
-      });
-
-    return () => {
-      cancelled = true;
-      void supabase.removeChannel(channel);
-    };
-  }, []);
 
   // Phase 7.1: load the chat-message history for the active
   // conversation. Triggers on `activeId` change so switching
@@ -269,7 +203,7 @@ export default function ConsoleMessagesPage() {
           className="fixed inset-0 z-0 bg-glass-light/30 pointer-events-none"
         />
 
-        <main id="main-content" className="relative z-10 flex-1 h-screen flex gap-gutter p-container-padding-sm overflow-hidden">
+        <main id="main-content" className="relative z-10 flex-1 min-h-screen lg:h-screen flex flex-col lg:flex-row gap-4 p-container-padding-sm overflow-y-auto lg:overflow-hidden">
           <h1 className="sr-only">Messaging Hub</h1>
           <p className="absolute top-2 left-1/2 -translate-x-1/2 z-20 rounded-full border border-ochre-light/40 bg-primary/90 px-3 py-1 font-mono-micro text-mono-micro uppercase tracking-wider text-ochre-light shadow-sm">
             Demo data · Portugal sample itinerary
@@ -310,7 +244,6 @@ export default function ConsoleMessagesPage() {
             onPush={pushItineraryEvent}
           />
         </main>
-        <SiteFooter />
       </div>
       <style>{`
         main ::-webkit-scrollbar { width: 6px; }

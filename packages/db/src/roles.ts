@@ -1,4 +1,4 @@
-import { resolveDataClient, type DataClientOptions } from "./clients";
+import { resolveLegacyDataClient, type DataClientOptions } from "./clients";
 
 export const trustedAppRoles = ["traveler", "reviewer", "admin", "none"] as const;
 
@@ -51,7 +51,7 @@ function parseUserRoleProfile(row: RawUserProfileRow): UserRoleProfile {
 }
 
 export async function getUserRoleProfile(userId: string, options?: DataClientOptions): Promise<UserRoleProfile | null> {
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("user_profiles")
     .select("user_id,app_role,display_name,created_at,updated_at")
     .eq("user_id", userId)
@@ -69,7 +69,7 @@ export async function getUserRoleProfile(userId: string, options?: DataClientOpt
 }
 
 export async function getReviewerIdForUser(userId: string, options?: DataClientOptions): Promise<string | null> {
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("reviewer_auth_links")
     .select("reviewer_id")
     .eq("user_id", userId)

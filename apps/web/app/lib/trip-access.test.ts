@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   getTripDraftById: vi.fn(),
   getTripDraftByIdForOwner: vi.fn(),
+  loadPostgresAuthorizationContext: vi.fn(),
   tripDraftExists: vi.fn()
 }));
 
@@ -15,6 +16,7 @@ vi.mock("@/lib/auth/current-user", () => ({
 vi.mock("@repo/db", () => ({
   getTripDraftById: mocks.getTripDraftById,
   getTripDraftByIdForOwner: mocks.getTripDraftByIdForOwner,
+  loadPostgresAuthorizationContext: mocks.loadPostgresAuthorizationContext,
   tripDraftExists: mocks.tripDraftExists
 }));
 
@@ -53,6 +55,7 @@ const ownedTrip = {
 describe("getOwnedTrip", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mocks.loadPostgresAuthorizationContext.mockResolvedValue(null);
   });
 
   test("returns anonymous before any database lookup", async () => {
@@ -63,19 +66,18 @@ describe("getOwnedTrip", () => {
     expect(mocks.getTripDraftById).not.toHaveBeenCalled();
   });
 
-  test("returns missing when the authenticated owner's filtered lookup has no row", async () => {
+  test("fails closed when the authenticated user has no PostgreSQL actor", async () => {
     mocks.getCurrentUser.mockResolvedValue({ user: { id: "traveler-user-123" } });
-    mocks.getTripDraftByIdForOwner.mockResolvedValue(null);
-    mocks.tripDraftExists.mockResolvedValue(false);
 
-    await expect(getOwnedTrip("42")).resolves.toEqual({ kind: "missing" });
-    expect(mocks.getTripDraftByIdForOwner).toHaveBeenCalledWith("42", "traveler-user-123");
-    expect(mocks.tripDraftExists).toHaveBeenCalledWith("42");
+    await expect(getOwnedTrip("42")).resolves.toEqual({ kind: "forbidden" });
+    expect(mocks.getTripDraftByIdForOwner).not.toHaveBeenCalled();
+    expect(mocks.tripDraftExists).not.toHaveBeenCalled();
     expect(mocks.getTripDraftById).not.toHaveBeenCalled();
   });
 
   test("returns the owner-filtered trip for its authenticated owner", async () => {
     mocks.getCurrentUser.mockResolvedValue({ user: { id: "traveler-user-123" } });
+    mocks.loadPostgresAuthorizationContext.mockResolvedValue({ capabilities: [], reviewerId: null, roles: ["traveler"], userId: "traveler-user-123" });
     mocks.getTripDraftByIdForOwner.mockResolvedValue(ownedTrip);
 
     await expect(getOwnedTrip("42")).resolves.toEqual({
@@ -83,16 +85,17 @@ describe("getOwnedTrip", () => {
       trip: ownedTrip,
       userId: "traveler-user-123"
     });
+    expect(mocks.getTripDraftByIdForOwner).toHaveBeenCalledWith("42", "traveler-user-123", { actor: expect.objectContaining({ userId: "traveler-user-123" }) });
     expect(mocks.getTripDraftById).not.toHaveBeenCalled();
   });
 
-  test("classifies a non-owner result without returning its trip", async () => {
+  test("fails closed when the actor-scoped lookup cannot see a trip", async () => {
     mocks.getCurrentUser.mockResolvedValue({ user: { id: "traveler-user-123" } });
+    mocks.loadPostgresAuthorizationContext.mockResolvedValue({ capabilities: [], reviewerId: null, roles: ["traveler"], userId: "traveler-user-123" });
     mocks.getTripDraftByIdForOwner.mockResolvedValue(null);
-    mocks.tripDraftExists.mockResolvedValue(true);
 
-    await expect(getOwnedTrip("42")).resolves.toEqual({ kind: "forbidden" });
-    expect(mocks.tripDraftExists).toHaveBeenCalledWith("42");
+    await expect(getOwnedTrip("42")).resolves.toEqual({ kind: "missing" });
+    expect(mocks.tripDraftExists).not.toHaveBeenCalled();
     expect(mocks.getTripDraftById).not.toHaveBeenCalled();
   });
 });

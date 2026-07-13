@@ -150,7 +150,7 @@ export interface EmbedResult {
 }
 
 /** Result of a `loadPlaces` run — how many rows landed in
- *  Supabase and how many failed (constraint violations,
+ *  PostgreSQL and how many failed (constraint violations,
  *  connection errors, etc.). */
 export interface LoadResult {
   inserted: number;
@@ -244,8 +244,8 @@ export interface LoadResponse {
 }
 
 /** Contract the load stage expects. Production wires the
- *  Supabase upsert (D-6 in ADR-003). Tests use a counting
+ *  PostgreSQL upsert (D-6 in ADR-003). Tests use a counting
  *  stub. */
-export interface SupabaseLoader {
+export interface PlaceLoader {
   load(request: LoadRequest): Promise<LoadResponse>;
 }

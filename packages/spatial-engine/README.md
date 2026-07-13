@@ -2,19 +2,40 @@
 
 Provider-agnostic map and globe foundation for Rumia.
 
+> **Current release boundary:** this package supports the existing trip-map
+> surface and future progressive enhancements. The current activity-first
+> homepage and activity list do not depend on MapLibre. The new activity-map
+> capability is progressive and remains behind `ENABLE_ACTIVITY_MAP` until the
+> provider/licensing and content gates pass. Phase 2 camera-story contracts
+> and Phase 3 extrusion preparation exist, but activation remains separately
+> gated.
+> `CartoBasemapStyleProvider` is a development/provider candidate, not a
+> production licence decision; see `docs/ops/map-provider-licensing.md`.
+
 The spatial engine is the single source of truth for the interactive map surface across every consumer: the home hero canopy, the `/explore` discovery hub, the `/explore/workspace` trip editor, and the `/trip/[id]/map` page. It owns the renderer lifecycle, the camera, the live data stream, and the layer registry — and it is renderer-agnostic, so swapping MapLibre GL JS for deck.gl or CesiumJS tomorrow is a factory change, not a rewrite of every consumer.
 
 ---
 
 ## 1. Overview
 
-Rumia's product surfaces are anchored to a map. The discovery hub invites a user to explore the world; the workspace lets them edit a route; the trip page zooms into a stop. The same map instance (or at least the same engine contract) backs every one of those moments, with the same live presence stream, the same camera choreography, and the same layer registry.
+Some Rumia surfaces use maps: the trip route can zoom into a stop, while the
+future activity workspace may offer a list-equivalent map. The activity list,
+editorial verdicts, and chosen-day flow remain primary and must work without a
+map. Where a map is enabled, the same engine contract owns the renderer,
+camera, and layer registry.
 
 This package exists to enforce that invariant. The rest of Rumia depends on the abstract `SpatialEngine`, `CameraController`, `TelemetryService`, and `SpatialLayer` interfaces in `core/types.ts` — never on MapLibre directly. Today there is one concrete adapter, `MapLibreSpatialEngine`; future adapters must satisfy the same shapes.
 
 The engine ships with two React entry points: `GlobeWorkspace` (3D, marketing / discovery) and `WorkspaceCanvas` (2D, trip editing). Both own one engine instance for their lifetime and seed the telemetry channels with deterministic fixtures so the surface is correct from the first frame.
 
-Phase status: the engine itself, the MapLibre adapter, the layer registry, the camera choreography, and the destination deep-link fixtures are all stable. The Phase 1e migration of `@repo/maps` (`CinematicMap`, `ProviderMap`) onto this engine is complete; the package has been deleted — see §10 below for the history.
+Phase status: the engine itself, the MapLibre adapter, the layer registry, and
+the legacy trip-route migration are stable and verified. Phase 1 is released
+behind the activity-map flag. Phase 2 camera presets/story controls and the
+provider-neutral Phase 3 building-extrusion contract are prepared but remain
+disabled until route geometry, provider/style licensing, and performance
+evidence pass; see
+`docs/superpowers/specs/2026-07-11-rumia-activity-map-capability.md` and
+`docs/superpowers/plans/2026-07-12-rumia-map-phase2-3-unblock.md`.
 
 ---
 
@@ -106,6 +127,7 @@ Every symbol below is exported from the package root (`@repo/spatial-engine`). T
 | `AmbientPulseLayer` | class | Soft ochre circle dots bound to the `travelers` channel. |
 | `SymbolBadgesLayer` | class | Country / region badges bound to the `specialists` channel. |
 | `RouteLayer` | class | Polyline + numbered stop markers bound to the `trips` channel. |
+| `BuildingExtrusionLayer` | class | Optional Phase 3 building treatment; inert unless an approved style exposes the configured source/source-layer. |
 | `RadialGradientAtmosphereLayer` | class | Custom 2D WebGL layer that draws the soft halo behind the globe (opt-in via `atmosphere.radialGradient`). |
 | `StarfieldLayer` | class | Custom 3D WebGL layer that draws ~26k stars depth-tested against the globe (opt-in via `atmosphere.starfield`). |
 | `AmbientPulseLayerOptions` | type | `{ palette, radius? }`. |
@@ -114,6 +136,7 @@ Every symbol below is exported from the package root (`@repo/spatial-engine`). T
 | `RadialGradientAtmosphereOptions` | type | `{ innerColor?, outerColor?, intensity?, radius?, disabled? }`. |
 | `StarfieldOptions` | type | `{ count?, minBrightness?, maxBrightness?, seed?, disabled? }`. |
 | `AtmosphereOptions` | type | `{ radialGradient?, starfield?, disabled? }` — pass to `SpatialEngineOptions.atmosphere` or `GlobeWorkspace`'s `atmosphere` prop. |
+| `BuildingExtrusionLayerOptions` | type | `{ sourceId?, sourceLayer?, color?, opacity?, minzoom? }`; disabled by the workspace unless explicitly enabled. |
 | `DEFAULT_ATMOSPHERE` | const | The soft default `AtmosphereOptions` exported alongside `GlobeWorkspace`. |
 
 ### 3.4 React components (`./components`)
@@ -222,7 +245,11 @@ return <WorkspaceCanvas initialFocus={preset?.camera} />;
 
 ## 6. Layer registration
 
-The engine ships a fixed set of layers today (`AmbientPulseLayer`, `SymbolBadgesLayer`, `RouteLayer`). Each layer is *renderer-specific code* — it knows how to add a MapLibre source + paint layer — but the lifecycle contract (`SpatialLayer`) is renderer-agnostic.
+The engine ships a fixed set of default layers today (`AmbientPulseLayer`,
+`SymbolBadgesLayer`, `RouteLayer`) plus the opt-in `BuildingExtrusionLayer`.
+Each layer is *renderer-specific code* — it knows how to add a MapLibre source
++ paint layer — but the lifecycle contract (`SpatialLayer`) is
+renderer-agnostic.
 
 A `LayerRegistry` wraps the engine and gives consumers a single surface for visibility + reorder without re-instantiating the engine:
 

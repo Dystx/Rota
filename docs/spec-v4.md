@@ -1,5 +1,11 @@
 # Rumia — Master Product Specification v4.0
 
+> **Long-term/historical product vision.** The immediate product contract is
+> now Portugal-wide activity curation, not a booking platform or live
+> concierge. Use the [activity-first design](superpowers/specs/2026-07-10-rumia-activity-curation-design.md)
+> and [latest audit](../specs/PLAN-AUDIT_LATEST.md) for current behavior. The
+> tier model below remains a gated future-business vision.
+
 **Core Paradigm**: 4-Tier Ascension Model
 **Target Launch Market**: Portugal (Phased Expansion)
 **Status**: Supersedes [`docs/spec.md`](./spec.md) (v2.0) and complements [`docs/spec-refined-2026.md`](./spec-refined-2026.md).

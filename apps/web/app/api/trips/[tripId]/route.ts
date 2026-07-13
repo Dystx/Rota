@@ -12,7 +12,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ tr
   const choice = (body as { transport?: unknown } | null)?.transport;
   if (choice !== "car" && choice !== "transit") return validationError("Trip update validation failed.");
   try {
-    const updated = await updateTripTransportMode(tripId, MODES[choice], auth.userId, { client: auth.client });
+    const updated = await updateTripTransportMode(tripId, MODES[choice], auth.userId, { actor: auth.actor });
     if (!updated) return notFoundError("Trip not found.");
     return Response.json({ message: "Trip updated." });
   } catch {

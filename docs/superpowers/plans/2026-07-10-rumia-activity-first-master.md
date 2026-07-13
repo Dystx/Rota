@@ -1,6 +1,12 @@
 # Rumia Activity-First Master Execution Plan
 
 > **Canonical plan.** This document supersedes the public-acquisition and route-normalization portions of `rumia-full-rework-master.md`, Phase 1 Public Discovery, and Phase 2 Living Brief. It preserves their security, operations, commerce, and quality gates unless this document states otherwise.
+>
+> **Infrastructure decision — 11 July 2026.** Rumia retires Supabase as its future backend. The production target is the existing Debian VPS beside Lumes: Caddy → Next.js/Better Auth → private PostgreSQL 17 with PostGIS, pgvector when needed, and Drizzle migrations. The Mac remains local development/test. See `docs/superpowers/specs/2026-07-11-rumia-vps-platform-design.md` for the required host, backup, authorization, and migration constraints.
+>
+> **UI redesign decision — 12 July 2026.** The redesign is a cross-cutting clarity and quality program, not a decorative rewrite. Its screen-by-screen hierarchy, component states, responsive rules, accessibility gates, browser-finding mapping, and release sequence live in `docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`.
+>
+> **Frontend aesthetic decision — 12 July 2026.** The deeper component, art-direction, texture, motion, and progressive 3D work is consolidated in `docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`. It is a frontend workstream, not a new product roadmap or permission to make the homepage map-first.
 
 **Goal:** Build Rumia into Portugal’s trusted activity-decision layer: travellers state the time and kind of day they have, receive a small set of independently judged activities, save a transparent day, and only then use planning, purchase, review, and export tools when needed.
 
@@ -42,6 +48,7 @@ Use premium digital-storytelling techniques as pacing and atmosphere, never as t
 
 - Spatial atmosphere is a progressive enhancement behind readable editorial content.
 - A map explains proximity and day conflicts after selection; it never replaces a list or becomes the hero’s primary task.
+- The optional activity-map track begins in the saved activity workspace, stays list-first, and is feature-flagged independently of the core generated-plan journey.
 - Motion conveys cause and effect: phrase selected, activity saved, day conflict revealed. It is short, interruptible, and absent under reduced-motion preference.
 - Editorial typography, paper-like spacing, visual crops, and a controlled color field create premium feeling; novelty cursor effects, scrolljacking, animated noise, autoplay video, and decorative 3D are excluded.
 
@@ -51,6 +58,10 @@ Use premium digital-storytelling techniques as pacing and atmosphere, never as t
 - A card needs a verdict, best use, time cost, timing/crowd trade-off, and one alternative when the caveat is material.
 - Use 44px practical touch targets for phrase controls and buttons; WCAG 2.2’s 24px minimum remains the absolute floor for constrained inline targets.
 - All nonessential animation obeys `prefers-reduced-motion`; no essential information may rely on motion.
+
+The full redesign plan maps these guardrails to every public, traveler, utility,
+and operator surface. Read it before changing shared shells, tokens, activity
+cards, the day tray, planner controls, or the optional map.
 
 ## 2. Canonical information architecture
 
@@ -139,7 +150,7 @@ The seed set is deliberately small: 30–50 reviewed activities across Porto, Li
 
 ### 4.2 Persistence release
 
-After public-entry validation, introduce `editorial_activity_profiles`, `activity_collection_memberships`, and `saved_activity_days` through forward Supabase migrations. RLS permits public read only for reviewed/published projections; drafts, notes, and editor evidence remain operator-only. Saved days are traveler-owner scoped.
+After public-entry validation, introduce `editorial_activity_profiles`, `activity_collection_memberships`, and `saved_activity_days` through forward Drizzle/PostgreSQL migrations. Public activity reads use reviewed/published server projections; drafts, notes, and editor evidence remain operator-only. Saved days are traveler-owner scoped through server-only repositories, explicit owner predicates, a restricted runtime database role, and defense-in-depth RLS.
 
 ## 5. Visual system: intentional humanism, operational restraint
 
@@ -168,7 +179,7 @@ After public-entry validation, introduce `editorial_activity_profiles`, `activit
 
 ### Release 0 — Platform and safety (complete or continue)
 
-Retain the existing foundations: shared shells, route catalogue, API envelopes, capability authorization, feature readiness, asset gate, route/persona/state matrix, and local/hosted migration parity. No live public-data feature activates while the managed PostGIS security advisory or Auth leaked-password setting remains unresolved.
+Retain the existing foundations: shared shells, route catalogue, API envelopes, capability authorization, feature readiness, asset gate, and route/persona/state matrix. Establish the self-hosted platform before enabling persistence: Mac PostgreSQL parity, a VPS `rumia` runtime identity, Node 24, PostgreSQL 17/PostGIS, loopback-only services, Caddy host routing, encrypted off-server backup with tested restore, and a restricted runtime database role. No public persistence feature activates until the owner/reviewer/admin authorization matrix and restore drill pass.
 
 ### Release 1A — Activity domain foundation
 
@@ -187,8 +198,12 @@ Retain the existing foundations: shared shells, route catalogue, API envelopes, 
 3. Replace `/explore` redirect with an explorer; replace `/explore/workspace` redirect with a day tray workspace.
 4. Build result cards, result/empty/loading/error states, shortlist persistence in URL/session, and accessible mobile day tray.
 5. Update public navigation labels and SEO metadata to “what to do” intent without making unsupported editorial claims.
+6. Clear the browser UI review findings before the next public visual baseline: shared icon rendering, planner dark-surface contrast, mobile map hierarchy, non-obscuring day tray, save/remove announcements, public utility shell consistency, and map warning cleanup.
 
 **Gate:** at 1440px and 390px, a visitor can enter a situation, save/remove an activity, reach workspace, and encounter a truthful empty/error state with one main/h1 and no overflow.
+
+The cross-cutting UI redesign sequence is Phase 0 through Phase 7 in
+[`docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`](2026-07-12-rumia-frontend-deep-redesign.md): artifact truth first, then shared surfaces, the public activity journey, chosen-day continuity, feedback/accessibility, utility/operator quality, optional spatial enhancement, and final hardening. UI work does not change the release order or authorize implementation of gated commerce.
 
 ### Release 2 — Chosen-day composition and preview
 
@@ -200,9 +215,37 @@ Retain the existing foundations: shared shells, route catalogue, API envelopes, 
 
 **Gate:** no selected activity disappears between explorer, workspace, planner, sign-in, and claimed trip; direct planner remains compatible.
 
+### Optional map capability track — after the Release 2 gate
+
+This is a progressive enhancement, not a prerequisite for the activity-first
+MVP and not a reason to delay the saved-day or persistence releases. The full
+product/technical contract is in
+[`docs/superpowers/specs/2026-07-11-rumia-activity-map-capability.md`](../specs/2026-07-11-rumia-activity-map-capability.md).
+
+1. **Phase 1 — Basic interactive activity map:** add an explicit `View on map`
+   surface to `/explore/workspace`, with one-to-five reviewed activity points,
+   list/marker selection sync, user-triggered focus, fit/reset controls,
+   optional licensed route segments, attribution, and a semantic 2D/list
+   fallback. Use the existing `@repo/spatial-engine` MapLibre adapter in
+   Mercator mode. No globe, auto-tour, terrain, building extrusions, or map
+   dependency on the homepage.
+2. **Phase 2 — Itinerary camera transitions and route storytelling:** after
+   Release 3 saved-day ownership, sharing, and route geometry are stable, add
+   an explicit “Explore your plan” mode with morning/afternoon/evening camera
+   presets, pause/step/stop controls, and walking/driving/transit segments.
+   Reduced motion uses immediate camera changes; the list remains equivalent.
+3. **Phase 3 — Richer 3D destination exploration:** only after repeated plan
+   use and provider, licensing, accessibility, and performance review, add
+   optional pitched views, dense-urban building extrusions, or terrain where
+   it materially explains an activity day. Mobile may remain 2D.
+
+**Map track rule:** Phase 1 may be released as an optional Release 2A slice,
+but it must not block Release 3. Phase 2 and Phase 3 are separately gated
+capabilities, not part of the base public MVP completion condition.
+
 ### Release 3 — Saved activity days, traveler workspace, and commerce
 
-1. Persist saved activity days and activity selections with traveler owner RLS.
+1. Persist saved activity days and activity selections through server-only Drizzle repositories with traveler-owner predicates and defense-in-depth PostgreSQL RLS.
 2. Update trip workspace hierarchy: next activity/day action → timing/proximity overview → agenda/detail → entitlements/review/export.
 3. Keep map/list synchronization and versioned route edits, but construct routes from chosen activities and explicit traveler changes.
 4. Preserve server-owned catalogue, Stripe session/webhook idempotency, export job state, receipt/email boundaries, archive, vault, and share policy.
@@ -230,8 +273,8 @@ Retain the existing foundations: shared shells, route catalogue, API envelopes, 
 
 ### Release 6 — Production proof and controlled launch
 
-1. Reconcile Supabase migrations and resolve managed-extension/Auth advisor blockers through supported infrastructure changes.
-2. Replace in-memory jobs with durable leases, idempotent worker effects, outbox, dead-letter handling, and verified delivery.
+1. Reconcile Drizzle migrations between the Mac and VPS; verify PostgreSQL extension versions, restricted runtime grants, backup restore, and no public database listener.
+2. Replace in-memory jobs with durable PostgreSQL leases, idempotent worker effects, outbox, dead-letter handling, and verified delivery through the VPS worker service.
 3. Add privacy-safe activity funnel events: `activity_intent_started`, `activity_results_viewed`, `activity_saved`, `day_workspace_opened`, `chosen_day_started`, then preserve checkout/review/export events.
 4. Run route/persona/state matrix, screenshot, axe, keyboard, RLS, visual, performance, and rollback drills.
 5. Enable features independently: reviewed public data → saved days → live AI → Stripe → email → messaging → B2B/Guide beta.
@@ -246,12 +289,74 @@ Retain the existing foundations: shared shells, route catalogue, API envelopes, 
 | Phrase interaction | Mouse, touch, keyboard arrows/Enter/Escape, clear, custom text, and focus return. |
 | Route continuity | `/` → `/explore` → workspace → planner → trip preserves selected IDs or reports truthful recovery. |
 | A11y | Zero serious/critical axe violations; one main/h1; focus indicator; reduced motion; label/announcement for save/remove/conflict. |
-| Responsive | 1440px and 390px captures; no document overflow; list equivalent for maps. |
-| RLS | Anonymous public projection only; draft/editor evidence private; owner/reviewer/admin boundaries tested in staging. |
-| Truthfulness | No fake reviews, specialist identity, availability, bookings, accommodation recommendations, or unrelated demo locations. |
+| Responsive | 1440px and 390px captures; no document overflow; list equivalent for maps; no fixed tray overlap; console mobile read/triage is usable. |
+| Activity map | When the feature flag is enabled, map opens only from an explicit workspace action; one-to-five reviewed points synchronize with the list; 2D fallback, route fallback, attribution, reduced motion, keyboard controls, and cleanup are evidenced. |
+| Authorization | No browser database access; public reviewed projection only; draft/editor evidence private; owner/reviewer/admin boundaries tested through server routes and a restricted database role. |
+| Truthfulness | No fake reviews, specialist identity, availability, bookings, accommodation recommendations, unrelated demo locations, or unsourced route connectors. |
 | Performance | Public JS ≤220KB excluding lazy map; map is lazy/progressive; LCP/INP/CLS budgets from original master hold. |
 | Commerce | Server catalogue, webhook idempotency, persisted return states, version-bound entitlement/export/review. |
 | Operations | Capability, audit, assignment, and organization-isolation contract tests. |
+
+## 7A. Browser UI review gate — 11 July 2026
+
+The live private release was reviewed at `1440x900` and `390x844` through the
+Mac tunnel on port 3302. The detailed finding list and evidence are recorded in
+[`docs/reviews/2026-07-11-rumia-browser-ui-review.md`](../../reviews/2026-07-11-rumia-browser-ui-review.md).
+
+The review confirms that the activity-first journey is understandable, but it
+also found P0/P1 issues that must clear before a public visual baseline is
+accepted:
+
+- replace the broken literal Material Symbols back-to-top text;
+- restore contrast for planner `Transport`/`Vibe` labels on dark surfaces;
+- make the mobile map subordinate to the activity decision;
+- reserve space for the mobile day tray;
+- restore the shared public shell on `/support`;
+- make the console usable for mobile read/triage;
+- announce save/remove state changes;
+- remove the repeated unsupported globe fog warning.
+
+P2 work then reconciles commerce copy, editorial whitespace, mobile-menu focus,
+and heading semantics with the release gates. No P0/P1 finding is considered
+closed from a source change alone: each requires fresh desktop/mobile captures,
+keyboard/announcement evidence, and a clean browser warning check.
+
+**Closure evidence (2026-07-13):** the canonical frontend plan records the
+fresh route-level closure: the shared icon, planner contrast, mobile map
+hierarchy, day-tray spacing, public utility shell, console mobile treatment,
+save/remove announcements, and warning cleanup are covered by the current
+authenticated smoke, visual, accessibility, performance, viewport, and private
+tunnel checks. Public ingress remains deferred by owner decision; that is an
+operational gate, not an unresolved frontend finding.
+
+## 7B. Optional activity-map capability gate — 11 July 2026
+
+The map capability is intentionally separated from the core activity-first
+journey. Phase 1 is accepted only when the workspace list remains fully useful
+without WebGL and the map is opened deliberately. The gate requires:
+
+- no MapLibre import or tile request before map intent on `/` or `/explore`;
+- one-to-five reviewed activities rendered with stable points and bidirectional
+  list/marker selection;
+- 2D Mercator as the default, with no automatic tour, globe fog, pitch,
+  terrain, or building extrusion;
+- only validated and licensed route geometry, with truthful list/proximity
+  fallback when geometry is absent;
+- visible basemap/tile/route attribution and a provider licence record;
+- 44px mobile controls where practical, no day-tray overlap, no document
+  overflow, and cooperative gestures;
+- keyboard-equivalent activity controls, map summary, live selection/error
+  announcements, Escape-to-close, and reduced-motion `jumpTo` behaviour;
+- map instance/layer/source cleanup, no unsupported globe-fog warning, and
+  focused unit, Playwright, accessibility, visual, and performance evidence.
+
+The inspiration repository is not a code dependency. Its reviewed directory
+does not expose an explicit project licence, so no source, asset, copy, data,
+or distinctive visual/camera sequence may be reused without permission. Rumia
+rebuilds the required interaction with documented MapLibre APIs and the
+existing spatial-engine/provider boundary. MapLibre’s BSD-3-Clause licence is
+recorded separately from basemap, tile, OpenStreetMap, glyph, sprite, route,
+and 3D-building terms.
 
 ## 8. Explicitly retired instructions
 
@@ -259,6 +364,7 @@ Retain the existing foundations: shared shells, route catalogue, API envelopes, 
 - Do not make `destination + duration + pace` the homepage’s first product decision.
 - Do not refer to region cards as route shapes or lead users directly to itinerary synthesis.
 - Do not make a 3D globe, map, cinematic animation, or human-review claim the hero’s reason to exist.
+- Do not build the optional map track before the generated-plan/list journey is stable; later 3D remains a user-invoked workspace enhancement with a practical 2D/list equivalent.
 - Do not launch a large place directory, bookings, accommodations, or global expansion before a reviewed Portugal activity corpus works.
 
 ## 9. Research references
@@ -267,8 +373,15 @@ Retain the existing foundations: shared shells, route catalogue, API envelopes, 
 - Atlas Obscura’s app combines a large map, detailed entries, and saved lists: <https://app.atlasobscura.com/>
 - Motion must respect user preference and nonessential movement should be avoidable: <https://web.dev/learn/accessibility/motion/>
 - WCAG 2.2 target-size minimum guidance: <https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum>
+- Rumia activity-map capability and phased MapLibre architecture: [`docs/superpowers/specs/2026-07-11-rumia-activity-map-capability.md`](../specs/2026-07-11-rumia-activity-map-capability.md)
+- MapLibre GL JS Map API: <https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/>
+- MapLibre source specification: <https://maplibre.org/maplibre-style-spec/sources/>
+- MapLibre examples (GeoJSON, camera, attribution, and 3D patterns): <https://maplibre.org/maplibre-gl-js/docs/examples/>
+- MapLibre GL JS licence: <https://github.com/maplibre/maplibre-gl-js/blob/main/LICENSE.txt>
+- Interactive 3D inspiration reviewed for concepts only: <https://github.com/siddsachar/gpt5.6-sol-test/tree/main/london-3d>
+- Frontend deep redesign and polish plan: [`docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`](2026-07-12-rumia-frontend-deep-redesign.md)
 - Editorial travel interaction inspiration (not a product model): <https://www.awwwards.com/sites/when-to-travel%20>
 
 ## 10. Master completion condition
 
-Rumia is complete when a traveler can state an activity situation, receive reviewed and practical Portugal activity judgments, save a transparent day, optionally shape it into a feasible route, claim it, purchase an eligible upgrade, receive real reviewer proposals, and export a version-bound plan—without a mock, role leak, unsupported promise, inaccessible interaction, or orphaned route.
+Rumia is complete when a traveler can state an activity situation, receive reviewed and practical Portugal activity judgments, save a transparent day, optionally shape it into a feasible route, claim it, purchase an eligible upgrade, receive real reviewer proposals, and export a version-bound plan—without a mock, role leak, unsupported promise, inaccessible interaction, orphaned route, or unresolved P0/P1 browser UI finding.

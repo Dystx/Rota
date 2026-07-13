@@ -10,7 +10,7 @@
  *   2. `embedFeatures(features)` — OpenAI `text-embedding-3-small`
  *      for each feature's flattened-tag text, return
  *      `EmbeddedFeature[]` with 1536-dim vectors.
- *   3. `loadPlaces(embedded)` — Supabase upsert into
+ *   3. `loadPlaces(embedded)` — PostgreSQL upsert into
  *      `places` (id, name, category, country_slug, geometry,
  *      embedding, metadata), return `LoadResult` with
  *      inserted/updated/failed counts.
@@ -52,4 +52,4 @@ export {
   type RunPipelineOptions
 } from "./pipeline";
 export { createOpenAIEmbeddingClient } from "./openai-client";
-export { createSupabaseLoader } from "./supabase-loader";
+export { createPostgresLoader } from "./postgres-loader";

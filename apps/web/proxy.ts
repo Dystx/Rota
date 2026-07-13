@@ -1,20 +1,12 @@
-import { ConfigValidationError } from "@repo/config";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { isProtectedRoute, requireRouteAccess } from "@/lib/auth/routes";
-import { refreshSupabaseSession } from "@/lib/supabase/middleware";
-
 export async function proxy(request: NextRequest) {
-  try {
-    const { claims, response } = await refreshSupabaseSession(request);
-    return requireRouteAccess(request, claims) ?? response;
-  } catch (error) {
-    if (error instanceof ConfigValidationError && !isProtectedRoute(request.nextUrl.pathname)) {
-      return NextResponse.next();
-    }
-
-    throw error;
-  }
+  // Better Auth sessions are verified at the server page/API boundary. The
+  // proxy intentionally performs no cookie refresh or database access so an
+  // edge request cannot become an alternate authorization path.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {

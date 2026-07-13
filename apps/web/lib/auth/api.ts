@@ -1,10 +1,6 @@
 import "server-only";
 
-import {
-  createAuthenticatedUserDataClient,
-  type RotaDataClient
-} from "@repo/db";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { AuthorizedActor } from "@repo/types";
 import { createApiErrorEnvelope } from "@/lib/http/api-error";
 import { requireApiAccess } from "./authorization";
 
@@ -13,7 +9,7 @@ export type ApiErrorCode = "unauthenticated" | "forbidden" | "validation_error" 
 export type ApiActor = "traveler" | "reviewer" | "admin";
 
 export type AuthorizedApiContext = {
-  client: RotaDataClient;
+  actor: AuthorizedActor;
   reviewerId: string | null;
   role: ApiActor;
   userId: string;
@@ -68,8 +64,6 @@ export async function requireApiRole(allowedRoles: ApiActor[]): Promise<Authoriz
     return access;
   }
 
-  const supabase = await createServerSupabaseClient();
-  const client = createAuthenticatedUserDataClient(supabase);
   const role = access.roles.find((candidate): candidate is ApiActor => allowedRoles.includes(candidate));
 
   if (!role) {
@@ -77,7 +71,7 @@ export async function requireApiRole(allowedRoles: ApiActor[]): Promise<Authoriz
   }
 
   return {
-    client,
+    actor: access,
     reviewerId: access.reviewerId,
     role,
     userId: access.userId

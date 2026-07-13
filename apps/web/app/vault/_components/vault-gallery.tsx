@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { TripDraftListItem } from "@repo/db";
+import { Icon } from "@repo/ui";
 
 interface VaultCard {
   id: string;
@@ -59,18 +60,14 @@ export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
               aria-label="Grid view"
               className="p-2 rounded-full hover:bg-surface-variant text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
             >
-              <span className="ph" aria-hidden="true">
-                grid_view
-              </span>
+              <Icon name="grid_view" />
             </button>
             <button
               type="button"
               aria-label="List view"
               className="p-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
             >
-              <span className="ph" aria-hidden="true">
-                view_list
-              </span>
+              <Icon name="view_list" />
             </button>
           </div>
         </header>
@@ -111,10 +108,7 @@ export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
                   <span className="font-mono-micro text-mono-micro text-on-surface-variant">
                     {card.days}
                   </span>
-                  <span
-                    className="ph text-on-surface-variant group-hover:text-ochre-dark transition-colors ph-arrow-right"
-                    aria-hidden="true"
-                  >arrow-right</span>
+                  <Icon name="arrow-right" className="text-on-surface-variant group-hover:text-ochre-dark transition-colors" />
                 </div>
               </div>
             </button>
@@ -152,7 +146,7 @@ export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
             onClick={close}
             className="text-on-surface-variant hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded"
           >
-            <span className="ph ph-x" aria-hidden="true">x</span>
+            <Icon name="x" />
           </button>
         </div>
 
@@ -172,9 +166,7 @@ export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
             className="w-full text-left group bg-surface hover:bg-surface-container-high border border-outline-variant/30 rounded-lg p-4 transition-all duration-200 flex items-start gap-4 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-olive-light/10 text-olive-light rounded-md group-hover:bg-ochre-light/20 group-hover:text-ochre-dark transition-colors">
-              <span className="ph" aria-hidden="true">
-                picture_as_pdf
-              </span>
+              <Icon name="picture_as_pdf" />
             </div>
             <div>
               <div className="font-label-ui text-label-ui text-primary mb-1 group-hover:text-ochre-dark transition-colors">
@@ -191,9 +183,7 @@ export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
             className="w-full text-left group bg-surface hover:bg-surface-container-high border border-outline-variant/30 rounded-lg p-4 transition-all duration-200 flex items-start gap-4 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-olive-light/10 text-olive-light rounded-md group-hover:bg-ochre-light/20 group-hover:text-ochre-dark transition-colors">
-              <span className="ph" aria-hidden="true">
-                sync_saved_locally
-              </span>
+              <Icon name="sync_saved_locally" />
             </div>
             <div>
               <div className="font-label-ui text-label-ui text-primary mb-1 group-hover:text-ochre-dark transition-colors">
@@ -210,9 +200,7 @@ export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
             className="w-full text-left group bg-surface hover:bg-surface-container-high border border-outline-variant/30 rounded-lg p-4 transition-all duration-200 flex items-start gap-4 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-olive-light/10 text-olive-light rounded-md group-hover:bg-ochre-light/20 group-hover:text-ochre-dark transition-colors">
-              <span className="ph" aria-hidden="true">
-                share
-              </span>
+              <Icon name="share" />
             </div>
             <div>
               <div className="font-label-ui text-label-ui text-primary mb-1 group-hover:text-ochre-dark transition-colors">
@@ -231,12 +219,7 @@ export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
             disabled={!selected}
             className="w-full bg-primary text-on-primary py-3 rounded-lg font-label-ui text-label-ui shadow-sm hover:bg-olive-light hover:shadow-md transition-all duration-200 flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span
-              className="ph text-sm"
-              aria-hidden="true"
-            >
-              file_download
-            </span>
+            <Icon name="file_download" className="text-sm" />
             Execute Export
           </button>
         </div>

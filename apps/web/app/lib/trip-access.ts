@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getTripDraftByIdForOwner, tripDraftExists, type TripDraftDetail } from "@repo/db";
+import { getTripDraftByIdForOwner, loadPostgresAuthorizationContext, type TripDraftDetail } from "@repo/db";
 import { getCurrentUser } from "@/lib/auth/current-user";
 
 export type TripAccessResult =
@@ -23,13 +23,16 @@ export async function getOwnedTrip(tripId: string): Promise<TripAccessResult> {
     return { kind: "anonymous" };
   }
 
-  const trip = await getTripDraftByIdForOwner(tripId, user.id);
+  const actor = await loadPostgresAuthorizationContext(user.id);
+  if (!actor) {
+    return { kind: "forbidden" };
+  }
+
+  const trip = await getTripDraftByIdForOwner(tripId, user.id, { actor });
 
   if (trip) {
     return { kind: "ok", trip, userId: user.id };
   }
 
-  const exists = await tripDraftExists(tripId);
-
-  return exists ? { kind: "forbidden" } : { kind: "missing" };
+  return { kind: "missing" };
 }

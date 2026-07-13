@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import type { TripDraftListItem } from "@repo/db";
+import { Icon } from "@repo/ui";
 import { ItineraryExportDrawer } from "./itinerary-export-drawer";
 
 /**
@@ -17,7 +18,7 @@ import { ItineraryExportDrawer } from "./itinerary-export-drawer";
  * action surface for a saved trip; navigating to the full
  * trip page happens from inside the drawer.
  *
- * Why client-side filter: the page is RSC-streamed from Supabase;
+ * Why client-side filter: the page is RSC-streamed from PostgreSQL;
  * pushing the filter through the server would require a router
  * round-trip on every keystroke. With 24 rows max the in-memory
  * filter is faster than the network.
@@ -59,10 +60,7 @@ export function ItinerarySearch({ trips }: { trips: TripDraftListItem[] }) {
         <label className="flex-1">
           <span className="sr-only">Search itineraries</span>
           <div className="relative">
-            <span
-              aria-hidden
-              className="ph absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] ph-magnifying-glass"
-            >magnifying-glass</span>
+            <Icon name="magnifying-glass" className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]" />
             <input
               type="search"
               value={query}
@@ -222,9 +220,9 @@ function ItineraryCard({
           </p>
         )}
         <span className="inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-dark group-hover:underline">
-          <span className="ph text-[16px] ph-share-network">share-network</span>
+          <Icon name="share-network" className="text-[16px]" />
           Export &amp; share
-          <span className="ph text-[16px] ph-arrow-right">arrow-right</span>
+          <Icon name="arrow-right" className="text-[16px]" />
         </span>
       </div>
     </button>

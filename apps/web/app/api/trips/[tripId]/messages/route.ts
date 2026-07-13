@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { isFeatureEnabled } from "@repo/config";
 import { getOwnedTrip } from "@/app/lib/trip-access";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 type Params = { params: Promise<{ tripId: string }> };
 
@@ -40,32 +39,12 @@ async function authorize(tripId: string) {
   return { access } as const;
 }
 
-function mapRow(row: Record<string, unknown>) {
-  return {
-    id: String(row.id),
-    authorRole: row.author_role === "traveler" ? "traveler" : "specialist",
-    body: typeof row.body === "string" ? row.body : "",
-    createdAt: typeof row.created_at === "string" ? row.created_at : null
-  };
-}
-
 export async function GET(_request: Request, { params }: Params) {
   const { tripId } = await params;
   const auth = await authorize(tripId);
   if ("response" in auth) return auth.response;
 
-  try {
-    const client = await createServerSupabaseClient();
-    const { data, error } = await client
-      .from("trip_messages")
-      .select("id, author_role, body, created_at")
-      .eq("trip_id", tripId)
-      .order("created_at", { ascending: true });
-    if (error) return unavailable();
-    return NextResponse.json({ messages: (data ?? []).map((row) => mapRow(row as Record<string, unknown>)) });
-  } catch {
-    return unavailable();
-  }
+  return unavailable();
 }
 
 export async function POST(request: Request, { params }: Params) {
@@ -84,16 +63,5 @@ export async function POST(request: Request, { params }: Params) {
     return errorResponse(400, "VALIDATION_ERROR", "Message body is required.");
   }
 
-  try {
-    const client = await createServerSupabaseClient();
-    const { data, error } = await client
-      .from("trip_messages")
-      .insert({ trip_id: tripId, author_role: "traveler", author_user_id: auth.access.userId, body: body.trim() })
-      .select("id, author_role, body, created_at")
-      .single();
-    if (error || !data) return unavailable();
-    return NextResponse.json({ message: mapRow(data as Record<string, unknown>) }, { status: 201 });
-  } catch {
-    return unavailable();
-  }
+  return unavailable();
 }

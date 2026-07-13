@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
-import { getAdminPageAuthContext } from "@/lib/auth/admin";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 import { moveTripStage } from "./store";
 
 const BodySchema = z.object({
@@ -10,7 +10,7 @@ const BodySchema = z.object({
 
 export async function POST(request: NextRequest) {
   const admin = await getAdminPageAuthContext();
-  if (!("client" in admin)) {
+  if (!isAdminPageAuthContext(admin)) {
     return NextResponse.json(
       { ok: false, error: `Forbidden: ${admin.reason}` },
       { status: admin.status }

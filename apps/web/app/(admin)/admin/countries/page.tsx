@@ -17,11 +17,11 @@ export default async function AdminCountriesPage() {
 
   try {
     if (isAdminPageAuthContext(auth)) {
-      regions = await listRegions(100, { client: auth.client });
+      regions = await listRegions(100, { actor: auth.actor });
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load persisted country rollout signals here."
+      ? "Configure PostgreSQL and Better Auth to load persisted country rollout signals here."
       : "Could not load country rollout data yet.";
   }
 

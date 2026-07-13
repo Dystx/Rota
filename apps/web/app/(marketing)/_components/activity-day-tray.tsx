@@ -14,7 +14,37 @@ export function ActivityDayTray({
 }) {
   const reducedMotion = useReducedMotion();
 
-  if (activities.length === 0) return null;
+  if (activities.length === 0) {
+    return (
+      <aside
+        aria-label="Your day"
+        data-empty="true"
+        data-testid="activity-day-empty"
+        className="hidden min-h-[18rem] border-t border-[var(--color-border)] pt-6 md:block"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">
+          Your day
+        </p>
+        <h2 className="mt-3 font-display text-3xl leading-tight text-primary">
+          Your day is open.
+        </h2>
+        <p className="mt-3 max-w-xs text-sm leading-relaxed text-on-surface-variant">
+          Save an activity and it will appear here with its time cost, verdict,
+          and practical shape.
+        </p>
+        <ol className="mt-8 grid gap-4 border-t border-[var(--color-border)] pt-5 text-sm text-on-surface-variant">
+          <li className="flex gap-3">
+            <span className="font-mono-micro text-mono-micro text-ochre-dark">01</span>
+            <span>Compare the judgement before you keep anything.</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="font-mono-micro text-mono-micro text-ochre-dark">02</span>
+            <span>Leave enough room for the day to stay yours.</span>
+          </li>
+        </ol>
+      </aside>
+    );
+  }
 
   const totalMinutes = activities.reduce((total, activity) => total + activity.durationMinutes, 0);
   const transitionClass = reducedMotion ? "transition-none" : "rumia-save-transition";

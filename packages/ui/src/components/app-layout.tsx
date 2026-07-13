@@ -23,6 +23,8 @@ export type AppLayoutVariant =
   | "checkout"
   | "auth";
 
+export type AppSurface = "linen" | "sage" | "midnight" | "ochre";
+
 interface AppLayoutProps extends HTMLAttributes<HTMLDivElement> {
   variant?: AppLayoutVariant;
   /**
@@ -42,14 +44,27 @@ interface AppLayoutProps extends HTMLAttributes<HTMLDivElement> {
    */
   siteFooter?: ReactNode;
   children: ReactNode;
+  /**
+   * Semantic page field. The default follows the layout variant, while
+   * authored routes can opt into a reading or planning chapter explicitly.
+   */
+  surface?: AppSurface;
 }
 
+const variantSurface: Record<AppLayoutVariant, AppSurface> = {
+  marketing: "sage",
+  app: "linen",
+  operator: "midnight",
+  checkout: "linen",
+  auth: "linen"
+};
+
 const variantClassName: Record<AppLayoutVariant, string> = {
-  marketing: "bg-background",
-  app: "bg-background",
-  operator: "bg-[#050806] text-white",
-  checkout: "bg-background",
-  auth: "bg-paper"
+  marketing: "text-primary",
+  app: "text-primary",
+  operator: "text-white",
+  checkout: "text-primary",
+  auth: "text-primary"
 };
 
 /**
@@ -61,14 +76,22 @@ export function AppLayout({
   bare = false,
   topNav,
   siteFooter,
+  surface,
   className,
   children,
   ...props
 }: AppLayoutProps) {
+  const resolvedSurface = surface ?? variantSurface[variant];
+  const texture = variant === "operator" ? "none" : "editorial";
+
   return (
     <div
+      data-surface={resolvedSurface}
+      data-surface-texture={texture}
       className={cn(
         "min-h-screen flex flex-col antialiased",
+        "rumia-surface",
+        `rumia-surface-${resolvedSurface}`,
         variantClassName[variant],
         className
       )}

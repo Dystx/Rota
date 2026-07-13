@@ -2,6 +2,7 @@
 
 import { type ReactNode, createContext, useContext, useId, useState } from "react";
 import { cn } from "../lib/cn";
+import { Icon } from "./icon";
 
 /**
  * Accordion — accessible disclosure primitive.
@@ -137,15 +138,13 @@ export function AccordionTrigger({ value, className, children }: AccordionTrigge
         )}
       >
         <span>{children}</span>
-        <span
-          aria-hidden
+        <Icon
+          name="expand_more"
           className={cn(
-            "material-symbols-outlined text-[20px] text-olive-light transition-transform duration-base ease-standard",
+            "text-[20px] text-olive-light transition-transform duration-base ease-standard",
             isOpen && "rotate-180"
           )}
-        >
-          expand_more
-        </span>
+        />
       </button>
     </h3>
   );

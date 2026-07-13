@@ -1,0 +1,111 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1783731167025,
+      "tag": "0000_initial_rumia",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783731300000,
+      "tag": "0001_actor_capability_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783731400000,
+      "tag": "0002_activity_feedback_rate_limit",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783731500000,
+      "tag": "0003_audit_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783731600000,
+      "tag": "0004_reviewer_assignment_idempotency",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783731700000,
+      "tag": "0005_payment_webhook_rls",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783731800000,
+      "tag": "0006_specialists",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783731900000,
+      "tag": "0007_catalog_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783732000000,
+      "tag": "0008_booking_clicks",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783732100000,
+      "tag": "0009_analytics_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783732200000,
+      "tag": "0010_booking_click_sequence",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1783732300000,
+      "tag": "0011_console_organizations",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1783732400000,
+      "tag": "0012_triage_rate_limit",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1783732500000,
+      "tag": "0013_reviewer_trip_update",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1783732600000,
+      "tag": "0014_place_adjustment_log",
+      "breakpoints": true
+    }
+  ]
+}

@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   try {
-    const reviewers = await listReviewers(100, { client: auth.client });
+    const reviewers = await listReviewers(100, { actor: auth.actor });
 
     return Response.json({ reviewers });
   } catch (error) {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const reviewer = await createReviewer(parsed.data, { client: auth.client });
+    const reviewer = await createReviewer(parsed.data, { actor: auth.actor });
     
     await writeAuditTrail({
       actorUserId: auth.userId,
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       entityType: "reviewers",
       entityId: reviewer.id,
       after: reviewer
-    }, { client: auth.client });
+    }, { actor: auth.actor });
 
     return Response.json(
       {

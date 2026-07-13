@@ -3,7 +3,7 @@ import { createTravelerStorageState } from "../fixtures/traveler-auth";
 import { getTravelerTripId } from "../fixtures/traveler-trip";
 
 // Task 11 lifecycle coverage. The seeded traveler state is intentionally used
-// here, but Supabase-backed routes may redirect to sign-in/archive when the
+// here, but persistence-backed routes may redirect to sign-in/archive when the
 // local environment has no live data. Those cases are explicit skips (rather
 // than empty assertions) so CI still reports the missing prerequisite.
 const tripId = () => getTravelerTripId();

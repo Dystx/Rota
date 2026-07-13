@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import { Icon } from "@repo/ui";
 import { SnippetCard } from "../../_components/snippet-card";
 import type { Day } from "../_lib/conversations";
 
@@ -100,16 +101,11 @@ export function TriagePanel({
   }
 
   return (
-    <aside className="w-[340px] flex-shrink-0 flex flex-col gap-gutter">
+    <aside className="w-full shrink-0 flex flex-col gap-4 lg:w-[clamp(18rem,27vw,21rem)]">
       <section className="flex-1 min-h-0 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
         <header className="px-4 py-3 border-b border-olive-light/10 bg-white/30 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
-            <span
-              aria-hidden
-              className="ph text-ochre-dark"
-            >
-              library_books
-            </span>
+            <Icon name="library_books" className="text-ochre-dark" />
             <h3 className="font-headline-sm text-headline-sm text-primary">
               Snippet Library
             </h3>
@@ -119,7 +115,7 @@ export function TriagePanel({
             aria-label="Add new snippet"
             className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span aria-hidden className="ph ph-plus-circle">plus-circle</span>
+            <Icon name="plus-circle" />
           </button>
         </header>
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-gutter">
@@ -159,12 +155,7 @@ export function TriagePanel({
 
       <section className="flex-1 min-h-0 flex flex-col bg-glass-dark text-on-primary backdrop-blur-xl shadow-xl rounded-xl overflow-hidden border border-white/10">
         <header className="px-4 py-3 border-b border-white/10 bg-black/20 flex items-center gap-2 shrink-0">
-          <span
-            aria-hidden
-            className="ph text-ochre-light"
-          >
-            timeline
-          </span>
+          <Icon name="timeline" className="text-ochre-light" />
           <h3 className="font-headline-sm text-headline-sm text-ochre-light">
             Update Timeline
           </h3>
@@ -260,9 +251,7 @@ export function TriagePanel({
               data-testid="push-event-submit"
               className="mt-2 w-full inline-flex items-center justify-center gap-2 bg-ochre-dark text-white font-label-ui text-label-ui px-4 py-2.5 rounded-lg hover:bg-ochre-light hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <span aria-hidden className="ph text-[18px]">
-                sync_alt
-              </span>
+              <Icon name="sync_alt" className="text-[18px]" />
               {isTimelinePending ? "Pushing…" : "Push to Timeline"}
             </button>
             {timelineStatus !== "idle" && timelineStatus !== "submitting" ? (
@@ -287,9 +276,7 @@ export function TriagePanel({
             className="border-t border-white/10 pt-4 mt-2"
           >
             <h4 className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-2 flex items-center gap-2">
-              <span aria-hidden className="ph text-[14px]">
-                history
-              </span>
+              <Icon name="history" className="text-[14px]" />
               Recent pushes
             </h4>
             {recentEventsLoading && recentEvents.length === 0 ? (

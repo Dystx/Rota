@@ -1,4 +1,3 @@
-import { SiteFooter } from "../../_components/site-footer";
 import { PipelinePageClient } from "./_components/pipeline-page-client";
 
 export default function ConsolePipelinePage() {
@@ -11,7 +10,6 @@ export default function ConsolePipelinePage() {
         >
           <PipelinePageClient />
         </main>
-        <SiteFooter />
       </div>
       <style>{`
         main ::-webkit-scrollbar { width: 6px; height: 6px; }

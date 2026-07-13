@@ -1,7 +1,7 @@
 /**
  * Phase 5 of the engineering lifecycle (Realtime Triage).
  *
- * Real-time telemetry coordinates go over Supabase Realtime broadcast channels.
+ * Real-time telemetry coordinates go over the future SSE broadcast channel.
  * Each channel payload includes a `{ lng, lat }` pair. Unbounded floats waste
  * up to 50% of the wire payload (a `123.4567890123` is 14 chars, but
  * `123.456789` is 9). The lifecycle spec fixes 6 decimal places (~1cm

@@ -1,4 +1,5 @@
-import { resolveDataClient, resolvePrivilegedServerDataClient, type DataClientOptions } from "./clients";
+import { resolveLegacyDataClient, resolveLegacyPrivilegedDataClient, type DataClientOptions } from "./clients";
+import { createPostgresBookingClick, listPostgresBookingClicks } from "./booking-clicks-postgres";
 
 type RawBookingClickRow = {
   id: number;
@@ -63,7 +64,9 @@ function parseBookingClick(row: RawBookingClickRow): BookingClick {
 }
 
 export async function createBookingClick(input: CreateBookingClickInput, options?: DataClientOptions): Promise<BookingClick> {
-  const { data, error } = await resolvePrivilegedServerDataClient(options)
+  if (options?.actor || !options?.client) return createPostgresBookingClick(input);
+
+  const { data, error } = await resolveLegacyPrivilegedDataClient(options)
     .from("booking_clicks")
     .insert({
       partner_id: input.partnerId,
@@ -84,7 +87,10 @@ export async function createBookingClick(input: CreateBookingClickInput, options
 }
 
 export async function listBookingClicks(limit = 200, options?: DataClientOptions): Promise<BookingClick[]> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) return listPostgresBookingClicks(limit, options.actor);
+  if (!options?.client) return [];
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("booking_clicks")
     .select("id,partner_id,trip_id,source,target,referer,user_agent,created_at,partners(name)")
     .order("created_at", { ascending: false })

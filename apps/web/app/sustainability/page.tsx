@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { PublicRouteLayout } from "../_components/public-route-layout";
 
 export const metadata: Metadata = {
-  title: "Sustainability | Rumia",
+  title: "Sustainability",
   description: "How Rumia thinks about sustainable travel in Portugal.",
   alternates: { canonical: "/sustainability" }
 };
@@ -10,7 +10,11 @@ export const metadata: Metadata = {
 export default function SustainabilityPage() {
   return (
     <PublicRouteLayout>
-      <div className="min-h-screen bg-background">
+      <div
+        className="min-h-screen rumia-surface rumia-surface-linen"
+        data-surface="linen"
+        data-surface-texture="editorial"
+      >
         <article className="max-w-3xl mx-auto px-container-padding-sm md:px-container-padding-lg py-section-gap">
           <header className="mb-8">
             <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-2">
@@ -25,15 +29,16 @@ export default function SustainabilityPage() {
           </header>
           <div className="space-y-4 font-body-md text-body-md text-on-surface">
             <p>
-              We favor small, family-run accommodations and locally
-              guided experiences. Our itinerary generator penalizes
-              long-haul inter-city transfers when a train or a slower
-              drive is available.
+              Rumia can surface locally grounded activities and calmer ways
+              to spend time in Portugal. We prefer context that helps people
+              make thoughtful choices rather than encouraging a checklist of
+              stops.
             </p>
             <p>
-              Carbon estimates for each itinerary land in the trip
-              workspace; future versions will surface them in the
-              wizard.
+              We do not claim that a recommendation is automatically
+              sustainable. Conditions, operators, transport, and local impact
+              change; travellers should check current information and choose
+              the pace and route that fit their circumstances.
             </p>
           </div>
         </article>

@@ -1,9 +1,14 @@
 # Engineering Lifecycle — 8-Phase Master Plan
 
-> Cross-reference for `docs/roadmap.md`. This file is the granular, week-by-week
-> engineering plan; `docs/roadmap.md` is the operational launch-readiness view.
-> Both reference `docs/spec-v4.md` as the source of truth for the 4-tier ascension
-> model. Update both when scope changes.
+> **Historical snapshot (2026-07-04; superseded).** This granular plan retains
+> the earlier serverless, Supabase, and itinerary/concierge assumptions. Do not
+> use it as an implementation or release checklist. Current work follows the
+> [activity-first master plan](superpowers/plans/2026-07-10-rumia-activity-first-master.md)
+> and the [VPS migration plan](superpowers/plans/2026-07-11-rumia-vps-self-hosted-migration.md).
+
+> Archived cross-reference for the former `docs/roadmap.md` plan. It is retained
+> for historical sequencing only; update the current activity-first plan and
+> `specs/PLAN-AUDIT_LATEST.md` instead.
 
 ---
 

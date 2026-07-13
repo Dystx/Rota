@@ -161,6 +161,11 @@ only production dependency for a paid Rumia route surface.
   map fallback available.
 - Attribution must remain visible; it cannot be hidden under a sheet or removed
   from a shared/saved route preview.
+- The activity workspace refuses to expose its optional map when
+  `ENABLE_ACTIVITY_MAP=true` but `RUMIA_MAP_STYLE_URL` is absent. This prevents
+  an accidental flag flip from selecting the unapproved CARTO development
+  candidate; the provider URL and paired attribution must be supplied together
+  by an approved release configuration.
 
 ## Primary references
 

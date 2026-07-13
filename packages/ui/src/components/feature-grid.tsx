@@ -33,9 +33,9 @@ export function FeatureGridItem({ icon, title, children, className, ...props }: 
           {icon}
         </div>
       )}
-      <h4 className="font-display text-xl font-medium tracking-tight text-[var(--color-foreground)]">
+      <h3 className="font-display text-xl font-medium tracking-tight text-[var(--color-foreground)]">
         {title}
-      </h4>
+      </h3>
       <p className="text-base leading-relaxed text-[var(--color-muted-foreground)]">
         {children}
       </p>

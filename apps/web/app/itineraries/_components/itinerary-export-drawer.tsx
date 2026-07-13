@@ -24,6 +24,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { TripDraftListItem } from "@repo/db";
+import { Icon } from "@repo/ui";
 
 type ExportOption = "pdf" | "calendar" | "share";
 
@@ -203,7 +204,7 @@ function DrawerBody({
           data-testid="export-drawer-close"
           className="p-2 -mr-2 rounded-full text-on-surface-variant hover:bg-olive-light/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          <span className="ph text-[20px] ph-x">x</span>
+          <Icon name="x" className="text-[20px]" />
         </button>
       </header>
 
@@ -230,7 +231,7 @@ function DrawerBody({
             className="inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-dark hover:underline"
           >
             View full trip
-            <span className="ph text-[16px] ph-arrow-right">arrow-right</span>
+            <Icon name="arrow-right" className="text-[16px]" />
           </Link>
         </div>
 
@@ -265,7 +266,7 @@ function DrawerBody({
                       isSelected ? "bg-olive-dark text-on-primary" : "bg-olive-light/30 text-olive-dark"
                     }`}
                   >
-                    <span className="ph text-[22px]">{opt.icon}</span>
+                    <Icon name={opt.icon} className="text-[22px]" />
                   </span>
                   <span className="flex-1">
                     <span className="block font-label-ui text-label-ui text-primary mb-0.5">
@@ -300,7 +301,7 @@ function DrawerBody({
           data-testid="export-drawer-execute"
           className="w-full inline-flex items-center justify-center gap-2 bg-olive-dark text-on-primary font-label-ui text-label-ui px-6 py-3 rounded-lg hover:bg-olive-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          <span className="ph text-[18px] ph-download-simple">download-simple</span>
+          <Icon name="download" className="text-[18px]" />
           Execute Export
         </button>
       </footer>

@@ -9,11 +9,11 @@ export default async function AdminPartnersPage() {
 
   try {
     if (isAdminPageAuthContext(auth)) {
-      partners = await listPartners(100, { client: auth.client });
+      partners = await listPartners(100, { actor: auth.actor });
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load persisted partners here."
+      ? "Configure PostgreSQL and Better Auth to load persisted partners here."
       : "Could not load partner records.";
   }
 

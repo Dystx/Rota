@@ -103,28 +103,34 @@ function TripPlannerSingleScreen({
   };
 
   return (
-    <main id="main-content" className="min-h-screen bg-primary text-linen-dark" data-testid="planner-single-screen">
-      <header className="flex justify-between items-center px-container-padding-lg py-5">
-        <Link href="/" aria-label="Back to home" className="font-headline-sm italic text-ochre-light">Rumia</Link>
-        <button type="button" onClick={() => router.push("/")} aria-label="Close planner" className="rounded p-2 text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light">×</button>
+    <main
+      id="main-content"
+      className="min-h-screen rumia-surface rumia-surface-midnight text-linen-dark"
+      data-testid="planner-single-screen"
+      data-planner="single-screen"
+    >
+      <header className="border-b border-ochre-light/15" data-testid="planner-editorial-shell">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-8 lg:px-12">
+          <div className="flex items-center gap-4">
+            <Link href="/" aria-label="Back to home" className="font-headline-sm italic text-ochre-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary">Rumia</Link>
+            <span aria-hidden className="hidden h-4 w-px bg-ochre-light/25 sm:block" />
+            <p className="hidden font-mono-micro uppercase tracking-[0.18em] text-linen-dark/60 sm:block">Activity planning field</p>
+          </div>
+          <button type="button" onClick={() => router.push("/")} aria-label="Close planner" className="min-h-11 min-w-11 rounded-full border border-linen-dark/20 text-lg text-linen-dark transition-colors hover:border-ochre-light hover:text-ochre-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary">×</button>
+        </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 pb-12 md:px-8 lg:grid-cols-[1.2fr_.8fr]">
-        <div className="contents">
-          <div className="lg:col-start-2 lg:row-start-1">
-            <TripContextBar draft={context} onEdit={(key) => {
-              if (key === "destination") setSheet("destination");
-              else if (key === "travelWindow") setSheet("window");
-              else if (key === "days") setSheet("days");
-              else if (key === "transport") setSheet("transport");
-              else if (key === "vibe") setSheet("vibe");
-            }} tripState="draft" />
-          </div>
-        <section className="grid content-start gap-6">
-          <div className="grid gap-2">
+      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-10 pb-16 md:px-8 md:py-14 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,24rem)] lg:gap-16 lg:px-12 lg:py-16">
+        <section className="grid content-start gap-8" data-testid="planner-brief">
+          <div className="grid max-w-3xl gap-3">
+            <div className="flex items-center gap-3">
+              <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light">01 / 03</span>
+              <span className="h-px w-10 bg-ochre-light/40" aria-hidden />
+              <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-linen-dark/60">Shape the brief</span>
+            </div>
             <p className="font-mono-micro uppercase tracking-widest text-ochre-light">Start with an activity decision</p>
-            <h1 className="font-display text-4xl leading-tight md:text-6xl">Plan from the activities you have in mind.</h1>
-            <p className="max-w-xl text-linen-dark/75">Choose an activity situation first, then return here when you have a day worth shaping.</p>
+            <h1 className="font-display text-4xl leading-[1.02] tracking-tight md:text-6xl">Plan from the activities you have in mind.</h1>
+            <p className="max-w-xl text-base leading-relaxed text-linen-dark/75 md:text-lg">Choose an activity situation first, then return here when you have a day worth shaping.</p>
           </div>
 
           <nav aria-label="Trip choices" className="grid grid-cols-3 gap-2 md:hidden">
@@ -156,11 +162,21 @@ function TripPlannerSingleScreen({
           <RouteConsequence status="ready" transportLabel={draft.transport === "transit" ? "Transit keeps the route to two bases" : "Car opens the Douro interior"} stopCount={draft.transport === "transit" ? 2 : 4} />
         </section>
 
-        <aside className="grid content-start gap-4 lg:col-start-2 lg:row-start-2 lg:sticky lg:top-6 lg:self-start">
+        <aside className="grid content-start gap-4 lg:sticky lg:top-6 lg:self-start">
+          <div className="grid gap-2">
+            <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light">Your brief</p>
+            <p className="max-w-xs text-sm leading-relaxed text-linen-dark/65">Keep the practical context visible while you choose what is worth doing.</p>
+          </div>
+          <TripContextBar draft={context} onEdit={(key) => {
+            if (key === "destination") setSheet("destination");
+            else if (key === "travelWindow") setSheet("window");
+            else if (key === "days") setSheet("days");
+            else if (key === "transport") setSheet("transport");
+            else if (key === "vibe") setSheet("vibe");
+          }} tripState="draft" />
           <TripSummary draft={context} primaryAction={pending ? "Updating your route" : "Build my itinerary"} onPrimaryAction={submit} primaryActionDisabled={pending || !draft.destination.trim() || draft.days < 1} />
           {pending ? <p role="status" className="text-center text-sm text-linen-dark/70">Updating your route</p> : null}
         </aside>
-        </div>
       </div>
 
       <OptionSheet open={sheet === "destination"} title="Choose a destination" description="Start with the place that pulls you in." onClose={() => setSheet(null)}>

@@ -44,7 +44,7 @@ export type MonitoringSurface =
  * so alert thresholds can be set per provider.
  */
 export type MonitoringProviderName =
-  | "supabase"
+  | "postgresql"
   | "stripe"
   | "resend"
   | "mapbox"
@@ -166,7 +166,6 @@ const FORBIDDEN_DETAIL_KEYS: ReadonlySet<string> = new Set([
   "ip",
   "ip_address",
   "service_role_key",
-  "supabase_service_role_key",
   "stripe_secret_key",
   "resend_api_key"
 ]);
@@ -180,7 +179,6 @@ const FORBIDDEN_DETAIL_KEYS: ReadonlySet<string> = new Set([
 const SECRET_VALUE_PATTERNS: ReadonlyArray<RegExp> = [
   /Bearer\s+\S+/iu,
   /sk_(test|live)_[A-Za-z0-9]{8,}/u,
-  /sb_secret_[A-Za-z0-9_-]{8,}/u,
   /pk\.eyJ[A-Za-z0-9_.-]+/u,
   /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/u,
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/u,

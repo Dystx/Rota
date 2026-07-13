@@ -6,6 +6,7 @@ import {
   WorkspaceCanvas,
   type WorkspaceCanvasHandle,
   type MapTelemetryHandler,
+  type MapStyleEndpoint,
   type SpatialFeatureCollection
 } from "@repo/spatial-engine";
 import { useReducedMotion } from "@repo/ui";
@@ -18,6 +19,18 @@ import {
   type ActivityMapModel
 } from "./activity-map-model";
 import { ActivityMapFallback } from "./activity-map-fallback";
+import {
+  ActivityMapAttribution,
+  DEFAULT_ACTIVITY_MAP_ATTRIBUTION,
+  type ActivityMapAttributionConfig
+} from "./activity-map-attribution";
+
+export interface ActivityMapProviderConfig {
+  /** The reviewed MapLibre style endpoint for this release. */
+  readonly style: MapStyleEndpoint;
+  /** The matching reviewed provider links and product-level note. */
+  readonly attribution: ActivityMapAttributionConfig;
+}
 
 export interface ActivityMapProps {
   /** The selected day, not the entire Portugal catalogue. */
@@ -30,6 +43,8 @@ export interface ActivityMapProps {
   showBuildingExtrusions?: boolean;
   /** Optional host analytics sink; no raw provider details are emitted. */
   onMapTelemetry?: MapTelemetryHandler;
+  /** Provider-neutral style + attribution pair; keep unset until approved. */
+  provider?: ActivityMapProviderConfig;
 }
 
 type MapViewport = {
@@ -57,14 +72,6 @@ function cameraFocus(
   } else {
     if (typeof canvas.flyTo === "function") void canvas.flyTo(target);
   }
-}
-
-function MapAttribution() {
-  return (
-    <p data-map-attribution="true" className="text-xs leading-relaxed text-on-surface-variant">
-      Basemap attribution: <a className="underline underline-offset-2" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a> · <a className="underline underline-offset-2" href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>. Activity locations are reviewed public-area approximations where labelled.
-    </p>
-  );
 }
 
 function MapControls({
@@ -100,7 +107,9 @@ function ActivityMapSurface({
   onSelectActivity,
   onClose,
   showBuildingExtrusions,
-  onMapTelemetry
+  onMapTelemetry,
+  provider,
+  attribution
 }: {
   model: ActivityMapModel;
   selectedActivityId: string | null;
@@ -108,6 +117,8 @@ function ActivityMapSurface({
   onClose: () => void;
   showBuildingExtrusions: boolean;
   onMapTelemetry?: MapTelemetryHandler;
+  provider?: ActivityMapProviderConfig;
+  attribution: ActivityMapAttributionConfig;
 }) {
   const reducedMotion = useReducedMotion();
   const canvasRef = React.useRef<WorkspaceCanvasHandle | null>(null);
@@ -226,6 +237,7 @@ function ActivityMapSurface({
               telemetrySurface="activity-map"
               onMapTelemetry={onMapTelemetry}
               showBuildingExtrusions={showBuildingExtrusions}
+              styleOverride={provider?.style}
               className="relative h-[420px] w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 sm:h-[520px]"
               onViewportChange={handleViewportChange}
               onActivitySelect={handleActivitySelect}
@@ -237,7 +249,7 @@ function ActivityMapSurface({
               </div>
             ) : null}
           </div>
-          <MapAttribution />
+          <ActivityMapAttribution config={attribution} />
         </div>
         <ActivityMapFallback
           model={model}
@@ -246,6 +258,7 @@ function ActivityMapSurface({
           error={mapError}
           onRetry={mapError ? () => { setMapError(null); setRetryKey((key) => key + 1); } : undefined}
           compact
+          attribution={attribution}
         />
       </div>
       <p role="status" aria-live="polite" className="sr-only">
@@ -261,8 +274,10 @@ export function ActivityMap({
   onSelectActivity,
   onClose = () => undefined,
   showBuildingExtrusions = false,
-  onMapTelemetry
+  onMapTelemetry,
+  provider
 }: ActivityMapProps) {
+  const attribution = provider?.attribution ?? DEFAULT_ACTIVITY_MAP_ATTRIBUTION;
   const model = React.useMemo(() => buildActivityMapModel(activities), [activities]);
   const selected = model.list.some((item) => item.activityId === selectedActivityId)
     ? selectedActivityId
@@ -281,7 +296,7 @@ export function ActivityMap({
     return (
       <section aria-label="Activity map" data-map-mode="fallback" className="space-y-4">
         <button type="button" onClick={onClose} className="min-h-11 rounded-full border border-[var(--color-border)] bg-linen px-4 py-2 text-sm font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light">View list</button>
-        <ActivityMapFallback model={model} selectedActivityId={selected} onSelectActivity={onSelectActivity} />
+        <ActivityMapFallback model={model} selectedActivityId={selected} onSelectActivity={onSelectActivity} attribution={attribution} />
       </section>
     );
   }
@@ -296,6 +311,8 @@ export function ActivityMap({
         onClose={onClose}
         showBuildingExtrusions={showBuildingExtrusions}
         onMapTelemetry={onMapTelemetry}
+        provider={provider}
+        attribution={attribution}
       />
     </section>
   );

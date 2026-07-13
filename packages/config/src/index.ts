@@ -1,7 +1,9 @@
 export type { ConfigDiagnostics, ConfigScope, EnvironmentMode } from "./shared";
 export { ConfigValidationError, environmentModeSchema } from "./shared";
-export type { PublicConfig, PublicSupabaseConfig } from "./public";
-export { createPublicConfig, createPublicSupabaseConfig } from "./public";
+export type { PublicConfig } from "./public";
+export { createPublicConfig } from "./public";
+export type { ServerAuthConfig, ServerDatabaseConfig } from "./server";
+export { createServerAuthConfig, createServerDatabaseConfig, getOptionalRumiaMapStyleUrl } from "./server";
 export {
   featureFlagNames,
   getFeatureFlagEnvironmentVariable,

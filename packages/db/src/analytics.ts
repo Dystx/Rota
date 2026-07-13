@@ -1,4 +1,5 @@
-import { resolveDataClient, type DataClientOptions } from "./clients";
+import { resolveLegacyDataClient, type DataClientOptions } from "./clients";
+import { getPostgresAdminAnalyticsMetricCounts } from "./analytics-postgres";
 
 export type AdminAnalyticsMetricCounts = {
   checkoutCompletions: number;
@@ -33,7 +34,7 @@ async function countRows(
   applyFilters: (query: FilterableCountQuery) => CountQuery,
   options?: DataClientOptions
 ): Promise<number> {
-  const query = resolveDataClient(options).from(table).select("id", { count: "exact", head: true }) as unknown as FilterableCountQuery;
+  const query = resolveLegacyDataClient(options).from(table).select("id", { count: "exact", head: true }) as unknown as FilterableCountQuery;
   const { count, error } = await applyFilters(query);
 
   if (error) {
@@ -44,6 +45,8 @@ async function countRows(
 }
 
 export async function getAdminAnalyticsMetricCounts(options?: DataClientOptions): Promise<AdminAnalyticsMetricCounts> {
+  if (options?.actor) return getPostgresAdminAnalyticsMetricCounts(options.actor);
+
   const since = sevenDaysAgoIso();
 
   const [

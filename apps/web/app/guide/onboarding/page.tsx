@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { getCurrentUserId } from "@/lib/supabase/server";
+import { getCurrentUserId } from "@/lib/auth/current-user";
+import { loadCurrentAuthorizedActor } from "@/lib/auth/authorization";
 import { getSpecialistProfileByUserId } from "@repo/db";
 import { isFeatureEnabled } from "@repo/config";
 import { GuideOnboardingForm } from "./_components/guide-onboarding-form";
@@ -39,11 +40,12 @@ export default async function GuideOnboardingPage() {
   }
 
   const userId = await getCurrentUserId();
-  if (!userId) {
+  const actor = await loadCurrentAuthorizedActor();
+  if (!userId || !actor || actor.userId !== userId) {
     redirect("/sign-in?next=/guide/onboarding");
   }
 
-  const existing = await getSpecialistProfileByUserId(userId);
+  const existing = await getSpecialistProfileByUserId(userId, { actor });
   // Capabilities (skills + languages) live in a
   // separate table. Only load them when the specialist
   // row exists; for a new user the form starts empty.

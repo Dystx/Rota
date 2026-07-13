@@ -2,35 +2,34 @@
  * Load stage (PR-5).
  *
  * Takes `EmbeddedFeature[]` from the embed stage and
- * upserts them into the Supabase `places` table via
+ * upserts them into the PostgreSQL `app.places` table via
  * ON CONFLICT (osm_id) DO UPDATE. The contract is
  * idempotent: a re-run of the pipeline overwrites the
  * existing row with the latest tag snapshot.
  *
- * The Supabase loader is **injected** so the test suite
+ * The PostgreSQL loader is **injected** so the test suite
  * can count inserts/updates/failed without a live
  * database. Production wires the existing
- * `@supabase/supabase-js` (already in the workspace
- * via `@repo/db`) into a `SupabaseLoader` adapter.
+ * a `PlaceLoader` adapter.
  *
- * Why a custom adapter instead of calling Supabase
+ * Why a custom adapter instead of calling PostgreSQL
  * directly: the load stage's contract is small and
  * stable; a real adapter can be added without changing
  * the orchestrator. PR-5 ships the seam; PR-5 follow-up
- * ships the Supabase adapter.
+ * ships the PostgreSQL adapter.
  */
 
 import type {
   EmbeddedFeature,
   LoadResult,
   PlaceRow,
-  SupabaseLoader
+  PlaceLoader
 } from "./types";
 
 const BATCH_SIZE = 100;
 
 /** Convert an `EmbeddedFeature` into the row shape the
- *  Supabase upsert expects. Drops `embeddingModel` (the
+ *  PostgreSQL upsert expects. Drops `embeddingModel` (the
  *  audit is the load result's job, not the row's) and
  *  reshapes the country code into a `country_slug`
  *  column. */
@@ -62,11 +61,11 @@ export function featureToRow(
 }
 
 /** Run the load stage. Batches the input and calls the
- *  injected Supabase loader. Returns a `LoadResult` with
+ *  injected PostgreSQL loader. Returns a `LoadResult` with
  *  per-batch counts. */
 export async function loadPlaces(
   features: readonly EmbeddedFeature[],
-  options: { loader: SupabaseLoader }
+  options: { loader: PlaceLoader }
 ): Promise<LoadResult> {
   if (features.length === 0) {
     return { inserted: 0, updated: 0, failed: 0 };

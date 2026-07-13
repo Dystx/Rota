@@ -29,6 +29,10 @@ function getFormatFromHref(href: string) {
   return match ? match[1] : "unknown";
 }
 
+function editorialTitle(value: string) {
+  return value.replace(/\broute\b/gi, "plan").replace(/\bitinerary\b/gi, "plan");
+}
+
 function renderPrintView(
   title: string,
   tripId: string,
@@ -42,13 +46,13 @@ function renderPrintView(
       <SectionHeading
         eyebrow={`Trip ${tripId}`}
         title={`${title} print view`}
-        description="A simplified export layout for browser print and PDF save flows."
+        description="A simplified saved-plan layout for browser print and PDF save flows."
         h1
       />
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Print-friendly itinerary</CardTitle>
+            <CardTitle>Print-friendly plan</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="flex flex-wrap gap-3">
@@ -77,7 +81,7 @@ function renderPrintView(
                 </div>
               ))
             ) : (
-              <p className="text-on-surface-variant leading-loose text-sm">No itinerary is available yet for print export.</p>
+        <p className="text-on-surface-variant leading-loose text-sm">No day agenda is available yet for print export.</p>
             )}
           </CardContent>
         </Card>
@@ -121,7 +125,7 @@ export default async function TripExportPage({
   }
 
   if (view === "print") {
-    return renderPrintView(trip?.title ?? "Trip export", tripId, itinerary, autoPrint);
+    return renderPrintView(editorialTitle(trip?.title ?? "Saved plan"), tripId, itinerary, autoPrint);
   }
 
   const tripCommerceState = getTripCommerceState({
@@ -139,8 +143,10 @@ export default async function TripExportPage({
     { id: "next-step", label: "Continue" }
   ];
 
-  const heroTitle = trip ? `${trip.title} exports` : "Trip export center";
-  const heroDescription = "PDF, print, calendar, and share actions live here, ready when the trip is unlocked.";
+  const displayTitle = trip ? trip.title.replace(/\broute\b/gi, "plan").replace(/\bitinerary\b/gi, "plan") : "Saved Portugal plan";
+  const heroTitle = trip ? `${displayTitle} exports` : "Plan export center";
+  const heroDescription = "Carry the activities you chose into a print view, calendar, PDF, or shareable plan when you are ready.";
+  const specialistReviewLabel = tripCommerceState.reviewLabel.replace("Human review", "Specialist review");
 
   return (
     <div className="min-h-screen bg-background">
@@ -150,7 +156,7 @@ export default async function TripExportPage({
         <GuideChapter id="overview" className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8" data-testid="trip-export-header">
             <RevealSection>
-              <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium text-[var(--color-atlantic)]">Export center · Trip {tripId}</p>
+              <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium text-[var(--color-atlantic)]">Carry your plan · Saved work</p>
               <h1 className="mt-4 font-display text-5xl tracking-tight text-[var(--color-foreground)] lg:text-6xl">
                 {heroTitle}
               </h1>
@@ -172,9 +178,9 @@ export default async function TripExportPage({
         <GuideChapter id="formats" className="py-12 md:py-24">
           <div className="mx-auto max-w-[1100px] grid gap-8">
             <RevealSection>
-              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Choose a format</h2>
+              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Choose how to carry it</h2>
               <p className="text-on-surface-variant leading-loose mt-4 max-w-2xl text-lg leading-relaxed">
-                Each format mirrors the same audited route. PDF, calendar, and markdown are gated until unlock; print is always safe to use.
+                Each format keeps the same chosen activities and practical context. PDF, calendar, and markdown are available after unlock; print remains available now.
               </p>
             </RevealSection>
             <RevealSection delayMs={120}>
@@ -188,7 +194,16 @@ export default async function TripExportPage({
                   return (
                     <div key={option.label} data-testid={`export-format-${format}`} className="relative">
                       <TripCard title={option.label} caption={`${option.description} · ${statusLabel}`} href={locked ? undefined : option.href} testid={`export-option-${format}`} />
-                      <span className="absolute right-4 top-4 rounded-full border px-2 py-1 text-xs" data-testid={`export-status-${format}`}>{statusLabel}</span>
+                      <span
+                        className={`absolute right-4 top-4 rounded-full border px-2 py-1 text-xs font-semibold ${
+                          locked
+                            ? "border-outline-variant/60 bg-surface-container-lowest/80 text-on-surface-variant"
+                            : "border-olive-light/25 bg-surface-container-low text-olive-dark"
+                        }`}
+                        data-testid={`export-status-${format}`}
+                      >
+                        {statusLabel}
+                      </span>
                       {jobState === "error" ? <form action={`/api/trips/${tripId}/export/retry`} method="post" className="mt-2"><button type="submit" className="text-sm underline">Retry</button></form> : null}
                     </div>
                   );
@@ -201,21 +216,21 @@ export default async function TripExportPage({
         <GuideChapter id="delivery" className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8">
             <RevealSection>
-              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Share &amp; delivery</h2>
+              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Share &amp; carry</h2>
               <p className="text-on-surface-variant leading-loose mt-4 max-w-2xl text-lg leading-relaxed">
-                Where the trip lives once it leaves the planner.
+                Keep the saved plan legible when it leaves the workspace.
               </p>
             </RevealSection>
             <RevealSection delayMs={120}>
               <Card data-testid="share-card">
                 <CardHeader>
-                  <CardTitle>Share and delivery</CardTitle>
+                  <CardTitle>Share this plan</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-3">
                   <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
                     <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Share path</p>
                     <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{buildTripSharePath(tripId)}</p>
-                    <p className="text-on-surface-variant leading-loose mt-2 text-sm">Share links stay tied to the saved trip route.</p>
+                    <p className="text-on-surface-variant leading-loose mt-2 text-sm">Share links stay tied to the saved plan and its current choices.</p>
                   </div>
                   <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
                     <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Delivery email</p>
@@ -228,13 +243,13 @@ export default async function TripExportPage({
             <RevealSection delayMs={200}>
               <Card data-testid="included-list">
                 <CardHeader>
-                  <CardTitle>Included in the PDF itinerary</CardTitle>
+                  <CardTitle>Included in the exported plan</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-3">
                   {[
-                    "Cover and trip summary",
-                    "Route overview and validation notes",
-                    "Day-by-day itinerary with stop timing",
+                    "Cover and saved-plan summary",
+                    "Spatial context and planning notes",
+                    "Day-by-day agenda with activity timing",
                     "Local tips and reviewer trust markers"
                   ].map((item) => (
                     <div key={item} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4 text-sm text-[var(--color-foreground)]">
@@ -253,8 +268,8 @@ export default async function TripExportPage({
               <h2 className="font-display text-4xl">Export access</h2>
               <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--color-cream)]">
                 {tripCommerceState.canExport
-                  ? "This trip is unlocked. PDF, calendar, markdown, and print exports are ready."
-                  : "Unlock the trip to release PDF, calendar, and markdown exports. Print stays available either way."}
+                  ? "This plan is unlocked. PDF, calendar, markdown, and print exports are ready."
+                  : "Unlock the plan to release PDF, calendar, and markdown exports. Print stays available either way."}
               </p>
             </RevealSection>
             <RevealSection delayMs={120}>
@@ -263,18 +278,18 @@ export default async function TripExportPage({
                   <div className="flex flex-wrap gap-2">
                     <Badge tone="soft" className="bg-white/15 border-white/10 text-white">{tripCommerceState.accessLabel}</Badge>
                     <Badge tone="soft" className="bg-white/15 border-white/10 text-white">{tripCommerceState.exportLabel}</Badge>
-                    <Badge tone="soft" className="bg-white/15 border-white/10 text-white">{tripCommerceState.reviewLabel}</Badge>
+                    <Badge tone="soft" className="bg-white/15 border-white/10 text-white">{specialistReviewLabel}</Badge>
                   </div>
                   <div className="flex flex-wrap gap-3 w-full">
                     {tripCommerceState.canUnlock ? (
                       <form action={`/api/trips/${tripId}/unlock`} method="post" className="flex-1">
                         <Button type="submit" className="w-full min-h-[44px] bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90">
-                          Checkout to unlock exports
+                          Unlock the full plan pack
                         </Button>
                       </form>
                     ) : null}
                     <Button asChild variant="ghost" className="flex-1 min-h-[44px] border border-[var(--color-paper)] text-[var(--color-paper)] hover:bg-white/10">
-                      <Link href={`/trip/${tripId}/map`}>Open route map</Link>
+                      <Link href={`/trip/${tripId}/map`}>Open spatial view</Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -285,9 +300,9 @@ export default async function TripExportPage({
 
         <GuideChapter id="next-step" className="p-0">
           <CTASection>
-            <h2 className="font-display text-4xl md:text-5xl">Send the trip onward</h2>
+            <h2 className="font-display text-4xl md:text-5xl">Carry the plan onward</h2>
             <p className="text-xl text-[var(--color-cream)] max-w-2xl">
-              Print directly, return to the guided trip, or unlock the full export bundle.
+              Print it, return to the saved plan, or unlock the full export pack.
             </p>
             <div className="flex flex-wrap justify-center gap-4 mt-4">
               <Button asChild className="bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90 text-lg px-8 py-3 h-auto min-h-[44px]">

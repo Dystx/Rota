@@ -1,6 +1,10 @@
 import * as React from "react";
 
 import type { ActivityMapModel } from "./activity-map-model";
+import {
+  ActivityMapAttribution,
+  type ActivityMapAttributionConfig
+} from "./activity-map-attribution";
 
 export interface ActivityMapFallbackProps {
   model: ActivityMapModel;
@@ -9,6 +13,7 @@ export interface ActivityMapFallbackProps {
   error?: string | null;
   onRetry?: () => void;
   compact?: boolean;
+  attribution?: ActivityMapAttributionConfig;
 }
 
 /**
@@ -21,7 +26,8 @@ export function ActivityMapFallback({
   onSelectActivity,
   error,
   onRetry,
-  compact = false
+  compact = false,
+  attribution
 }: ActivityMapFallbackProps) {
   return (
     <section
@@ -87,9 +93,9 @@ export function ActivityMapFallback({
           Retry map
         </button>
       ) : null}
-      <p className="mt-5 text-xs leading-relaxed text-on-surface-variant">
-        Map data attribution: <a className="underline underline-offset-2" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a> · <a className="underline underline-offset-2" href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>. Activity locations are public-area approximations where labelled.
-      </p>
+      <div className="mt-5">
+        <ActivityMapAttribution config={attribution} />
+      </div>
     </section>
   );
 }

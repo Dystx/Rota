@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "../lib/cn";
+import { Icon } from "./icon";
 
 /**
  * Badge — small status / count indicator.
@@ -49,14 +50,6 @@ const dotColorClassName = {
 const interactiveClassName =
   "cursor-pointer focus-visible:outline-none focus-visible:shadow-focus hover:shadow-overlay transition-shadow duration-base ease-standard";
 
-function MaterialSymbol({ name }: { name: string }) {
-  return (
-    <span aria-hidden className="material-symbols-outlined text-[1.1em]">
-      {name}
-    </span>
-  );
-}
-
 export function Badge({
   className,
   tone = "default",
@@ -87,7 +80,7 @@ export function Badge({
       ) : null}
       {icon ? (
         typeof icon === "string" ? (
-          <MaterialSymbol name={icon} />
+          <Icon name={icon} className="text-[1.1em]" />
         ) : (
           icon
         )

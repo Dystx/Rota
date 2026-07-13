@@ -17,6 +17,7 @@ const marketingRoutes = [
   "/",
   "/portugal",
   "/explore",
+  "/activities/porto-ribeira-slow-walk",
   "/explore/workspace",
   "/how-it-works",
   "/pricing",
@@ -33,17 +34,17 @@ const marketingRoutes = [
   "/guide/onboarding",
   "/b2b/unknown-workspace"
 ];
-const travelerRoutes: Array<string | (() => string)> = [
-  "/trip/new",
-  travelerTripPath,
-  () => travelerTripPath("/map"),
-  () => travelerTripPath("/export"),
+const travelerRoutes = [
+  { label: "/trip/new", snapshotName: "trip-new", resolve: () => "/trip/new" },
+  { label: "generated trip route", snapshotName: "trip", resolve: () => travelerTripPath() },
+  { label: "generated trip route map", snapshotName: "trip-map", resolve: () => travelerTripPath("/map") },
+  { label: "generated trip route export", snapshotName: "trip-export", resolve: () => travelerTripPath("/export") },
   "/account",
   "/itineraries",
   "/vault",
   "/planner",
   "/checkout"
-];
+] as const;
 const reviewerRoutes = ["/reviewer/queue", "/reviewer/profile", "/reviewer/history"];
 const adminRoutes = [
   "/admin/places",
@@ -145,11 +146,13 @@ test.describe("@smoke @visual Marketing baselines", () => {
 test.describe("@smoke @visual Traveler baselines", () => {
   test.setTimeout(60_000);
   test.use({ storageState: createTravelerStorageState() });
-  for (const [index, routeEntry] of travelerRoutes.entries()) {
-    const routeLabel = typeof routeEntry === "string" ? routeEntry : `generated trip route ${index + 1}`;
+  for (const routeEntry of travelerRoutes) {
+    const routeLabel = typeof routeEntry === "string" ? routeEntry : routeEntry.label;
     test(`traveler route ${routeLabel}`, async ({ page }, testInfo) => {
-      const route = typeof routeEntry === "string" ? routeEntry : routeEntry();
-      const routeName = route.replace(/\//g, "-").replace(/^-/, "");
+      const route = typeof routeEntry === "string" ? routeEntry : routeEntry.resolve();
+      const routeName = typeof routeEntry === "string"
+        ? route.replace(/\//g, "-").replace(/^-/, "")
+        : routeEntry.snapshotName;
       await page.goto(route);
       await assertRouteQuality(page, route, true);
       await disableAnimations(page);

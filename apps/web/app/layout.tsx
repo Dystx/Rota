@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "@repo/ui/styles.css";
 import "./globals.css";
 import { WebVitalsReporter } from "./web-vitals-reporter";
@@ -7,58 +6,36 @@ import { MotionProvider, ToastViewport, BackToTop } from "@repo/ui";
 import { RegisterServiceWorker } from "./_components/register-sw";
 import { MapLibreErrorSuppressor } from "./_components/maplibre-error-suppressor";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-body-md",
-  weight: ["400", "600"],
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["600", "700"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono-micro",
-  weight: ["500", "700"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://rumia.pt"),
   title: {
-    default: "Rumia | Intentional Humanism in Travel",
+    default: "What to do in Portugal, judged well | Rumia",
     template: "%s | Rumia",
   },
   description:
-    "Portugal-first AI travel planning system. Cinematic itineraries, structured routes, and human-curated quality.",
+    "A Portugal-first guide to activities genuinely worth your limited time.",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://rumia.pt",
     siteName: "Rumia",
-    title: "Rumia | Intentional Humanism in Travel",
+    title: "What to do in Portugal, judged well | Rumia",
     description:
-      "Discover Portugal intentionally. Cinematic itineraries, structured routes, and human-curated quality.",
+      "A digital-first guide to what is genuinely worth doing in Portugal.",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Rumia — Portugal-first AI travel planning",
+        alt: "Rumia — Portugal activity curation",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rumia | Intentional Humanism in Travel",
+    title: "What to do in Portugal, judged well | Rumia",
     description:
-      "Discover Portugal intentionally. Cinematic itineraries, structured routes, and human-curated quality.",
+      "A digital-first guide to what is genuinely worth doing in Portugal.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -73,9 +50,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`light ${inter.variable} ${playfair.variable} ${jetbrains.variable} relative`}
+      className="light relative"
     >
       <head>
+        <link rel="icon" href="/brand/mark.svg" type="image/svg+xml" />
         {/* PWA: manifest + theme color. The manifest is harmless to
          * always link — the SW itself is feature-flagged via
          * NEXT_PUBLIC_PWA_ENABLED. */}

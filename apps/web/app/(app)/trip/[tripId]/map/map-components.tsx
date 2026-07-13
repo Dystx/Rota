@@ -25,7 +25,7 @@ import Link from "next/link";
 import { RouteMap as SchematicMap } from "@repo/ui";
 
 import { useTripRoute } from "../_hooks/use-trip-route";
-import { tripRouteStatusMessage } from "../_lib/trip-to-features";
+import { tripRouteStatusMessage, type TripRouteStatus } from "../_lib/trip-to-features";
 import { useReducedMotion } from "@repo/ui";
 import {
   cameraPresetTarget,
@@ -41,6 +41,24 @@ const EMPTY_ROUTE_FEATURES: SpatialFeatureCollection = {
   type: "FeatureCollection",
   features: []
 };
+
+const RouteMapStatusContext = React.createContext<TripRouteStatus>("unavailable");
+
+export function RouteMapStatus({ className }: { className?: string }) {
+  const status = React.useContext(RouteMapStatusContext);
+  return (
+    <p
+      role="status"
+      data-testid="trip-route-status"
+      className={[
+        "rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.88)] px-4 py-3 text-sm leading-relaxed text-[var(--color-muted-foreground)]",
+        className
+      ].filter(Boolean).join(" ")}
+    >
+      {tripRouteStatusMessage(status)}
+    </p>
+  );
+}
 
 const WorkspaceCanvas = dynamic(
   () => import("@repo/spatial-engine").then((mod) => mod.WorkspaceCanvas),
@@ -125,75 +143,67 @@ export function RouteMap({
     handleMapTelemetry({ type: "intent", surface: "trip-map", intent: "story-stop" });
   }, [handleMapTelemetry]);
 
-  // SSR + initial render: render the schematic so the page has
-  // something to display before the spatial engine has finished
-  // mounting. Once the route is non-null (or the trip is
-  // confirmed missing / errored) we swap to the live canvas.
-  if (routeStatus === "unavailable" && !isLoading) {
+  // Keep the practical schematic visible until validated geometry is ready.
+  // A blank MapLibre canvas is not a useful fallback when the provider is
+  // intentionally disabled or the trip only has stop points. The schematic
+  // keeps the day list, warnings, and details panel usable while preserving
+  // the explicit status that no sourced connector is being invented.
+  if (routeStatus !== "ready") {
     return (
-      <SchematicMap
-        selectedDayId={selectedDayId}
-        days={days}
-        warnings={warnings}
-        {...rest}
-        data-map-capable="true"
-        data-route-status={routeStatus}
-      >
-        <p
-          role="status"
-          data-testid="trip-route-status"
-          className="absolute bottom-16 left-4 right-4 z-20 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.94)] px-4 py-3 text-sm text-[var(--color-muted-foreground)] shadow-sm"
+      <RouteMapStatusContext.Provider value={routeStatus}>
+        <SchematicMap
+          selectedDayId={selectedDayId}
+          days={days}
+          warnings={warnings}
+          {...rest}
+          showFallbackNotice={false}
+          data-map-capable="true"
+          data-route-status={routeStatus}
+          data-map-renderer="schematic"
         >
-          {tripRouteStatusMessage(routeStatus)}
-        </p>
-        {children}
-      </SchematicMap>
+          {children}
+        </SchematicMap>
+      </RouteMapStatusContext.Provider>
     );
   }
 
   return (
-    <div
-      data-testid="trip-workspace-canvas-frame"
-      data-trip-id={tripId}
-      data-mode="trip"
-      data-map-capable="true"
-      data-route-status={routeStatus}
-      className="relative flex h-[600px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.96)] shadow-[0_24px_60px_rgba(7,17,19,0.06)]"
-    >
-      <WorkspaceCanvas
-        ref={canvasRef}
-        className="absolute inset-0 h-full w-full"
-        testId="trip-workspace-canvas"
-        routeFeatures={routeFeatures ?? EMPTY_ROUTE_FEATURES}
-        showBuildingExtrusions={showBuildingExtrusions}
-        telemetrySurface="trip-map"
-        onMapTelemetry={handleMapTelemetry}
-        disableIntro
-      />
-      <div className="relative z-10 h-full w-full pointer-events-none">{children}</div>
-      {storyReady ? (
-        <div className="pointer-events-auto absolute left-4 top-4 z-30 w-[min(25rem,calc(100%-2rem))]">
-          <RouteStoryControls
-            presets={storyPresets}
-            activeIndex={storyIndex}
-            started={storyIndex >= 0}
-            onStart={startStory}
-            onPrevious={() => focusStoryPreset(Math.max(0, storyIndex - 1))}
-            onNext={() => focusStoryPreset(Math.min(storyPresets.length - 1, storyIndex + 1))}
-            onStop={stopStory}
-          />
-        </div>
-      ) : null}
-      {routeStatus === "partial" ? (
-        <p
-          role="status"
-          data-testid="trip-route-status"
-          className="pointer-events-none absolute bottom-4 left-4 right-4 z-20 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.94)] px-4 py-3 text-sm text-[var(--color-muted-foreground)] shadow-sm"
-        >
-          {tripRouteStatusMessage(routeStatus)}
-        </p>
-      ) : null}
-    </div>
+    <RouteMapStatusContext.Provider value={routeStatus}>
+      <div
+        data-testid="trip-workspace-canvas-frame"
+        data-trip-id={tripId}
+        data-mode="trip"
+        data-map-capable="true"
+        data-route-status={routeStatus}
+        data-map-renderer="maplibre"
+        className="relative flex h-[600px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.96)] shadow-[0_24px_60px_rgba(7,17,19,0.06)]"
+      >
+        <WorkspaceCanvas
+          ref={canvasRef}
+          className="absolute inset-0 h-full w-full"
+          testId="trip-workspace-canvas"
+          routeFeatures={routeFeatures ?? EMPTY_ROUTE_FEATURES}
+          showBuildingExtrusions={showBuildingExtrusions}
+          telemetrySurface="trip-map"
+          onMapTelemetry={handleMapTelemetry}
+          disableIntro
+        />
+        <div className="relative z-10 h-full w-full pointer-events-none">{children}</div>
+        {storyReady ? (
+          <div className="pointer-events-auto absolute left-4 top-4 z-30 w-[min(25rem,calc(100%-2rem))]">
+            <RouteStoryControls
+              presets={storyPresets}
+              activeIndex={storyIndex}
+              started={storyIndex >= 0}
+              onStart={startStory}
+              onPrevious={() => focusStoryPreset(Math.max(0, storyIndex - 1))}
+              onNext={() => focusStoryPreset(Math.min(storyPresets.length - 1, storyIndex + 1))}
+              onStop={stopStory}
+            />
+          </div>
+        ) : null}
+      </div>
+    </RouteMapStatusContext.Provider>
   );
 }
 

@@ -1,4 +1,5 @@
 import { useState, type DragEvent } from "react";
+import { Icon } from "@repo/ui";
 
 export interface SnippetCardProps {
   title: string;
@@ -41,12 +42,7 @@ export function SnippetCard({ title, body }: SnippetCardProps) {
       role="button"
       aria-label={`Drag snippet: ${title}`}
     >
-      <span
-        aria-hidden="true"
-        className="ph text-[14px] text-outline group-hover:text-ochre-light mt-0.5 shrink-0"
-      >
-        drag_indicator
-      </span>
+      <Icon aria-hidden="true" name="drag_indicator" className="text-[14px] text-outline group-hover:text-ochre-light mt-0.5 shrink-0" />
       <div className="min-w-0 flex-1">
         <p className="font-label-ui text-label-ui text-primary truncate">
           {title}

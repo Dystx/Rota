@@ -1,10 +1,11 @@
 import * as React from "react";
 import type { Metadata } from "next";
-import { isFeatureEnabled } from "@repo/config";
+import { getOptionalRumiaMapStyleUrl, isFeatureEnabled } from "@repo/config";
 
 import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 
 import { ActivityWorkspace } from "./activity-workspace";
+import type { ActivityMapProviderConfig } from "../../_components/activity-map";
 
 export const metadata: Metadata = {
   title: "Your Portugal day",
@@ -18,6 +19,28 @@ function selectedIds(value: string | readonly string[] | undefined): readonly st
   return [...new Set(values.map((id) => id.trim()).filter(Boolean))];
 }
 
+function configuredMapProvider(): ActivityMapProviderConfig | undefined {
+  const styleUrl = getOptionalRumiaMapStyleUrl();
+  if (!styleUrl) return undefined;
+
+  return {
+    style: {
+      id: "protomaps-portugal-canary",
+      name: "Rumia Portugal basemap",
+      url: styleUrl,
+      attribution:
+        '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · <a href="https://protomaps.com/about">Protomaps</a>'
+    },
+    attribution: {
+      links: [
+        { label: "© OpenStreetMap contributors", href: "https://www.openstreetmap.org/copyright" },
+        { label: "Protomaps", href: "https://protomaps.com/about" }
+      ],
+      note: "Activity locations are reviewed public-area approximations where labelled."
+    }
+  };
+}
+
 export default async function WorkspacePage({
   searchParams
 }: {
@@ -29,12 +52,15 @@ export default async function WorkspacePage({
     const reviewedActivity = byId.get(id);
     return reviewedActivity ? [reviewedActivity] : [];
   });
+  const mapProvider = configuredMapProvider();
+  const mapEnabled = isFeatureEnabled("activityMap") && Boolean(mapProvider);
 
   return (
     <ActivityWorkspace
       initialActivities={activities}
-      mapEnabled={isFeatureEnabled("activityMap")}
-      map3dEnabled={isFeatureEnabled("activityMap") && isFeatureEnabled("activityMap3d")}
+      mapEnabled={mapEnabled}
+      map3dEnabled={mapEnabled && isFeatureEnabled("activityMap3d")}
+      mapProvider={mapProvider}
     />
   );
 }

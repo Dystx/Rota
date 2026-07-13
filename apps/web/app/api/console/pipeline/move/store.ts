@@ -1,7 +1,8 @@
 import "server-only";
 
 import { z } from "zod";
-import { getAdminPageAuthContext } from "@/lib/auth/admin";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
+import { updatePostgresTripStatus } from "@repo/db";
 
 const MovePayloadSchema = z.object({
   tripId: z.string().min(1).max(64),
@@ -45,7 +46,7 @@ export async function moveTripStage(
 ): Promise<MoveTripStageResult> {
   const input = MovePayloadSchema.parse(rawInput);
   const admin = await getAdminPageAuthContext();
-  if (!("client" in admin)) {
+  if (!isAdminPageAuthContext(admin)) {
     throw new Error(
       `moveTripStage requires an admin actor (got: ${admin.reason})`
     );
@@ -62,14 +63,8 @@ export async function moveTripStage(
     );
   }
 
-  const { error } = await admin.client
-    .from("trips")
-    .update({ status: newStatus, updated_at: new Date().toISOString() })
-    .eq("id", input.tripId);
-
-  if (error) {
-    throw new Error(`moveTripStage failed: ${error.message}`);
-  }
+  const updated = await updatePostgresTripStatus(input.tripId, newStatus as "draft" | "in_review" | "active", admin.actor);
+  if (!updated) throw new Error("moveTripStage failed: trip not found or not authorized.");
 
   return { tripId: input.tripId, newStatus };
 }

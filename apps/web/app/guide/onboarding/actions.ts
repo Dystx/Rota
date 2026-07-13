@@ -11,7 +11,8 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentUserId } from "@/lib/supabase/server";
+import { getCurrentUserId } from "@/lib/auth/current-user";
+import { loadCurrentAuthorizedActor } from "@/lib/auth/authorization";
 import {
   getSpecialistCapabilities,
   setSpecialistCapabilities,
@@ -102,7 +103,8 @@ export async function submitSpecialistProfile(
   input: ProfileInput
 ): Promise<OnboardingResult> {
   const userId = await getCurrentUserId();
-  if (!userId) {
+  const actor = await loadCurrentAuthorizedActor();
+  if (!userId || !actor || actor.userId !== userId) {
     return { kind: "error", message: "Not signed in" };
   }
 
@@ -141,18 +143,19 @@ export async function submitSpecialistProfile(
         parsed.data.photoPath && parsed.data.photoPath.length > 0
           ? parsed.data.photoPath
           : null
-    });
+    }, { actor });
 
     // 2. Replace the capabilities rows (skills + languages)
     //    if the profile upsert returned a row id. The
     //    onboarding flow is "always upsert the user_id" so
     //    `result.id` is the new specialist row's primary key.
     if (result?.id) {
-      await setSpecialistCapabilities(result.id, "skill", parsed.data.skills);
+      await setSpecialistCapabilities(result.id, "skill", parsed.data.skills, { actor });
       await setSpecialistCapabilities(
         result.id,
         "language",
-        parsed.data.languages
+        parsed.data.languages,
+        { actor }
       );
     }
 
@@ -175,10 +178,11 @@ export async function loadSpecialistCapabilities(): Promise<{
   languages: readonly string[];
 }> {
   const userId = await getCurrentUserId();
-  if (!userId) return { skills: [], languages: [] };
+  const actor = await loadCurrentAuthorizedActor();
+  if (!userId || !actor || actor.userId !== userId) return { skills: [], languages: [] };
   const { getSpecialistProfileByUserId } = await import("@repo/db");
-  const profile = await getSpecialistProfileByUserId(userId);
+  const profile = await getSpecialistProfileByUserId(userId, { actor });
   if (!profile) return { skills: [], languages: [] };
-  const caps = await getSpecialistCapabilities(profile.id);
+  const caps = await getSpecialistCapabilities(profile.id, { actor });
   return { skills: caps.skills, languages: caps.languages };
 }

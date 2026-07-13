@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChoiceCard } from "@repo/ui";
+import { ChoiceCard, Icon } from "@repo/ui";
 
 type DestinationOption = {
   value: string;
@@ -56,14 +56,14 @@ export function WhereStep({
           className="flex items-center justify-between gap-2 rounded-xl border-2 border-olive-light/30 bg-white p-4 transition-colors hover:border-ochre-light/60 hover:bg-ochre-light/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           <span className="flex items-center gap-2">
-            <span aria-hidden className="ph text-ochre-dark">place</span>
+            <Icon name="place" className="text-ochre-dark" />
             <span className="font-headline-sm text-headline-sm text-primary">
               {destinationLabel(value)}
             </span>
           </span>
           <span className="inline-flex items-center gap-1 font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
             Change
-            <span aria-hidden className="ph text-[14px]">edit</span>
+            <Icon name="edit_note" className="text-[14px]" />
           </span>
         </button>
       ) : (

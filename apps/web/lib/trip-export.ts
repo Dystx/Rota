@@ -283,24 +283,24 @@ export function buildTripSharePath(tripId: string) {
 export function listTripExportOptions(tripId: string): ExportOption[] {
   return [
     {
-      description: "Download a simple itinerary PDF with route summary, day plans, warnings, and reviewer markers.",
+      description: "Download a considered plan PDF with activity context, day sections, notes, and reviewer markers.",
       href: `/api/trips/${tripId}/export?format=pdf`,
-      label: "PDF itinerary"
+      label: "PDF plan"
     },
     {
-      description: "Add itinerary stops to a calendar app as timed events.",
+      description: "Add the activities you kept to a calendar app as timed events.",
       href: `/api/trips/${tripId}/export?format=calendar`,
-      label: "Calendar export"
+      label: "Calendar entries"
     },
     {
-      description: "Download the raw structured itinerary as markdown.",
+      description: "Download the structured activity notes and practical context as markdown.",
       href: `/api/trips/${tripId}/export?format=markdown`,
-      label: "Markdown export"
+      label: "Markdown notes"
     },
     {
-      description: "Open a print-focused version of the itinerary in the browser.",
+      description: "Open a print-focused version of the saved plan in the browser.",
       href: `/trip/${tripId}/export?view=print`,
-      label: "Print-friendly itinerary"
+      label: "Print-friendly plan"
     }
   ];
 }

@@ -64,7 +64,7 @@ const inMemoryReadings: Tier3MetricReading[] = [];
 
 /**
  * Record a metric reading. In-memory for now; the production path
- * will write to a `tier_3_metrics_history` Supabase table (added
+ * will write to a `tier_3_metrics_history` PostgreSQL table (added
  * when the dashboard ships).
  */
 export function recordTier3Metric(reading: Tier3MetricReading): void {
@@ -73,7 +73,7 @@ export function recordTier3Metric(reading: Tier3MetricReading): void {
 
 /** Read the in-memory history. For the future dashboard, this is
  *  the data source. Tests can use this to assert the recording
- *  path; the production dashboard will read from Supabase. */
+ *  path; the production dashboard will read from PostgreSQL. */
 export function listTier3Metrics(): readonly Tier3MetricReading[] {
   return inMemoryReadings.slice();
 }

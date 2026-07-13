@@ -7,7 +7,7 @@ import { getTripCommerceState } from "@/lib/trip-commerce";
 
 export const metadata: Metadata = {
   title: "Human Review Trust Layer",
-  description: "Add a premium human review layer to your AI-generated route for local notes, pace adjustments, and rain plans.",
+  description: "Optional specialist context for a saved Portugal activity day.",
   alternates: {
     canonical: "/human-review"
   }
@@ -21,25 +21,28 @@ export default function HumanReviewPage() {
   return (
       <PageShell bare>
         <SectionHeading
-          eyebrow="Trust layer"
-          title="Expert polish for your itinerary"
-          description="Expert polish is the final step after your €19 itinerary unlock: a €49 one-time review with a one-business-day target."
+          eyebrow="Optional trust layer"
+          title="A specialist can pressure-test the day."
+          description="Rumia helps you choose activities first. If you later unlock a saved day, an optional Portugal specialist can check pacing, pairings, and practical context. This is not booking, concierge, or a guarantee."
           h1={true}
         />
 
-        <div className="mb-20">
+        <section aria-labelledby="review-scope-heading" className="mb-20">
+          <h2 id="review-scope-heading" className="sr-only">
+            What a specialist checks
+          </h2>
           <FeatureGrid>
-            <FeatureGridItem title="Route & Pacing Validation">
-              We ensure your driving times are realistic and your daily schedule allows you to breathe. We fix overly ambitious AI routes before you hit the road.
+            <FeatureGridItem title="Day shape checked">
+              We look at the time you have, the effort between activities, and whether the day leaves room to breathe.
             </FeatureGridItem>
-            <FeatureGridItem title="Restaurant curation">
-              We suggest local alternatives and flag where you should confirm opening hours yourself.
+            <FeatureGridItem title="Pairings made practical">
+              We can suggest nearby combinations and flag where opening hours, queues, or transfer friction need checking.
             </FeatureGridItem>
-            <FeatureGridItem title="Rain plans">
-              We add practical weather alternatives; the review does not make bookings or guarantees.
+            <FeatureGridItem title="Fallbacks, when known">
+              We add a practical weather or energy alternative where the reviewed activity set supports it; no bookings or guarantees are included.
             </FeatureGridItem>
           </FeatureGrid>
-        </div>
+        </section>
 
         <div className="grid gap-12 lg:grid-cols-2">
           <div className="space-y-8">
@@ -60,8 +63,8 @@ export default function HumanReviewPage() {
 
           <div>
             <PricingCard
-              title="Human Review Add-on"
-              description="Available exclusively after unlocking your base trip."
+              title="Optional local review"
+              description="Available only after a chosen day is unlocked."
               price={reviewPlan.priceLabel}
               fulfillment={reviewPlan.fulfillment}
               features={reviewedTripState.markers}

@@ -59,6 +59,8 @@ describe("PlannerSingleScreen", () => {
   it("explains that direct entry starts with an activity decision", () => {
     render(<PlannerSingleScreen />);
 
+    expect(screen.getByTestId("planner-editorial-shell")).toBeTruthy();
+    expect(screen.getByTestId("planner-brief")).toBeTruthy();
     expect(screen.getByText("Start with an activity decision")).toBeTruthy();
     expect(screen.queryByText("Advanced day planning")).toBeNull();
     expect(screen.getByRole("button", { name: "Build my itinerary" })).toBeTruthy();

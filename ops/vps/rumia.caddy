@@ -1,0 +1,14 @@
+# Install this fragment only after rumia.pt and www.rumia.pt DNS records resolve
+# to the VPS and the Rumia web service has passed a loopback health check.
+rumia.pt, www.rumia.pt {
+    encode zstd gzip
+
+    header {
+        -Server
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    }
+
+    reverse_proxy 127.0.0.1:3002
+}

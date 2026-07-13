@@ -39,6 +39,8 @@ describe("ActivityWorkspace", () => {
 
     expect(screen.getByRole("heading", { name: /Your tentative day/i })).toBeTruthy();
     expect(screen.getByText("Ribeira and Miragaia at walking pace")).toBeTruthy();
+    expect(screen.getAllByTestId("workspace-activity-card")).toHaveLength(2);
+    expect(screen.getAllByTestId("workspace-activity-index")[0]?.textContent).toBe("01");
     expect(screen.getAllByText(/Rumia's judgement/i).length).toBeGreaterThan(0);
     expect(screen.queryByRole("button", { name: "View on map" })).toBeNull();
 

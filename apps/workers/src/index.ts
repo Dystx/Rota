@@ -7,7 +7,7 @@ import {
 import {
   runPipeline,
   createOpenAIEmbeddingClient,
-  createSupabaseLoader,
+  createPostgresLoader,
   type PipelineResult
 } from "@repo/ingest";
 import {
@@ -532,11 +532,11 @@ export async function handleQStashRequest(
   if (payload.kind === "ingest_pipeline_run") {
     try {
       const embeddingClient = createOpenAIEmbeddingClient();
-      const supabaseLoader = createSupabaseLoader();
+      const placeLoader = createPostgresLoader();
       const result = await runPipeline({
         pbfPath: PBF_PATH,
         embeddingClient,
-        supabaseLoader
+        placeLoader
       });
       return {
         status: 200,

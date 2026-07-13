@@ -1,10 +1,11 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, StatPill } from "@repo/ui";
 import { TripBriefFormBoundary } from "./trip-brief-form";
 
 export const metadata: Metadata = {
-  title: "Shape Your Portugal Route",
-  description: "Choose the details that matter to your Portugal trip before we craft your itinerary.",
+  title: "Shape a saved plan | Rumia",
+  description: "Set the time, pace, and practical context that should shape the activities you keep in Portugal.",
   alternates: {
     canonical: "/trip/new"
   }
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default function NewTripPage() {
   return (
     <div className="min-h-screen bg-background">
-      <section className="relative w-full flex flex-col justify-center items-center overflow-hidden pt-12 pb-12 mb-12">
+      <section className="relative isolate w-full overflow-hidden border-b border-olive-light/20">
         <div className="absolute inset-0 w-full h-full -z-10">
           <div
             className="w-full h-full bg-cover bg-center filter brightness-[0.85] contrast-110 saturate-110"
@@ -21,52 +22,87 @@ export default function NewTripPage() {
               backgroundImage:
                 "url('/hero/portugal-coast-golden-hour.svg')",
             }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80" />
+            />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90" />
         </div>
 
-        <div className="relative z-10 w-full max-w-3xl text-center flex flex-col items-center gap-6">
-          <StatPill label="Route details" value="Choice-led planning" />
-          <h1 className="font-display text-display-mobile md:text-display text-foreground drop-shadow-2xl">
-            Shape your brief
-          </h1>
-          <p className="text-on-surface-variant leading-loose text-xl max-w-2xl mx-auto">
-            Choose the details that shape your trip. We use these decisions to craft a paced, realistic Portugal itinerary.
-          </p>
+        <div className="relative z-10 mx-auto w-full max-w-[1200px] px-6 py-16 md:px-10 md:py-24">
+          <div className="max-w-3xl">
+            <StatPill label="Saved-plan editor" value="Activity-first" />
+            <p className="mt-8 font-label-ui text-label-ui uppercase tracking-[0.22em] text-primary/70">
+              A practical layer for the activities you keep
+            </p>
+            <h1 className="mt-4 font-display text-display-mobile text-foreground drop-shadow-2xl md:text-display">
+              Give your time a shape.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-on-surface-variant md:text-xl">
+              Set the pace, travel window, and context that should hold your Portugal activities together. Rumia uses these choices to keep the plan useful, realistic, and yours.
+            </p>
+            <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-5">
+              <Link
+                href="/explore"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-3 font-label-ui text-label-ui text-on-primary shadow-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+              >
+                Find activities in Explore
+              </Link>
+              <span className="text-sm text-on-surface-variant">
+                Or continue with a saved selection below.
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
-      <div className="grid gap-12 lg:grid-cols-[1.3fr_0.7fr] items-start">
-        <TripBriefFormBoundary />
+      <div className="mx-auto grid max-w-[1200px] items-start gap-10 px-6 py-12 md:px-10 md:py-16 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,0.75fr)] lg:gap-16">
+        <div className="min-w-0">
+          <div className="mb-6 max-w-2xl">
+            <p className="font-label-ui text-label-ui uppercase tracking-[0.2em] text-primary/65">Shape the saved plan</p>
+            <h2 className="mt-3 font-display text-3xl text-foreground md:text-4xl">Keep the constraints that make a good day possible.</h2>
+            <p className="mt-4 leading-relaxed text-on-surface-variant">
+              These choices are a quiet editing layer—not a booking flow. Change only what should affect the activities you keep, then save the shape.
+            </p>
+          </div>
+          <TripBriefFormBoundary />
+        </div>
 
-        <div className="grid gap-6 sticky top-32">
-          <Card className="border-none shadow-none bg-transparent">
-            <CardHeader className="px-0 pt-0">
-              <h3 className="font-display text-2xl">Why we ask</h3>
+        <div className="min-w-0 grid gap-6 lg:sticky lg:top-32">
+          <Card className="min-w-0 border border-olive-light/25 bg-white/65 shadow-sm backdrop-blur-sm">
+            <CardHeader>
+              <p className="font-label-ui text-label-ui uppercase tracking-[0.18em] text-primary/65">What this protects</p>
+              <h3 className="font-display text-2xl text-foreground">A plan with room to work.</h3>
             </CardHeader>
-            <CardContent className="px-0 grid gap-8">
-              <div>
-                <p className="font-medium text-[var(--color-foreground)] mb-2">Pacing & Reality</p>
-                <p className="text-on-surface-variant leading-loose text-sm">
-                  Many travelers pack too much into a single day. By understanding your pace and transport preferences, we ensure you spend more time experiencing Portugal and less time in transit.
+            <CardContent className="grid gap-6">
+              <div className="border-t border-olive-light/20 pt-5">
+                <p className="font-medium text-[var(--color-foreground)]">A believable pace</p>
+                <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                  Fewer, better stops with time for the walk, meal, view, or pause that makes them worthwhile.
                 </p>
               </div>
 
-              <div>
-                <p className="font-medium text-[var(--color-foreground)] mb-2">Local Nuance</p>
-                <p className="text-on-surface-variant leading-loose text-sm">
-                  We don't just match generic tags. We cross-reference your interests against regional realities—knowing which coastal towns have the best winter seafood or where to avoid summer crowds.
+              <div className="border-t border-olive-light/20 pt-5">
+                <p className="font-medium text-[var(--color-foreground)]">Useful local context</p>
+                <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                  Season, transfers, effort, and nearby combinations stay visible when you shape what to do.
                 </p>
               </div>
 
-              <div>
-                <p className="font-medium text-[var(--color-foreground)] mb-2">The Concierge Audit</p>
-                <p className="text-on-surface-variant leading-loose text-sm">
-                  Once submitted, your brief is audited by our routing engine. We look for logistical friction (like trying to see the Douro Valley as a half-day trip from Lisbon) and offer a polished, workable draft.
+              <div className="border-t border-olive-light/20 pt-5">
+                <p className="font-medium text-[var(--color-foreground)]">Your control</p>
+                <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                  Save, remove, or reorder later. Rumia does not book, choose accommodation, or take over the day.
                 </p>
               </div>
             </CardContent>
           </Card>
+
+          <div className="rounded-2xl border border-olive-light/20 bg-olive-light/10 p-5">
+            <p className="font-label-ui text-label-ui uppercase tracking-[0.18em] text-primary/65">Need recommendations first?</p>
+            <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">Explore Portugal by situation, then return here when you have a shortlist worth shaping.</p>
+            <Link href="/explore" className="mt-4 inline-flex items-center font-label-ui text-label-ui text-primary underline decoration-olive-light/60 underline-offset-4 hover:decoration-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2">
+              Browse worthwhile activities
+            </Link>
+          </div>
         </div>
       </div>
     </div>

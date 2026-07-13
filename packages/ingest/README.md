@@ -26,7 +26,7 @@ are stubs and land in PR-4 + PR-5.
             │ EmbeddedFeature[]
             ▼
    ┌────────────────────┐
-   │ loadPlaces()       │  PR-5 — Supabase upsert into places
+   │ loadPlaces()       │  PR-5 — owner-role PostgreSQL upsert into places
    └────────┬───────────┘
             │
             ▼
@@ -57,11 +57,9 @@ are stubs and land in PR-4 + PR-5.
 - **Embedding model:** `text-embedding-3-small` (1536-dim). The
   `embeddingModel` field on `EmbeddedFeature` records which model
   produced each vector so we can re-embed on a model-version bump.
-- **Supabase target table:** `places` (current code) — see
-  `docs/reviews/2026-07-03-llm-review.md` LOW-1 for the
-  `places` vs `destinations` naming decision. The migration lint
-  already catches the rename; the rename itself is a separate
-  task.
+- **PostgreSQL target table:** `app.places` through the server-only Drizzle
+  boundary. The migration lint catches the `places` vs `destinations` naming
+  decision; any rename remains a separate owner-role migration.
 
 ## Open work (after this PR)
 
@@ -70,7 +68,7 @@ are stubs and land in PR-4 + PR-5.
   scratch path. Includes the worker entrypoint that triggers
   this stage via QStash.
 - **PR-5:** `embedFeatures` (OpenAI batching, rate-limit
-  handling) + `loadPlaces` (Supabase upsert with ON CONFLICT
+  handling) + `loadPlaces` (owner-role PostgreSQL upsert with ON CONFLICT
   semantics). The `runPipeline` orchestrator that chains all
   three stages.
 - **PR-7:** ES/IT/FR/GR bounding boxes + localized OSM extract.
@@ -92,12 +90,13 @@ The pgvector HNSW index on `places.embedding` is rebuilt by the
 (when pgvector ≥ 0.7.0 is available) and by any future
 `ALTER TYPE ... HALFVEC(3072)` migration. HNSW builds are
 **memory-hungry** — the working buffer is the whole `places`
-table on disk, plus neighbor-graph scratch. On Supabase's
-default tier the build OOMs and rolls back if you don't bump
+table on disk, plus neighbor-graph scratch. On a small PostgreSQL
+host the build can OOM and roll back if you don't bump
 `maintenance_work_mem` first.
 
-Run this in the Supabase SQL editor (or via the `psql` console)
-**before** applying the migration, in the same session:
+Run this through the approved PostgreSQL owner maintenance connection
+(`psql` on the Mac rehearsal database or VPS), in the same session before
+applying the migration:
 
 ```sql
 -- Bump maintenance_work_mem for the HNSW build. 2GB is conservative
@@ -106,7 +105,8 @@ set maintenance_work_mem = '2GB';
 
 -- Apply the halfvec migration, then re-run ANALYZE so the planner
 -- picks up the new HNSW index stats.
-\i supabase/migrations/202607032300_migrate_places_embedding_to_halfvec.sql
+-- Apply the corresponding Drizzle migration from the current release here.
+-- Do not run a hosted Supabase migration for Rumia.
 
 vacuum analyze public.places;
 ```
@@ -118,14 +118,14 @@ neighbor graph to populate correctly.
 
 If the build still OOMs, drop `ef_construction` to 32 in the
 migration (trades a few percent recall for ~half the memory)
-or run the build on a paid Supabase tier where
+or run the build during a planned owner-role maintenance window where
 `maintenance_work_mem` can be raised higher.
 
 ## pgvector dimension limit — forward compat
 
 `pgvector`'s `VECTOR(n)` and `HALFVEC(n)` types cap `n` at
 **2000** in pgvector 0.6 and earlier; pgvector 0.7.0+ raises
-the cap to **16000** (Supabase currently runs 0.7+). Our
+the cap to **16000** on current pgvector releases. Our
 current model is `text-embedding-3-small` at 1536-dim — well
 under either cap. The next model bump
 (`text-embedding-3-large` at 3072-dim) also fits.

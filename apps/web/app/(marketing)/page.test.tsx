@@ -20,7 +20,7 @@ vi.mock("./_components/how-it-works", () => ({
 }));
 
 vi.mock("./_components/hero-intent-card", () => ({
-  HeroIntentCard: () => <div />
+  HeroIntentCard: () => <div data-testid="hero-intent-card" />
 }));
 
 vi.mock("../_components/destination-bento", () => ({
@@ -45,5 +45,16 @@ describe("HomePage hero layout", () => {
     expect(container.querySelector("[data-testid='home-value-prop']")?.textContent).toMatch(
       /judged Portugal activities/i
     );
+  });
+
+  it("gives the hero an editorial image anchor and trust rail without adding another task", async () => {
+    const page = await HomePage();
+    const { container } = render(page);
+
+    expect(container.querySelector("[data-testid='hero-editorial-figure']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='hero-proof-rail']")?.textContent).toMatch(
+      /Portugal-wide/i
+    );
+    expect(container.querySelectorAll("[data-testid='hero-intent-card']")).toHaveLength(1);
   });
 });

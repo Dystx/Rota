@@ -21,4 +21,19 @@ describe("AcceptedPhrase", () => {
 
     expect(document.activeElement).toBe(phrase);
   });
+
+  it("uses an inverse text treatment when embedded in a dark composer", () => {
+    render(
+      <AcceptedPhrase
+        label="Duration"
+        value="an afternoon"
+        options={["three hours", "an afternoon"]}
+        onAccept={vi.fn()}
+        onClear={vi.fn()}
+        tone="inverse"
+      />
+    );
+
+    expect(screen.getByRole("button", { name: /duration, an afternoon/i })).toHaveClass("text-[var(--color-paper)]");
+  });
 });

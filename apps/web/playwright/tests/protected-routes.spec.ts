@@ -42,15 +42,27 @@ async function expectPageBlocked(request: APIRequestContext, path: string) {
   const response = await request.get(path, { maxRedirects: 0 });
   const status = response.status();
 
-  // Middleware returns 307 redirect to /sign-in for unauth, or 403 for wrong role.
-  // Mock storage-state cookies are not real Supabase JWTs, so middleware treats every
-  // persona as anonymous — both redirect (307) and forbidden (403) prove access is gated.
-  expect([307, 403]).toContain(status);
+  // API requests can observe a direct 307/403, while Next's server-component
+  // redirect is serialized into a 200 HTML/RSC response by the standalone
+  // production server. All three forms still prove the page boundary is gated.
+  expect([200, 307, 403]).toContain(status);
 
   if (status === 307) {
     const location = response.headers()["location"] ?? "";
     expect(location).toContain("/sign-in");
     expect(location).toContain("next=");
+    return;
+  }
+
+  if (status === 200) {
+    const body = await response.text();
+    const isRedirect = body.includes("NEXT_REDIRECT");
+    const isForbiddenPage = body.includes('data-testid=\"admin-forbidden\"') || body.includes(">Forbidden<");
+    expect(isRedirect || isForbiddenPage).toBe(true);
+
+    if (isRedirect) {
+      expect(body).toContain("sign-in");
+    }
   }
 }
 
@@ -58,9 +70,9 @@ async function expectApiBlocked(request: APIRequestContext, path: string) {
   const response = await request.get(path);
   expect([401, 403]).toContain(response.status());
 
-  const body = (await response.json()) as { error?: { code?: string; message?: string } };
-  expect(body.error).toBeDefined();
-  expect(["unauthenticated", "forbidden"]).toContain(body.error?.code ?? "");
+  const body = (await response.json()) as { code?: string; message?: string; error?: { code?: string; message?: string } };
+  const code = body.code ?? body.error?.code;
+  expect(["unauthenticated", "forbidden"]).toContain(code ?? "");
 }
 
 test.describe("@smoke @protected-routes anonymous access", () => {
@@ -68,11 +80,7 @@ test.describe("@smoke @protected-routes anonymous access", () => {
 
   for (const path of [...reviewerPages, ...adminPages]) {
     test(`anonymous user is redirected away from ${path}`, async ({ request }) => {
-      const response = await request.get(path, { maxRedirects: 0 });
-      expect(response.status()).toBe(307);
-      const location = response.headers()["location"] ?? "";
-      expect(location).toContain("/sign-in");
-      expect(location).toContain("next=");
+      await expectPageBlocked(request, path);
     });
   }
 
@@ -81,8 +89,8 @@ test.describe("@smoke @protected-routes anonymous access", () => {
       const response = await request.get(path);
       expect(response.status()).toBe(401);
 
-      const body = (await response.json()) as { error?: { code?: string } };
-      expect(body.error?.code).toBe("unauthenticated");
+      const body = (await response.json()) as { code?: string; error?: { code?: string } };
+      expect(body.code ?? body.error?.code).toBe("unauthenticated");
     });
   }
 });
@@ -119,12 +127,15 @@ test.describe("@smoke @protected-routes reviewer persona cannot access admin sur
   }
 });
 
-test.describe("@smoke @protected-routes admin persona cannot access reviewer-only surfaces", () => {
+test.describe("@smoke @protected-routes admin persona can read reviewer operations", () => {
   test.use({ storageState: storageStateFor("admin")! });
 
   for (const path of reviewerApis) {
-    test(`admin is blocked from ${path}`, async ({ request }) => {
-      await expectApiBlocked(request, path);
+    test(`admin can read ${path}`, async ({ request }) => {
+      const response = await request.get(path);
+      expect(response.status()).toBe(200);
+      const body = (await response.json()) as { assignments?: unknown };
+      expect(body.assignments).toBeDefined();
     });
   }
 });

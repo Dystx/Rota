@@ -1,12 +1,17 @@
 # Rumia — Master Engineering Lifecycle & Full Cloudflare Deployment Roadmap
 
-> **Source of truth for the Cloudflare Pages + R2 + PMTiles + Workers
-> deployment blueprint and the engineering lifecycle that drives it.**
-> `docs/roadmap.md` is the operational launch-readiness view; this file is
-> the strategic / engineering-lifecycle view. Both reference
-> `docs/spec-v4.md` as the source of truth for the 4-tier ascension model.
-> Cross-reference: `docs/engineering-lifecycle.md` is the granular
-> 8-phase plan; this master is the consolidated target.
+> **Historical snapshot (2026-07-04; superseded).** This file documents the
+> former Cloudflare Pages + R2 + Supabase direction. It is retained for
+> architectural history only. The active direction is the VPS-native
+> PostgreSQL/Better Auth plan in
+> [`docs/superpowers/specs/2026-07-11-rumia-vps-platform-design.md`](superpowers/specs/2026-07-11-rumia-vps-platform-design.md),
+> and the current release truth is
+> [`specs/PLAN-AUDIT_LATEST.md`](../specs/PLAN-AUDIT_LATEST.md).
+
+> **Archived source of truth for the former Cloudflare Pages + R2 + PMTiles +
+> Workers blueprint.** The active source of truth is now the activity-first
+> master plan and the VPS platform design linked above. The older tier and
+> engineering documents are retained for history only.
 >
 > Last updated: 2026-07-04.
 

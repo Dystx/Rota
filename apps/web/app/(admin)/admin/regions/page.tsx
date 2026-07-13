@@ -9,11 +9,11 @@ export default async function AdminRegionsPage() {
 
   try {
     if (isAdminPageAuthContext(auth)) {
-      regions = await listRegions(100, { client: auth.client });
+      regions = await listRegions(100, { actor: auth.actor });
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load persisted regions here."
+      ? "Configure PostgreSQL and Better Auth to load persisted regions here."
       : "Could not load admin regions.";
   }
 

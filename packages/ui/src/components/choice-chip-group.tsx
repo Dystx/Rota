@@ -2,6 +2,7 @@
 
 import { type JSX, useId } from "react";
 import { ChipGroup } from "./form-primitives";
+import { cn } from "../lib/cn";
 
 export type ChoiceGroupOption = {
   value: string;
@@ -17,6 +18,7 @@ export function ChoiceChipGroup(props: {
   selected: string[];
   onChange: (values: string[]) => void;
   multiple?: boolean;
+  labelClassName?: string;
 }): JSX.Element {
   const labelId = useId();
   const multiple = props.multiple ?? true;
@@ -32,7 +34,7 @@ export function ChoiceChipGroup(props: {
 
   return (
     <section className="grid gap-3">
-      <p id={labelId} className="text-sm font-medium text-[var(--color-foreground)]">
+      <p id={labelId} className={cn("text-sm font-medium text-[var(--color-foreground)]", props.labelClassName)}>
         {props.label}
       </p>
       {multiple ? (

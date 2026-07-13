@@ -6,6 +6,7 @@ import type {
 } from "react";
 import { cloneElement, isValidElement } from "react";
 import { cn } from "../lib/cn";
+import { Icon } from "./icon";
 
 /**
  * Button — primary action primitive.
@@ -14,7 +15,7 @@ import { cn } from "../lib/cn";
  *   - 5 variants: primary | secondary | ghost | destructive | link
  *   - 3 sizes: sm | md | lg
  *   - 4 tones: neutral | ochre | olive | danger (overlay on variant)
- *   - leadingIcon / trailingIcon: Material Symbols Outlined name or ReactNode
+ *   - leadingIcon / trailingIcon: shared icon name or ReactNode
  *   - fullWidth: stretches to container
  *   - isLoading: pending state with spinner + aria-busy
  *   - loadingIndicator: replace the default spinner
@@ -112,17 +113,9 @@ function DefaultSpinner({ tone }: { tone: "white" | "ink" }) {
   );
 }
 
-function MaterialSymbol({ name }: { name: string }) {
-  return (
-    <span aria-hidden className="material-symbols-outlined text-[1.1em]">
-      {name}
-    </span>
-  );
-}
-
 function IconSlot({ icon }: { icon: ReactNode | undefined }) {
   if (!icon) return null;
-  if (typeof icon === "string") return <MaterialSymbol name={icon} />;
+  if (typeof icon === "string") return <Icon name={icon} className="text-[1.1em]" />;
   return <>{icon}</>;
 }
 

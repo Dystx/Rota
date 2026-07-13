@@ -47,11 +47,11 @@ export default async function ReviewerTripPage({
     if (!auth) {
       infoMessage = "Sign in with a reviewer account to open this reviewer trip workspace.";
     } else {
-      if (!(await reviewerHasTripAssignment(tripId, auth.reviewerId, { client: auth.client }))) {
+      if (!(await reviewerHasTripAssignment(tripId, auth.reviewerId, { actor: auth.actor }))) {
         infoMessage = "This trip is not assigned to your reviewer account.";
       } else {
         isAuthorizedReviewer = true;
-        trip = await getTripDraftById(tripId, { client: auth.client });
+      trip = await getTripDraftById(tripId, { actor: auth.actor });
       }
     }
 
@@ -61,7 +61,7 @@ export default async function ReviewerTripPage({
     }
   } catch (error) {
     errorMessage = isPersistenceConfigError(error)
-      ? "Supabase environment variables are not configured yet, so this workspace cannot load the saved route draft."
+      ? "PostgreSQL and Better Auth are not configured yet, so this workspace cannot load the saved route draft."
       : "Could not load the reviewer trip workspace. Please try again later.";
   }
 

@@ -9,6 +9,7 @@ import { useState } from "react";
 import type { EditorialActivity } from "@/lib/content/activities";
 import { StatusRegion, useReducedMotion } from "@repo/ui";
 import { captureMapTelemetry } from "@/app/_lib/map-telemetry";
+import type { ActivityMapProviderConfig } from "../../_components/activity-map";
 
 const ActivityMap = dynamic(
   () => import("../../_components/activity-map").then((module) => module.ActivityMap),
@@ -41,11 +42,13 @@ function workspaceUrl(activities: readonly EditorialActivity[]): string {
 export function ActivityWorkspace({
   initialActivities,
   mapEnabled = false,
-  map3dEnabled = false
+  map3dEnabled = false,
+  mapProvider
 }: {
   initialActivities: readonly EditorialActivity[];
   mapEnabled?: boolean;
   map3dEnabled?: boolean;
+  mapProvider?: ActivityMapProviderConfig;
 }) {
   const router = useRouter();
   const reducedMotion = useReducedMotion();
@@ -195,6 +198,7 @@ export function ActivityWorkspace({
               onClose={closeMap}
               showBuildingExtrusions={map3dEnabled}
               onMapTelemetry={handleMapTelemetry}
+              provider={mapProvider}
             />
           </div>
         ) : null}
@@ -203,38 +207,50 @@ export function ActivityWorkspace({
           <ol key={activitiesMotionKey} data-motion-key={activitiesMotionKey} className={`mt-10 space-y-8 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`} aria-label="Chosen activities">
             {activities.map((activity, index) => (
               <li className={reducedMotion ? "transition-none" : "rumia-save-transition"} key={activity.id}>
-                <article className="border-t border-[var(--color-border)] py-7">
-                  <div className="flex flex-wrap items-baseline justify-between gap-3">
-                    <p className="text-sm font-medium text-ochre-dark">{String(index + 1).padStart(2, "0")} · {durationLabel(activity.durationMinutes)}</p>
-                    <button
-                      type="button"
-                      className="min-h-11 border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-                      onClick={() => remove(activity.id)}
-                      aria-label={`Remove ${activity.title} from this day`}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                  <h2 className="mt-3 font-display text-3xl text-primary">{activity.title}</h2>
-                  <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">Rumia&apos;s judgement</p>
-                  <p className="mt-2 max-w-2xl leading-relaxed text-on-surface-variant">{activity.verdict}</p>
-                  <dl className="mt-6 grid gap-4 border-l border-ochre-light pl-4 text-sm leading-relaxed text-on-surface-variant sm:grid-cols-2">
+                <article data-testid="workspace-activity-card" className="group relative border-t border-[var(--color-border)] py-8 md:py-9">
+                  <div aria-hidden className="absolute inset-y-8 left-0 w-1 rounded-full bg-ochre-dark md:inset-y-9" />
+                  <div className="grid gap-6 pl-5 md:grid-cols-[minmax(0,1fr)_16rem] md:gap-12 md:pl-7">
                     <div>
-                      <dt className="font-medium text-primary">Best time</dt>
-                      <dd>{activity.bestTime}</dd>
+                      <div className="flex flex-wrap items-center gap-4">
+                        <p data-testid="workspace-activity-index" className="font-mono-technical text-sm tracking-[0.24em] text-ochre-dark">{String(index + 1).padStart(2, "0")}</p>
+                        <span className="h-px w-10 bg-ochre-dark/50" aria-hidden />
+                        <p className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-ochre-dark">{durationLabel(activity.durationMinutes)} · chosen</p>
+                      </div>
+                      <h2 className="mt-4 font-display text-3xl leading-tight text-primary md:text-4xl">{activity.title}</h2>
+                      <p className="mt-5 font-mono-micro text-mono-micro uppercase tracking-[0.18em] text-ochre-dark">Rumia&apos;s judgement</p>
+                      <p className="mt-3 max-w-2xl leading-relaxed text-on-surface-variant">{activity.verdict}</p>
+                    </div>
+                    <aside className="border-l border-ochre-dark/30 pl-5 md:mt-1 md:pl-6">
+                      <p className="font-mono-micro text-mono-micro uppercase tracking-[0.18em] text-ochre-dark">Practical shape</p>
+                      <p className="mt-3 text-sm leading-6 text-on-surface-variant">Leave room for travel, food, and the day changing its mind.</p>
+                      <button
+                        type="button"
+                        className="mt-5 min-h-11 border-b border-ochre-dark px-1 py-2 text-left text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+                        onClick={() => remove(activity.id)}
+                        aria-label={`Remove ${activity.title} from this day`}
+                      >
+                        Remove from this day
+                      </button>
+                    </aside>
+                  </div>
+                  <dl className="mt-8 grid gap-4 border-t border-[var(--color-border)]/70 pl-5 pt-5 text-sm leading-relaxed text-on-surface-variant sm:grid-cols-2 md:ml-7 md:pl-0">
+                    <div>
+                      <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-primary">Best time</dt>
+                      <dd className="mt-2">{activity.bestTime}</dd>
                     </div>
                     <div>
-                      <dt className="font-medium text-primary">Planning</dt>
-                      <dd>{activity.bookingNeed === "essential" ? "Plan ahead" : activity.bookingNeed === "consider" ? "Check ahead" : "No advance booking needed"}</dd>
+                      <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-primary">Planning</dt>
+                      <dd className="mt-2">{activity.bookingNeed === "essential" ? "Plan ahead" : activity.bookingNeed === "consider" ? "Check ahead" : "No advance booking needed"}</dd>
                     </div>
                     {activity.avoidWhen ? <div className="sm:col-span-2">
-                      <dt className="font-medium text-primary">Avoid when</dt>
-                      <dd>{activity.avoidWhen}</dd>
+                      <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-primary">Leave room for</dt>
+                      <dd className="mt-2">{activity.avoidWhen}</dd>
                     </div> : null}
                   </dl>
-                  <a className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-ochre-dark underline decoration-ochre-light underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href={activity.evidenceUrl} target="_blank" rel="noreferrer">
+                  <a className="mt-6 ml-5 inline-flex min-h-11 items-center text-sm font-medium text-ochre-dark underline decoration-ochre-light underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light md:ml-7" href={activity.evidenceUrl} target="_blank" rel="noreferrer">
                     Read the editorial evidence
                   </a>
+                  <span className="sr-only">{activity.title} is selected for this day.</span>
                 </article>
               </li>
             ))}

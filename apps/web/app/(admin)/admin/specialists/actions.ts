@@ -46,7 +46,7 @@ export async function flipVerification(
 
   try {
     const updated = await setSpecialistVerified(parsed.data.specialistId, parsed.data.verified, {
-      client: auth.client
+      actor: auth.actor
     });
     if (!updated) {
       return { kind: "error", message: "Specialist not found" };

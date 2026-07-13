@@ -1,9 +1,15 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { DatabaseActor } from "./actor";
 
-export type RotaDataClient = Pick<SupabaseClient, "from" | "rpc">;
+/** Transitional test seam only. Production callers must use `{ actor }`. */
+export type RotaDataClient = {
+  from: (table: string) => any;
+  rpc: (functionName: string, args?: Record<string, unknown>) => any;
+};
 
 export type DataClientOptions = {
   client?: RotaDataClient;
+  /** Transitional bridge: new callers use an RLS-bound PostgreSQL actor. */
+  actor?: DatabaseActor;
 };
 
 export type UserDataOptions = {
@@ -24,49 +30,24 @@ export function createSystemDataOptions(client: RotaDataClient): SystemDataOptio
   return { client, scope: "system" };
 }
 
-type PublicSupabaseEnvName = "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_ANON_KEY";
-type ServerSupabaseEnvName = "SUPABASE_SERVICE_ROLE_KEY";
-
-function requireEnv(name: PublicSupabaseEnvName | ServerSupabaseEnvName) {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-
-  return value;
-}
-
-export function createPublicRlsDataClient(): RotaDataClient {
-  return createClient(requireEnv("NEXT_PUBLIC_SUPABASE_URL"), requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"), {
-    auth: {
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-      persistSession: false
-    }
-  });
+export function throwLegacyDataClient(): RotaDataClient {
+  throw new Error("Legacy hosted data client retired; use an actor-scoped PostgreSQL repository.");
 }
 
 export function createAuthenticatedUserDataClient(client: RotaDataClient): RotaDataClient {
   return client;
 }
 
-export function createPrivilegedServerDataClient(): RotaDataClient {
-  return createClient(requireEnv("NEXT_PUBLIC_SUPABASE_URL"), requireEnv("SUPABASE_SERVICE_ROLE_KEY"), {
-    auth: {
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-      persistSession: false
-    }
-  });
+export function throwLegacyPrivilegedDataClient(): RotaDataClient {
+  throw new Error("Legacy privileged data client retired; use an actor-scoped PostgreSQL repository.");
 }
 
-export function resolveDataClient(options?: DataClientOptions): RotaDataClient {
-  return options?.client ?? createPublicRlsDataClient();
+export function resolveLegacyDataClient(options?: DataClientOptions): RotaDataClient {
+  return options?.client ?? throwLegacyDataClient();
 }
 
-export function resolvePrivilegedServerDataClient(options?: DataClientOptions): RotaDataClient {
-  return options?.client ?? createPrivilegedServerDataClient();
+export function resolveLegacyPrivilegedDataClient(options?: DataClientOptions): RotaDataClient {
+  return options?.client ?? throwLegacyPrivilegedDataClient();
 }
 
 export function isPersistenceConfigError(error: unknown) {
@@ -74,13 +55,9 @@ export function isPersistenceConfigError(error: unknown) {
 }
 
 /**
- * Detects PostgREST/Supabase schema-cache drift errors that occur when a
- * referenced table or relation is missing or stale (for example, when a
- * deployment's hosted schema does not yet match local migrations).
- *
- * The check is conservative and string-based because PostgREST surfaces these
- * conditions through `error.message` rather than a typed error code. Matching
- * literals are kept narrow so unrelated runtime errors still propagate.
+ * Detects database schema drift errors while a deployment is being migrated.
+ * The legacy structural client seam may still surface text errors in tests,
+ * so this helper remains conservative and string-based.
  */
 export function isSchemaDriftError(error: unknown): boolean {
   if (!(error instanceof Error)) {
@@ -90,13 +67,11 @@ export function isSchemaDriftError(error: unknown): boolean {
   const message = error.message;
 
   return (
-    message.includes("schema cache") ||
+    message.includes("relation") && message.includes("does not exist") ||
     message.includes("Could not find the table") ||
     message.includes("Could not find the relation") ||
     message.includes("Could not find the function") ||
     /relation\s+"[^"]+"\s+does not exist/i.test(message) ||
-    message.includes("PGRST205") ||
-    message.includes("PGRST204") ||
-    message.includes("PGRST202")
+    "code" in error && typeof error.code === "string" && error.code === "42P01"
   );
 }

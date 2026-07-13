@@ -1,42 +1,37 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { auth } from "@repo/auth/server";
+import { headers } from "next/headers";
 import { safeNext } from "../../auth/safe-next";
 
 /**
- * signInWithMagicLinkAction — sends a one-time sign-in link to the
- * submitted email via Supabase Auth's `signInWithOtp` flow.
- *
- * On success, redirects to `/sign-in?sent=1&next=<next>` so the page
- * can show a "check your inbox" confirmation. On failure, redirects
- * with `error=<message>` so the page can show an error banner.
+ * Sign in with Better Auth email/password and preserve the requested route.
  *
  * The `next` parameter preserves the user's intended destination
- * (e.g. `/admin`, `/reviewer`) so the middleware can route them back
- * after they click the magic link.
+ * (e.g. `/admin`, `/reviewer`) after the session cookie is set.
  */
-export async function signInWithMagicLinkAction(formData: FormData): Promise<void> {
+export async function signInAction(formData: FormData): Promise<void> {
   const email = formData.get("email");
+  const password = formData.get("password");
   const next = safeNext(String(formData.get("next") ?? "/account"));
 
-  if (typeof email !== "string" || !email.includes("@")) {
-    redirect(`/sign-in?error=${encodeURIComponent("Please enter a valid email address.")}&next=${encodeURIComponent(String(next))}`);
+  if (typeof email !== "string" || !email.includes("@") || typeof password !== "string" || password.length < 8) {
+    redirect(`/sign-in?error=${encodeURIComponent("Enter a valid email and password.")}&next=${encodeURIComponent(String(next))}`);
   }
 
-  const supabase = await createServerSupabaseClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://127.0.0.1:3105";
-
-  const { error } = await supabase.auth.signInWithOtp({
-    email: email.trim().toLowerCase(),
-    options: {
-      emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(String(next))}`
-    }
-  });
-
-  if (error) {
-    redirect(`/sign-in?error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(String(next))}`);
+  try {
+    await auth.api.signInEmail({
+      body: {
+        email: email.trim().toLowerCase(),
+        password
+      },
+      headers: await headers()
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Sign-in failed.";
+    redirect(`/sign-in?error=${encodeURIComponent(message)}&next=${encodeURIComponent(String(next))}`);
   }
 
-  redirect(`/sign-in?sent=1&next=${encodeURIComponent(String(next))}`);
+  redirect(String(next));
 }

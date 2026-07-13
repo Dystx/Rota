@@ -2,12 +2,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { generateItineraryFromBrief } from "@repo/ai";
 import { isFeatureEnabled } from "@repo/config";
-import { listPartners } from "@repo/db";
 import { buildRouteValidation } from "@repo/routing";
 import { buildCameraPresets } from "@repo/spatial-engine";
 import {
   type MapRouteWarning,
-  Badge,
   Button,
   Card,
   CardContent,
@@ -20,9 +18,16 @@ import {
   StatPill,
   TravelTimeChip
 } from "@repo/ui";
-import { buildPartnerClickHref, selectRelevantPartners } from "@/lib/partner-enrichment";
 import { getOwnedTrip } from "@/app/lib/trip-access";
-import { PrewarmLink, RouteMap } from "./map-components";
+import { PrewarmLink, RouteMap, RouteMapStatus } from "./map-components";
+
+function editorialTitle(value: string) {
+  return value.replace(/\broute\b/gi, "plan").replace(/\bitinerary\b/gi, "plan");
+}
+
+function editorialCopy(value: string) {
+  return value.replace(/\broute\b/gi, "plan").replace(/\bitinerary\b/gi, "agenda");
+}
 
 export default async function TripMapPage({
   params,
@@ -47,22 +52,16 @@ export default async function TripMapPage({
 
   const trip = tripAccess.trip;
   let itinerary = null;
-  let partnerOffers = [] as Awaited<ReturnType<typeof listPartners>>;
   let routeValidation = null;
   let infoMessage = "";
 
   try {
     itinerary = await generateItineraryFromBrief(trip.brief);
     routeValidation = buildRouteValidation(itinerary);
-    partnerOffers = selectRelevantPartners(
-      await listPartners(),
-      [routeValidation.days[0]?.region ?? trip.brief.regions[0] ?? ""],
-      trip.brief.destinationCountry
-    );
   } catch (error) {
     infoMessage = error instanceof Error
-      ? "Could not load the saved trip route yet."
-      : "Could not load the saved trip route yet.";
+      ? "Could not load the saved plan view yet."
+      : "Could not load the saved plan view yet.";
   }
 
   const activeDay = routeValidation?.days.find((routeDay) => routeDay.dayIndex === selectedDayIndex) ?? routeValidation?.days[0];
@@ -106,16 +105,16 @@ export default async function TripMapPage({
 
   const chapters = [
     { id: "overview", label: "Overview" },
-    { id: "pacing", label: "Pacing" },
-    { id: "route", label: "Route" },
+    { id: "pacing", label: "Pace" },
+    { id: "route", label: "Spatial view" },
     { id: "warnings", label: "Notes" },
     { id: "next-step", label: "Continue" }
   ];
 
-  const heroTitle = trip ? trip.title : "Route validation & map";
+  const heroTitle = trip ? editorialTitle(trip.title) : "Spatial view";
   const heroSummary =
-    routeValidation?.summary ??
-    "Daily pacing model with stop sequences, travel-time labels, and validation notes.";
+    (routeValidation?.summary ? editorialCopy(routeValidation.summary) : null) ??
+    "A practical spatial view for comparing the activities you kept, their order, and the time between them.";
   const dayPills = routeValidation?.days ?? Array.from({ length: 3 }, (_, index) => ({ dayIndex: index + 1, label: `Day ${index + 1}`, region: "" }));
   const warningList =
     routeValidation?.warnings ??
@@ -130,7 +129,7 @@ export default async function TripMapPage({
         <GuideChapter id="overview" className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8" data-testid="trip-map-header">
             <RevealSection>
-              <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium text-[var(--color-atlantic)]">Route audit · Trip {tripId}</p>
+              <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium text-[var(--color-atlantic)]">Spatial view · Saved plan</p>
               <h1 className="mt-4 font-display text-5xl tracking-tight text-[var(--color-foreground)] lg:text-6xl">
                 {heroTitle}
               </h1>
@@ -184,8 +183,8 @@ export default async function TripMapPage({
             <RevealSection delayMs={120}>
               <div className="grid gap-4 sm:grid-cols-2">
                 {(itinerary?.whyThisFitsYou ?? [
-                  "Show why this route pace fits the traveler.",
-                  "Show where human review or route validation still needs to tighten the plan."
+                  "Show why this pace fits the activities and time you chose.",
+                  "Use the list as the source of truth; this view adds spatial context without taking control away."
                 ]).map((note) => (
                   <div key={note} className="rounded-[24px] border border-[var(--color-border)] bg-[rgba(247,250,249,0.5)] p-6 shadow-sm">
                     <p className="text-on-surface-variant leading-loose leading-relaxed">{note}</p>
@@ -199,9 +198,9 @@ export default async function TripMapPage({
         <GuideChapter id="route" className="py-12 md:py-24">
           <div className="mx-auto max-w-[1200px] grid gap-8">
             <RevealSection>
-              <div className="flex flex-wrap items-center gap-3" data-testid="trip-map-day-tabs" aria-label="Map day and route filters">
+              <div className="flex flex-wrap items-center gap-3" data-testid="trip-map-day-tabs" aria-label="Plan day and spatial filters">
                 <span className="mr-2 text-xs font-semibold uppercase tracking-widest text-[var(--color-muted-foreground)]">
-                  Route layers
+                  Plan days
                 </span>
                 {dayPills.map((routeDay) => {
                   const isActive = routeDay.dayIndex === activeDay?.dayIndex || (!activeDay && routeDay.dayIndex === 1);
@@ -233,18 +232,23 @@ export default async function TripMapPage({
                 storyPresets={storyPresets}
                 showBuildingExtrusions={activityMapEnabled && isFeatureEnabled("activityMap3d")}
               >
-                <MapPanel position="right" className="w-[380px] p-6">
+                <MapPanel
+                  position="right"
+                  className="right-3 top-3 bottom-3 w-[calc(100%-1.5rem)] p-5 sm:right-6 sm:top-6 sm:bottom-6 sm:w-[380px] sm:p-6"
+                >
                   <div className="flex flex-col gap-6">
                     <div>
-                      <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium mb-2">Day {activeDay?.dayIndex ?? 1} route</p>
+                      <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium mb-2">Day {activeDay?.dayIndex ?? 1} · Selected activities</p>
                       <h3 className="font-display text-2xl text-[var(--color-foreground)]">
-                        {activeDay ? `${activeDay.label} · ${activeDay.region}` : "Saved route preview"}
+                        {activeDay ? `${activeDay.label} · ${activeDay.region}` : "Saved plan preview"}
                       </h3>
                       <p className="text-on-surface-variant leading-loose mt-3 text-sm leading-relaxed">
-                        {activeItineraryDay?.summary ??
-                          "Route validation appears once a saved trip brief generates itinerary data."}
+                        {(activeItineraryDay?.summary ? editorialCopy(activeItineraryDay.summary) : null) ??
+                          "Spatial context appears once the saved plan has activity data."}
                       </p>
                     </div>
+
+                    <RouteMapStatus />
 
                     <div className="flex flex-wrap gap-2">
                       <TravelTimeChip time={activeDay ? `${activeDay.estimatedTravelMinutes} min` : "Pending"} distance="Drive time" />
@@ -279,39 +283,6 @@ export default async function TripMapPage({
                       })}
                     </div>
 
-                    {partnerOffers.length ? (
-                      <div className="mt-4 flex flex-col gap-5 border-t border-[var(--color-border)] pt-6">
-                        <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Booking sources</p>
-                        {partnerOffers.map((partner) => (
-                          <div key={partner.id} className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm transition-all hover:shadow-md">
-                            <div className="flex flex-wrap items-center justify-between gap-3">
-                              <div>
-                                <p className="text-sm font-semibold text-[var(--color-foreground)]">{partner.name}</p>
-                                <p className="text-on-surface-variant leading-loose mt-1 text-[10px] uppercase tracking-wider">{partner.type || "Booking source"}</p>
-                              </div>
-                              {partner.isAffiliate ? <Badge tone="soft">Affiliate</Badge> : null}
-                            </div>
-                            <p className="text-on-surface-variant leading-loose mt-3 text-xs leading-relaxed">{partner.notes || "Useful for booking or comparing a stop on this route."}</p>
-                            <div className="mt-4">
-                              <Button asChild variant="ghost" className="h-8 w-full text-xs">
-                                <Link
-                                  href={buildPartnerClickHref({
-                                    partnerId: partner.id,
-                                    source: "trip-map",
-                                    target: partner.link,
-                                    tripId
-                                  })}
-                                  rel="noopener noreferrer"
-                                  target="_blank"
-                                >
-                                  Open booking source
-                                </Link>
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
                   </div>
                 </MapPanel>
               </RouteMap>
@@ -322,16 +293,16 @@ export default async function TripMapPage({
         <GuideChapter id="warnings" className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8">
             <RevealSection>
-              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Route notes</h2>
+              <h2 className="font-display text-4xl text-[var(--color-foreground)]">Planning notes</h2>
               <p className="text-on-surface-variant leading-loose mt-4 text-lg leading-relaxed">
-                Items the route audit flagged for tightening. Reviewer polish addresses these directly.
+                Practical trade-offs to keep visible while you shape the day. They are prompts for judgement, not hidden failures.
               </p>
             </RevealSection>
             <RevealSection delayMs={120}>
               <div className="flex flex-col gap-3">
                 {warningList.length === 0 ? (
                   <div className="rounded-[24px] border border-[var(--color-border)] bg-white/60 p-6">
-                    <p className="text-on-surface-variant leading-loose text-sm">No flagged notes for this route.</p>
+                    <p className="text-on-surface-variant leading-loose text-sm">No planning notes for this saved plan.</p>
                   </div>
                 ) : (
                   warningList.map((warning, index) => (
@@ -348,16 +319,16 @@ export default async function TripMapPage({
 
         <GuideChapter id="next-step" className="p-0">
           <CTASection>
-            <h2 className="font-display text-4xl md:text-5xl">Continue with this route</h2>
-            <p className="text-xl text-[var(--color-cream)] max-w-2xl">
-              Return to the guided overview or open the export center when you are ready.
+            <h2 className="font-display text-4xl md:text-5xl">Continue shaping the day</h2>
+              <p className="text-xl text-[var(--color-cream)] max-w-2xl">
+              Return to the saved plan or carry it into the export surface when you are ready.
             </p>
             <div className="flex flex-wrap justify-center gap-4 mt-4">
               <Button asChild className="bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90 text-lg px-8 py-3 h-auto min-h-[44px]">
-                <Link href={`/trip/${tripId}`}>Back to trip</Link>
+                <Link href={`/trip/${tripId}`}>Back to saved plan</Link>
               </Button>
               <Button asChild variant="ghost" className="border border-[var(--color-paper)] text-[var(--color-paper)] hover:bg-white/10 text-lg px-8 py-3 h-auto min-h-[44px]">
-                <Link href={`/trip/${tripId}/export`}>Open export center</Link>
+                <Link href={`/trip/${tripId}/export`}>Carry it with you</Link>
               </Button>
             </div>
           </CTASection>

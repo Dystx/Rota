@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the Rumia outbox worker every minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+Persistent=true
+RandomizedDelaySec=10
+Unit=rumia-worker.service
+
+[Install]
+WantedBy=timers.target

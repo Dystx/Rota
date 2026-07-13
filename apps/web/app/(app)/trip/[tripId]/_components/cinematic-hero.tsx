@@ -46,7 +46,7 @@ export function CinematicHero({
       ref={containerRef}
       data-section="hero"
       className={cn(
-        'relative w-full h-[100svh] min-h-[400px] overflow-hidden bg-iberian-shadow flex flex-col justify-end pb-24 md:pb-32',
+        'relative w-full h-[58svh] min-h-[360px] max-h-[620px] overflow-hidden bg-iberian-shadow flex flex-col justify-end pb-16 md:pb-20',
         className
       )}
     >

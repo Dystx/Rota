@@ -3,7 +3,7 @@ import { createSystemDataOptions, createUserDataOptions, isPersistenceConfigErro
 
 describe("isPersistenceConfigError", () => {
   test("matches missing env var error", () => {
-    expect(isPersistenceConfigError(new Error("Missing required environment variable: SUPABASE_URL"))).toBe(true);
+    expect(isPersistenceConfigError(new Error("Missing required environment variable: DATABASE_URL"))).toBe(true);
   });
 
   test("rejects unrelated errors", () => {
@@ -26,8 +26,9 @@ describe("isSchemaDriftError", () => {
     expect(isSchemaDriftError(new Error('relation "public.reviewer_auth_links" does not exist'))).toBe(true);
   });
 
-  test("matches PGRST205 schema-cache code", () => {
-    expect(isSchemaDriftError(new Error("PGRST205: schema cache reload pending"))).toBe(true);
+  test("matches a PostgreSQL missing-relation code", () => {
+    const error = Object.assign(new Error('relation "app.trips" does not exist'), { code: "42P01" });
+    expect(isSchemaDriftError(error)).toBe(true);
   });
 
   test("rejects unrelated runtime errors", () => {

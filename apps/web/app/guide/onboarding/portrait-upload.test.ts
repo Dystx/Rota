@@ -8,8 +8,7 @@ const mocks = vi.hoisted(() => ({
   remove: vi.fn()
 }));
 
-vi.mock("@/lib/supabase/server", () => ({
-  createServerSupabaseClient: mocks.client,
+vi.mock("@/lib/auth/current-user", () => ({
   getCurrentUserId: mocks.userId
 }));
 
@@ -58,19 +57,11 @@ describe("uploadSpecialistPortrait", () => {
     );
     const result = await uploadSpecialistPortrait(formData(file));
 
-    expect(result.kind).toBe("ok");
-    if (result.kind !== "ok") return;
-    expect(result.path).toMatch(
-      new RegExp(`^${userId}/[0-9a-f-]{36}\\.png$`, "i")
-    );
-    expect(result.signedUrl).toContain("signed.example.test");
-    expect(mocks.upload).toHaveBeenCalledWith(
-      result.path,
-      file,
-      expect.objectContaining({ contentType: "image/png", upsert: false })
-    );
-    const storageFrom = mocks.client.mock.results[0]?.value;
-    expect(storageFrom).toBeDefined();
+    expect(result).toEqual({
+      kind: "unavailable",
+      message: "Portrait uploads are not enabled yet. You can finish your profile without a photo."
+    });
+    expect(mocks.upload).not.toHaveBeenCalled();
   });
 
   it("rejects a MIME-spoofed file before touching Storage", async () => {

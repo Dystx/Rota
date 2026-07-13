@@ -1,0 +1,33 @@
+[Unit]
+Description=Rumia outbox worker
+Documentation=file:///opt/apps/rumia/current/ops/vps/README.md
+Wants=network-online.target
+After=network-online.target postgresql.service
+ConditionPathExists=/etc/rumia/web.env
+ConditionPathExists=/opt/apps/rumia/current/apps/worker/dist/worker.mjs
+
+[Service]
+Type=oneshot
+User=rumia
+Group=rumia
+WorkingDirectory=/opt/apps/rumia/current
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--enable-source-maps
+EnvironmentFile=/etc/rumia/web.env
+ExecStart=/opt/node-v24.18.0/bin/node apps/worker/dist/worker.mjs
+TimeoutStartSec=10min
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/rumia /var/log/rumia
+MemoryMax=768M
+CPUQuota=100%

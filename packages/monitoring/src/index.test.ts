@@ -32,7 +32,6 @@ describe("redactMonitoringDetails", () => {
     const out = redactMonitoringDetails({
       note: "Bearer sk_live_abcdefgh",
       stripe: "sk_test_abcdefghij",
-      supabase: "sb_secret_abcdefghij",
       mapboxToken: "pk.eyJabcdefghij.kl",
       jwt: "eyJabcdefghij.eyJabcdefghij.signaturehere",
       pemBlob: "-----BEGIN RSA PRIVATE KEY-----\nMIIB",
@@ -42,7 +41,6 @@ describe("redactMonitoringDetails", () => {
     expect(out).toEqual({
       note: "[redacted]",
       stripe: "[redacted]",
-      supabase: "[redacted]",
       mapboxToken: "[redacted]",
       jwt: "[redacted]",
       pemBlob: "[redacted]",

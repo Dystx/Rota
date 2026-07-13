@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icon } from "@repo/ui";
 import { BrandMark } from "@repo/ui";
 import { SiteFooter } from "./_components/site-footer";
 
@@ -22,7 +23,7 @@ import { SiteFooter } from "./_components/site-footer";
  */
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col bg-paper">
+    <div className="min-h-screen flex flex-col rumia-surface rumia-surface-linen" data-surface="linen" data-surface-texture="editorial">
       <main
         id="main-content"
         className="flex-1 flex items-center justify-center px-6 py-16"
@@ -31,29 +32,29 @@ export default function NotFound() {
           <BrandMark size="md" tone="light" />
 
           <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
-            404 — off the map
+            404 — not in this guide
           </p>
           <h1 className="font-display-mobile text-4xl md:font-display md:text-5xl text-ink">
-            We haven&apos;t charted this <em className="text-ochre-dark not-italic">route</em> yet.
+            We haven&apos;t placed this <em className="text-ochre-dark not-italic">page</em> yet.
           </h1>
           <p className="text-ink-soft text-lg max-w-md">
-            The page you&apos;re looking for either moved, expired, or
-            was never part of this itinerary. Let&apos;s get you back on track.
+            The page you&apos;re looking for either moved, expired, or was never
+            part of the guide. Here is a useful place to begin again.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-2">
             <Link
-              href="/"
+              href="/explore"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-ink text-cream font-medium hover:bg-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 transition-colors"
             >
-              Back to home
-              <span aria-hidden className="ph ph-arrow-right text-[1.1em]" />
+              Explore activities
+              <Icon name="arrow-right" className="text-[1.1em]" />
             </Link>
             <Link
-              href="/plan"
+              href="/"
               className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-olive-light/40 text-olive-dark hover:bg-olive-light/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
             >
-              Plan a trip
+              Back to home
             </Link>
           </div>
         </div>

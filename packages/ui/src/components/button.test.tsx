@@ -57,8 +57,7 @@ describe("Button", () => {
         Plan
       </Button>
     );
-    const matSymbols = document.querySelectorAll(".material-symbols-outlined");
-    expect(matSymbols).toHaveLength(2);
+    expect(screen.getAllByTestId("icon")).toHaveLength(2);
   });
 
   it("clones a child element when asChild is true", () => {

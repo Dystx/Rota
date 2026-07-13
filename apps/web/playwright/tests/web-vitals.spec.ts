@@ -34,7 +34,8 @@ const isKnownStaticAssetServerError = (url: string): boolean => {
 
 test.describe("@perf Web Vitals reporting", () => {
   test("home page renders and stays interactive when analytics endpoint is unreachable", async ({
-    page
+    page,
+    context
   }) => {
     const blockedRequests: CapturedRequest[] = [];
     const consoleErrors: ConsoleCapture[] = [];
@@ -176,9 +177,50 @@ test.describe("@perf Web Vitals reporting", () => {
       )
     );
 
-    await page.screenshot({
-      path: path.join(evidenceDir, "task-39-analytics-outage.png"),
-      fullPage: false
-    });
+    // Chromium can briefly reject capture while the desktop compositor is
+    // recovering from the aborted analytics requests. Retry the evidence
+    // capture in the same page so a transient protocol race does not turn a
+    // successfully verified outage-resilience check red.
+    const screenshotPath = path.join(evidenceDir, "task-39-analytics-outage.png");
+    let screenshotError: unknown;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        await page.screenshot({
+          path: screenshotPath,
+          fullPage: false,
+          animations: "disabled",
+          caret: "hide"
+        });
+        screenshotError = undefined;
+        break;
+      } catch (error) {
+        screenshotError = error;
+        await page.waitForTimeout(250 * (attempt + 1));
+      }
+    }
+    if (screenshotError) {
+      // A long multi-project run can leave the current Chromium target in a
+      // compositor state where captureScreenshot rejects even though the DOM
+      // and assertions are healthy. Use a fresh target for the evidence
+      // artifact, retaining the same analytics outage simulation.
+      const evidencePage = await context.newPage();
+      try {
+        await evidencePage.route(/\/i\/v0\/e\/?(?:\?.*)?$/u, (route) => route.abort("connectionrefused"));
+        await evidencePage.route(/\.posthog\.com\//u, (route) => route.abort("connectionrefused"));
+        await evidencePage.goto("/", { waitUntil: "networkidle" });
+        await evidencePage.screenshot({
+          path: screenshotPath,
+          fullPage: false,
+          animations: "disabled",
+          caret: "hide"
+        });
+        screenshotError = undefined;
+      } catch (error) {
+        screenshotError = error;
+      } finally {
+        await evidencePage.close();
+      }
+    }
+    if (screenshotError) throw screenshotError;
   });
 });

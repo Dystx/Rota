@@ -15,7 +15,7 @@ export type TravelerTripFixture = {
  * Reads the trip created by Playwright global setup for the E2E traveler.
  *
  * The fixture is deliberately generated at runtime rather than relying on a
- * well-known database id. This keeps the suite safe against hosted Supabase
+ * well-known database id. This keeps the suite safe against shared hosted
  * data owned by another user and makes route assertions exercise ownership.
  */
 export function readTravelerTripFixture(): TravelerTripFixture {
@@ -61,4 +61,3 @@ export function travelerTripPath(suffix = ""): string {
 export function travelerCheckoutPath(): string {
   return `/checkout?trip=${encodeURIComponent(getTravelerTripId())}`;
 }
-

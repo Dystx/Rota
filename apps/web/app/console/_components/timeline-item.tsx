@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Icon } from "@repo/ui";
 
 export interface TimelineItemProps {
   time: string;
@@ -60,9 +61,7 @@ export function TimelineItem({
           }
         />
         {variant === "ochre" ? (
-          <span className="ph text-ochre-light text-[14px]">
-            priority_high
-          </span>
+          <Icon name="priority_high" className="text-ochre-light text-[14px]" />
         ) : null}
       </span>
       <span
@@ -72,9 +71,7 @@ export function TimelineItem({
       <div className={cardClass}>
         {overrideBanner ? (
           <div className="absolute top-0 left-0 right-0 bg-ochre-light/10 border-b border-ochre-light/20 py-1.5 px-card-padding flex items-center gap-2">
-            <span className="ph text-ochre-dark text-[16px]">
-              warning
-            </span>
+            <Icon name="warning" className="text-ochre-dark text-[16px]" />
             <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
               {overrideBanner}
             </span>

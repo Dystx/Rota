@@ -14,9 +14,9 @@
  * The orchestrator owns the timing (`startedAt`,
  * `completedAt`) and the per-stage wiring. The stage
  * functions own their own work. The injected
- * `EmbeddingClient` and `SupabaseLoader` are the seams
+ * `EmbeddingClient` and `PlaceLoader` are the seams
  * for the test suite; production wires real OpenAI and
- * real Supabase.
+ * self-hosted PostgreSQL.
  *
  * Idempotency: re-running the pipeline over the same
  * bbox produces the same `LoadResult` shape (more
@@ -38,7 +38,7 @@ export type RunPipelineOptions = {
   bbox?: Bbox;
   country?: import("./types").SupportedCountry;
   embeddingClient: import("./types").EmbeddingClient;
-  supabaseLoader: import("./types").SupabaseLoader;
+  placeLoader: import("./types").PlaceLoader;
 };
 
 export async function runPipeline(
@@ -60,7 +60,7 @@ export async function runPipeline(
 
   // Stage 3: load
   const load = await loadPlaces(embed.embedded, {
-    loader: options.supabaseLoader
+    loader: options.placeLoader
   });
 
   const completedAt = new Date().toISOString();

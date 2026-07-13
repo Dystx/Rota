@@ -15,7 +15,7 @@
  * pattern: each day is a selectable card in the left rail
  * that filters the chat thread in the center column.
  *
- * When the realtime channel is wired up (Supabase `itinerary`
+ * When the realtime channel is wired up (`itinerary`
  * + `message` tables) the data layer can replace this fixture
  * without touching the components.
  */

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  ACTIVITY_REGIONS,
   activityExplorerUrl,
   getReviewedActivityById,
   getReviewedActivities,
@@ -41,6 +42,31 @@ describe("activity editorial adapter", () => {
           activity.reviewedAt === "2026-07-10"
       )
     ).toBe(true);
+  });
+
+  it("keeps the Portugal-wide seed structurally publishable", () => {
+    const ids = new Set(REVIEWED_ACTIVITY_SEED.map((activity) => activity.id));
+    const regions = new Map<string, number>();
+
+    for (const activity of REVIEWED_ACTIVITY_SEED) {
+      regions.set(activity.region, (regions.get(activity.region) ?? 0) + 1);
+      expect(activity.placeId.trim()).not.toBe("");
+      expect(activity.title.trim().length).toBeGreaterThan(8);
+      expect(activity.verdict.trim().length).toBeGreaterThan(20);
+      expect(activity.bestFor.length).toBeGreaterThan(0);
+      expect(activity.durationMinutes).toBeGreaterThan(0);
+      expect(activity.bestTime.trim()).not.toBe("");
+      expect(activity.pairWith.length).toBeGreaterThan(0);
+      expect(activity.editorialStatus).toBe("reviewed");
+      expect(activity.reviewedAt).toMatch(/^2026-07-10$/u);
+      expect(activity.evidenceUrl).toMatch(/^https:\/\//u);
+      if (activity.alternativeId) expect(ids.has(activity.alternativeId)).toBe(true);
+    }
+
+    expect(ids.size).toBe(REVIEWED_ACTIVITY_SEED.length);
+    for (const region of ACTIVITY_REGIONS) {
+      expect(regions.get(region), `missing seed coverage for ${region}`).toBeGreaterThanOrEqual(6);
+    }
   });
 
   it("normalizes absent public intent to an editable Porto afternoon", () => {

@@ -1,14 +1,14 @@
 "use server";
 
 import { z } from "zod";
-import { createServerSupabaseClient, getCurrentUserId } from "@/lib/supabase/server";
+import { getCurrentUserId } from "@/lib/auth/current-user";
 import {
-  SPECIALIST_PORTRAIT_BUCKET,
   SPECIALIST_PORTRAIT_MAX_BYTES
 } from "./portrait-upload-constants";
 
 /**
- * Private Supabase Storage bucket for specialist profile portraits.
+ * Private object storage for specialist profile portraits remains gated until
+ * the R2 media configuration is enabled.
  *
  * Objects are always written below `<auth user id>/...`. The matching
  * storage policies enforce that prefix for reads and writes as a second
@@ -87,36 +87,13 @@ export async function uploadSpecialistPortrait(
     const bytesError = await validatePortraitBytes(file);
     if (bytesError) return { kind: "error", message: bytesError };
 
-    const path = `${userId}/${crypto.randomUUID()}.${metadata.extension}`;
-    const supabase = await createServerSupabaseClient();
-    const { error: uploadError } = await supabase.storage
-      .from(SPECIALIST_PORTRAIT_BUCKET)
-      .upload(path, file, {
-        cacheControl: "3600",
-        contentType: file.type,
-        upsert: false
-      });
-
-    if (uploadError) {
-      return {
-        kind: "unavailable",
-        message: "Portrait uploads are not enabled yet. You can finish your profile without a photo."
-      };
-    }
-
-    const { data, error: signedUrlError } = await supabase.storage
-      .from(SPECIALIST_PORTRAIT_BUCKET)
-      .createSignedUrl(path, 60 * 60);
-    if (signedUrlError || !data?.signedUrl) {
-      // Do not leave an object behind if it cannot be previewed or saved.
-      await supabase.storage.from(SPECIALIST_PORTRAIT_BUCKET).remove([path]);
-      return {
-        kind: "unavailable",
-        message: "Portrait uploads are temporarily unavailable. Please try again later."
-      };
-    }
-
-    return { kind: "ok", path, signedUrl: data.signedUrl };
+    // R2-backed media storage is a later release gate. Do not write to a
+    // local disk or manufacture a preview URL while that gate is closed.
+    void metadata;
+    return {
+      kind: "unavailable",
+      message: "Portrait uploads are not enabled yet. You can finish your profile without a photo."
+    };
   } catch {
     return {
       kind: "unavailable",

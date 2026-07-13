@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@repo/ui";
+
 function cn(...values: Array<string | false | null | undefined>): string {
   return values.filter(Boolean).join(" ");
 }
@@ -88,9 +90,7 @@ export function HowItWorks() {
                 aria-hidden
                 className="inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full bg-ochre-light/15 text-olive-dark"
               >
-                <span className="ph text-[20px] md:text-[22px]">
-                  {step.icon}
-                </span>
+                <Icon name={step.icon} className="text-[20px] md:text-[22px]" />
               </span>
             </div>
             <h3 className="font-headline-md md:font-headline-lg text-headline-md md:text-headline-lg text-primary mb-3 leading-tight">

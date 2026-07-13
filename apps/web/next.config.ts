@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
 
+const workspaceRoot = path.join(__dirname, "../..");
+
 const nextConfig: NextConfig = {
+  output: "standalone",
+  outputFileTracingRoot: workspaceRoot,
+  turbopack: {
+    root: workspaceRoot
+  },
   transpilePackages: ["@repo/ai", "@repo/config", "@repo/db", "@repo/routing", "@repo/ui", "@repo/types", "@repo/workers"],
   // Server Actions cap request bodies at 1MB by default. The trip-brief
   // Route Action payload is small today, but the cinematic trip page posts
@@ -9,7 +17,7 @@ const nextConfig: NextConfig = {
   // the product grows. 4MB matches Vercel's documented limit for the
   // Node.js runtime and is the limit we ship in this Next.js 16 + Turbopack
   // build. See docs/ops/serverless-database-connections.md for the
-  // corresponding operational notes (Supabase pooler, body size, etc.).
+  // corresponding operational notes (PostgreSQL pooler, body size, etc.).
   experimental: {
     serverActions: {
       bodySizeLimit: "4mb"

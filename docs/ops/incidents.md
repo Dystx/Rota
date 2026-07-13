@@ -31,20 +31,26 @@ This runbook defines severity levels, escalation paths, and specific playbooks f
    - Fix the root cause.
    - Re-run the failed worker job from `LocalWorkerState`.
 
-### Playbook: RLS Lockout / Access Denied
+### Playbook: PostgreSQL authorization lockout / Access Denied
 1. **Signal**: `auth_failure` spikes or `api_error` with 403.
 2. **Action**:
    - Identify the table/policy via `errorCode`.
    - Check for recent migrations (T10 drift).
-   - Use SQL Editor to fix the policy or `ALTER TABLE "name" DISABLE ROW LEVEL SECURITY` as a temporary emergency measure ONLY IF absolutely necessary. **CAUTION**: This exposes all rows in the table; re-enable immediately after fix.
+   - Connect through the local owner role using the approved maintenance path,
+     inspect the RLS policy and actor context, and repair forward with a
+     migration. Never expose PostgreSQL or disable RLS as a casual emergency
+     workaround; if a narrowly scoped break-glass action is unavoidable, record
+     it, re-enable protection immediately, and run the cross-owner tests.
 
-### Playbook: Map Provider Degradation (Mapbox)
-1. **Signal**: `api_error` or `provider_error` for Mapbox routes.
+### Playbook: Map Provider Degradation (MapLibre surface)
+1. **Signal**: MapLibre tile/style errors, route-provider failures, or a
+   missing map canvas.
 2. **Action**:
-   - Check Mapbox Status page.
-   - Verify `<MAPBOX_PUBLIC_TOKEN>` and `<MAPBOX_SECRET_KEY>` are active.
+   - Check the approved basemap/route provider status and quota.
+   - Confirm the attribution and provider feature flag are unchanged.
 3. **Mitigation**:
-   - If persistent, consider switching to a fallback provider in `@repo/maps` if configured.
+   - Keep the list/schematic fallback visible and disable the provider flag;
+     never draw fabricated route geometry.
 
 ### Playbook: Analytics Outage (PostHog)
 1. **Signal**: Spike in client-side console errors or missing events in PostHog Dashboard.
@@ -59,16 +65,13 @@ This runbook defines severity levels, escalation paths, and specific playbooks f
 - **Objective**: Verify that a non-production database can be wiped and restored from a schema dump without errors.
 - **Commands**:
   ```bash
-  # For local development environment
-  npx supabase db reset 
-  
-  # For a dedicated test/staging project
-  npx supabase db push --db-url "<TEST_PROJECT_DB_URL>"
+  # On the VPS, as root, against the encrypted Restic repository
+  /usr/local/sbin/restore-rumia-check.sh
   ```
 - **Frequency**: Every 3 months or after major schema changes.
 
 ### Drill: Key Rotation Rehearsal
-- **Objective**: Rotate a low-impact key (e.g., PostHog or Mapbox Public) and verify zero downtime.
+- **Objective**: Rotate a low-impact key (for example PostHog) and verify zero downtime.
 - **Frequency**: Every 6 months.
 
 ## 4. Monitoring & Alerting Note (T41)

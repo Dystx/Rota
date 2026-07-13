@@ -1,0 +1,40 @@
+[Unit]
+Description=Rumia web application
+Documentation=file:///opt/apps/rumia/current/ops/vps/README.md
+Wants=network-online.target
+After=network-online.target postgresql.service
+ConditionPathExists=/etc/rumia/web.env
+ConditionPathExists=/opt/apps/rumia/current/apps/web/.next/standalone/apps/web/server.js
+
+[Service]
+Type=simple
+User=rumia
+Group=rumia
+WorkingDirectory=/opt/apps/rumia/current
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=3002
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--enable-source-maps
+EnvironmentFile=/etc/rumia/web.env
+ExecStart=/opt/node-v24.18.0/bin/node apps/web/.next/standalone/apps/web/server.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/rumia /var/log/rumia
+MemoryMax=1500M
+CPUQuota=150%
+
+[Install]
+WantedBy=multi-user.target

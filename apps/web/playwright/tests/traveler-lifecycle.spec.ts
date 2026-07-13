@@ -10,9 +10,9 @@ import { getTravelerTripId } from "../fixtures/traveler-trip";
 // Plus a negative API check for unauthenticated trip creation.
 //
 // We use trip id "3" because it is a stable demo route handled by the trip
-// pages even when Supabase env is not configured (the pages render an info
+// pages even when PostgreSQL is not configured (the pages render an info
 // message rather than throwing, which keeps E2E coverage deterministic in
-// CI without live Supabase credentials).
+// CI without live database credentials).
 //
 // Selectors are stable data-testid hooks confirmed in:
 //   apps/web/app/(app)/trip/[tripId]/page.tsx          -> trip-overview-header
@@ -33,6 +33,12 @@ test.describe("@smoke @traveler-lifecycle traveler trip lifecycle", () => {
 
     await page.goto(`/trip/${tripId()}/map`);
     await expect(page.getByTestId("trip-map-header")).toBeVisible();
+    const mapSurface = page.locator('[data-map-renderer]');
+    await expect(mapSurface).toBeVisible();
+    if ((await mapSurface.getAttribute("data-route-status")) !== "ready") {
+      await expect(page.getByTestId("schematic-map-fallback")).toBeVisible();
+      await expect(page.getByTestId("trip-route-status")).toContainText(/validated route geometry/i);
+    }
     await expect(page).toHaveURL(new RegExp(`/trip/${tripId()}/map$`));
 
     await page.goto(`/trip/${tripId()}/export`);
@@ -68,11 +74,6 @@ test.describe("@smoke @traveler-lifecycle unauthenticated trip API", () => {
     });
 
     expect(response.status()).toBe(401);
-    await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "unauthenticated",
-        message: "Authentication required."
-      }
-    });
+    await expect(response.json()).resolves.toEqual({ code: "unauthenticated", message: "Authentication required." });
   });
 });

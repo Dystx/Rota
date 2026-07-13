@@ -1,9 +1,9 @@
 import "server-only";
 
-import { getDatabaseAuthorizationContext } from "@repo/db";
+import { loadPostgresAuthorizationContext } from "@repo/db";
 import type { AppRole, AuthorizedActor, Capability } from "@repo/types";
 
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCurrentSession } from "./session";
 
 export type AccessRequirement = {
   anyRole?: readonly AppRole[];
@@ -15,14 +15,12 @@ export type AuthorizationDependencies = {
 };
 
 export async function loadCurrentAuthorizedActor(): Promise<AuthorizedActor | null> {
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase.auth.getClaims();
-
-  if (error || !data?.claims?.sub) {
+  const session = await getCurrentSession();
+  if (!session?.user.id) {
     return null;
   }
 
-  return getDatabaseAuthorizationContext(data.claims.sub);
+  return loadPostgresAuthorizationContext(session.user.id);
 }
 
 export async function requireApiAccess(

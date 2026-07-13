@@ -13,6 +13,8 @@ describe("PortugalPage", () => {
     render(<PortugalPage />);
 
     expect(screen.getByRole("heading", { name: /What deserves your time in Portugal/i })).toBeTruthy();
+    expect(screen.getByTestId("portugal-atlas-intro")).toBeTruthy();
+    expect(screen.getByText("5 regions, one activity-first lens")).toBeTruthy();
     expect(screen.getByTestId("activity-collections")).toBeTruthy();
     expect(screen.queryByText(/Build a route/i)).toBeNull();
   });

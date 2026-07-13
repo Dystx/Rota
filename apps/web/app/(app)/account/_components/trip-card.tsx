@@ -184,7 +184,7 @@ export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
               Saved {formatDate(trip.createdAt)}
             </p>
             <h3 className="font-headline-md text-headline-md text-primary leading-tight">
-              {trip.title}
+              {trip.title.replace(/\broute\b/gi, "plan").replace(/\bitinerary\b/gi, "plan")}
             </h3>
           </div>
           <Badge tone={statusTone}>{trip.status}</Badge>
@@ -195,8 +195,8 @@ export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
             readable sentence; saves ~30% card height and lets the
             grid breathe. */}
         <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-          {commerce.accessLabel}
-          {commerce.reviewLabel ? ` · ${commerce.reviewLabel}` : ""}
+          {commerce.canUnlock ? "Free shape · exports available after unlock" : commerce.accessLabel}
+          {commerce.reviewLabel ? ` · ${commerce.reviewLabel.replace("Human review", "Specialist review")}` : ""}
         </p>
 
         <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
@@ -207,7 +207,7 @@ export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
 
         <div className="mt-auto flex flex-wrap gap-2 pt-2">
           <Button asChild>
-            <Link href={`/trip/${trip.id}`}>Open draft</Link>
+            <Link href={`/trip/${trip.id}`}>Open saved plan</Link>
           </Button>
           {commerce.canUnlock ? (
             <form
@@ -216,13 +216,13 @@ export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
               className="inline-flex"
             >
               <Button type="submit" variant="ghost">
-                Checkout to unlock
+                Unlock exports
               </Button>
             </form>
           ) : null}
           {commerce.canExport ? (
             <Button asChild variant="ghost">
-              <Link href={`/trip/${trip.id}/export`}>Open exports</Link>
+              <Link href={`/trip/${trip.id}/export`}>Carry it with you</Link>
             </Button>
           ) : null}
         </div>

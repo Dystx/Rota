@@ -19,7 +19,8 @@
  */
 
 import type { DataClientOptions } from "./index";
-import { resolveDataClient } from "./index";
+import { resolveLegacyDataClient } from "./clients";
+import { getPostgresOrgBranding, getPostgresOrgBySlug } from "./console-postgres";
 
 export interface OrgBranding {
   logoUrl?: string;
@@ -70,7 +71,9 @@ export async function getOrgBySlug(
   slug: string,
   options?: DataClientOptions
 ): Promise<PublicOrg | null> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor || !options?.client) return getPostgresOrgBySlug(slug);
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("organizations")
     .select("id,name,slug,branding")
     .eq("slug", slug)
@@ -87,7 +90,9 @@ export async function getOrgBranding(
   orgId: string,
   options?: DataClientOptions
 ): Promise<OrgBranding> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor || !options?.client) return getPostgresOrgBranding(orgId);
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("organizations")
     .select("branding")
     .eq("id", orgId)

@@ -8,7 +8,7 @@ import {
 import type { RotaDataClient } from "./clients";
 
 /**
- * Supabase PostgrestQueryBuilder is a fluent chain. Each
+ * The legacy structural data client is a fluent chain. Each
  * call to `from(table)` returns a fresh chain whose links
  * (`select`, `eq`, `order`, `limit`, `maybeSingle`,
  * `update`, `delete`, `insert`) return the chain itself;
@@ -222,7 +222,7 @@ describe("setSpecialistVerified", () => {
 describe("getSpecialistCapabilities", () => {
   // Build a thenable chain that resolves to { data, error }
   // on await. The chain is BOTH chainable (select/eq/order
-  // return it) AND awaitable (has .then). The Supabase
+  // return it) AND awaitable (has .then). The legacy adapter
   // PostgrestQueryBuilder follows this exact pattern.
   function thenableChain(
     data: Array<{ type: string; value: string }> | null,

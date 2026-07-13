@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   try {
-    const partners = await listPartners(100, { client: auth.client });
+    const partners = await listPartners(100, { actor: auth.actor });
 
     return Response.json({ partners });
   } catch (error) {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const partner = await createPartner(parsed.data, { client: auth.client });
+    const partner = await createPartner(parsed.data, { actor: auth.actor });
     
     await writeAuditTrail({
       actorUserId: auth.userId,
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       entityType: "partners",
       entityId: partner.id,
       after: partner
-    }, { client: auth.client });
+    }, { actor: auth.actor });
 
     return Response.json(
       {

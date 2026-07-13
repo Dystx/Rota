@@ -12,7 +12,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ pla
   const { placeId } = await params;
 
   try {
-    const place = await getPlaceById(placeId, { client: auth.client });
+    const options = { actor: auth.actor };
+    const place = await getPlaceById(placeId, options);
 
     if (!place) {
       return notFoundError("Place not found.");
@@ -41,7 +42,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ pl
   }
 
   try {
-    const place = await updatePlace(placeId, parsed.data, { client: auth.client });
+    const options = { actor: auth.actor };
+    const place = await updatePlace(placeId, parsed.data, options);
     
     if (place) {
       await writeAuditTrail({
@@ -51,7 +53,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ pl
         entityId: place.id,
         before: null,
         after: place
-      }, { client: auth.client });
+      }, options);
     }
 
     if (!place) {

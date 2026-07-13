@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ reg
   const { regionId } = await params;
 
   try {
-    const region = await getRegionById(regionId, { client: auth.client });
+    const region = await getRegionById(regionId, { actor: auth.actor });
 
     if (!region) {
       return notFoundError("Region not found.");
@@ -41,7 +41,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ re
   }
 
   try {
-    const region = await updateRegion(regionId, parsed.data, { client: auth.client });
+    const region = await updateRegion(regionId, parsed.data, { actor: auth.actor });
     
     if (region) {
       await writeAuditTrail({
@@ -51,7 +51,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ re
         entityId: region.id,
         before: null,
         after: region
-      }, { client: auth.client });
+      }, { actor: auth.actor });
     }
 
     if (!region) {

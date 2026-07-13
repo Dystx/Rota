@@ -326,12 +326,12 @@ test.describe("Accessibility Audits - Behavior", () => {
 
     await page.goto("/trip/new");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("h1")).toContainText("Shape your brief");
+    await expect(page.locator("h1")).toContainText("Give your time a shape");
     trace.push("Navigated to /trip/new");
 
     await page.waitForTimeout(5000);
 
-    const submitButton = page.getByRole("button", { name: /Audit/i });
+    const submitButton = page.getByRole("button", { name: /Save this plan shape/i });
     await submitButton.waitFor({ state: "visible" });
     await submitButton.focus();
     trace.push("Focused submit button via keyboard target");

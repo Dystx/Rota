@@ -1,15 +1,11 @@
 import "server-only";
 
-import {
-  createAuthenticatedUserDataClient,
-  type RotaDataClient
-} from "@repo/db";
+import type { AuthorizedActor } from "@repo/types";
 import { cache } from "react";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { loadCurrentAuthorizedActor } from "./authorization";
 
 export type AdminPageAuthContext = {
-  client: RotaDataClient;
+  actor: AuthorizedActor;
   role: "admin";
   userId: string;
 };
@@ -22,7 +18,7 @@ export type AdminPageAuthResult =
     };
 
 export function isAdminPageAuthContext(result: AdminPageAuthResult): result is AdminPageAuthContext {
-  return "client" in result;
+  return "actor" in result;
 }
 
 export const getAdminPageAuthContext = cache(async (): Promise<AdminPageAuthResult> => {
@@ -36,11 +32,8 @@ export const getAdminPageAuthContext = cache(async (): Promise<AdminPageAuthResu
     return { reason: "forbidden", status: 403 };
   }
 
-  const supabase = await createServerSupabaseClient();
-  const client = createAuthenticatedUserDataClient(supabase);
-
   return {
-    client,
+    actor,
     role: "admin",
     userId: actor.userId
   };

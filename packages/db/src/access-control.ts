@@ -1,6 +1,6 @@
 import type { AppRole, AuthorizedActor, Capability } from "@repo/types";
 
-import { resolvePrivilegedServerDataClient, type DataClientOptions } from "./clients";
+import { resolveLegacyPrivilegedDataClient, type DataClientOptions } from "./clients";
 import { getReviewerIdForUser, getUserRoleProfile } from "./roles";
 
 export type CapabilityGrant = {
@@ -52,7 +52,7 @@ type RawCapabilityGrant = {
 };
 
 export async function getCapabilityGrantsForUser(userId: string, options?: DataClientOptions): Promise<CapabilityGrant[]> {
-  const { data, error } = await resolvePrivilegedServerDataClient(options)
+  const { data, error } = await resolveLegacyPrivilegedDataClient(options)
     .from("app_role_capability_grants")
     .select("capability,expires_at,revoked_at")
     .eq("subject_user_id", userId);
@@ -69,7 +69,7 @@ export async function getCapabilityGrantsForUser(userId: string, options?: DataC
 }
 
 export async function getDatabaseAuthorizationContext(userId: string, options?: DataClientOptions): Promise<AuthorizedActor | null> {
-  const client = resolvePrivilegedServerDataClient(options);
+  const client = resolveLegacyPrivilegedDataClient(options);
 
   return getAuthorizationContext(userId, {
     loadCapabilityGrants: (subjectUserId) => getCapabilityGrantsForUser(subjectUserId, { client }),

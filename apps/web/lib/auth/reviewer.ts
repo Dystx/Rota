@@ -1,13 +1,9 @@
 import { cache } from "react";
-import {
-  createAuthenticatedUserDataClient,
-  type RotaDataClient
-} from "@repo/db";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { AuthorizedActor } from "@repo/types";
 import { loadCurrentAuthorizedActor } from "./authorization";
 
 export type ReviewerPageAuthContext = {
-  client: RotaDataClient;
+  actor: AuthorizedActor;
   reviewerId: string;
   userId: string;
 };
@@ -19,11 +15,8 @@ export const getReviewerPageAuthContext = cache(async (): Promise<ReviewerPageAu
     return null;
   }
 
-  const supabase = await createServerSupabaseClient();
-  const client = createAuthenticatedUserDataClient(supabase);
-
   return {
-    client,
+    actor,
     reviewerId: actor.reviewerId,
     userId: actor.userId
   };

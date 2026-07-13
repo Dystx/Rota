@@ -19,7 +19,8 @@ export function KanbanLane({ title, count, dot, children }: KanbanLaneProps) {
   return (
     <section
       aria-label={`${title} lane`}
-      className="flex-shrink-0 w-80 flex flex-col bg-glass-light border border-white/20 backdrop-blur-md rounded-xl p-card-padding shadow-sm"
+      data-testid="kanban-lane"
+      className="flex min-w-0 shrink-0 flex-col rounded-xl border border-olive-light/15 bg-white/55 p-card-padding shadow-sm backdrop-blur-md w-[min(20rem,calc((100vw-23rem)/3))] max-md:w-[min(20rem,calc(100vw-5rem))]"
     >
       <header className="flex items-center justify-between mb-3 shrink-0">
         <h3 className="font-headline-sm text-headline-sm text-primary flex items-center gap-2">

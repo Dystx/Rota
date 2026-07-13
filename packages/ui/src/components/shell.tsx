@@ -1,13 +1,17 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "../lib/cn";
 
+type PageSurface = "linen" | "sage" | "midnight" | "ochre";
+
 export function PageShell({
   className,
   children,
   variant = "marketing",
-  bare = false
+  bare = false,
+  surface
 }: HTMLAttributes<HTMLDivElement> & {
   variant?: "marketing" | "app" | "reviewer" | "admin";
+  surface?: PageSurface;
   /**
    * When true, suppresses the built-in Cinematic Concierge header so the page
    * can be wrapped externally with a shared TopNav + SiteFooter (used by the
@@ -19,9 +23,23 @@ export function PageShell({
   // and admin routes are rendered inside OperatorShell, so PageShell must be
   // content-only there to avoid a second navigation bar and nested layout.
   const renderLegacyHeader = !bare && variant === "marketing";
+  // Operator work is dense and table/card-heavy. Keep it on the readable
+  // linen field; midnight is reserved for the chosen-day/planning chapter
+  // where the page owns inverse editorial typography explicitly.
+  const resolvedSurface = surface ?? "linen";
+  const texture = variant === "reviewer" || variant === "admin" ? "none" : "editorial";
 
   return (
-    <div className={cn("min-h-screen bg-[var(--color-background)] selection:bg-[var(--color-accent)]/30", className)}>
+    <div
+      data-surface={resolvedSurface}
+      data-surface-texture={texture}
+      className={cn(
+        "min-h-screen rumia-surface",
+        `rumia-surface-${resolvedSurface}`,
+        "selection:bg-[var(--color-accent)]/30",
+        className
+      )}
+    >
       {renderLegacyHeader && (
         <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[rgba(247,250,249,0.7)] backdrop-blur-2xl">
           <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-6 lg:px-12">

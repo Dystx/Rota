@@ -1,10 +1,23 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 
 import ActivityDetailPage from "./page";
 
+afterEach(cleanup);
+
 describe("ActivityDetailPage", () => {
+  it("composes the judgement before the supporting fact rail", async () => {
+    const page = await ActivityDetailPage({
+      params: Promise.resolve({ activityId: "porto-ribeira-slow-walk" })
+    });
+    render(page);
+
+    expect(screen.getByTestId("activity-detail-page")).toBeTruthy();
+    expect(screen.getByTestId("activity-detail-judgement")).toBeTruthy();
+    expect(screen.getByTestId("activity-detail-fact-rail")).toBeTruthy();
+  });
+
   it("shows the evidence and caveat behind a reviewed activity", async () => {
     const page = await ActivityDetailPage({
       params: Promise.resolve({ activityId: "porto-ribeira-slow-walk" })

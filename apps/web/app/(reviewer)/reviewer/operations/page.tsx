@@ -50,7 +50,7 @@ export default async function ReviewerOperationsPage() {
     }
   } catch (error) {
     if (isPersistenceConfigError(error)) {
-      infoMessage = "Configure Supabase environment variables to load the reviewer operations console.";
+      infoMessage = "Configure PostgreSQL and Better Auth to load the reviewer operations console.";
     } else if (isSchemaDriftError(error)) {
       infoMessage = "Reviewer operations are temporarily unavailable while persistence is being reconciled. Background queues, checkout, and delivery previews remain visible below.";
     } else {

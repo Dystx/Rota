@@ -43,6 +43,14 @@ or database write path: desktop activity-map rendering reported 3D enabled,
 the same page at a 390px viewport reported the conservative 3D fallback, both
 states retained attribution and the complete list-equivalent surface, and no
 browser console errors were recorded.
+**Private self-hosted style canary (2026-07-13):** a fresh standalone build
+with `ENABLE_ACTIVITY_MAP=true` and a runtime `RUMIA_MAP_STYLE_URL` rendered
+the map against the loopback Protomaps preflight through a separate SSH tunnel.
+The browser reported `data-map-mode="map"`, the reviewed activity remained
+visible, OSM/Protomaps attribution was present, at least one provider request
+was observed, and the browser console had zero errors. This proves the paired
+style/attribution wiring and browser compatibility only; it does not approve
+the provider, public hostname, or production flag enablement.
 The archive SHA-256 is
 `8368ff2029904f0228523872e2eab674c0f5730e8623001c38af756583ef06ee` and its
 source OSM replication time is `2026-07-12T04:00:00Z`.

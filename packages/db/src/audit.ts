@@ -1,4 +1,6 @@
-import { resolveDataClient, type DataClientOptions } from "./clients";
+import { withActor } from "./actor";
+import { resolveLegacyDataClient, type DataClientOptions } from "./clients";
+import { auditEvents } from "./schema";
 
 export type AuditAction = "create" | "update" | "delete";
 
@@ -12,7 +14,25 @@ export type AuditEntry = {
 };
 
 export async function writeAuditTrail(entry: AuditEntry, options?: DataClientOptions): Promise<void> {
-  const client = resolveDataClient(options);
+  if (options?.actor) {
+    if (entry.actorUserId !== options.actor.userId) {
+      throw new Error("Audit actor does not match the authenticated database actor.");
+    }
+
+    await withActor(options.actor, async ({ db }) => {
+      await db.insert(auditEvents).values({
+        action: entry.action,
+        actorUserId: entry.actorUserId,
+        after: entry.after ?? null,
+        before: entry.before ?? null,
+        entityId: entry.entityId,
+        entityType: entry.entityType
+      });
+    });
+    return;
+  }
+
+  const client = resolveLegacyDataClient(options);
   
   const { error } = await client.from("admin_audit_trail").insert({
     actor_user_id: entry.actorUserId,

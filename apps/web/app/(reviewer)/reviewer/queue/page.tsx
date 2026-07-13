@@ -38,13 +38,13 @@ export default async function ReviewerQueuePage() {
     if (!authContext) {
       notSignedIn = true;
     } else {
-      const { client, reviewerId } = authContext;
-      const assignments = await listReviewerAssignments(100, reviewerId, { client });
+      const { actor, reviewerId } = authContext;
+      const assignments = await listReviewerAssignments(100, reviewerId, { actor });
       const activeAssignments = filterActiveReviewerAssignments(assignments);
 
       activeTrips = (await Promise.all(
         activeAssignments.map(async (assignment) => {
-          const trip = await getTripDraftById(assignment.tripId, { client });
+          const trip = await getTripDraftById(assignment.tripId, { actor });
           if (!trip) return null;
 
           const tripCommerceState = getTripCommerceState({
@@ -67,7 +67,7 @@ export default async function ReviewerQueuePage() {
     }
   } catch (error) {
     errorMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load real assigned trips here."
+      ? "Configure PostgreSQL and Better Auth to load real assigned trips here."
       : "Could not load reviewer queue. Please try again later.";
   }
 
@@ -86,19 +86,19 @@ export default async function ReviewerQueuePage() {
       <div className="flex flex-wrap gap-4 mt-6">
         <a
           href="/reviewer/operations"
-          className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white min-h-[44px]"
+          className="inline-flex min-h-[44px] items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           Open worker plan
         </a>
         <a
           href="/reviewer/profile"
-          className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white min-h-[44px]"
+          className="inline-flex min-h-[44px] items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           Reviewer profile
         </a>
         <a
           href="/reviewer/history"
-          className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white min-h-[44px]"
+          className="inline-flex min-h-[44px] items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           Review history
         </a>

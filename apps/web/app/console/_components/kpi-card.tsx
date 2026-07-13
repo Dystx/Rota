@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Icon } from "@repo/ui";
 
 export interface KpiCardProps {
   eyebrow: string;
@@ -19,14 +20,13 @@ export function KpiCard({ eyebrow, icon, iconTone = "ochre-dark", value, trend }
         <span className="font-mono-micro text-mono-micro uppercase tracking-widest bg-olive-light/10 text-primary px-2 py-1 rounded">
           {eyebrow}
         </span>
-        <span
+        <Icon
           aria-hidden
-          className={`ph ${
+          name={icon}
+          className={`${
             iconTone === "ochre-dark" ? "text-ochre-dark" : "text-olive-light"
           }`}
-        >
-          {icon}
-        </span>
+        />
       </header>
       <h2 className="font-headline-lg text-headline-lg text-primary">
         {value}
@@ -34,9 +34,7 @@ export function KpiCard({ eyebrow, icon, iconTone = "ochre-dark", value, trend }
       <p
         className={`font-label-ui text-label-ui flex items-center gap-1 ${trendColor}`}
       >
-        <span aria-hidden className="ph text-[18px]">
-          {trendIcon}
-        </span>
+        <Icon name={trendIcon} className="text-[18px]" />
         {trend.label}
       </p>
     </article>

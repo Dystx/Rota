@@ -6,7 +6,7 @@ import { getBehaviorConsent, setBehaviorConsent } from "@/app/_lib/behavioral-pr
 /**
  * Opt-in toggle for the behavioral profiler. Recording is off by
  * default; this control lets the traveler turn it on and then
- * refines their route suggestions based on the signals they
+ * refines their activity suggestions based on the signals they
  * generate (skip / extend / replace / pin / mute). Turning the
  * toggle off stops new events from being recorded; the in-memory
  * ring buffer is cleared on the next page reload.
@@ -59,7 +59,7 @@ export function BehaviorConsentToggle() {
         />
         <span className="grid gap-1">
           <span className="text-sm font-medium text-[var(--color-foreground)]">
-            Personalize my route suggestions
+            Personalize my activity suggestions
           </span>
           <span className="text-xs text-[var(--color-muted-foreground)] leading-relaxed">
             When this is on, the platform remembers which suggested stops you skip, extend,

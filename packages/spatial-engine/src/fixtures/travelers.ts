@@ -2,7 +2,7 @@ import type { SpatialFeature, SpatialFeatureCollection } from "../core/types";
 
 /**
  * Deterministic GeoJSON fixtures for phase-1 verification. Real-time
- * traveler / specialist presence will arrive via Supabase Realtime or
+ * traveler / specialist presence will arrive via PostgreSQL-backed SSE or
  * SSE in phase 2 — the engine consumes both via the same
  * TelemetryService.subscribe() / publish() interface.
  */

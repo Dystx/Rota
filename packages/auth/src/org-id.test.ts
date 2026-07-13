@@ -3,9 +3,9 @@ import {
   getOrgIdFromSession,
   getOrgIdFromUser
 } from "./org-id";
-import type { Session, User } from "@supabase/supabase-js";
+import type { AuthSessionLike, AuthUserLike } from "./org-id";
 
-function makeSession(orgId: string | null): Session {
+function makeSession(orgId: string | null): AuthSessionLike {
   return {
     access_token: "test",
     refresh_token: "test",
@@ -21,10 +21,10 @@ function makeSession(orgId: string | null): Session {
       user_metadata: {},
       created_at: new Date().toISOString()
     }
-  } as unknown as Session
+  };
 }
 
-function makeUser(orgId: string | null): User {
+function makeUser(orgId: string | null): AuthUserLike {
   return {
     id: "user-1",
     aud: "authenticated",
@@ -33,7 +33,7 @@ function makeUser(orgId: string | null): User {
     user_metadata: {},
     email: "test@example.com",
     created_at: new Date().toISOString()
-  } as unknown as User
+  };
 }
 
 describe("org-id helpers (Phase 8)", () => {

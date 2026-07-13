@@ -1,4 +1,3 @@
-import { SiteFooter } from "../../_components/site-footer";
 import { KpiCard } from "../_components/kpi-card";
 import { VolumeChart } from "../_components/volume-chart";
 
@@ -119,7 +118,6 @@ export default function ConsoleMetricsPage() {
             </section>
           </section>
         </main>
-        <SiteFooter />
       </div>
     </>
   );

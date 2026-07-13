@@ -14,7 +14,7 @@ describe("TripBriefReview", () => {
     expect(screen.getByText("Portugal")).toBeTruthy();
     expect(screen.getByText("5 days")).toBeTruthy();
     expect(container.querySelectorAll("input, select, textarea")).toHaveLength(0);
-    expect(screen.getByRole("button", { name: /refine this plan/i }).getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByRole("button", { name: /refine the day context/i }).getAttribute("aria-expanded")).toBe("false");
   });
 
   it("surfaces top-level API field errors", async () => {
@@ -27,7 +27,7 @@ describe("TripBriefReview", () => {
     }));
 
     render(<TripBriefReview initialBrief={brief} />);
-    fireEvent.click(screen.getByRole("button", { name: /audit & polish plan/i }));
+    fireEvent.click(screen.getByRole("button", { name: /save this plan shape/i }));
 
     await waitFor(() => expect(screen.getByText("Destination is unavailable.")).toBeTruthy());
     expect(screen.getByText("Please fix the highlighted fields.")).toBeTruthy();
@@ -42,8 +42,8 @@ describe("TripBriefReview", () => {
     expect(container.querySelectorAll("input, select, textarea")).toHaveLength(0);
     fireEvent.click(screen.getByRole("radio", { name: /april 10/i }));
 
-    fireEvent.click(screen.getByRole("button", { name: /refine this plan/i }));
-    expect(screen.getByRole("group", { name: /what should the route protect/i })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /refine the day context/i }));
+    expect(screen.getByRole("group", { name: /what should the day protect/i })).toBeTruthy();
     expect(container.querySelectorAll("input, select, textarea")).toHaveLength(0);
   });
 });

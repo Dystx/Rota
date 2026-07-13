@@ -1,7 +1,7 @@
 /**
  * Multi-tenant org_id helper (Phase 8 of the roadmap).
  *
- * The Supabase JWT carries the org_id under `app_metadata.org_id`
+ * The authenticated session carries the org_id under `app_metadata.org_id`
  * for B2B partner users. For consumer users (single-tenant) the
  * claim is absent and we return null — which the RLS policy
  * treats as "always readable" (see migration
@@ -13,34 +13,43 @@
  * the value into the query.
  */
 
-import type { SupabaseClient, Session, User } from "@supabase/supabase-js";
+type AuthMetadataCarrier = {
+  app_metadata?: unknown;
+  [key: string]: unknown;
+};
+export type AuthSessionLike = {
+  user?: AuthMetadataCarrier | null;
+  [key: string]: unknown;
+} | null | undefined;
+export type AuthUserLike = AuthMetadataCarrier | null | undefined;
+
+function readOrgId(value: AuthMetadataCarrier | null | undefined): string | null {
+  const metadata = value?.app_metadata;
+  if (!metadata || typeof metadata !== "object") return null;
+  const orgId = (metadata as { org_id?: unknown }).org_id;
+  return typeof orgId === "string" && orgId.trim() ? orgId : null;
+}
 
 /**
- * Read the org_id from a Supabase session's JWT app_metadata.
+ * Read the org_id from a session's app_metadata.
  * Returns null for single-tenant consumer users.
  */
 export function getOrgIdFromSession(
-  session: Session | null | undefined
+  session: AuthSessionLike
 ): string | null {
-  if (!session) return null;
-  const orgClaim = (
-    session.user?.app_metadata as { org_id?: string | null } | undefined
-  )?.org_id;
-  return orgClaim ?? null;
+  return readOrgId(session?.user);
 }
 
 /**
- * Read the org_id from a Supabase user object directly. Useful
+ * Read the org_id from an authenticated user object directly. Useful
  * for server actions that have already extracted the user.
  */
-export function getOrgIdFromUser(user: User | null | undefined): string | null {
-  if (!user) return null;
-  const orgClaim = (user.app_metadata as { org_id?: string | null } | undefined)?.org_id;
-  return orgClaim ?? null;
+export function getOrgIdFromUser(user: AuthUserLike): string | null {
+  return readOrgId(user);
 }
 
 /**
- * Server-side helper: ask the Supabase client for the current
+ * Adapter helper: ask an auth client for the current
  * session and return the org_id in one call. Returns null when
  * there's no authenticated user or no org claim (caller should
  * handle the auth + tenancy boundary).
@@ -52,9 +61,9 @@ export function getOrgIdFromUser(user: User | null | undefined): string | null {
  * other helpers (and to stop the lie about the contract).
  */
 export async function getOrgIdFromClient(
-  supabase: SupabaseClient
+  client: { auth: { getSession: () => Promise<{ data: { session: AuthSessionLike }; error?: Error | null }> } }
 ): Promise<string | null> {
-  const { data, error } = await supabase.auth.getSession();
+  const { data, error } = await client.auth.getSession();
   if (error) throw error;
   return getOrgIdFromSession(data.session);
 }

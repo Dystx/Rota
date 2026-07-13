@@ -1,52 +1,40 @@
-# Supabase Backup & Restore Runbook
+# Rumia Backup & Restore Runbook
 
-This runbook covers data protection, backups, and recovery procedures for the hosted Supabase environment.
+Rumia's active data-protection path is native PostgreSQL on the VPS with an
+encrypted Restic repository in Cloudflare R2. The historical hosted Supabase
+project is rollback evidence only; this document contains no Supabase command.
 
-## 1. Backup Strategy
+## Backup
 
-### Automated Backups
-- **Daily Backups**: Managed by Supabase (standard).
-- **PITR (Point-in-Time Recovery)**: **ACTION REQUIRED**. Verify PITR is enabled for Production in the Supabase Dashboard. Allows restoration to any specific second within the retention period (typically 7-30 days).
+Install `/etc/rumia/backup.env` as `root:root` mode `0600`, including a
+separate Restic password file. Then install and run the root-owned
+`ops/vps/backup-rumia.sh` script. It creates a custom-format `pg_dump` of the
+`rumia` database, uploads it with the `rumia-postgres` tag, and applies the
+daily/weekly/monthly retention policy. The temporary dump is deleted on exit.
 
-### Manual Exports (Pre-Migration)
-Before running high-risk migrations:
-```bash
-# Export schema only
-npx supabase db dump --db-url "<SUPABASE_DB_URL>" -f backup_schema_$(date +%Y%m%d).sql
+## Restore drill
 
-# Export data only (Caution: PII/Secrets)
-# npx supabase db dump --db-url "<SUPABASE_DB_URL>" --data-only -f backup_data.sql
-```
+Run `ops/vps/restore-rumia-check.sh` as root on the VPS. The script restores the
+latest tagged snapshot into a new `rumia_restore_check` database, verifies the
+PostGIS extension, and drops the temporary database and staging directory on
+exit. It refuses to overwrite an existing check database.
 
-## 2. Restore Procedure (Non-Destructive/Staging)
+The drill is evidence only when the command exits successfully and the output
+is recorded without secrets. A successful backup upload alone is not restore
+proof.
 
-To verify a backup without touching production:
-1. Create a new Supabase project (e.g., `rota-restore-test`).
-2. Use the Supabase CLI to push the dumped schema/data:
-   ```bash
-   npx supabase db push --db-url "<TEST_PROJECT_DB_URL>"
-   ```
-3. Verify RLS and data integrity in the test project.
+## Recovery order
 
-## 3. Production Restore (PITR)
+1. Stop public writes or place the app in a truthful unavailable state.
+2. Preserve the current release symlink and incident timestamps.
+3. Restore into a separate database first; run migrations/authorization and
+   `/api/health` checks.
+4. If approved, switch the database or release during a defined rollback
+   window, then verify owner/reviewer/admin isolation.
+5. Keep the previous database snapshot and release available until the owner
+   records the rollback decision.
 
-**WARNING: This is a destructive operation for any data written after the target timestamp.**
-
-1. Navigate to Supabase Dashboard -> Database -> Backups.
-2. Select "Point-in-Time Recovery".
-3. Select target Date and Time.
-4. Review the "Impact Analysis" (Number of transactions to be reverted).
-5. Confirm Restoration.
-6. **Post-Restore**:
-   - Re-verify `owner_user_id` and RLS policies (T40 drift check).
-   - Check `admin_audit_trail` for gap analysis.
-
-## 4. Disaster Recovery (RLS Lockout)
-
-If an RLS policy accidentally blocks all access (including admins using the Data API):
-1. Use the **Supabase SQL Editor** (which uses a privileged connection).
-2. Fix or drop the offending policy:
-   ```sql
-   DROP POLICY "Offending Policy" ON "target_table";
-   ```
-3. If SQL Editor is also blocked (unlikely), contact Supabase Support or use the `SUPABASE_SERVICE_ROLE_KEY` via the Supabase CLI's `db query` command from an authorized environment to remediate. **CRITICAL**: Re-enable RLS or fix policies immediately after recovery and log the incident in the audit trail.
+See [VPS operations](../../ops/vps/README.md), the
+[self-hosted migration plan](../superpowers/plans/2026-07-11-rumia-vps-self-hosted-migration.md),
+and [Supabase retirement](supabase-retirement.md) for the boundaries between
+active recovery and historical rollback evidence.

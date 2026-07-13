@@ -1,12 +1,12 @@
 import { describe, expect, test } from "vitest";
 import { createFakeAnalyticsProvider } from "@repo/analytics";
 import { createFakeMonitoringProvider } from "@repo/monitoring";
-import { handleTripCreateRequest } from "./route";
+import { handleTripCreateRequest } from "./handler";
 import type { AuthorizedApiContext } from "@/lib/auth/api";
 import type { TripBrief } from "@repo/types";
 
 const travelerAuth = {
-  client: {},
+  actor: { capabilities: [], reviewerId: null, roles: ["traveler"], userId: "traveler-user-123" },
   reviewerId: null,
   role: "traveler",
   userId: "traveler-user-123"
@@ -218,7 +218,7 @@ describe("handleTripCreateRequest", () => {
 
     const response = await handleTripCreateRequest(jsonRequest(validBrief), {
       createDraft: async () => {
-        throw new Error("supabase down: Bearer eyJabc.def.ghi user@example.com");
+        throw new Error("database down: Bearer eyJabc.def.ghi user@example.com");
       },
       monitor,
       requireTraveler: async () => travelerAuth
@@ -242,7 +242,7 @@ describe("handleTripCreateRequest", () => {
     const stringified = JSON.stringify(captured);
     expect(stringified).not.toContain("Bearer");
     expect(stringified).not.toContain("user@example.com");
-    expect(stringified).not.toContain("supabase down");
+    expect(stringified).not.toContain("database down");
   });
 
   test("captures a 503 service_unavailable monitoring event when env is missing", async () => {
@@ -250,7 +250,7 @@ describe("handleTripCreateRequest", () => {
 
     const response = await handleTripCreateRequest(jsonRequest(validBrief), {
       createDraft: async () => {
-        throw new Error("Missing required environment variable SUPABASE_SERVICE_ROLE_KEY");
+        throw new Error("Missing required environment variable DATABASE_URL");
       },
       monitor,
       requireTraveler: async () => travelerAuth
@@ -265,7 +265,7 @@ describe("handleTripCreateRequest", () => {
       errorKind: "missing_env"
     });
     const stringified = JSON.stringify(monitor.outbox[0]);
-    expect(stringified).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
+    expect(stringified).not.toContain("DATABASE_URL");
   });
 
   test("still returns 500 when monitoring provider throws", async () => {

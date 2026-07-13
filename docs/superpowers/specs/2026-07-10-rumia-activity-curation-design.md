@@ -108,6 +108,11 @@ ledger:
 Desktop prioritizes reading and comparison. Mobile provides one-card focus,
 visible pagination, 44px targets, and no document-level horizontal overflow.
 
+The optional spatial enhancement is specified separately in
+`2026-07-11-rumia-activity-map-capability.md`: it begins after activity
+selection in the workspace, remains list-first, and does not change this
+activity-card contract.
+
 ## Trust and failure states
 
 - No fabricated expert names, review dates, availability, ratings, or

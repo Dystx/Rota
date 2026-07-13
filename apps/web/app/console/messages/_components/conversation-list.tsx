@@ -1,6 +1,7 @@
 "use client";
 
 import type { Day } from "../_lib/conversations";
+import { Icon } from "@repo/ui";
 
 interface DayListProps {
   days: Day[];
@@ -36,7 +37,7 @@ export function ConversationList({
   incomingCount
 }: DayListProps) {
   return (
-    <aside className="w-[320px] flex-shrink-0 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
+    <aside className="w-full min-h-[20rem] shrink-0 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden lg:min-h-0 lg:w-[clamp(16rem,24vw,20rem)]">
       <header className="p-4 border-b border-olive-light/10 flex items-center justify-between shrink-0">
         <h2 className="font-headline-sm text-headline-sm text-primary">Itinerary Days</h2>
         <button
@@ -44,7 +45,7 @@ export function ConversationList({
           aria-label="Filter days"
           className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          <span aria-hidden className="ph ph-funnel">funnel</span>
+          <Icon name="funnel" />
         </button>
       </header>
       <div className="p-3 border-b border-olive-light/10 bg-surface-container-lowest/50">

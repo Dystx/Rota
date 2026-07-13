@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Icon } from "@repo/ui";
 import { PublicRouteLayout } from "../_components/public-route-layout";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { getTripsForUser } from "@repo/db";
+import { getTripsForUser, loadPostgresAuthorizationContext } from "@repo/db";
 import { ItinerarySearch } from "./_components/itinerary-search";
 
 /**
  * Itineraries — saved-trips archive for the signed-in traveler.
  *
- * Reads the user's trips from Supabase (filtered by
+ * Reads the user's trips from PostgreSQL (filtered by
  * `owner_user_id`), passes them to a small client island for
  * search + status filter, and renders the rest as static cards.
  *
@@ -26,7 +27,8 @@ export default async function ItinerariesPage({
   }
 
   const { notice } = await searchParams;
-  const trips = await getTripsForUser(user.id);
+  const actor = await loadPostgresAuthorizationContext(user.id);
+  const trips = actor ? await getTripsForUser(user.id, 24, { actor }) : [];
 
   return (
     <PublicRouteLayout>
@@ -63,9 +65,7 @@ function EmptyState({ signedIn }: { signedIn: boolean }) {
       data-testid="itineraries-empty"
       className="bg-glass-light/60 backdrop-blur-md rounded-xl border border-olive-light/20 p-card-padding text-center max-w-2xl mx-auto"
     >
-      <span className="ph text-[48px] text-olive-light mb-3 block">
-        map
-      </span>
+      <Icon name="map" className="text-[48px] text-olive-light mb-3 block" />
         <h2 className="font-display-mobile text-headline-sm md:font-display md:text-headline text-primary mb-2 italic">
           {signedIn ? "Nothing on the map yet." : "Sign in to see your trips."}
         </h2>

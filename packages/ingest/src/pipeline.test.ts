@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PORTUGAL_BBOX, type OsmFeature, type EmbeddedFeature, type EmbeddingRequest, type EmbeddingResponse, type LoadResponse, type EmbeddingClient, type SupabaseLoader, type PlaceRow, type LoadRequest } from "./types";
+import { PORTUGAL_BBOX, type OsmFeature, type EmbeddedFeature, type EmbeddingRequest, type EmbeddingResponse, type LoadResponse, type EmbeddingClient, type PlaceLoader, type PlaceRow, type LoadRequest } from "./types";
 import { flattenTagsForEmbedding, embedFeatures } from "./embed";
 import { loadPlaces, featureToRow } from "./load";
 
@@ -19,8 +19,8 @@ const stubEmbedder: EmbeddingClient = {
   }
 };
 
-/** Counting stub Supabase loader. Records every batch. */
-function makeCountingLoader(): SupabaseLoader & { calls: LoadRequest[] } {
+/** Counting stub PostgreSQL loader. Records every batch. */
+function makeCountingLoader(): PlaceLoader & { calls: LoadRequest[] } {
   const calls: LoadRequest[] = [];
   return {
     calls,
@@ -146,7 +146,7 @@ describe("load — loadPlaces", () => {
   });
 
   it("marks the whole batch as failed when the loader throws", async () => {
-    const failing: SupabaseLoader = {
+    const failing: PlaceLoader = {
       async load(): Promise<LoadResponse> {
         throw new Error("connection refused");
       }

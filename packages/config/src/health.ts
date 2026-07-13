@@ -13,7 +13,7 @@
  *                 publishable key looking like a secret) — provider must not
  *                 be used; UI falls back.
  *
- * Required-for-actions providers (Stripe, Resend, Supabase, worker queue) are
+ * Required-for-actions providers (Stripe, Resend, PostgreSQL, worker queue) are
  * marked `missing` when absent; they MUST gate the relevant action paths but
  * MUST NOT block app boot or marketing routes.
  *
@@ -30,7 +30,7 @@ export type HealthProvider =
   | "resend"
   | "posthog"
   | "mapbox"
-  | "supabase"
+  | "postgresql"
   | "worker-queue";
 
 export type HealthStatus = "configured" | "missing" | "degraded";
@@ -63,9 +63,8 @@ export const HEALTH_ENV_VAR_NAMES = {
   stripePublishableKey: "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
   stripeSecretKey: "STRIPE_SECRET_KEY",
   stripeWebhookSecret: "STRIPE_WEBHOOK_SECRET",
-  supabaseAnonKey: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-  supabaseServiceRoleKey: "SUPABASE_SERVICE_ROLE_KEY",
-  supabaseUrl: "NEXT_PUBLIC_SUPABASE_URL"
+  databaseUrl: "DATABASE_URL",
+  betterAuthSecret: "BETTER_AUTH_SECRET"
 } as const;
 
 function readEnv(name: string): string | undefined {
@@ -196,48 +195,47 @@ function checkMapbox(): ProviderHealth {
   };
 }
 
-function checkSupabase(): ProviderHealth {
-  const url = readEnv(HEALTH_ENV_VAR_NAMES.supabaseUrl);
-  const anon = readEnv(HEALTH_ENV_VAR_NAMES.supabaseAnonKey);
-  const service = readEnv(HEALTH_ENV_VAR_NAMES.supabaseServiceRoleKey);
+function checkPostgresql(): ProviderHealth {
+  const databaseUrl = readEnv(HEALTH_ENV_VAR_NAMES.databaseUrl);
+  const authSecret = readEnv(HEALTH_ENV_VAR_NAMES.betterAuthSecret);
   const requirement: HealthRequirement = "required-for-action";
-  if (!url || !anon || !service) {
+  if (!databaseUrl || !authSecret) {
     return {
-      provider: "supabase",
+      provider: "postgresql",
       requirement,
       status: "missing",
-      hint: "Persistence-backed actions are gated; set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and SUPABASE_SERVICE_ROLE_KEY. Marketing routes still render."
+      hint: "Persistence-backed actions are gated; set DATABASE_URL and BETTER_AUTH_SECRET server-side. Marketing routes still render."
     };
   }
   return {
-    provider: "supabase",
+    provider: "postgresql",
     requirement,
     status: "configured",
-    hint: "Supabase URL, anon key, and service role key are present."
+    hint: "Private PostgreSQL and Better Auth configuration are present."
   };
 }
 
 function checkWorkerQueue(): ProviderHealth {
   // The worker queue runs as a bounded local runner with no external broker.
-  // Its readiness depends on Resend (for email jobs) and Supabase (for state),
+  // Its readiness depends on Resend (for email jobs) and PostgreSQL (for state),
   // but the runner itself is in-process and always present.
   const resend = checkResend();
-  const supabase = checkSupabase();
+  const postgresql = checkPostgresql();
   const requirement: HealthRequirement = "required-for-action";
 
-  if (supabase.status !== "configured" || resend.status !== "configured") {
+  if (postgresql.status !== "configured" || resend.status !== "configured") {
     return {
       provider: "worker-queue",
       requirement,
       status: "missing",
-      hint: "Local worker runner is in-process, but downstream providers are missing; jobs will be skipped until Supabase and Resend are configured."
+      hint: "Local worker runner is in-process, but downstream providers are missing; jobs will be skipped until PostgreSQL and Resend are configured."
     };
   }
   return {
     provider: "worker-queue",
     requirement,
     status: "configured",
-    hint: "Local worker runner is in-process; downstream Supabase and Resend are configured."
+    hint: "Local worker runner is in-process; downstream PostgreSQL and Resend are configured."
   };
 }
 
@@ -248,7 +246,7 @@ export function getProviderHealth(): ProviderHealth[] {
     checkResend(),
     checkPostHog(),
     checkMapbox(),
-    checkSupabase(),
+    checkPostgresql(),
     checkWorkerQueue()
   ];
 }
@@ -267,7 +265,7 @@ export function formatProviderHealthReport(report: ProviderHealthReport): string
 /**
  * Asserts a string contains no obvious secret-shaped substrings.
  * Used by tests to prove redaction. Patterns covered: Stripe (`sk_`,
- * `whsec_`, `pk_live_`, `pk_test_`), Supabase (`sb_secret`, JWT-shaped
+ * `whsec_`, `pk_live_`, `pk_test_`), JWT-shaped
  * `eyJ`), generic `Bearer ` tokens, and Mapbox secret prefix `sk.`.
  *
  * Mapbox `pk.` is NOT a secret; the redaction policy is to never include
@@ -280,7 +278,6 @@ export function assertNoSecretLeak(text: string): void {
     { label: "stripe-secret", pattern: /\bsk_(live|test)_[A-Za-z0-9]+/ },
     { label: "stripe-webhook", pattern: /\bwhsec_[A-Za-z0-9]+/ },
     { label: "stripe-publishable", pattern: /\bpk_(live|test)_[A-Za-z0-9]+/ },
-    { label: "supabase-secret", pattern: /\bsb_secret_[A-Za-z0-9]+/ },
     { label: "jwt", pattern: /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/ },
     { label: "bearer", pattern: /\bBearer\s+[A-Za-z0-9._-]{8,}/ },
     { label: "mapbox-secret", pattern: /\bsk\.[A-Za-z0-9_-]{10,}/ },

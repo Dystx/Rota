@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SiteFooter } from "../../_components/site-footer";
+import { Icon } from "@repo/ui";
 
 interface TreeNode {
   id: string;
@@ -76,12 +76,11 @@ export default function ConsoleGraphPage() {
               : "text-linen-dark"
           }`}
         >
-          <span aria-hidden className="ph text-[18px]">
-            {hasChildren ? (isExpanded ? "expand_more" : "chevron_right") : node.icon}
-          </span>
-          <span aria-hidden className="ph text-[18px] text-ochre-light">
-            {hasChildren ? node.icon : ""}
-          </span>
+          <Icon
+            name={hasChildren ? (isExpanded ? "expand_more" : "chevron_right") : node.icon}
+            className="text-[18px]"
+          />
+          <Icon name={hasChildren ? node.icon : ""} className="text-[18px] text-ochre-light" />
           <span className="flex-1 truncate">{node.label}</span>
           {node.count ? (
             <span className="font-mono-technical text-mono-technical opacity-70">
@@ -146,7 +145,7 @@ export default function ConsoleGraphPage() {
                 aria-label="Filter tree"
                 className="p-2 rounded-lg text-linen-dark/70 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-olive-dark"
               >
-                <span aria-hidden className="ph ph-funnel">funnel</span>
+                <Icon name="funnel" />
               </button>
             </header>
             <div className="flex-1 overflow-y-auto p-4 font-mono-technical text-mono-technical">
@@ -188,18 +187,14 @@ export default function ConsoleGraphPage() {
                       aria-label="Edit node"
                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark"
                     >
-                      <span aria-hidden className="ph">
-                        edit
-                      </span>
+                      <Icon name="edit" />
                     </button>
                     <button
                       type="button"
                       aria-label="View revision history"
                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark"
                     >
-                      <span aria-hidden className="ph">
-                        history
-                      </span>
+                      <Icon name="history" />
                     </button>
                   </div>
                 </div>
@@ -208,12 +203,7 @@ export default function ConsoleGraphPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
                 <article className="bg-black/40 border border-white/5 rounded-lg p-card-padding">
                   <h3 className="font-headline-sm text-headline-sm text-linen-dark mb-3 flex items-center gap-2">
-                    <span
-                      aria-hidden
-                      className="ph text-ochre-light"
-                    >
-                      data_array
-                    </span>
+                    <Icon name="data_array" className="text-ochre-light" />
                     Semantic Vector Map
                   </h3>
                   <div className="relative bg-black/60 rounded border border-white/5 p-3 mb-3 h-32 overflow-hidden">
@@ -233,9 +223,7 @@ export default function ConsoleGraphPage() {
 
                 <article className="bg-black/40 border border-white/5 rounded-lg p-card-padding flex flex-col">
                   <h3 className="font-headline-sm text-headline-sm text-linen-dark mb-3 flex items-center gap-2">
-                    <span aria-hidden className="ph text-ochre-light">
-                      satellite_alt
-                    </span>
+                    <Icon name="satellite_alt" className="text-ochre-light" />
                     Spatial Data (PostGIS)
                   </h3>
                   <div className="flex-1 relative bg-black/60 rounded border border-white/5 overflow-hidden min-h-[120px]">
@@ -257,7 +245,6 @@ export default function ConsoleGraphPage() {
             </div>
           </section>
         </main>
-        <SiteFooter />
       </div>
       <style>{`
         main ::-webkit-scrollbar { width: 6px; }

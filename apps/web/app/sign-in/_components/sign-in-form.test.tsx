@@ -9,7 +9,8 @@ import { SignInForm } from "./sign-in-form";
 describe("SignInForm", () => {
   it("uses a sentence-style inline email action", () => {
     render(<SignInForm next="/planner" initialSent={false} />);
-    expect(screen.getByLabelText(/send my private sign-in link to/i)).toBeTruthy();
-    expect(screen.getByRole("button", { name: /send link/i })).toBeTruthy();
+    expect(screen.getByLabelText(/email address/i)).toBeTruthy();
+    expect(screen.getByLabelText(/password/i)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /sign in/i })).toBeTruthy();
   });
 });

@@ -36,9 +36,8 @@ function setAllConfigured(): void {
   process.env[HEALTH_ENV_VAR_NAMES.posthogKey] = "ph-key-placeholder";
   process.env[HEALTH_ENV_VAR_NAMES.posthogHost] = "https://example.invalid";
   process.env[HEALTH_ENV_VAR_NAMES.mapboxPublicToken] = "pk.placeholder";
-  process.env[HEALTH_ENV_VAR_NAMES.supabaseUrl] = "https://example.supabase.co";
-  process.env[HEALTH_ENV_VAR_NAMES.supabaseAnonKey] = "anon-placeholder";
-  process.env[HEALTH_ENV_VAR_NAMES.supabaseServiceRoleKey] = "service-placeholder";
+  process.env[HEALTH_ENV_VAR_NAMES.databaseUrl] = "postgresql://127.0.0.1/rumia";
+  process.env[HEALTH_ENV_VAR_NAMES.betterAuthSecret] = "a-long-placeholder-secret-for-health";
 }
 
 function byProvider(list: ProviderHealth[]): (key: ProviderHealth["provider"]) => ProviderHealth {
@@ -70,7 +69,7 @@ describe("getProviderHealth", () => {
     expect(result("resend").status).toBe("missing");
     expect(result("posthog").status).toBe("missing");
     expect(result("mapbox").status).toBe("missing");
-    expect(result("supabase").status).toBe("missing");
+    expect(result("postgresql").status).toBe("missing");
     expect(result("worker-queue").status).toBe("missing");
   });
 
@@ -82,7 +81,7 @@ describe("getProviderHealth", () => {
     expect(result("resend").status).toBe("configured");
     expect(result("posthog").status).toBe("configured");
     expect(result("mapbox").status).toBe("configured");
-    expect(result("supabase").status).toBe("configured");
+    expect(result("postgresql").status).toBe("configured");
     expect(result("worker-queue").status).toBe("configured");
   });
 
@@ -102,7 +101,7 @@ describe("getProviderHealth", () => {
     expect(result("stripe").hint).not.toContain("sk_test_wrong_prefix");
   });
 
-  it("marks worker-queue missing when Supabase or Resend is missing", () => {
+  it("marks worker-queue missing when PostgreSQL or Resend is missing", () => {
     setAllConfigured();
     delete process.env[HEALTH_ENV_VAR_NAMES.resendApiKey];
     expect(byProvider(getProviderHealth())("worker-queue").status).toBe("missing");
@@ -117,7 +116,7 @@ describe("getProviderHealth", () => {
     const result = byProvider(getProviderHealth());
     expect(result("stripe").requirement).toBe("required-for-action");
     expect(result("resend").requirement).toBe("required-for-action");
-    expect(result("supabase").requirement).toBe("required-for-action");
+    expect(result("postgresql").requirement).toBe("required-for-action");
     expect(result("worker-queue").requirement).toBe("required-for-action");
     expect(result("mapbox").requirement).toBe("optional");
     expect(result("posthog").requirement).toBe("optional");
@@ -144,9 +143,8 @@ describe("formatProviderHealthReport redaction", () => {
     process.env[HEALTH_ENV_VAR_NAMES.posthogKey] = "phc_EEEEEEEEEEEEEEEE";
     process.env[HEALTH_ENV_VAR_NAMES.posthogHost] = "https://example.invalid";
     process.env[HEALTH_ENV_VAR_NAMES.mapboxPublicToken] = "pk.FFFFFFFFFFFFFFFF";
-    process.env[HEALTH_ENV_VAR_NAMES.supabaseUrl] = "https://proj.supabase.co";
-    process.env[HEALTH_ENV_VAR_NAMES.supabaseAnonKey] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload-placeholder.signature-placeholder";
-    process.env[HEALTH_ENV_VAR_NAMES.supabaseServiceRoleKey] = "sb_secret_GGGGGGGGGGGGGGGG";
+    process.env[HEALTH_ENV_VAR_NAMES.databaseUrl] = "postgresql://127.0.0.1/rumia";
+    process.env[HEALTH_ENV_VAR_NAMES.betterAuthSecret] = "a-long-placeholder-secret-for-health";
 
     const report = getProviderHealthReport(new Date("2026-05-02T00:00:00.000Z"));
     const text = formatProviderHealthReport(report);
@@ -155,7 +153,7 @@ describe("formatProviderHealthReport redaction", () => {
     expect(() => assertNoSecretLeak(text)).not.toThrow();
     expect(text).not.toContain("sk_test_AAAA");
     expect(text).not.toContain("whsec_BBBB");
-    expect(text).not.toContain("sb_secret_GGGG");
+    expect(text).not.toContain("postgresql://127.0.0.1");
     expect(text).not.toContain("pk.FFFF");
     expect(text).not.toContain("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
   });
@@ -164,7 +162,6 @@ describe("formatProviderHealthReport redaction", () => {
     expect(() => assertNoSecretLeak("hello sk_test_AAAAAAAAAAAA world")).toThrow();
     expect(() => assertNoSecretLeak("token: whsec_BBBBBBBBBBBB")).toThrow();
     expect(() => assertNoSecretLeak("Authorization: Bearer abcdefghij")).toThrow();
-    expect(() => assertNoSecretLeak("env: sb_secret_CCCCCCCCCCCC")).toThrow();
     expect(() => assertNoSecretLeak("mapbox: sk.DDDDDDDDDDDD")).toThrow();
     expect(() => assertNoSecretLeak("mapbox: pk.EEEEEEEEEEEE")).toThrow();
   });

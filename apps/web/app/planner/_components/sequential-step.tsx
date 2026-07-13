@@ -1,5 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
+import { Icon } from "@repo/ui";
 
 /**
  * SequentialStep — the shared shell for each question in the
@@ -170,7 +171,7 @@ export function SequentialStep({
                   data-testid="sequential-step-back"
                   className="inline-flex items-center gap-1.5 font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded-md px-2 py-1"
                 >
-                  <span aria-hidden className="ph text-[16px] ph-arrow-left">arrow-left</span>
+                  <Icon name="arrow_back" className="text-[16px]" />
                   Back
                 </button>
               ) : (
@@ -179,7 +180,7 @@ export function SequentialStep({
                   data-testid="sequential-step-back"
                   className="inline-flex items-center gap-1.5 font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 rounded-md px-2 py-1"
                 >
-                  <span aria-hidden className="ph text-[16px] ph-arrow-left">arrow-left</span>
+                  <Icon name="arrow_back" className="text-[16px]" />
                   Back
                 </Link>
               )
@@ -195,7 +196,7 @@ export function SequentialStep({
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-olive-light text-on-primary font-label-ui text-label-ui hover:bg-olive-dark transition-colors shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {continueLabel}
-              <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
+              <Icon name="arrow_forward" className="text-[16px]" />
             </button>
           </div>
         </div>

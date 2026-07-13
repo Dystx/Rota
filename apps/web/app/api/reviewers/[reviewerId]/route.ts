@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ rev
   const { reviewerId } = await params;
 
   try {
-    const reviewer = await getReviewerById(reviewerId, { client: auth.client });
+    const reviewer = await getReviewerById(reviewerId, { actor: auth.actor });
 
     if (!reviewer) {
       return notFoundError("Reviewer not found.");
@@ -41,7 +41,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ re
   }
 
   try {
-    const reviewer = await updateReviewer(reviewerId, parsed.data, { client: auth.client });
+    const reviewer = await updateReviewer(reviewerId, parsed.data, { actor: auth.actor });
     
     if (reviewer) {
       await writeAuditTrail({
@@ -51,7 +51,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ re
         entityId: reviewer.id,
         before: null,
         after: reviewer
-      }, { client: auth.client });
+      }, { actor: auth.actor });
     }
 
     if (!reviewer) {

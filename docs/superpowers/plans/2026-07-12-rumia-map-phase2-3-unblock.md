@@ -65,6 +65,17 @@ co-hosted Lumes deployment.
   device/reduced-motion policy still controls the final enhancement.
 - [x] Add focused feature-enabled unit coverage for story navigation, 3D
   policy reasons, telemetry safety, map fallback, attribution, and list parity.
+- [x] Keep the activity-map surface provider-neutral at the browser boundary:
+  style endpoints and reviewed attribution links can now be injected together;
+  the explicit Protomaps candidate adapter is available for a future approved
+  release, while CARTO remains only the default development path.
+- [x] Exercise the paired provider configuration in a private standalone
+  browser canary against the loopback Protomaps preflight: map mode rendered,
+  the reviewed activity and OSM/Protomaps attribution remained visible, and
+  the browser reported zero console errors. This is pre-approval evidence only.
+- [x] Make provider configuration a prerequisite for the public workspace map:
+  an activity-map flag without `RUMIA_MAP_STYLE_URL` remains list-only instead
+  of selecting the unapproved development style.
 - [x] Run a feature-enabled public browser canary without database fixture
   writes: desktop reported `data-3d-capability="enabled"`, a mobile-width
   reload reported `fallback`, attribution and the complete semantic list stayed
@@ -124,6 +135,8 @@ co-hosted Lumes deployment.
 - `packages/types/src/geographic-route.ts` and exports/tests
 - `apps/web/app/(app)/trip/[tripId]/_lib/*` route/camera adapters
 - `apps/web/app/(app)/trip/[tripId]/map/*` explicit story controls
+- `apps/web/app/(marketing)/_components/activity-map*.tsx` list/map surface,
+  paired provider configuration, attribution, and fallback
 - `packages/spatial-engine/src/core/*` camera and route contracts
 - `packages/spatial-engine/src/adapters/maplibre/layers/*`
 - `apps/web/playwright/tests/*` focused map/story/performance/a11y coverage

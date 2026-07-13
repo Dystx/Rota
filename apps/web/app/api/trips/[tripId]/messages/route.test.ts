@@ -8,7 +8,6 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@repo/config", () => ({ isFeatureEnabled: mocks.feature }));
 vi.mock("@/app/lib/trip-access", () => ({ getOwnedTrip: mocks.access }));
-vi.mock("@/lib/supabase/server", () => ({ createServerSupabaseClient: mocks.client }));
 
 import { GET, POST } from "./route";
 
@@ -55,17 +54,14 @@ describe("trip messaging API", () => {
     expect(response.status).toBe(403);
   });
 
-  it("returns unavailable when the provider/schema cannot be queried", async () => {
-    mocks.client.mockResolvedValue({ from: () => ({ select: () => ({ eq: () => ({ order: async () => ({ data: null, error: new Error("relation does not exist") }) }) }) }) });
+  it("returns unavailable while the PostgreSQL messaging ledger is pending", async () => {
     const response = requireResponse(await GET(request(), { params }));
     expect(response.status).toBe(503);
     await expect(response.json()).resolves.toMatchObject({ error: { code: "MESSAGING_UNAVAILABLE" } });
   });
 
-  it("returns the stable adapter shape for a successful list", async () => {
-    mocks.client.mockResolvedValue({ from: () => ({ select: () => ({ eq: () => ({ order: async () => ({ data: [{ id: "m1", author_role: "traveler", body: "Hello", created_at: "2026-01-01T00:00:00Z" }], error: null }) }) }) }) });
+  it("keeps the provider disabled until the PostgreSQL messaging ledger is migrated", async () => {
     const response = requireResponse(await GET(request(), { params }));
-    expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({ messages: [{ id: "m1", authorRole: "traveler", body: "Hello", createdAt: "2026-01-01T00:00:00Z" }] });
+    expect(response.status).toBe(503);
   });
 });

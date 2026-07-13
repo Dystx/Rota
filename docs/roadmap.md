@@ -1,22 +1,33 @@
 # Rumia — Roadmap
 
-> **Three specs, three axes.** This file bridges them.
+> **Historical snapshot (2026-07-04).** This document preserves the earlier
+> tiered/Cloudflare/Supabase roadmap for context. It is not the current launch
+> contract. Use the [activity-first master plan](superpowers/plans/2026-07-10-rumia-activity-first-master.md),
+> [VPS migration plan](superpowers/plans/2026-07-11-rumia-vps-self-hosted-migration.md),
+> and [latest plan audit](../specs/PLAN-AUDIT_LATEST.md) for current scope,
+> architecture, and release status.
+
+> **Historical cross-reference only.** The three older specs below are retained
+> for context; none is the current release source of truth.
 >
 > - **v4.0 (current authoritative)** → [`docs/spec-v4.md`](./spec-v4.md) — 4-tier ascension model (Tier 1 Core / Tier 2 Curation / Tier 3 Concierge / Tier 4 Marketplace).
 > - **v2.0 long-term vision** → [`docs/spec.md`](./spec.md) — 3-tier Tiered Service Model (preserved for historical reference).
 > - **Refined 2026 scope** → [`docs/spec-refined-2026.md`](./spec-refined-2026.md) — visual identity (olive/ochre) + UI/UX details; Tier 3 + Mobile deferred.
-> - **Operational launch-readiness** → §3 below. Drives *how* we ship.
+> - **Former operational launch-readiness** → §3 below. It is superseded by the
+>   current plan audit and VPS runbook.
 > - **Master engineering lifecycle & Cloudflare deployment roadmap** → [`docs/master-roadmap.md`](./master-roadmap.md) — the consolidated 6-phase Cloudflare Pages + R2 + PMTiles + Workers blueprint with the phase-to-PR cross-reference and the 2026-07-04 status table. This file is the operational view; the master is the strategic / engineering-lifecycle view.
 > - **Granular 8-phase engineering plan** → [`docs/engineering-lifecycle.md`](./engineering-lifecycle.md) — week-by-week engineering sequencing (complements the master; different scope — international expansion + marketplace + white-label B2B).
 > - **2026-07-04 polish + functional-fixes pass** → [`docs/reviews/2026-07-04-polish-and-functional-fixes.md`](./reviews/2026-07-04-polish-and-functional-fixes.md) — the 12-phase pass that wired console forms end-to-end, added Portugal region covers, fixed the visual test flake, and brought @smoke to 184/184.
 >
 > Section 2 maps current state to the v4 5-phase engineering plan.
 
-> **Last verified 2026-07-04.** Specialist onboarding + verification queue (PR-11) now in tree. Observability foundation (Sentry + perf budget) wired. **563/563 unit tests green across 64 files**. **177/200 @smoke E2E pass** (16 skipped, 7 visual-baseline drift — pre-existing on /, /account, /admin/analytics + 2 from the filmstrip pixel changes) — **resolved: 184/184 @smoke E2E pass (16 skipped, 0 failed) after the 2026-07-04 visual flake fix** (see `docs/reviews/2026-07-04-polish-and-functional-fixes.md` §5). **Filmstrip → Map → Camera E2E coverage live against hosted Supabase** (4/4: 2 tests × desktop + mobile, 31.4s). **ESLint 9 flat config** set up at the root (`eslint.config.mjs`) — scoped to the 2026-07-04 risk-mitigation pass. `pnpm lint` at the root chains `tsc --noEmit` + `eslint .`; the new code is 0 errors, 0 warnings. **Visual reference catalog (Rumia Console v1.0) — all 13 HTML files committed to `docs/reference/rumia-console/` — see §3.10. All 13 rows at reference parity as of 2026-07-04:** 1.1 (cinematic 3D/2D map hero + bento), 1.2 (natural brief wizard), 1.3 (smart logistical cards / dual-tile binary variant), 1.4 (dynamic workspace + filmstrip stops — **end-to-end live with per-stop fan-out + Playwright E2E (2 tests × 2 projects, 31.4s) + a11y audit clean on desktop AND mobile after color fixes (Details link: text-ochre-dark 2.6:1 → text-olive-dark 13:1; SummaryRow labels: opacity-60 4.17:1 → opacity-75 ~6.5:1 in light context, ~7:1 in dark context) + stable test hooks: `data-testid="filmstrip-section"`, `data-testid="filmstrip-track"`, `data-testid="stop-card-{id}"`; `aria-pressed` is now `undefined` on no-coords disabled cards**), 1.5 (split-screen tier ascension checkout), 1.6 (level 2 expert chat + embedded recommendation), 1.7 (saved vault + sliding export drawer), 2.1 (operations pipeline board + dnd-kit), 2.2 (master revision workspace + validation bar), 2.3 (specialist messaging hub + snippet library + drag-to-input + Update Timeline), 3.1 (global metrics bento), 3.2 (knowledge graph vector CMS dark shell + PostGIS preview), 3.3 (system variable config bento). PR-11b admin route already at `app/(admin)/admin/specialists/page.tsx` (per PR-11b, `abdb135`); the `revalidatePath("/admin/specialists")` pointer in the onboarding action resolves. `docs/ops/launch.md` refreshed with the 2026-07-04 migration batch (Phase-2 foundation / PostGIS+pgvector+places / PR-11 specialist / hybrid search + audit) + a 3-step smoke test (traveler / specialist / provider). Mobile home hero collapsed from 819px to 560px on `<md` (h1 now uses `text-display-mobile`). `useMapStore` dead code removed (2026-07-04): `viewport` (3 write-only callers), `activeDay` (no callers), `setViewport` + `ViewportState` interface, `setActiveDay` — all scrubbed. `useMapStore.setSourceData` now fires a dev-mode `console.warn` once per session when called with no registered source (silent no-op was a real footgun). Engineering lifecycle coverage (6 phases) — see §3.11. Lifecycle close-outs: `match_hybrid_destinations` PL/pgSQL (Phase 3), `clampCoordinates` 6-decimal helper + 7 tests (Phase 5), antimeridian pitch clamp in `SpatialCameraController` (Phase 6), ADR-007 deferring PMTiles to post-launch. PR-14a admin console shell shipped (`app/console/layout.tsx` + 6 page edits; all 6 pages share `ConsoleNav`). Operational Phase 2 hosted Supabase apply is the only blocker for production.
+> The long status paragraph below is a historical snapshot from 2026-07-04.
+> Its test counts, hosted-Supabase blocker, and Cloudflare/CARTO decisions are
+> not current evidence. See `specs/PLAN-AUDIT_LATEST.md` for verified status.
 
 ---
 
-## 1. What Rumia Is
+## 1. Historical product model (superseded)
 
 Four-tier travel concierge platform for Portugal-first, AI-powered itinerary planning:
 
@@ -29,7 +40,7 @@ The immediate implementation focus is Tier 1 + Tier 2 with Tier 3 in-progress (p
 
 ---
 
-## 2. Current State vs Refined 2026 Phases (last verified 2026-07-04)
+## 2. Historical implementation snapshot (last verified 2026-07-04)
 
 ### Phase 1 — Foundations & Architecture Setup
 

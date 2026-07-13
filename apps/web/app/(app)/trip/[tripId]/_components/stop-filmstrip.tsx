@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useMapStore } from "../../../../../store/useMapStore";
-import { runViewTransition } from "@repo/ui";
+import { Icon, runViewTransition } from "@repo/ui";
 
 /**
  * StopFilmstrip — 1.4 reference: horizontal snap-x filmstrip of stops.
@@ -153,9 +153,7 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
                         : "text-on-surface-variant hover:text-ochre-dark")
                     }
                   >
-                    <span className="ph text-[18px]">
-                      more_vert
-                    </span>
+                    <Icon name="more_vert" className="text-[18px]" />
                   </span>
                 </div>
                 {stop.description && (
@@ -183,10 +181,7 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
                           : "text-on-surface-variant")
                       }
                     >
-                      <span
-                        aria-hidden="true"
-                        className="ph text-[14px] ph-calendar"
-                      >calendar</span>
+                      <Icon name="schedule" className="text-[14px]" />
                       {stop.durationHours.toFixed(1)} hrs
                     </div>
                   )}
@@ -226,7 +221,7 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
             aria-hidden="true"
             className="w-12 h-12 rounded-full border-2 border-olive-light/60 flex items-center justify-center"
           >
-            <span className="ph text-[24px] ph-plus">plus</span>
+            <Icon name="plus" className="text-[24px]" />
           </span>
           <span className="font-label-ui text-label-ui">Add Stop</span>
         </a>

@@ -8,9 +8,27 @@ test.describe("@smoke @reviewer-assigned-access", () => {
     await expect(page.getByTestId("reviewer-trip-header")).toHaveCount(0);
     await expect(page.getByText("Client brief context")).toHaveCount(0);
 
-    await page.screenshot({
-      fullPage: true,
-      path: "../../.sisyphus/evidence/future-roadmap/task-29-reviewer-assigned-access.png"
-    });
+    // This is evidence for the redirect contract, not a full-page visual
+    // baseline. Keeping the viewport capture bounded avoids Chromium's
+    // full-page capture race when both browser projects run the guard. A
+    // short retry handles the mobile protocol race that can occur while the
+    // redirected sign-in shell is still committing its final paint.
+    await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(100);
+    let screenshotError: unknown;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        await page.screenshot({
+          fullPage: false,
+          path: "../../.sisyphus/evidence/future-roadmap/task-29-reviewer-assigned-access.png"
+        });
+        screenshotError = undefined;
+        break;
+      } catch (error) {
+        screenshotError = error;
+        await page.waitForTimeout(250);
+      }
+    }
+    if (screenshotError) throw screenshotError;
   });
 });

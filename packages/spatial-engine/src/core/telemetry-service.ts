@@ -4,7 +4,7 @@ import type { SpatialFeature, SpatialFeatureCollection, TelemetryChannel, Teleme
  * Deterministic in-memory telemetry fixture.
  *
  * Phase 1 ships a stub so the SpatialEngine wiring can be verified
- * without a Supabase Realtime channel or SSE stream. Phase 2 will swap
+ * without a database-backed SSE stream. Phase 2 will swap
  * this for a real adapter behind the same TelemetryService interface.
  */
 export class InMemoryTelemetryService implements TelemetryService {

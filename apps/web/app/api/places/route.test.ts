@@ -1,12 +1,10 @@
 import { describe, expect, test } from "vitest";
 import type { Place } from "@repo/types";
 import type { AuthorizedApiContext } from "@/lib/auth/api";
-import { handlePlacesGetRequest, handlePlacesPostRequest } from "./route";
-
-const authClient = {};
+import { handlePlacesGetRequest, handlePlacesPostRequest } from "./handler";
 
 const adminAuth = {
-  client: authClient,
+  actor: { capabilities: [], reviewerId: null, roles: ["admin"], userId: "admin-user-123" },
   reviewerId: null,
   role: "admin",
   userId: "admin-user-123"
@@ -94,7 +92,7 @@ describe("places admin API authorization", () => {
     const response = await handlePlacesGetRequest({
       listPlaceRecords: async (limit, options) => {
         expect(limit).toBe(100);
-        expect(options?.client).toBe(authClient);
+        expect(options?.actor).toBe(adminAuth.actor);
 
         return [savedPlace];
       },
@@ -109,7 +107,7 @@ describe("places admin API authorization", () => {
     const response = await handlePlacesPostRequest(placeRequest(savedPlace), {
       createPlaceRecord: async (input, options) => {
         expect(input).toEqual(savedPlace);
-        expect(options?.client).toBe(authClient);
+        expect(options?.actor).toBe(adminAuth.actor);
 
         return savedPlace;
       },

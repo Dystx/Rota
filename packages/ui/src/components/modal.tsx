@@ -3,6 +3,7 @@
 import { type ReactNode, useCallback, useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "../lib/cn";
+import { Icon } from "./icon";
 
 /**
  * Modal — overlay dialog with focus trap.
@@ -174,7 +175,7 @@ export function Modal({
           aria-label="Close dialog"
           className="absolute top-3 right-3 w-9 h-9 inline-flex items-center justify-center rounded-full text-[var(--color-muted-foreground)] hover:bg-olive-light/10 focus-visible:outline-none focus-visible:shadow-focus transition-colors duration-fast ease-standard"
         >
-          <span aria-hidden className="material-symbols-outlined">close</span>
+          <Icon name="close" className="text-[20px]" />
         </button>
       </div>
     </div>,

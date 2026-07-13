@@ -1,18 +1,42 @@
 import { TripBriefSchema, type TripBrief } from "@repo/types";
 
+export * from "./actor";
 export * from "./analytics";
+export * from "./analytics-postgres";
 export * from "./access-control";
 export * from "./audit";
+export * from "./activity-days";
 export * from "./booking-clicks";
+export * from "./booking-clicks-postgres";
 export * from "./clients";
+export * from "./catalog-postgres";
+export * from "./console-postgres";
+export * from "./feedback";
 export * from "./partners";
 export * from "./places";
+export * from "./payments-postgres";
 export * from "./regions";
 export * from "./reviewer-assignments";
 export * from "./reviewers";
 export * from "./roles";
+export * from "./specialists";
+export * from "./specialists-postgres";
+export * from "./trips-postgres";
+export * from "./triage";
 
-import { createPrivilegedServerDataClient, resolvePrivilegedServerDataClient, type DataClientOptions } from "./clients";
+import {
+  createPostgresTripDraft,
+  getPostgresTripDraftById,
+  getPostgresTripDraftByIdForOwner,
+  listPostgresTripDrafts,
+  listPostgresTripsForUser,
+  markPostgresTripAsHumanReviewed,
+  markPostgresTripAsPaid,
+  requestPostgresTripHumanReview,
+  updatePostgresTripTransportMode
+} from "./trips-postgres";
+import { fulfillPostgresTripPaymentWebhook } from "./payments-postgres";
+import { resolveLegacyPrivilegedDataClient, type DataClientOptions } from "./clients";
 
 type SavedTripDraft = {
   tripBriefId: string;
@@ -113,7 +137,7 @@ function parseTripRow(row: RawTripRow | null): TripDraftDetail | null {
 }
 
 function selectTripsQuery(options?: DataClientOptions) {
-  return resolvePrivilegedServerDataClient(options).from("trips").select(
+  return resolveLegacyPrivilegedDataClient(options).from("trips").select(
     "id,title,status,visibility,is_paid,has_human_review,owner_user_id,created_at,trip_briefs!inner(id,normalized_json,status)"
   );
 }
@@ -124,7 +148,11 @@ type RawCreateTripDraftRpcRow = {
 };
 
 export async function createTripDraft(brief: TripBrief, options: DataClientOptions & { ownerUserId: string }): Promise<SavedTripDraft> {
-  const { data, error } = await resolvePrivilegedServerDataClient(options)
+  if (options.actor) {
+    return createPostgresTripDraft(brief, options.actor);
+  }
+
+  const { data, error } = await resolveLegacyPrivilegedDataClient(options)
     .rpc("create_trip_draft", {
       p_accommodation_location: brief.accommodationLocation,
       p_avoidances: brief.avoidances,
@@ -173,12 +201,16 @@ export type PaymentWebhookFulfillmentResult = {
 };
 
 export async function fulfillTripPaymentWebhook(input: PaymentWebhookFulfillmentInput, options?: DataClientOptions): Promise<PaymentWebhookFulfillmentResult> {
+  if (options?.actor || (!options?.client && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.tripId))) {
+    return fulfillPostgresTripPaymentWebhook(input, options?.actor);
+  }
+
   const numericTripId = toNumericTripId(input.tripId);
   if (numericTripId === null) {
     throw new Error("Invalid trip ID");
   }
 
-  const { data, error } = await resolvePrivilegedServerDataClient(options)
+  const { data, error } = await resolveLegacyPrivilegedDataClient(options)
     .rpc("fulfill_trip_payment_webhook", {
       p_event_id: input.eventId,
       p_purchase_kind: input.purchaseKind,
@@ -203,6 +235,10 @@ export async function fulfillTripPaymentWebhook(input: PaymentWebhookFulfillment
 }
 
 export async function getTripDraftById(tripId: string, options?: DataClientOptions): Promise<TripDraftDetail | null> {
+  if (options?.actor) {
+    return (await getPostgresTripDraftById(tripId, options.actor)) as TripDraftDetail | null;
+  }
+
   const numericTripId = toNumericTripId(tripId);
 
   if (numericTripId === null) {
@@ -233,7 +269,7 @@ export async function tripDraftExists(tripId: string, options?: DataClientOption
     return false;
   }
 
-  const { count, error } = await (resolvePrivilegedServerDataClient(options)
+  const { count, error } = await (resolveLegacyPrivilegedDataClient(options)
     .from("trips")
     .select("id", { count: "exact", head: true })
     .eq("id", numericTripId) as unknown as TripExistenceQuery);
@@ -254,6 +290,10 @@ export async function getTripDraftByIdForOwner(
   ownerUserId: string,
   options?: DataClientOptions
 ): Promise<TripDraftDetail | null> {
+  if (options?.actor) {
+    return (await getPostgresTripDraftByIdForOwner(tripId, ownerUserId, options.actor)) as TripDraftDetail | null;
+  }
+
   const numericTripId = toNumericTripId(tripId);
 
   if (numericTripId === null) {
@@ -283,9 +323,13 @@ export async function updateTripTransportMode(
   ownerUserId: string,
   options?: DataClientOptions
 ): Promise<boolean> {
+  if (options?.actor) {
+    return updatePostgresTripTransportMode(tripId, transportMode, ownerUserId, options.actor);
+  }
+
   const trip = await getTripDraftByIdForOwner(tripId, ownerUserId, options);
   if (!trip) return false;
-  const client = resolvePrivilegedServerDataClient(options);
+  const client = resolveLegacyPrivilegedDataClient(options);
   const { data, error } = await client
     .from("trip_briefs")
     .update({ transport_mode: transportMode, normalized_json: { ...trip.brief, transportMode } })
@@ -298,13 +342,15 @@ export async function updateTripTransportMode(
 }
 
 export async function markTripAsPaid(tripId: string, options?: DataClientOptions): Promise<TripDraftDetail | null> {
+  if (options?.actor) return (await markPostgresTripAsPaid(tripId, options.actor)) as TripDraftDetail | null;
+
   const numericTripId = toNumericTripId(tripId);
 
   if (numericTripId === null) {
     return null;
   }
 
-  const { data, error } = await resolvePrivilegedServerDataClient(options)
+  const { data, error } = await resolveLegacyPrivilegedDataClient(options)
     .from("trips")
     .update({ is_paid: true, status: "paid" })
     .eq("id", numericTripId)
@@ -323,6 +369,8 @@ export async function markTripAsPaid(tripId: string, options?: DataClientOptions
 }
 
 export async function requestTripHumanReview(tripId: string, options?: DataClientOptions): Promise<TripDraftDetail | null> {
+  if (options?.actor) return (await requestPostgresTripHumanReview(tripId, options.actor)) as TripDraftDetail | null;
+
   const trip = await getTripDraftById(tripId, options);
 
   if (!trip || !trip.isPaid || trip.hasHumanReview || trip.status === "in_review") {
@@ -335,7 +383,7 @@ export async function requestTripHumanReview(tripId: string, options?: DataClien
     return null;
   }
 
-  const { data, error } = await resolvePrivilegedServerDataClient(options)
+  const { data, error } = await resolveLegacyPrivilegedDataClient(options)
     .from("trips")
     .update({ status: "in_review" })
     .eq("id", numericTripId)
@@ -354,6 +402,8 @@ export async function requestTripHumanReview(tripId: string, options?: DataClien
 }
 
 export async function markTripAsHumanReviewed(tripId: string, options?: DataClientOptions): Promise<TripDraftDetail | null> {
+  if (options?.actor) return (await markPostgresTripAsHumanReviewed(tripId, options.actor)) as TripDraftDetail | null;
+
   const trip = await getTripDraftById(tripId, options);
 
   if (!trip || !trip.isPaid || trip.hasHumanReview) {
@@ -366,7 +416,7 @@ export async function markTripAsHumanReviewed(tripId: string, options?: DataClie
     return null;
   }
 
-  const { data, error } = await resolvePrivilegedServerDataClient(options)
+  const { data, error } = await resolveLegacyPrivilegedDataClient(options)
     .from("trips")
     .update({ has_human_review: true, status: "reviewed" })
     .eq("id", numericTripId)
@@ -385,6 +435,10 @@ export async function markTripAsHumanReviewed(tripId: string, options?: DataClie
 }
 
 export async function listTripDrafts(limit = 12, options?: DataClientOptions): Promise<TripDraftListItem[]> {
+  if (options?.actor) {
+    return (await listPostgresTripDrafts(limit, options.actor)) as TripDraftListItem[];
+  }
+
   const { data, error } = await selectTripsQuery(options).order("created_at", { ascending: false }).limit(limit);
 
   if (error) {
@@ -431,6 +485,10 @@ export async function getTripsForUser(
   if (!userId) {
     return [];
   }
+  if (options?.actor) {
+    return (await listPostgresTripsForUser(userId, limit, options.actor)) as TripDraftListItem[];
+  }
+
   const { data, error } = await selectTripsQuery(options)
     .eq("owner_user_id", userId)
     .order("created_at", { ascending: false })

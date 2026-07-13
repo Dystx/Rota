@@ -61,5 +61,9 @@ Before any hosted environment enables map, storytelling, route geometry, or 3D:
 - Rumia remains loopback-only on `127.0.0.1:3002`.
 - Lumes remains on `0.0.0.0:3001`.
 - Map assets and route adapter remain isolated to Rumia-owned VPS paths.
+- The public activity workspace also requires the server-only
+  `RUMIA_MAP_STYLE_URL` provider configuration when the activity-map flag is
+  true; without it, the workspace remains list-only rather than selecting the
+  unapproved development candidate.
 
 No approval is implied by the existence of this document.

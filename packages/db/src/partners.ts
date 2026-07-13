@@ -1,5 +1,6 @@
 import { CreatePartnerSchema, PartnerSchema, type CreatePartnerInput, type Partner, type UpdatePartnerInput } from "@repo/types";
-import { resolveDataClient, type DataClientOptions } from "./clients";
+import { resolveLegacyDataClient, type DataClientOptions } from "./clients";
+import { createPostgresPartner, getPostgresPartnerById, listPostgresPartners, updatePostgresPartner } from "./catalog-postgres";
 
 type RawPartnerRow = {
   id: string;
@@ -30,7 +31,10 @@ function parsePartnerRow(row: RawPartnerRow): Partner {
 }
 
 export async function listPartners(limit = 100, options?: DataClientOptions): Promise<Partner[]> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) return listPostgresPartners(limit, options.actor);
+  if (!options?.client) return listPostgresPartners(limit);
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("partners")
     .select("id,name,type,coverage_regions,status,notes,link,is_affiliate")
     .order("created_at", { ascending: false })
@@ -44,7 +48,10 @@ export async function listPartners(limit = 100, options?: DataClientOptions): Pr
 }
 
 export async function getPartnerById(id: string, options?: DataClientOptions): Promise<Partner | null> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) return getPostgresPartnerById(id, options.actor);
+  if (!options?.client) return getPostgresPartnerById(id);
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("partners")
     .select("id,name,type,coverage_regions,status,notes,link,is_affiliate")
     .eq("id", id)
@@ -62,10 +69,12 @@ export async function getPartnerById(id: string, options?: DataClientOptions): P
 }
 
 export async function createPartner(input: CreatePartnerInput, options?: DataClientOptions): Promise<Partner> {
+  if (options?.actor) return createPostgresPartner(input, options.actor);
+
   const partner = CreatePartnerSchema.parse(input);
   const nextId = partner.id?.trim() || slugifyPartnerId(partner.name);
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("partners")
     .insert({
       coverage_regions: partner.coverageRegions,
@@ -88,6 +97,8 @@ export async function createPartner(input: CreatePartnerInput, options?: DataCli
 }
 
 export async function updatePartner(id: string, patch: UpdatePartnerInput, options?: DataClientOptions): Promise<Partner | null> {
+  if (options?.actor) return updatePostgresPartner(id, patch, options.actor);
+
   const nextPatch = CreatePartnerSchema.partial().parse(patch);
   const updates: Record<string, string | string[] | boolean> = {};
 
@@ -99,7 +110,7 @@ export async function updatePartner(id: string, patch: UpdatePartnerInput, optio
   if (nextPatch.link !== undefined) updates.link = nextPatch.link;
   if (nextPatch.isAffiliate !== undefined) updates.is_affiliate = nextPatch.isAffiliate;
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("partners")
     .update(updates)
     .eq("id", id)

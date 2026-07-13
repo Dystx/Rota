@@ -6,7 +6,7 @@ test.describe("@smoke public routes", () => {
   test("home page renders on the current project viewport", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Discover");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("What is actually worth your time in Portugal?");
     await expect(page).toHaveURL("/");
   });
 });
@@ -18,9 +18,7 @@ test.describe("@smoke seeded auth personas", () => {
     await page.goto("/");
 
     const cookies = await context.cookies();
-    expect(cookies.some((cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("auth-token"))).toBe(true);
-    const token = await page.evaluate(() => localStorage.getItem("supabase.auth.token"));
-    expect(token).toBeNull();
+    expect(cookies.some((cookie) => cookie.name === "better-auth.session_token")).toBe(true);
   });
 });
 
@@ -31,8 +29,6 @@ test.describe("@smoke reviewer persona", () => {
     await page.goto("/");
 
     const cookies = await context.cookies();
-    expect(cookies.some((cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("auth-token"))).toBe(true);
-    const token = await page.evaluate(() => localStorage.getItem("supabase.auth.token"));
-    expect(token).toBeNull();
+    expect(cookies.some((cookie) => cookie.name === "better-auth.session_token")).toBe(true);
   });
 });

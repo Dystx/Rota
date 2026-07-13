@@ -25,13 +25,13 @@ export default async function AdminAnalyticsPage() {
   try {
     if (isAdminPageAuthContext(auth)) {
       [analyticsCounts, bookingClicks] = await Promise.all([
-        getAdminAnalyticsMetricCounts({ client: auth.client }),
-        listBookingClicks(200, { client: auth.client })
+        getAdminAnalyticsMetricCounts({ actor: auth.actor }),
+        listBookingClicks(200, { actor: auth.actor })
       ]);
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load persisted analytics here."
+      ? "Configure PostgreSQL and Better Auth to load persisted analytics here."
       : "Could not load analytics yet.";
   }
 

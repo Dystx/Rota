@@ -10,11 +10,13 @@ export type AcceptedPhraseProps = {
   options: readonly string[];
   onAccept: (value: string) => void;
   onClear: () => void;
+  tone?: "default" | "inverse";
 };
 
-export function AcceptedPhrase({ label, value, options, onAccept, onClear }: AcceptedPhraseProps) {
+export function AcceptedPhrase({ label, value, options, onAccept, onClear, tone = "default" }: AcceptedPhraseProps) {
   const [isChoosing, setIsChoosing] = useState(false);
   const phraseButton = useRef<HTMLButtonElement>(null);
+  const isInverse = tone === "inverse";
 
   function close() {
     phraseButton.current?.focus();
@@ -27,13 +29,13 @@ export function AcceptedPhrase({ label, value, options, onAccept, onClear }: Acc
         ref={phraseButton}
         aria-expanded={isChoosing}
         aria-label={`${label}, ${value}`}
-        className="rounded-none border-b border-[var(--color-ochre-on-light)] bg-transparent px-0 py-1 font-medium text-[var(--color-foreground)] decoration-1 underline-offset-4 hover:text-[var(--color-ochre-on-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ochre-light)]"
+        className={`rounded-none border-b border-[var(--color-ochre-on-light)] bg-transparent px-0 py-1 font-medium decoration-1 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ochre-light)] ${isInverse ? "text-[var(--color-paper)] hover:text-[var(--color-ochre-light)]" : "text-[var(--color-foreground)] hover:text-[var(--color-ochre-on-light)]"}`}
         onClick={() => setIsChoosing((open) => !open)}
         type="button"
       >
         {value}
       </button>
-      <button aria-label={`Clear ${label}`} className="min-h-11 min-w-11 text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ochre-light)]" onClick={onClear} type="button">×</button>
+      <button aria-label={`Clear ${label}`} className={`min-h-11 min-w-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ochre-light)] ${isInverse ? "text-[var(--color-paper)] hover:text-[var(--color-ochre-light)]" : "text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"}`} onClick={onClear} type="button">×</button>
       {isChoosing ? (
         <PhraseChoiceRail
           options={options}

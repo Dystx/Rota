@@ -5,12 +5,32 @@
 > checklist. It is subordinate to the activity-first product plan and does not
 > change Rumia's product boundary, backend, or release order.
 >
-> **Status:** redesign is approved for implementation planning. Shared
-> component work and map-gating infrastructure exist in source, but the visual
-> release is not accepted until a fresh artifact is served and reviewed at the
-> required viewports. The currently visible 3302 browser tunnel has shown a
-> stale homepage globe and stale planner chapter; those are deployment/evidence
-> defects until proven against the current source build.
+> **Status (2026-07-13):** the canonical plan is being executed. Shared public
+> and operator foundations are implemented: semantic page fields, deterministic
+> editorial texture, offline/recovery/loading surfaces, a useful empty desktop
+> day rail, and a texture-free linen operator field. Local PostgreSQL/Better
+> Auth integration is now available for browser gates. The first real public
+> art-direction slice is also in the active worktree: the homepage has an owned
+> editorial image anchor, Portugal activity-edition kicker, and trust rail; the
+> explorer uses numbered dossier cards with an explicit trade-off column; the
+> planner uses one responsive brief/context/action composition; and the console
+> uses a dense linen operator shell with fitting lanes and a stacked mobile
+> messaging workspace. Targeted visual captures and focused tests pass.
+> The last approved artifact is deployed privately on the VPS as release
+> `20260713T0128Z-provider-gate`, with the private tunnel visual check rerun against
+> that release. The current worktree contains a subsequent proof-rail, pricing
+> hierarchy, chosen-day editor, saved-traveler surface, and utility recovery
+> slices that are verified
+> on the local current-source artifact but is not yet in the VPS release. The
+> saved surface pass covers `/account`, `/trip/[tripId]`, `/trip/[tripId]/map`,
+> and `/trip/[tripId]/export`: activity-first labels, reduced hero dominance,
+> explicit spatial/export language, removal of booking-source cards, and a
+> keyboard-discoverable map details panel. Remaining external work is the map provider/legal gate
+> and owner-controlled public ingress; the activity-map browser boundary now
+> accepts a reviewed style endpoint and attribution configuration without
+> enabling any provider. A private standalone canary also rendered the
+> self-hosted Protomaps preflight with visible attribution and zero browser
+> console errors; route-level frontend gates are fresh.
 
 ## 1. Authority and plan reconciliation
 
@@ -54,9 +74,9 @@ not imply that Rumia is Porto-only.
 
 ## 3. Evidence-led diagnosis
 
-### 3.1 P0 — source and browser artifact are not the same thing
+### 3.1 Historical P0 — source and browser artifact were not the same thing
 
-The current visual review used `http://127.0.0.1:3302/` through the SSH tunnel
+The earlier visual review used `http://127.0.0.1:3302/` through the SSH tunnel
 to the VPS's HTTP-only Rumia listener. The visible artifact still showed:
 
 - an old globe-first homepage with world labels and public-3D/map controls;
@@ -64,7 +84,8 @@ to the VPS's HTTP-only Rumia listener. The visible artifact still showed:
 - mobile versions of the same stale composition.
 
 The current source contract instead requires a quiet Portugal context, a
-phrase-led activity decision, and a secondary chosen-day planner. Therefore:
+phrase-led activity decision, and a secondary chosen-day planner. This was a
+stale-artifact finding, not the current source baseline. Therefore:
 
 1. Do not accept screenshots from 3302 as current-source evidence until the
    release artifact is rebuilt and deployed from the active worktree.
@@ -76,7 +97,10 @@ phrase-led activity decision, and a secondary chosen-day planner. Therefore:
    `https://127.0.0.1:3002` is not a valid visual target today.
 
 **Exit:** the browser-rendered homepage and planner copy match the checked-out
-source, and a stale-build check can identify the served commit.
+source, and a stale-build check can identify the served commit. This exit is
+now proven on the rebuilt local standalone artifact at `127.0.0.1:3003`; the
+external 3002 tunnel still requires a separate deploy/restart before it can be
+called current.
 
 ### 3.2 P1 — the visual system is not yet expressed as a shared background system
 
@@ -209,6 +233,13 @@ criteria and the relevant focused tests are green.
 **Exit:** source and browser agree; old globe/planner copy is either removed
 from the served artifact or recorded as a deployment blocker.
 
+**Current evidence:** rebuilt standalone artifact on `127.0.0.1:3003` from this
+worktree shows the activity-first Portugal homepage, judged explore surface,
+chosen-day workspace, and secondary planner. Representative desktop/mobile
+screens were checked after static/public assets were copied beside the
+standalone server; browser console error scan was empty and support measured one
+`main` landmark with zero horizontal overflow.
+
 ### Phase 1 — Shared visual foundations and backgrounds
 
 **Purpose:** make the redesign visible everywhere without changing product
@@ -232,6 +263,18 @@ behavior.
 **Exit:** no public page relies on an unexplained flat fill or one-off token;
 texture is subtle, deterministic, contrast-safe, and removable by one class.
 
+**Implementation status:** semantic surfaces now live in `AppLayout` and
+`PageShell`, with explicit `data-surface` and `data-surface-texture` fields.
+Marketing discovery defaults to sage, reading pages to linen, focused planning
+to midnight, and dense operator screens disable texture. Root, route-group,
+offline, legal, sign-in, not-found, and error/loading states use the same
+surface contract. The desktop empty activity rail now explains how to start a
+day and stays hidden from the mobile fixed-tray path.
+
+Operator cohesion is now explicit as well: `OperatorShell` and admin/reviewer
+`PageShell` variants use a dense, texture-free linen field. Midnight remains
+reserved for planning chapters that opt into inverse editorial typography.
+
 ### Phase 2 — Public editorial journey
 
 **Purpose:** make the product proposition visually decisive.
@@ -252,6 +295,31 @@ texture is subtle, deterministic, contrast-safe, and removable by one class.
 **Exit:** a new traveller can state a situation, understand a judgement, save
    an activity, and reach the workspace at desktop/mobile without map use.
 
+**Implementation status:** the first art-direction slice is now in the active
+worktree. The cover uses a restrained owned Portugal illustration as an
+atmospheric anchor while keeping the phrase composer as the only task; its
+proof rail states Portugal-wide, activity-first, and no-paid-ranking
+boundaries. Explorer results now read as editorial dossiers with sequence
+markers, a visible trade-off column, a composed save action, and a fact rail.
+Activity detail now follows the same grammar: region kicker, oversized title,
+verdict-first judgement, a fact rail, explicit trade-offs, and a source
+colophon. Portugal collections now use an atlas intro/proof rail, coverage
+facts, and numbered collection covers rather than an undifferentiated grid.
+The chosen-day workspace selected state also uses numbered choice cards with a
+practical-shape aside, explicit removal control, and a fact rail; its empty
+state remains the recovery path.
+
+The next editorial pass adds a reusable proof rail to the long-form
+`/how-it-works` and `/local-expertise` surfaces. It puts the product boundary,
+selection standard, and control promise in the first reading sequence, reducing
+desktop dead space without adding decorative content or changing the activity
+journey. The rail is a semantic definition list and stacks cleanly on mobile.
+
+Pricing now uses the same rail and labels each tier as Included, Optional, or
+Future access. This keeps the current free-first boundary visible before the
+price rows and prevents the waitlisted concierge idea from reading like a live
+product.
+
 ### Phase 3 — Chosen-day continuity and planner polish
 
 **Purpose:** make the selected day feel like the same product.
@@ -271,6 +339,29 @@ texture is subtle, deterministic, contrast-safe, and removable by one class.
 planner → sign-in → saved trip; list/agenda remains complete without motion or
 map interaction.
 
+**Implementation status:** `/trip/new` now reads as a secondary saved-plan
+editor rather than a route or concierge wizard. Its hero leads with activity
+selection and a clear Explore hand-off; the review card uses activity-first
+labels, explicit edit affordances, a truthful no-booking boundary, and a
+mobile-safe layout; the supporting rail explains pace, local context, and user
+control without promising an audit or automated concierge. Its current-source
+desktop/mobile captures report one H1, zero horizontal overflow, zero serious/
+critical axe findings, and zero browser console errors. The underlying
+`/api/trips` contract is unchanged.
+
+The saved-traveler surface slice is now implemented in the current worktree.
+The account shelf speaks in saved plans and activities, the trip workspace
+reduces the cinematic hero's empty dominance and uses plan/agenda/spatial
+language, the spatial view removes booking-source cards and keeps the list
+authoritative, and export uses carry/share language with explicit
+locked/unlocked states. The map details panel is a keyboard-discoverable
+labelled region, and an unsourced/partial route now uses an intentional
+schematic map with its geometry status inside the details panel instead of an
+empty renderer canvas. The source artifact is locally verified at 1440×900 and
+393×852 with one H1, zero horizontal overflow, zero browser console errors,
+and zero serious/critical axe findings. This slice is local-only until the
+release cutover gate is approved.
+
 ### Phase 4 — Motion, feedback, and accessibility polish
 
 **Purpose:** make interaction feel responsive and trustworthy.
@@ -289,6 +380,13 @@ map interaction.
 **Exit:** every motion has a text/state equivalent and a reduced-motion trace;
    no serious/critical accessibility finding remains.
 
+**Current evidence (2026-07-13):** shared status regions, focus-safe state
+transitions, and reduced-motion behavior are covered by focused UI/web tests
+and the motion gate (445 files scanned). Dedicated accessibility is green at
+61 passed with one expected mobile h1-sweep skip. The latest authenticated
+smoke run is green at 303 passed with 33 expected skips after the activity-detail
+route was added.
+
 ### Phase 5 — Utility, account, and operator cohesion
 
 **Purpose:** remove the feeling of separate products.
@@ -304,6 +402,25 @@ map interaction.
 
 **Exit:** every route group has one purpose, one primary action, one H1/main,
    intentional density, and recovery links.
+
+**Current evidence:** support, offline, legal, sign-in, recovery/loading, and
+feedback surfaces share the semantic field contract; admin/reviewer shells now
+share the dense linen/no-texture operator treatment. Planner and console now
+have the same route-scoped art direction, with refreshed desktop/mobile
+captures. The full authenticated browser matrix is green at 303 passed/33
+expected skips, visual at 104 passed/32 expected skips, dedicated accessibility
+at 61 passed/1 expected skip, performance at 14/14, and the explicit tablet
+viewport contract at 120/120.
+
+The utility recovery slice is now refreshed in the current worktree. Offline
+has a real recovery composition with connection state, cached-day truth, and
+next-step guidance; feedback uses the same rounded editorial surface and
+explicit selected/disabled control states; sign-in now carries a compact trust
+rail that explains the privacy and editorial boundaries without adding social
+login or chatbot language. Auth and anonymous feedback contracts remain
+unchanged. Current-source desktop/mobile checks for `/offline`, `/feedback`,
+`/sign-in`, and `/support` report one H1, one main, zero overflow, zero console
+errors, and zero serious/critical axe findings.
 
 ### Phase 6 — Optional spatial enhancement
 
@@ -341,6 +458,40 @@ pnpm --dir apps/web test:a11y
 pnpm --dir apps/web test:visual
 pnpm --dir apps/web test:perf
 ```
+
+**Current evidence (2026-07-13):** the current standalone artifact builds with
+the explicit local PostgreSQL/Better Auth environment; unit tests pass at 171
+files/885 tests, typecheck is 15/15, ESLint and the 445-file motion gate pass,
+the production build emits 64 routes, and the browser gates are green at
+303/336 smoke, 61/62 accessibility, 104/136 visual, 14/14 performance, and
+120/120 tablet viewport checks. The full smoke suite was rerun after the
+schematic spatial-fallback polish and remains green at 303/336. Fresh
+1440×900/393×852 route captures report
+78/78 HTTP-success routes; the only console errors in that unauthenticated
+review script are the expected 401s from the protected console messaging API.
+The authenticated console visuals and smoke checks are green.
+
+The saved-traveler surface slice is also green on the current local
+standalone: `/account`, `/trip/[tripId]`, `/trip/[tripId]/map`, and
+`/trip/[tripId]/export` return 200 at desktop and mobile, each has one H1,
+zero horizontal overflow, zero console errors, and no serious/critical axe
+violations. The focused map-panel test and existing chosen-day tests pass; the
+full unit suite is 171 files / 885 tests. The production build emits 64 routes
+and the motion gate scans 445 files with no violations. These checks do not
+change the VPS release until a release branch/cutover is explicitly approved.
+
+The current-source proof-rail slice was also checked independently at
+1440×900 and 393×852: both routes render the labelled definition list with no
+horizontal overflow, zero serious/critical axe findings, and zero browser
+console errors.
+
+The same refreshed artifact is privately deployed as VPS release
+`20260713T0128Z-provider-gate` on `127.0.0.1:3002`; the Mac tunnel at
+`127.0.0.1:3302` returned 200 for the representative public, planner, and
+activity-detail routes at both 1440px and 393px, with no horizontal overflow or
+browser console errors. The local and remote standalone server entrypoints
+share SHA-256 `0ad9393852f225bdb93be2496f25ee79842cd9069b7cef5e5e4b0aa5d322f604`.
+Lumes remains unchanged on port 3001.
 
 **Manual evidence:** 1440×900, 1024×768, 768×768, and 390×844 captures for
 `/`, `/portugal`, `/explore`, `/explore/workspace`, `/planner`, `/support`,
@@ -404,10 +555,15 @@ The redesign is complete only when all of the following are true:
 
 ## 10. Current open decisions
 
-- Fresh Rumia 3002/3302 artifact must be rebuilt from this worktree before any
-  visual acceptance claim.
-- Final texture treatment and asset manifest still require route-by-route
-  review.
+- Fresh Rumia 3002/3302 artifact is rebuilt and privately deployed from this
+  worktree; public visual acceptance is still intentionally deferred with the
+  public-ingress decision.
+- Final texture treatment and the owned asset manifest have been reviewed
+  against the refreshed 1440px/393px route set; future editorial asset changes
+  must continue through the same manifest gate.
+- Local Playwright gates use an explicit PostgreSQL/Better Auth environment;
+  production deploy evidence must still record the equivalent VPS secrets
+  without committing them.
 - Map owner/legal/provider/quota/GTFS decisions remain open in the launch
   packet; no production Phase 2/3 flag may be enabled.
 - External public ingress (`rumia.pt`) remains deferred.

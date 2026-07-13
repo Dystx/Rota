@@ -7,7 +7,7 @@ const regions = JSON.parse(readFileSync(resolve(root, "apps/web/content/portugal
 const errors = [];
 
 for (const asset of manifest) {
-  if (!asset.id || !asset.licence || !asset.owner || !asset.files?.length) errors.push(`Incomplete manifest entry: ${asset.id ?? "unknown"}`);
+  if (!asset.id || !asset.alt?.trim() || !asset.licence || !asset.owner || !asset.reviewedAt || !asset.files?.length) errors.push(`Incomplete manifest entry: ${asset.id ?? "unknown"}`);
   for (const file of asset.files ?? []) {
     if (!file.src?.startsWith("/") || file.src.startsWith("//")) errors.push(`Non-owned path: ${asset.id}`);
     const path = resolve(root, "apps/web/public", String(file.src).replace(/^\//u, ""));

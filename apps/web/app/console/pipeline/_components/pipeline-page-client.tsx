@@ -21,7 +21,7 @@ export function PipelinePageClient({ initialItems }: { initialItems?: PipelineIt
 
   return (
     <>
-      <header className="mb-section-gap flex flex-col gap-4 md:flex-row md:items-end md:justify-between shrink-0">
+      <header className="mb-section-gap flex min-w-0 flex-col gap-4 md:flex-row md:items-end md:justify-between shrink-0">
         <div>
           <h1 className="font-headline-lg text-headline-lg text-primary">
             Operations Pipeline
@@ -39,7 +39,7 @@ export function PipelinePageClient({ initialItems }: { initialItems?: PipelineIt
       </header>
 
       <div
-        className="flex-1 flex gap-gutter overflow-x-auto pb-4 rounded-xl"
+        className="flex min-w-0 w-full flex-1 gap-gutter overflow-x-auto pb-4 rounded-xl"
         style={{
           backgroundImage:
             "url(\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNlOGZmZjAiLz48cmVjdCB3aWR0aD0iMSIgaGVpZHRoPSIxIiBmaWxsPSJyZ2JhKDQzLCA2MiwgNTIsIDAuMSkiLz48L3N2Zz4=\")"

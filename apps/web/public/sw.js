@@ -8,7 +8,7 @@
 //  - /_next/static/* (hashed bundles): cache-first. The filenames
 //    hash per build, so anything in the cache is safe to reuse.
 //  - /icon-* and /manifest.webmanifest: cache-first.
-//  - Everything else (API, Supabase, MapLibre tiles): bypass the
+//  - Everything else (API, PostgreSQL-backed routes, MapLibre tiles): bypass the
 //    SW entirely. Realtime / writes / maps must always hit the
 //    network.
 //

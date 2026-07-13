@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Icon } from "@repo/ui";
 function cn(...values: Array<string | false | null | undefined>): string { return values.filter(Boolean).join(" "); }
 
 /**
@@ -73,15 +74,13 @@ export function TransportStep({
                 : "bg-white border-outline-variant/30 hover:border-ochre-light/60 hover:bg-ochre-light/5"
             )}
           >
-            <span
-              aria-hidden
+            <Icon
+              name={option.icon}
               className={cn(
-                "ph text-4xl",
+                "text-4xl",
                 isSelected ? "text-ochre-dark" : "text-on-surface-variant"
               )}
-            >
-              {option.icon}
-            </span>
+            />
             <span
               className={cn(
                 "font-headline-sm text-headline-sm",

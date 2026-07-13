@@ -14,11 +14,11 @@ export default async function ReviewerProfilePage() {
     if (!auth) {
       notSignedIn = true;
     } else {
-      reviewer = await getReviewerById(auth.reviewerId, { client: auth.client });
+      reviewer = await getReviewerById(auth.reviewerId, { actor: auth.actor });
     }
   } catch (error) {
     errorMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load the persisted reviewer profile here."
+      ? "Configure PostgreSQL and Better Auth to load the persisted reviewer profile here."
       : "Could not load reviewer profile. Please try again later.";
   }
 

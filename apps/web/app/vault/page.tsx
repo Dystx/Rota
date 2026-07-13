@@ -1,7 +1,7 @@
 import { PublicRouteLayout } from "../_components/public-route-layout";
 import { VaultGallery } from "./_components/vault-gallery";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { getTripsForUser } from "@repo/db";
+import { getTripsForUser, loadPostgresAuthorizationContext } from "@repo/db";
 
 /**
  * Vault page — Saved Vault & Export (1.7 reference parity).
@@ -14,7 +14,8 @@ import { getTripsForUser } from "@repo/db";
  */
 export default async function VaultPage() {
   const { user } = await getCurrentUser();
-  const trips = user ? await getTripsForUser(user.id) : [];
+  const actor = user ? await loadPostgresAuthorizationContext(user.id) : null;
+  const trips = user && actor ? await getTripsForUser(user.id, 24, { actor }) : [];
   return (
     <PublicRouteLayout>
       <div className="min-h-screen flex flex-col font-body-md text-body-md">

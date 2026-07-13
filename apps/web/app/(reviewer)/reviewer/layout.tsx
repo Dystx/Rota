@@ -3,8 +3,7 @@ import { redirect } from "next/navigation";
 import { OperatorShell } from "@repo/ui";
 import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
 import { getReviewerById } from "@repo/db";
-import { createAuthenticatedUserDataClient } from "@repo/db";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCurrentSession } from "@/lib/auth/session";
 
 /**
  * Reviewer layout — shared shell + auth guard for every
@@ -31,27 +30,22 @@ export default async function ReviewerLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headerList = await headers();
+  const currentPath = headerList.get("x-pathname") ?? headerList.get("next-url") ?? "/reviewer/queue";
   const auth = await getReviewerPageAuthContext();
   if (!auth) {
-    redirect("/sign-in?next=/reviewer/queue");
+    redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
   }
 
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const dataClient = createAuthenticatedUserDataClient(supabase);
-  const reviewer = await getReviewerById(auth.reviewerId, { client: dataClient });
+  const session = await getCurrentSession();
+  const user = session?.user ?? null;
+  const reviewer = await getReviewerById(auth.reviewerId, { actor: auth.actor });
   const displayName = reviewer?.name || user?.email || "Reviewer";
 
   // Read the current pathname for active-link highlighting.
   // Next.js 15+ exposes the current path via `headers()` under
   // the `next-url` / `x-pathname` headers (set by middleware).
   // Fall back to the queue path so the first paint is sane.
-  const headerList = await headers();
-  const currentPath =
-    headerList.get("x-pathname") ??
-    headerList.get("next-url") ??
-    "/reviewer/queue";
-
   return (
     <OperatorShell
       section="reviewer"

@@ -1,4 +1,4 @@
-import { SiteFooter } from "../../_components/site-footer";
+import { Icon } from "@repo/ui";
 import { ClientAnchorCard } from "../_components/client-anchor-card";
 import { TimelineItem } from "../_components/timeline-item";
 import { ValidationBar } from "../_components/validation-bar";
@@ -50,7 +50,7 @@ export default function ConsoleWorkspacePage() {
                 aria-label="Filter anchors"
                 className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
-                <span aria-hidden className="ph ph-funnel">funnel</span>
+                <Icon name="funnel" />
               </button>
             </div>
 
@@ -94,21 +94,11 @@ export default function ConsoleWorkspacePage() {
                   meta={
                     <>
                       <span className="flex items-center gap-1">
-                        <span
-                          aria-hidden
-                          className="ph text-[16px]"
-                        >
-                          directions_walk
-                        </span>
+                        <Icon name="directions_walk" className="text-[16px]" />
                         Moderate Activity
                       </span>
                       <span className="flex items-center gap-1">
-                        <span
-                          aria-hidden
-                          className="ph text-[16px]"
-                        >
-                          groups
-                        </span>
+                        <Icon name="groups" className="text-[16px]" />
                         Guide: Inês · local host
                       </span>
                     </>
@@ -130,9 +120,7 @@ export default function ConsoleWorkspacePage() {
                       aria-label="Edit lunch entry"
                       className="p-2 rounded-lg text-ochre-dark hover:bg-ochre-light/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                     >
-                      <span aria-hidden className="ph">
-                        edit
-                      </span>
+                      <Icon name="edit" />
                     </button>
                   }
                 >
@@ -160,10 +148,7 @@ export default function ConsoleWorkspacePage() {
                           <span className="font-label-ui text-label-ui">
                             Taberna do Mercado · allergen briefed
                           </span>
-                          <span
-                            aria-hidden
-                            className="ph text-ochre-dark text-[18px] ph-plus"
-                          >plus</span>
+                          <Icon name="plus" className="text-ochre-dark text-[18px]" />
                         </button>
                       </li>
                       <li>
@@ -174,10 +159,7 @@ export default function ConsoleWorkspacePage() {
                           <span className="font-label-ui text-label-ui">
                             Quinta da Foz · kitchen confirmed
                           </span>
-                          <span
-                            aria-hidden
-                            className="ph text-ochre-dark text-[18px] ph-plus"
-                          >plus</span>
+                          <Icon name="plus" className="text-ochre-dark text-[18px]" />
                         </button>
                       </li>
                     </ul>
@@ -206,7 +188,6 @@ export default function ConsoleWorkspacePage() {
             />
           </section>
         </main>
-        <SiteFooter />
       </div>
       <style>{`
         aside::-webkit-scrollbar, section::-webkit-scrollbar { width: 6px; }

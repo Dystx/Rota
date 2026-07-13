@@ -9,11 +9,11 @@ export default async function AdminQualityPage() {
 
   try {
     if (isAdminPageAuthContext(auth)) {
-      places = await listPlaces(100, { client: auth.client });
+      places = await listPlaces(100, { actor: auth.actor });
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load persisted quality signals here."
+      ? "Configure PostgreSQL and Better Auth to load persisted quality signals here."
       : "Could not load quality data yet.";
   }
 

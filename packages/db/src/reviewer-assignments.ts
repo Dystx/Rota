@@ -6,23 +6,20 @@ import {
   type ReviewerAssignment,
   type UpdateReviewerAssignmentInput
 } from "@repo/types";
-import { resolveDataClient, type DataClientOptions } from "./clients";
+import { resolveLegacyDataClient, type DataClientOptions } from "./clients";
+import {
+  createPostgresReviewerAssignment,
+  getPostgresReviewerAssignmentById,
+  listPostgresAssignmentsForTrip,
+  listPostgresReviewerAssignments,
+  updatePostgresReviewerAssignment,
+  DuplicateActiveReviewerAssignmentDatabaseError,
+  DuplicateActiveReviewerAssignmentError
+} from "./reviewer-assignments-postgres";
+
+export { DuplicateActiveReviewerAssignmentDatabaseError, DuplicateActiveReviewerAssignmentError } from "./reviewer-assignments-postgres";
 
 export const activeReviewerAssignmentStatuses = ["assigned", "submitted"] as const;
-
-export class DuplicateActiveReviewerAssignmentError extends Error {
-  constructor(public readonly existingAssignment: ReviewerAssignment) {
-    super("Trip already has an active reviewer assignment.");
-    this.name = "DuplicateActiveReviewerAssignmentError";
-  }
-}
-
-export class DuplicateActiveReviewerAssignmentDatabaseError extends Error {
-  constructor() {
-    super("Trip already has an active reviewer assignment.");
-    this.name = "DuplicateActiveReviewerAssignmentDatabaseError";
-  }
-}
 
 type RawReviewerAssignmentRow = {
   id: number;
@@ -83,6 +80,10 @@ export function filterActiveReviewerAssignments(assignments: ReviewerAssignment[
 }
 
 export async function createReviewerAssignment(input: CreateReviewerAssignmentInput, options?: DataClientOptions): Promise<ReviewerAssignment> {
+  if (options?.actor) {
+    return createPostgresReviewerAssignment(input, options.actor);
+  }
+
   const assignment = CreateReviewerAssignmentSchema.parse(input);
   const numericTripId = toNumericTripId(assignment.tripId);
 
@@ -97,7 +98,7 @@ export async function createReviewerAssignment(input: CreateReviewerAssignmentIn
     throw new DuplicateActiveReviewerAssignmentError(existingAssignment);
   }
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("reviewer_assignments")
     .insert({
       notes: assignment.notes,
@@ -120,7 +121,11 @@ export async function createReviewerAssignment(input: CreateReviewerAssignmentIn
 }
 
 export async function listReviewerAssignments(limit = 100, reviewerId?: string, options?: DataClientOptions): Promise<ReviewerAssignment[]> {
-  let query = resolveDataClient(options)
+  if (options?.actor) {
+    return listPostgresReviewerAssignments(limit, reviewerId, options.actor);
+  }
+
+  let query = resolveLegacyDataClient(options)
     .from("reviewer_assignments")
     .select("id,trip_id,reviewer_id,status,notes,created_at,completed_at,reviewers(name)")
     .order("created_at", { ascending: false })
@@ -140,13 +145,17 @@ export async function listReviewerAssignments(limit = 100, reviewerId?: string, 
 }
 
 export async function listAssignmentsForTrip(tripId: string, options?: DataClientOptions): Promise<ReviewerAssignment[]> {
+  if (options?.actor) {
+    return listPostgresAssignmentsForTrip(tripId, options.actor);
+  }
+
   const numericTripId = toNumericTripId(tripId);
 
   if (numericTripId === null) {
     return [];
   }
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("reviewer_assignments")
     .select("id,trip_id,reviewer_id,status,notes,created_at,completed_at,reviewers(name)")
     .eq("trip_id", numericTripId)
@@ -160,13 +169,17 @@ export async function listAssignmentsForTrip(tripId: string, options?: DataClien
 }
 
 export async function getReviewerAssignmentById(assignmentId: string, options?: DataClientOptions): Promise<ReviewerAssignment | null> {
+  if (options?.actor) {
+    return getPostgresReviewerAssignmentById(assignmentId, options.actor);
+  }
+
   const numericAssignmentId = Number(assignmentId);
 
   if (!Number.isInteger(numericAssignmentId)) {
     return null;
   }
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("reviewer_assignments")
     .select("id,trip_id,reviewer_id,status,notes,created_at,completed_at,reviewers(name)")
     .eq("id", numericAssignmentId)
@@ -214,6 +227,10 @@ export async function updateReviewerAssignment(
   patch: UpdateReviewerAssignmentInput,
   options?: DataClientOptions
 ): Promise<ReviewerAssignment | null> {
+  if (options?.actor) {
+    return updatePostgresReviewerAssignment(assignmentId, patch, options.actor);
+  }
+
   const numericAssignmentId = Number(assignmentId);
 
   if (!Number.isInteger(numericAssignmentId)) {
@@ -226,7 +243,7 @@ export async function updateReviewerAssignment(
   if (patch.status !== undefined) updates.status = patch.status;
   if (patch.completedAt !== undefined) updates.completed_at = patch.completedAt;
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("reviewer_assignments")
     .update(updates)
     .eq("id", numericAssignmentId)

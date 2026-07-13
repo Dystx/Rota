@@ -1,54 +1,58 @@
-# Deployment & Rollback Runbook
+# Rumia deployment and rollback
 
-This runbook covers standard deployments, hotfixes, and rollback procedures.
+Rumia is deployed as a versioned standalone Next artifact beside the existing
+Lumes service. The deployment wrapper only changes `/opt/apps/rumia/current`
+and restarts `rumia-web.service`; it never restarts or rewrites Lumes.
 
-## 1. Standard Deployment
+## Release activation
 
-### Build & Test
-All deployments must pass CI gates:
-1. `pnpm build` (Turbo cache hit for packages)
-2. `pnpm typecheck`
-3. `pnpm lint`
-4. `pnpm test:e2e` (Playwright smoke suite)
+1. Build on the Mac with the PostgreSQL/Better Auth environment.
+2. Copy `apps/web/.next/standalone/` into a prepared release directory, then
+   place the built browser assets inside the nested standalone app that owns
+   the server process:
 
-### Schema Changes
-1. Inspect `supabase/migrations/` for new `.sql` files.
-2. Run `supabase db lint` locally.
-3. Apply to staging/preview branch first.
-4. Verify RLS policies with `get_advisors(security)`.
+   ```text
+   apps/web/.next/standalone/apps/web/.next/static/
+   apps/web/.next/standalone/apps/web/public/
+   ```
 
-## 2. Rollback Procedures
+   The standalone server changes its working directory to
+   `apps/web/.next/standalone/apps/web`; placing assets only beside the
+   standalone directory produces an unstyled production page.
+3. Upload the directory to the VPS and run:
 
-### Application Rollback (Vercel/Web)
-1. Navigate to Deployment history.
-2. Identify last "Green" deployment.
-3. Select "Redeploy" or "Promote to Production".
-4. Estimated time: < 2 minutes.
+   ```sh
+   sudo /usr/local/sbin/deploy-rumia.sh /var/tmp/rumia-release <git-sha>
+   ```
 
-### Worker Rollback
-1. Revert worker image/script to previous stable version.
-2. Check `LocalWorkerState` for interrupted jobs.
-3. Estimated time: < 5 minutes.
+4. The wrapper verifies the standalone server entrypoint and both nested asset
+   directories, copies the release atomically, updates `current`, restarts only
+   Rumia, and checks
+   `http://127.0.0.1:3002/api/health`.
 
-### Database Rollback
-**WARNING: Destructive Operation.**
-1. Check if the issue can be fixed with a "forward-only" migration (e.g., dropping a bad index).
-2. If schema is corrupted/unstable:
-   - Use Supabase Point-in-Time Recovery (PITR).
-   - Restore to timestamp immediately preceding the deployment.
-   - **Note**: This will lose any data written between the deploy and the restore.
-3. Refer to `backup-restore.md` for restoration steps.
+## Application rollback
 
-## 3. Key Rotation (T1)
+If the loopback health check fails, the wrapper restores the previous `current`
+symlink and restarts only `rumia-web.service`. For a later manual rollback:
 
-### Supabase Service Role Key
-1. Generate new key in Supabase Dashboard.
-2. Update `<SUPABASE_SERVICE_ROLE_KEY>` in Production Environment Variables.
-3. Redeploy `apps/web` and `@repo/workers`.
-4. Revoke old key in Supabase Dashboard.
+```sh
+sudo ln -s /opt/apps/rumia/releases/<known-good> /opt/apps/rumia/current.rollback
+sudo mv -Tf /opt/apps/rumia/current.rollback /opt/apps/rumia/current
+sudo systemctl restart rumia-web.service
+curl --fail http://127.0.0.1:3002/api/health
+```
 
-### Provider Keys (Stripe, Resend, etc.)
-1. Rotate in provider dashboard.
-2. Update corresponding environment variable.
-3. Trigger redeploy.
-4. Verify integration via `provider_error` monitoring signal.
+## Database policy
+
+Database changes are forward-only. Roll back application code first; do not
+destructively downgrade PostgreSQL schema. A corrective migration must be
+written, reviewed, applied with the owner role, and verified with the policy
+runner before the next release.
+
+## Backup restore gate
+
+The R2/Restic backup and restore procedure is configured and has passed a
+successful backup plus `restore-rumia-check.sh` validation. Keep the restore
+output and snapshot identity with the cutover record. Do not treat a symlink
+rollback as a substitute for database restore evidence; repeat the restore
+check after material backup-script changes.

@@ -6,6 +6,7 @@
  *    TelemetryService, MapStyleProvider (see ./core/types)
  *  - MapLibre GL JS adapter with globe projection + soft fog
  *  - CartoBasemapStyleProvider as a development/provider-candidate adapter
+ *  - ProtomapsBasemapStyleProvider as an explicitly injected self-hosted candidate
  *  - InMemoryTelemetryService for deterministic fixtures
  *  - Two reference layers: AmbientPulseLayer, SymbolBadgesLayer
  *  - GlobeWorkspace React component for the Discovery Hub

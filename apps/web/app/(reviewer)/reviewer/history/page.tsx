@@ -18,12 +18,12 @@ export default async function ReviewerHistoryPage() {
     if (!auth) {
       notSignedIn = true;
     } else {
-      reviewer = await getReviewerById(auth.reviewerId, { client: auth.client });
-      assignments = await listReviewerAssignments(20, auth.reviewerId, { client: auth.client });
+      reviewer = await getReviewerById(auth.reviewerId, { actor: auth.actor });
+      assignments = await listReviewerAssignments(20, auth.reviewerId, { actor: auth.actor });
     }
   } catch (error) {
     errorMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load persisted reviewer history context here."
+      ? "Configure PostgreSQL and Better Auth to load persisted reviewer history context here."
       : "Could not load reviewer history. Please try again later.";
   }
 

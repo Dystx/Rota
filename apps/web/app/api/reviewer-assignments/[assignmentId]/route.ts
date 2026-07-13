@@ -18,8 +18,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ as
   }
 
   try {
+    const dataOptions = { actor: auth.actor };
     if (auth.role === "reviewer") {
-      const existingAssignment = await getReviewerAssignmentById(assignmentId, { client: auth.client });
+      const existingAssignment = await getReviewerAssignmentById(assignmentId, dataOptions);
 
       if (!existingAssignment) {
         return notFoundError("Reviewer assignment not found.");
@@ -30,7 +31,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ as
       }
     }
 
-    const assignment = await updateReviewerAssignment(assignmentId, parsed.data, { client: auth.client });
+    const assignment = await updateReviewerAssignment(assignmentId, parsed.data, dataOptions);
 
     if (!assignment) {
       return notFoundError("Reviewer assignment not found.");

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { generateItineraryFromBrief } from "@repo/ai";
 import { getCheckoutPlan } from "@repo/payments";
 import { 
-  Badge, Breadcrumb, Button, EmptyState, RevealSection, StatPill,
+  Badge, Breadcrumb, Button, EmptyState, RevealSection, StatPill, Icon,
   CinematicGuide, GuideProgress, GuideChapter, CTASection,
   ItineraryTimeline, TimelineDay
 } from "@repo/ui";
@@ -22,6 +22,8 @@ export const metadata: Metadata = {
 };
 
 function prettify(value: string) { return value.replace(/-/g, " "); }
+function editorialTitle(value: string) { return value.replace(/\broute\b/gi, "plan").replace(/\bitinerary\b/gi, "plan"); }
+function editorialCopy(value: string) { return value.replace(/\broute\b/gi, "plan").replace(/\bitinerary\b/gi, "agenda"); }
 
 /**
  * Resolve a hero cover image for a given trip. The current seeded
@@ -46,7 +48,7 @@ function prettify(value: string) { return value.replace(/-/g, " "); }
  */
 function summarizeBrief(brief: import("@repo/types").TripBrief | undefined): string {
   if (!brief) {
-    return "Your itinerary is being drafted. Once the brief is confirmed, the AI will produce day-by-day stops and a route.";
+    return "Your saved plan is ready to shape. Add the activities, pace, and practical context that should guide the day.";
   }
   const days = brief.tripLengthDays;
   const country = brief.destinationCountry || "Portugal";
@@ -57,9 +59,9 @@ function summarizeBrief(brief: import("@repo/types").TripBrief | undefined): str
     : null;
 
   const place = [region, country].filter(Boolean).join(", ");
-  const moves = transport ? `${days}-day ${transport} itinerary through ${place}` : `${days}-day itinerary through ${place}`;
+  const moves = transport ? `${days}-day ${transport} plan around ${place}` : `${days}-day plan around ${place}`;
   const flavor = interests ? ` — focusing on ${interests}.` : ".";
-  return `A ${moves}${flavor}`;
+  return `A considered ${moves}${flavor}`;
 }
 
 type GeneratedItinerary = Awaited<ReturnType<typeof generateItineraryFromBrief>>;
@@ -104,7 +106,7 @@ export default async function TripDetailPage({
     itineraryError = true;
   }
 
-  const title = trip ? trip.title : "Generated route overview preview";
+  const title = trip ? editorialTitle(trip.title) : "Saved Portugal plan";
   const tripCommerceState = getTripCommerceState({ status: trip?.status, hasHumanReview: trip?.hasHumanReview, isPaid: trip?.isPaid });
   const checkoutPlan = getCheckoutPlan(tripCommerceState.canUnlock ? "paid-trip" : tripCommerceState.canRequestReview ? "human-polish" : "free-preview");
   // Do not synthesize preview days when generation failed or returned
@@ -130,10 +132,10 @@ export default async function TripDetailPage({
 
   const chapters = [
     { id: "overview", label: "Overview" },
-    { id: "pacing", label: "Pacing" },
-    { id: "route", label: "Route" },
-    { id: "itinerary", label: "Itinerary" },
-    { id: "unlock", label: "Unlock" },
+    { id: "pacing", label: "Pace" },
+    { id: "route", label: "Spatial view" },
+    { id: "itinerary", label: "Agenda" },
+    { id: "unlock", label: "Access" },
     { id: "next-step", label: "Next Step" }
   ];
 
@@ -188,7 +190,7 @@ export default async function TripDetailPage({
       <div className="mx-auto max-w-[1100px] px-6 pt-6">
         <Breadcrumb
           items={[
-            { label: "Itineraries", href: "/itineraries" },
+            { label: "Saved plans", href: "/account" },
             { label: title }
           ]}
         />
@@ -199,7 +201,7 @@ export default async function TripDetailPage({
               data-testid="trip-brief-open-map"
               className="inline-flex items-center gap-2 rounded-full border border-olive-light/40 bg-white/70 px-5 py-2 font-label-ui text-label-ui text-primary transition-colors hover:bg-olive-light/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
             >
-              Open route map
+              Open spatial view
             </a>
           </div>
         ) : null}
@@ -237,9 +239,9 @@ export default async function TripDetailPage({
                     <p className="font-mono-micro text-mono-micro text-olive-light uppercase tracking-widest mb-1">
                       Overview
                     </p>
-                    <h3 className="font-display text-2xl text-[var(--color-foreground)]">
-                      {trip?.title ?? title}
-                    </h3>
+                    <h2 className="font-display text-2xl text-[var(--color-foreground)]">
+                      {title}
+                    </h2>
                   </div>
                   {trip ? (
                     <div className="flex flex-wrap gap-2">
@@ -248,8 +250,8 @@ export default async function TripDetailPage({
                         data-testid="trip-brief-view-route"
                         className="inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-2 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                       >
-                        View Route
-                        <span className="ph text-[16px] ph-arrow-right">arrow-right</span>
+                        View spatial context
+                        <Icon name="arrow-right" className="text-[16px]" />
                       </Link>
                     </div>
                   ) : null}
@@ -277,10 +279,10 @@ export default async function TripDetailPage({
 
                 <div className="grid gap-4 text-sm">
                   <SummaryRow label="Country" value={trip?.brief.destinationCountry ?? "Portugal"} />
-                  <SummaryRow label="Regions" value={trip ? trip.brief.regions.map(prettify).join(", ") : "—"} />
+                  <SummaryRow label="Areas" value={trip ? trip.brief.regions.map(prettify).join(", ") : "—"} />
                   <SummaryRow label="Interests" value={trip ? trip.brief.interests.map(prettify).join(", ") : "—"} />
-                  <SummaryRow label="Transport" value={trip ? prettify(trip.brief.transportMode) : "—"} />
-                  <SummaryRow label="Status" value={trip?.status ?? "Draft"} />
+                  <SummaryRow label="Getting around" value={trip ? prettify(trip.brief.transportMode) : "—"} />
+                  <SummaryRow label="State" value={trip?.status ?? "Draft"} />
                   <SummaryRow label="Access" value={tripCommerceState.accessLabel} />
                 </div>
 
@@ -296,20 +298,20 @@ export default async function TripDetailPage({
                   <Link
                     href={`/trip/${tripId}/export`}
                     data-testid="trip-brief-share"
-                    aria-label="Open export and share panel"
+                    aria-label="Open share and export panel"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 text-primary border border-olive-light/40 font-label-ui text-label-ui hover:bg-olive-light/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                   >
-                    <span aria-hidden="true" className="ph text-[16px] ph-share-network">share-network</span>
-                    Share
+                    <Icon name="share-network" className="text-[16px]" />
+                    Share plan
                   </Link>
                   <Link
                     href={`/trip/${tripId}/export`}
                     data-testid="trip-brief-download"
-                    aria-label="Download this trip"
+                    aria-label="Download this saved plan"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-olive-light text-on-primary font-label-ui text-label-ui hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                   >
-                    <span aria-hidden="true" className="ph text-[16px] ph-download-simple">download-simple</span>
-                    Download
+                    <Icon name="download" className="text-[16px]" />
+                    Download plan
                   </Link>
                 </div>
 
@@ -327,8 +329,8 @@ export default async function TripDetailPage({
                       variant="ghost"
                       className="border border-olive-light text-olive-dark hover:bg-olive-light/10"
                     >
-                      <span className="ph text-[16px] mr-1 ph-headset">headset</span>
-                      Request Polish — async chat with a specialist
+                      <Icon name="headset" className="text-[16px] mr-1" />
+                      Request specialist review
                     </Button>
                   </form>
                 ) : null}
@@ -343,9 +345,9 @@ export default async function TripDetailPage({
             {itinerary ? (
               <RevealSection>
                 <div className="grid gap-6 text-center">
-                  <h2 className="font-display text-4xl text-[var(--color-foreground)]">Route & Pacing</h2>
+                  <h2 className="font-display text-4xl text-[var(--color-foreground)]">Pace & practical shape</h2>
                   <p className="text-lg leading-[1.6] text-[var(--color-muted-foreground)] font-[family-name:var(--font-inter)] mx-auto max-w-2xl">
-                    {itinerary.routeOverview}
+                    {editorialCopy(itinerary.routeOverview)}
                   </p>
                   <div className="flex flex-wrap justify-center gap-3 mt-4">
                     <StatPill label="Confidence" value={`${Math.round(itinerary.confidenceScore * 100)}%`} />
@@ -356,8 +358,8 @@ export default async function TripDetailPage({
             ) : (
               <EmptyState
                 icon="route"
-                title="Route & pacing will appear here"
-                description="Once the brief is confirmed, the AI drafts a day-by-day route with confidence scores and a list of missing inputs. Until then, this section stays empty so we don't show guesswork."
+                title="Pace notes will appear here"
+                description="Once the saved plan has enough context, this section explains timing, buffers, and the practical trade-offs behind the activities you kept."
                 variant="default"
               />
             )}
@@ -381,8 +383,8 @@ export default async function TripDetailPage({
             // section evenly.
             <EmptyState
               icon="map"
-              title={itineraryError ? "Itinerary unavailable" : itineraryEmpty ? "No itinerary days yet" : "Itinerary is generating"}
-              description={itineraryError ? "We couldn’t load the saved route. Your last saved trip details are unchanged; try again shortly." : itineraryEmpty ? "The saved itinerary has no day data yet. Try again after generation finishes." : "Your saved brief is ready; day-by-day stops will appear when generation finishes."}
+              title={itineraryError ? "Saved plan unavailable" : itineraryEmpty ? "No agenda yet" : "Building your agenda"}
+              description={itineraryError ? "We couldn’t load the saved plan. Your saved choices are unchanged; try again shortly." : itineraryEmpty ? "The saved plan has no day data yet. Try again after the activity selection finishes." : "Your saved choices are ready; the day-by-day agenda will appear when generation finishes."}
               variant="map"
               action={itineraryError ? <Link href={`/trip/${tripId}?retry=1#route`} className="mt-4 inline-flex min-h-11 items-center rounded-full bg-olive-light px-5 text-white">Retry generation</Link> : undefined}
             />
@@ -403,7 +405,7 @@ export default async function TripDetailPage({
 
         <GuideChapter id="itinerary" className="py-12 md:py-24">
           <div className="mx-auto max-w-[800px]">
-            <h2 className="font-display text-4xl text-[var(--color-foreground)] mb-12">Detailed Itinerary</h2>
+            <h2 className="font-display text-4xl text-[var(--color-foreground)] mb-12">Day-by-day agenda</h2>
             <ItineraryTimeline days={timelineDays} readOnly={false} />
           </div>
         </GuideChapter>
@@ -411,8 +413,8 @@ export default async function TripDetailPage({
         <GuideChapter id="unlock" className="py-12 md:py-24 bg-[var(--color-ink)] text-[var(--color-paper)]">
           <div className="mx-auto max-w-[800px] grid gap-12">
             <div className="text-center">
-              <h2 className="font-display text-4xl">Unlock & Delivery</h2>
-              <p className="mt-4 text-lg text-[var(--color-cream)]">Get full access to this curated route.</p>
+              <h2 className="font-display text-4xl">Plan access</h2>
+              <p className="mt-4 text-lg text-[var(--color-cream)]">Choose what you need to carry this saved plan beyond the workspace.</p>
             </div>
             
             <div className="grid gap-6 rounded-[24px] border border-white/10 bg-white/5 p-8 shadow-sm backdrop-blur-xl text-white">
@@ -432,8 +434,8 @@ export default async function TripDetailPage({
 
         <GuideChapter id="next-step" className="p-0">
           <CTASection>
-             <h2 className="font-display text-4xl md:text-5xl">Ready to proceed?</h2>
-             <p className="text-xl md:text-2xl text-[var(--color-cream)] max-w-2xl">Confirm your unlocking plan, chat with the destination specialist, or request an expert human review to perfect these details.</p>
+             <h2 className="font-display text-4xl md:text-5xl">Ready to carry it forward?</h2>
+             <p className="text-xl md:text-2xl text-[var(--color-cream)] max-w-2xl">Keep shaping the day, export the saved plan, or read how specialist review works.</p>
              <div className="flex flex-wrap justify-center gap-4 mt-4">
                {tripCommerceState.canUnlock ? (
                  // The "Unlock Trip" CTA used to POST directly to the
@@ -444,7 +446,7 @@ export default async function TripDetailPage({
                  // and picks a tier explicitly. The checkout page
                  // posts the chosen tier back to the unlock API.
                  <Button asChild className="bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90 text-lg px-8 py-3 h-auto">
-                   <Link href={`/checkout?trip=${tripId}`}>Unlock Trip</Link>
+                   <Link href={`/checkout?trip=${tripId}`}>Unlock plan exports</Link>
                  </Button>
                ) : tripCommerceState.canExport ? (
                  <Button asChild className="bg-[var(--color-paper)] text-[var(--color-ink)] hover:bg-white/90 text-lg px-8 py-3 h-auto">
@@ -458,21 +460,16 @@ export default async function TripDetailPage({
                    link. The destination is the auth-gated
                    /expert-chat?trip=<id> page. */}
                <Button asChild variant="ghost" className="border border-[var(--color-paper)] text-[var(--color-paper)] hover:bg-white/10 text-lg px-8 py-3 h-auto">
-                 <Link href={`/expert-chat?trip=${tripId}`}>
-                   <span
-                     aria-hidden
-                     className="ph text-[20px] mr-1 ph-chat-circle-dots"
-                     style={{ fontVariationSettings: "'FILL' 1" }}
-                   >chat-circle-dots</span>
-                   Open expert chat
-                 </Link>
+                   <Link href="/local-expertise">
+                     Specialist review
+                   </Link>
                </Button>
 
                {tripCommerceState.canRequestReview ? (
                  <form action={`/api/trips/${tripId}/review`} method="post">
                    <input type="hidden" name="intent" value="request" />
                    <input type="hidden" name="target" value="trip" />
-                   <Button type="submit" variant="ghost" className="border border-[var(--color-paper)] text-[var(--color-paper)] hover:bg-white/10 text-lg px-8 py-3 h-auto">Request Polish</Button>
+                   <Button type="submit" variant="ghost" className="border border-[var(--color-paper)] text-[var(--color-paper)] hover:bg-white/10 text-lg px-8 py-3 h-auto">Request specialist review</Button>
                  </form>
                ) : null}
              </div>

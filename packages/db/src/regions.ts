@@ -1,5 +1,6 @@
 import { CreateRegionSchema, RegionSchema, type CreateRegionInput, type Region, type UpdateRegionInput } from "@repo/types";
-import { resolveDataClient, type DataClientOptions } from "./clients";
+import { resolveLegacyDataClient, type DataClientOptions } from "./clients";
+import { createPostgresRegion, getPostgresRegionById, listPostgresRegions, updatePostgresRegion } from "./catalog-postgres";
 
 type RawRegionRow = {
   id: string;
@@ -28,7 +29,9 @@ function parseRegionRow(row: RawRegionRow): Region {
 }
 
 export async function listRegions(limit = 100, options?: DataClientOptions): Promise<Region[]> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) return listPostgresRegions(limit, options.actor);
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("regions")
     .select("id,name,country_slug,best_for,seasonality,launch_status,description")
     .order("created_at", { ascending: false })
@@ -42,7 +45,9 @@ export async function listRegions(limit = 100, options?: DataClientOptions): Pro
 }
 
 export async function getRegionById(id: string, options?: DataClientOptions): Promise<Region | null> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) return getPostgresRegionById(id, options.actor);
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("regions")
     .select("id,name,country_slug,best_for,seasonality,launch_status,description")
     .eq("id", id)
@@ -60,10 +65,12 @@ export async function getRegionById(id: string, options?: DataClientOptions): Pr
 }
 
 export async function createRegion(input: CreateRegionInput, options?: DataClientOptions): Promise<Region> {
+  if (options?.actor) return createPostgresRegion(input, options.actor);
+
   const region = CreateRegionSchema.parse(input);
   const nextId = region.id?.trim() || slugifyRegionId(region.name);
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("regions")
     .insert({
       best_for: region.bestFor,
@@ -85,6 +92,8 @@ export async function createRegion(input: CreateRegionInput, options?: DataClien
 }
 
 export async function updateRegion(id: string, patch: UpdateRegionInput, options?: DataClientOptions): Promise<Region | null> {
+  if (options?.actor) return updatePostgresRegion(id, patch, options.actor);
+
   const nextPatch = CreateRegionSchema.partial().parse(patch);
   const updates: Record<string, string | string[]> = {};
 
@@ -95,7 +104,7 @@ export async function updateRegion(id: string, patch: UpdateRegionInput, options
   if (nextPatch.launchStatus !== undefined) updates.launch_status = nextPatch.launchStatus;
   if (nextPatch.description !== undefined) updates.description = nextPatch.description;
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("regions")
     .update(updates)
     .eq("id", id)

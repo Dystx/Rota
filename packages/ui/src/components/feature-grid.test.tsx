@@ -22,6 +22,7 @@ describe("FeatureGridItem", () => {
       </FeatureGridItem>
     );
     expect(screen.getByText("Curated Stays")).toBeDefined();
+    expect(screen.getByRole("heading", { level: 3, name: "Curated Stays" })).toBeDefined();
     expect(screen.getByText("Handpicked luxury hotels.")).toBeDefined();
   });
 

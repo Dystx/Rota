@@ -5,7 +5,7 @@
  *
  * Captures client-side signals that the platform uses to refine
  * each traveler's preference profile. Today this writes to an
- * in-memory ring buffer; tomorrow it POSTs to a Supabase
+ * in-memory ring buffer; tomorrow it POSTs to a PostgreSQL
  * `user_behavior_events` table and the offline IndexedDB cache
  * (from Phase 5) flushes the buffer on reconnect.
  *
@@ -27,7 +27,7 @@
  * None of these fire network requests in this scaffold. Callers
  * wire them via `onSkip`, `onExtend`, etc. on the relevant UI
  * components. The next Phase 6 commit will add the POST handler
- * and the Supabase table.
+ * and the PostgreSQL table.
  */
 
 export type BehaviorEventType =
@@ -187,7 +187,7 @@ export function peekBehaviorBuffer(): readonly BehaviorEvent[] {
  * calls this, sends the batch, and re-pushes any events that
  * arrived during the in-flight request so nothing is lost.
  *
- * TODO(LOW-11 / P6-1): the Supabase `user_behavior_events` table
+ * TODO(LOW-11 / P6-1): the PostgreSQL `user_behavior_events` table
  * doesn't exist yet. The flush path is wired for when it does
  * (P6-1 in docs/engineering-lifecycle.md). Until then, the
  * drain helper is exported for tests + the future Settings →

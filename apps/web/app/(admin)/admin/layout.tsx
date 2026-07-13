@@ -3,7 +3,7 @@ import { OperatorShell, SectionHeading } from "@repo/ui";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCurrentSession } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Admin Workspace",
@@ -17,15 +17,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const auth = await getAdminPageAuthContext();
 
   if (isAdminPageAuthContext(auth)) {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const session = await getCurrentSession();
     const currentPath = (await headers()).get("x-pathname") ?? "/admin/places";
 
     return (
       <OperatorShell
         section="admin"
         currentPath={currentPath}
-        user={{ name: user?.email ?? "Administrator", email: user?.email ?? null, avatarUrl: null }}
+        user={{ name: session?.user.name || session?.user.email || "Administrator", email: session?.user.email ?? null, avatarUrl: session?.user.image ?? null }}
         signOutAction="/api/auth/sign-out"
       >
         {children}

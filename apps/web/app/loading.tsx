@@ -2,7 +2,7 @@ import { SiteFooter } from "./_components/site-footer";
 
 /**
  * Root loading skeleton — shown during Next.js streaming while
- * a server component is resolving (e.g. a Supabase query on
+ * a server component is resolving (e.g. a PostgreSQL query on
  * /trip/[tripId] or /itineraries). The skeleton mirrors the
  * shape of the loaded page so the layout doesn't shift when
  * the data arrives (no CLS).
@@ -13,7 +13,7 @@ import { SiteFooter } from "./_components/site-footer";
  */
 export default function RootLoading() {
   return (
-    <div className="min-h-screen flex flex-col bg-paper" aria-busy="true" aria-live="polite">
+    <div className="min-h-screen flex flex-col rumia-surface rumia-surface-sage" data-surface="sage" data-surface-texture="editorial" aria-busy="true" aria-live="polite">
       <div className="flex-1">
         <div
           className="relative h-[420px] md:h-[520px] w-full overflow-hidden bg-gradient-to-b from-sage/40 via-paper to-paper"

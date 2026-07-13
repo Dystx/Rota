@@ -1,12 +1,32 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import "@testing-library/jest-dom/vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 
 import { ActivityDayTray } from "./activity-day-tray";
 
 describe("ActivityDayTray", () => {
+  afterEach(() => cleanup());
+
+  it("keeps the empty desktop rail useful without creating a mobile obstruction", () => {
+    render(
+      <ActivityDayTray
+        activities={[]}
+        onRemove={vi.fn()}
+        onContinue={vi.fn()}
+      />
+    );
+
+    const tray = screen.getByTestId("activity-day-empty");
+    expect(tray.getAttribute("data-empty")).toBe("true");
+    expect(tray.className).toContain("hidden");
+    expect(tray.className).toContain("md:block");
+    expect(screen.getByText("Your day is open.")).toBeDefined();
+    expect(screen.getByText(/Save an activity/)).toBeDefined();
+  });
+
   it("uses a compact sticky mobile tray while retaining the full desktop day list", () => {
     render(
       <ActivityDayTray

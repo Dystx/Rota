@@ -24,11 +24,14 @@ export type ServerConfig = {
     secretKey: string | undefined;
     webhookSecret: string | undefined;
   };
-  supabase: {
-    anonKey: string;
-    serviceRoleKey: string;
-    url: string;
-  };
+};
+
+export type ServerDatabaseConfig = {
+  databaseUrl: string;
+};
+
+export type ServerAuthConfig = {
+  betterAuthSecret: string;
 };
 
 export type ServerStripeSecretConfig = {
@@ -43,6 +46,11 @@ export type ServerResendConfig = {
   apiKey: string;
 };
 
+/** Optional server-side style URL for an isolated, reviewed map canary. */
+export function getOptionalRumiaMapStyleUrl(): string | undefined {
+  return process.env.RUMIA_MAP_STYLE_URL?.trim() || undefined;
+}
+
 export function createServerResendConfig(): ServerResendConfig {
   const missing: string[] = [];
   const resendApiKey = process.env.RESEND_API_KEY?.trim();
@@ -54,6 +62,25 @@ export function createServerResendConfig(): ServerResendConfig {
   return {
     apiKey: resendApiKey!
   };
+}
+
+export function createServerDatabaseConfig(): ServerDatabaseConfig {
+  const databaseUrl = process.env.DATABASE_URL?.trim();
+
+  assertNoMissing("server", databaseUrl ? [] : ["DATABASE_URL"]);
+
+  return { databaseUrl: databaseUrl! };
+}
+
+export function createServerAuthConfig(): ServerAuthConfig {
+  const betterAuthSecret = process.env.BETTER_AUTH_SECRET?.trim();
+
+  assertNoMissing("server", betterAuthSecret ? [] : ["BETTER_AUTH_SECRET"]);
+  if (betterAuthSecret!.length < 32) {
+    throw new Error("BETTER_AUTH_SECRET must be at least 32 characters.");
+  }
+
+  return { betterAuthSecret: betterAuthSecret! };
 }
 
 export function createServerStripeSecretConfig(): ServerStripeSecretConfig {
@@ -83,16 +110,10 @@ export function createServerStripeWebhookSecretConfig(): ServerStripeWebhookSecr
 }
 
 export function createServerConfig(publicConfig: PublicConfig = createPublicConfig()): ServerConfig {
-  const missing: string[] = [];
-
-  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
   const resendApiKey = process.env.RESEND_API_KEY?.trim();
   const mapboxSecretKey = process.env.MAPBOX_SECRET_KEY?.trim();
-
-  if (!supabaseServiceRoleKey) missing.push("SUPABASE_SERVICE_ROLE_KEY");
-  assertNoMissing("server", missing);
 
   return {
     appUrl: publicConfig.appUrl,
@@ -109,11 +130,6 @@ export function createServerConfig(publicConfig: PublicConfig = createPublicConf
       publishableKey: publicConfig.stripe.publishableKey,
       secretKey: stripeSecretKey,
       webhookSecret: stripeWebhookSecret
-    },
-    supabase: {
-      anonKey: publicConfig.supabase.anonKey,
-      serviceRoleKey: supabaseServiceRoleKey!,
-      url: publicConfig.supabase.url
     }
   };
 }

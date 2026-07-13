@@ -102,7 +102,7 @@ export default async function AdminSpecialistsPage() {
 
   try {
     if (isAdminPageAuthContext(auth)) {
-      profiles = await listSpecialists(100, { client: auth.client });
+      profiles = await listSpecialists(100, { actor: auth.actor });
       // One query per specialist for capabilities. For an
       // admin queue capped at 100 rows this is bounded
       // and parallel; the alternative (a single query
@@ -112,7 +112,7 @@ export default async function AdminSpecialistsPage() {
       // add a batched read helper.
       const caps = await Promise.all(
         profiles.map(async (p) => {
-          const c = await getSpecialistCapabilities(p.id, { client: auth.client });
+          const c = await getSpecialistCapabilities(p.id, { actor: auth.actor });
           return [p.id, c] as const;
         })
       );
@@ -120,7 +120,7 @@ export default async function AdminSpecialistsPage() {
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load persisted specialists here."
+      ? "Configure PostgreSQL and Better Auth to load persisted specialists here."
       : "Could not load admin specialists.";
   }
 
@@ -259,7 +259,7 @@ export default async function AdminSpecialistsPage() {
 
   // Seed the capabilities map for the demo data so the
   // "Capabilities" column reflects realistic counts when
-  // the Supabase env isn't configured.
+  // the PostgreSQL environment isn't configured.
   if (profiles.length === 0) {
     DEMO_SPECIALISTS.forEach((d, i) => {
       capsById.set(`demo-${i}`, d.caps);

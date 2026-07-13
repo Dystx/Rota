@@ -25,6 +25,9 @@ export interface RouteMapProps extends HTMLAttributes<HTMLDivElement> {
   selectedDayId?: string;
   days?: MapDayLayer[];
   warnings?: MapRouteWarning[];
+  /** Keep the generic fallback notice visible unless the host supplies a more contextual status surface. */
+  showFallbackNotice?: boolean;
+  fallbackNotice?: ReactNode;
   children?: ReactNode;
 }
 
@@ -32,6 +35,8 @@ export function RouteMap({
   selectedDayId,
   days = [],
   warnings = [],
+  showFallbackNotice = true,
+  fallbackNotice = "Schematic route map shown while interactive map is unavailable",
   className,
   children,
   ...props
@@ -125,16 +130,18 @@ export function RouteMap({
         </div>
       )}
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
-        <div className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/90 px-4 py-2 min-h-[44px] text-xs font-medium shadow-sm backdrop-blur-md text-[var(--color-muted-foreground)]">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="16" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12.01" y2="8" />
-          </svg>
-          Schematic route map shown while interactive map is unavailable
+      {showFallbackNotice ? (
+        <div className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2">
+          <div className="flex min-h-[44px] items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/90 px-4 py-2 text-xs font-medium text-[var(--color-muted-foreground)] shadow-sm backdrop-blur-md">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            {fallbackNotice}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="relative z-10 h-full w-full pointer-events-none">
         {children}
@@ -148,8 +155,15 @@ export interface MapPanelProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function MapPanel({ position = "left", className, children, ...props }: MapPanelProps) {
+  const panelRole = props.role ?? "region";
+  const panelTabIndex = props.tabIndex ?? 0;
+  const panelLabel = props["aria-label"] ?? "Selected day details";
+
   return (
     <div
+      role={panelRole}
+      tabIndex={panelTabIndex}
+      aria-label={panelLabel}
       className={cn(
         "absolute bottom-6 top-6 flex w-[320px] flex-col gap-5 overflow-y-auto rounded-[24px] border border-[var(--color-border)] bg-white/85 p-5 shadow-[0_16px_40px_rgba(7,17,19,0.08)] backdrop-blur-xl pointer-events-auto",
         position === "left" ? "left-6" : "right-6",

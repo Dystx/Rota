@@ -33,7 +33,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-paper">
+    <div className="min-h-screen flex flex-col rumia-surface rumia-surface-linen" data-surface="linen" data-surface-texture="editorial">
       <main id="main-content" className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="max-w-xl text-center">
           <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-4">
@@ -43,7 +43,7 @@ export default function GlobalError({
             We hit a <em className="text-ochre-dark not-italic">detour</em>.
           </h1>
           <p className="text-ink-soft text-lg mb-10 max-w-md mx-auto">
-            The page didn&apos;t load as expected. Our team has been notified — you can try again, or head back to a known-good spot.
+            The page didn&apos;t load as expected. Try again, or return to the activity guide and choose a different starting point.
           </p>
 
           {error.digest ? (

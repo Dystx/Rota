@@ -1,8 +1,9 @@
 /// <reference types="@testing-library/jest-dom" />
 import "@testing-library/jest-dom/vitest";
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
+import { afterEach } from "vitest";
 import { ChoiceChipGroup } from "./choice-chip-group";
 
 function ChipHarness() {
@@ -44,6 +45,8 @@ function SingleChipHarness(props: { onChange: (values: string[]) => void }) {
 }
 
 describe("ChoiceChipGroup", () => {
+  afterEach(() => cleanup());
+
   it("toggles choices with aria-pressed semantics", () => {
     render(<ChipHarness />);
 
@@ -101,5 +104,20 @@ describe("ChoiceChipGroup", () => {
     expect(history).toHaveAttribute("aria-checked", "true");
     expect(food).toHaveAttribute("aria-checked", "false");
     expect(onChange).toHaveBeenCalledWith(["history"]);
+  });
+
+  it("allows labels to opt into a dark-surface contrast token", () => {
+    render(
+      <ChoiceChipGroup
+        label="Transport"
+        labelClassName="text-linen-dark"
+        options={[{ value: "transit", label: "Transit" }]}
+        selected={["transit"]}
+        onChange={vi.fn()}
+        multiple={false}
+      />
+    );
+
+    expect(screen.getByText("Transport")).toHaveClass("text-linen-dark");
   });
 });

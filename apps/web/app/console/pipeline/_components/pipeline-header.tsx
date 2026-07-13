@@ -16,6 +16,7 @@
  */
 
 import * as React from "react";
+import { Icon } from "@repo/ui";
 import type { PipelineItem } from "../../_components/pipeline-board";
 
 type StatusFilter = "all" | PipelineItem["status"];
@@ -67,20 +68,17 @@ export function PipelineHeader({
     STATUS_OPTIONS.find((opt) => opt.value === statusFilter)?.label ?? "Filter";
 
   return (
-    <div className="flex items-center gap-3">
-      <label className="relative">
+    <div className="flex w-full min-w-0 flex-wrap items-center gap-3 md:w-auto md:flex-nowrap">
+      <label className="relative min-w-0 flex-1 sm:flex-none">
         <span className="sr-only">Search pipeline</span>
-        <span
-          aria-hidden
-          className="ph absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none ph-magnifying-glass"
-        >magnifying-glass</span>
+        <Icon aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" name="search" />
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search threads…"
           data-testid="pipeline-search-input"
-          className="font-body-md text-body-md pl-10 pr-4 py-2 rounded-full bg-white/60 border border-white/40 backdrop-blur-md text-primary placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light"
+          className="w-full max-w-full font-body-md text-body-md pl-10 pr-4 py-2 rounded-full bg-white/60 border border-white/40 backdrop-blur-md text-primary placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light sm:w-64"
         />
       </label>
       <div className="relative">
@@ -92,9 +90,9 @@ export function PipelineHeader({
           aria-expanded={filterOpen}
           aria-label="Filter pipeline by status"
           data-testid="pipeline-filter-button"
-          className="font-label-ui text-label-ui flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-white/40 backdrop-blur-md text-primary hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+          className="min-h-11 shrink-0 font-label-ui text-label-ui flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-white/40 backdrop-blur-md text-primary hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          <span className="ph ph-sliders-horizontal">sliders-horizontal</span>
+          <Icon name="tune" />
           {filterLabel}
         </button>
         {filterOpen ? (
@@ -127,7 +125,7 @@ export function PipelineHeader({
                 >
                   {opt.label}
                   {selected ? (
-                    <span aria-hidden className="ph text-[16px] ph-check">check</span>
+                    <Icon name="check" className="text-[16px]" />
                   ) : null}
                 </button>
               );
@@ -145,7 +143,7 @@ export function PipelineHeader({
           data-testid="pipeline-filter-clear"
           className="font-label-ui text-label-ui flex items-center gap-1 px-3 py-2 rounded-full text-ochre-dark hover:bg-ochre-light/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          <span className="ph text-[16px] ph-x">x</span>
+          <Icon name="close" className="text-[16px]" />
           Clear
         </button>
       )}

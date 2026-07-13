@@ -9,6 +9,7 @@ import {
   type FormEvent,
 } from "react";
 import type { TriageResult } from "@repo/ai";
+import { Icon } from "@repo/ui";
 import { formatChatTimestamp, type Day } from "../_lib/conversations";
 
 /**
@@ -144,7 +145,7 @@ export function MessageThread({
   }
 
   return (
-    <section className="flex-1 min-w-0 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
+    <section className="w-full min-h-[28rem] min-w-0 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden lg:min-h-0 lg:flex-1">
       <header className="px-6 py-4 border-b border-olive-light/10 bg-white/40 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <img
@@ -154,11 +155,11 @@ export function MessageThread({
             height={48}
             className="w-12 h-12 rounded-full object-cover"
           />
-          <div>
+          <div className="min-w-0">
             <h2 className="font-headline-sm text-headline-sm text-primary">
-              {activeDay.name}
+              <span className="block truncate">{activeDay.name}</span>
             </h2>
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="mt-0.5 flex flex-wrap items-center gap-2">
               <span
                 aria-hidden
                 className="w-2 h-2 rounded-full bg-olive-light"
@@ -204,18 +205,14 @@ export function MessageThread({
             aria-label="Open client profile"
             className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span aria-hidden className="ph">
-              person
-            </span>
+            <Icon name="person" />
           </button>
           <button
             type="button"
             aria-label="Open itinerary map"
             className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
-            <span aria-hidden className="ph">
-              map
-            </span>
+            <Icon name="map" />
           </button>
         </div>
       </header>
@@ -243,12 +240,7 @@ export function MessageThread({
               role="status"
               className="flex flex-col items-center justify-center text-center py-16 px-6 gap-4 rounded-2xl border border-olive-light/30 bg-white/60 backdrop-blur"
             >
-              <span
-                aria-hidden
-                className="ph text-[40px] text-ochre-light"
-              >
-                lock
-              </span>
+              <Icon name="lock" className="text-[40px] text-ochre-light" />
               <div className="flex flex-col gap-1.5 max-w-sm">
                 <h2 className="font-display text-xl text-foreground">
                   Operator sign-in required
@@ -263,7 +255,7 @@ export function MessageThread({
                 className="inline-flex items-center gap-2 bg-ink text-cream font-medium text-sm px-5 py-2.5 rounded-full hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
                 Sign in
-                <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
+                <Icon name="arrow-right" className="text-[16px]" />
               </a>
             </div>
           ) : (
@@ -281,10 +273,7 @@ export function MessageThread({
             data-testid="chat-thread-empty"
             className="flex flex-col items-center justify-center text-center py-12 gap-2"
           >
-            <span
-              aria-hidden
-              className="ph text-4xl text-on-surface-variant ph-chat-circle-dots"
-            >chat-circle-dots</span>
+            <Icon name="chat-circle-dots" className="text-4xl text-on-surface-variant" />
             <p className="font-headline-sm text-headline-sm text-primary">
               No messages yet
             </p>
@@ -387,16 +376,14 @@ export function MessageThread({
                   aria-label="Attach file"
                   className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                 >
-                  <span aria-hidden className="ph">
-                    attach_file
-                  </span>
+                  <Icon name="attach_file" />
                 </button>
                 <button
                   type="button"
                   aria-label="AI assistance"
                   className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                 >
-                  <span aria-hidden className="ph ph-sparkle">sparkle</span>
+                  <Icon name="sparkle" />
                 </button>
               </div>
               <div className="flex items-center gap-3">
@@ -422,9 +409,7 @@ export function MessageThread({
                   aria-label="Send message"
                   className="inline-flex items-center gap-2 bg-primary text-on-primary font-label-ui text-label-ui px-4 py-2 rounded-lg hover:bg-olive-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <span aria-hidden className="ph text-[18px]">
-                    send
-                  </span>
+                  <Icon name="send" className="text-[18px]" />
                   {isChatPending ? "Sending…" : "Send"}
                 </button>
               </div>

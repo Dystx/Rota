@@ -18,7 +18,11 @@ import { SiteFooter } from "../_components/site-footer";
  */
 export default function AppLoading() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div
+      className="min-h-screen flex flex-col rumia-surface rumia-surface-linen"
+      data-surface="linen"
+      data-surface-texture="editorial"
+    >
       <TopNav />
       <div
         role="status"

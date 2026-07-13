@@ -6,9 +6,9 @@ import { TripBriefSchema, type TripBrief } from "@repo/types";
 import { TripBriefReview } from "./trip-brief-review";
 
 /**
- * The route intentionally has no native form controls. It is a review canvas
+ * The page intentionally has no native form controls. It is a review canvas
  * composed of buttons, chips, and focused option sheets; freeform context is
- * represented by finite, privacy-safe route-protection choices.
+ * represented by finite, privacy-safe day-shaping choices.
  */
 const DEFAULT_BRIEF: TripBrief = {
   destinationCountry: "portugal",
@@ -25,7 +25,7 @@ const DEFAULT_BRIEF: TripBrief = {
   avoidances: ["rushed-schedules"],
   transportMode: "train-and-transfers",
   accommodationLocation: "Porto historic center or riverside",
-  rawBrief: "A considered Portugal route with local character, a comfortable pace, and room to wander."
+  rawBrief: "A considered Portugal plan with local character, a comfortable pace, and room to wander."
 };
 
 function parseBriefFromQuery(raw: string | null): TripBrief | null {

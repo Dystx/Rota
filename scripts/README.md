@@ -1,8 +1,16 @@
 # Scripts
 
+## PostgreSQL migrations
+
+- `pnpm db:generate` generates a candidate Drizzle migration from `packages/db/src/schema/`.
+- `pnpm db:migrate` applies the checked-in forward-only migrations using the server-only `DATABASE_URL`.
+- `RUMIA_ALLOW_DB_RESET=1 pnpm db:reset` destroys and recreates schemas only on a loopback database. It refuses a non-local host.
+
+The development database mirrors the VPS extensions: PostGIS, `pg_trgm`, pgvector, and `pgcrypto`. Historical hosted migrations are rollback evidence only; all new work uses Drizzle migrations.
+
 Planned for Portugal seed imports, embeddings generation, and place validation scripts.
 
-## Local Supabase personas
+## Local Better Auth personas
 
 `seed-local-personas.mjs` creates or updates deterministic non-production auth users and trusted role/profile rows for local testing:
 
@@ -21,4 +29,4 @@ export ROTA_OUTSIDER_PASSWORD='local-only-password'
 node scripts/seed-local-personas.mjs
 ```
 
-It requires `NEXT_PUBLIC_SUPABASE_URL` and the server-only `SUPABASE_SERVICE_ROLE_KEY` in the local shell. Never commit real credentials or print service keys in evidence.
+It requires the server-only `RUMIA_OWNER_DATABASE_URL` in the local shell. Never commit real credentials or print database credentials in evidence.

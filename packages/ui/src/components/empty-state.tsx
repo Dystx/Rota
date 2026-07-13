@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
+import { Icon } from "./icon";
 
 /**
  * Visual context the empty state lives in. Each variant maps to a
@@ -45,10 +46,9 @@ const HERO_VARIANTS: ReadonlySet<Variant> = new Set([
 ]);
 
 interface EmptyStateProps {
-  /** Either a Material Symbols icon name (e.g. "explore", "map",
-   *  "inbox") or a custom ReactNode (for callers that want to
-   *  pass their own SVG/markup). Strings go through the
-   *  material-symbols-outlined font; nodes are rendered as-is
+  /** Either a shared icon name (e.g. "explore", "map", "inbox") or a
+   *  custom ReactNode (for callers that want to pass their own SVG/markup).
+   *  Strings go through the shared SVG Icon component; nodes are rendered as-is
    *  inside the icon container. */
   icon?: string | ReactNode;
   /** Primary heading — kept short ("No itineraries yet"). */
@@ -118,12 +118,7 @@ export function EmptyState({
         )}
       >
         {typeof icon === "string" ? (
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: isHero ? 32 : 24 }}
-          >
-            {icon}
-          </span>
+          <Icon name={icon} className={isHero ? "text-[32px]" : "text-[24px]"} />
         ) : (
           icon
         )}

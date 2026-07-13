@@ -11,10 +11,10 @@ import {
   useSensor,
   useSensors
 } from "@dnd-kit/core";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { KanbanCard } from "./kanban-card";
 import { KanbanLane } from "./kanban-lane";
 import { RelativeTime } from "./relative-time";
+import { Icon } from "@repo/ui";
 
 /**
  * A single trip-shaped row surfaced on the Operations Pipeline board.
@@ -33,7 +33,7 @@ export interface PipelineItem {
 }
 
 interface PipelineBoardProps {
-  /** Server-rendered fallback when Supabase is unreachable or USE_REALTIME is off. */
+  /** Server-rendered fallback while the operator feed is not enabled. */
   initialItems?: PipelineItem[];
   /** Free-text query from the page header search input.
    *  Filters by title, body, and clientName (case-insensitive). */
@@ -142,72 +142,6 @@ export function PipelineBoard({
     const handle = window.setTimeout(() => setToast(null), 4000);
     return () => window.clearTimeout(handle);
   }, [toast]);
-
-  useEffect(() => {
-    // Feature flag: only opt into Realtime when explicitly enabled.
-    // Default off so SSR / local dev / no-Supabase environments
-    // continue to render the hardcoded board.
-    if (process.env.NEXT_PUBLIC_USE_REALTIME_PIPELINE !== "true") return;
-
-    const supabase = createBrowserSupabaseClient();
-    const channel = supabase
-      .channel("console-pipeline")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "trips" },
-        (payload) => {
-          const row = (payload.new ?? payload.old) as Record<string, unknown> | null;
-          if (!row || typeof row.id !== "string") return;
-          // The actual `trips` table schema (202604291900_…trips.sql):
-          //   id, trip_brief_id, country_slug, title, status, visibility,
-          //   is_paid, has_human_review, created_at, updated_at
-          // There is no `brief` or `sla_hours` column. The brief lives
-          // on the related `trip_briefs` row; a full join is out of
-          // scope for the Realtime path, so the card body shows the
-          // trip title + country, and the SLA badge is only emitted
-          // for the fallback dataset (see FALLBACK_ITEMS).
-          const next: PipelineItem = {
-            id: row.id,
-            title: typeof row.title === "string" ? row.title : "Untitled trip",
-            body: typeof row.country_slug === "string"
-              ? `Country: ${row.country_slug.replace(/-/g, " ")}`
-              : "",
-            clientName: typeof row.trip_brief_id === "string" || typeof row.trip_brief_id === "number"
-              ? `Brief #${row.trip_brief_id}`
-              : "—",
-            // TODO(LOW-3): enrich with the real client name via a
-            // trip_briefs join. Out of scope for the Realtime path;
-            // needs a separate `consumer-name` enrichment pass.
-            status: mapTripStatus(row.status),
-            slaHours: null, // not on the trips table; fallback items only
-            updatedAt: typeof row.updated_at === "string" ? row.updated_at : null
-          };
-          setItems((prev) => {
-            const without = prev.filter((item) => item.id !== next.id);
-            // eventType is the canonical field on
-            // RealtimePostgresChangesPayload (v2 SDK). The single
-            // helper avoids the repeated inline cast.
-            if (eventTypeOf(payload) === "DELETE") return without;
-            return [...without, next];
-          });
-        }
-      )
-      .subscribe((status) => {
-        setIsLive(status === "SUBSCRIBED");
-      });
-
-    return () => {
-      // Capture the error from removeChannel — the previous
-      // `void ...removeChannel(channel)` discarded both the
-      // promise and any error, so a closed socket leaked silently.
-      supabase
-        .removeChannel(channel)
-        .catch((err) => {
-          // eslint-disable-next-line no-console
-          console.warn("[pipeline] removeChannel failed:", err);
-        });
-    };
-  }, []);
 
   // Stitch 1.4 / Phase D: the page header search + filter drive
   // which lanes and which cards surface. Filtering is intentionally
@@ -331,7 +265,7 @@ export function PipelineBoard({
         data-testid="pipeline-board"
       >
         {/* UX Pass 2: live/demo data indicator. Surfaces whether
-            the board is showing real Supabase data (live) or the
+            the board is showing live operator data or the
             fallback fixtures (demo). Without this, the operator
             can't tell whether their drag is being persisted. */}
         <div
@@ -351,8 +285,8 @@ export function PipelineBoard({
           />
           <span>
             {isLive
-              ? "Live · connected to Supabase"
-              : "Demo data · set NEXT_PUBLIC_USE_REALTIME_PIPELINE=true to connect"}
+              ? "Live · connected to operator feed"
+              : "Demo data · live updates are intentionally disabled until the operator feed is enabled"}
           </span>
         </div>
         {/* UX Pass 1: inline toast above the board. `aria-live`
@@ -373,14 +307,12 @@ export function PipelineBoard({
                   : "px-3 py-1.5 rounded-md bg-olive-light/15 border border-olive-light/40 text-olive-dark font-mono-technical text-[12px] flex items-center gap-2"
               }
             >
-              <span aria-hidden className="ph text-[14px]">
-                {toast.kind === "error" ? "error" : "check_circle"}
-              </span>
+              <Icon name={toast.kind === "error" ? "error" : "check_circle"} className="text-[14px]" />
               <span>{toast.message}</span>
             </div>
           ) : null}
         </div>
-        <div className="flex-1 flex gap-gutter overflow-x-auto pb-4 rounded-xl">
+        <div className="flex min-w-0 flex-1 gap-gutter overflow-x-auto pb-4 rounded-xl">
           {/* Phase D: hide lanes that are filtered out (rather than
               rendering them empty) so the operator's focus stays
               on the active column when statusFilter !== "all". */}
@@ -503,32 +435,6 @@ function DroppableLane({
       <KanbanLane {...laneProps}>{children}</KanbanLane>
     </div>
   );
-}
-
-function mapTripStatus(raw: unknown): PipelineItem["status"] {
-  if (typeof raw !== "string") return "draft";
-  if (raw === "in_review" || raw === "in_revision" || raw === "needs_revision") return "in_revision";
-  if (raw === "active" || raw === "in_progress" || raw === "on_trip") return "active_chat";
-  // Terminal-but-recent statuses default to the active_chat lane so
-  // completed / cancelled / archived trips don't visually mis-classify
-  // as "New Drafts". The exhaustive list lives here; add new upstream
-  // statuses explicitly rather than relying on the fallthrough.
-  if (raw === "completed" || raw === "cancelled" || raw === "archived") return "active_chat";
-  return "draft";
-}
-
-/**
- * Extract the event type from a Supabase Realtime payload. The
- * v2 SDK types `RealtimePostgresChangesPayload` with `eventType`,
- * but earlier versions used `event`. This helper centralises the
- * read so the consumer doesn't need a cast at every call site.
- */
-function eventTypeOf(payload: unknown): string | undefined {
-  if (typeof payload !== "object" || payload === null) return undefined;
-  const obj = payload as { eventType?: unknown; event?: unknown };
-  if (typeof obj.eventType === "string") return obj.eventType;
-  if (typeof obj.event === "string") return obj.event;
-  return undefined;
 }
 
 function initialsFor(name: string): string {

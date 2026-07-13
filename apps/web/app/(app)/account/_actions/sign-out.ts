@@ -2,16 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { auth } from "@repo/auth/server";
+import { headers } from "next/headers";
 
 /**
- * Sign-out server action. Wired to the account page's
- * profile section form (Phase C.5). Calls Supabase
- * signOut, then redirects to /.
+ * Sign-out server action. Better Auth owns the cookie-backed session and
+ * nextCookies() writes the clearing Set-Cookie response.
  */
 export async function signOutAction() {
-  const supabase = await createServerSupabaseClient();
-  await supabase.auth.signOut();
+  await auth.api.signOut({ headers: await headers() });
   revalidatePath("/", "layout");
   redirect("/");
 }

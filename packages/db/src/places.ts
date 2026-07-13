@@ -1,5 +1,8 @@
 import { CreatePlaceSchema, PlaceSchema, type CreatePlaceInput, type Place, type UpdatePlaceInput } from "@repo/types";
-import { resolveDataClient, type DataClientOptions } from "./clients";
+import { desc, eq } from "drizzle-orm";
+import { resolveLegacyDataClient, type DataClientOptions } from "./clients";
+import { withActor, type DatabaseActor } from "./actor";
+import { placeAdjustmentLogs, places as placesTable } from "./schema";
 
 type RawPlaceRow = {
   id: string;
@@ -26,7 +29,26 @@ function parsePlaceRow(row: RawPlaceRow): Place {
 }
 
 export async function listPlaces(limit = 100, options?: DataClientOptions): Promise<Place[]> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) {
+    return withActor(options.actor, async ({ db }) => {
+      const rows = await db
+        .select({
+          category: placesTable.category,
+          id: placesTable.slug,
+          name: placesTable.name,
+          quality: placesTable.qualityScore,
+          region: placesTable.regionSlug,
+          sourceConfidence: placesTable.sourceConfidence
+        })
+        .from(placesTable)
+        .orderBy(desc(placesTable.createdAt))
+        .limit(limit);
+
+      return rows.map((row) => parsePlaceRow({ ...row, source_confidence: row.sourceConfidence }));
+    });
+  }
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("places")
     .select("id,name,region,category,quality,source_confidence")
     .order("created_at", { ascending: false })
@@ -40,7 +62,26 @@ export async function listPlaces(limit = 100, options?: DataClientOptions): Prom
 }
 
 export async function getPlaceById(id: string, options?: DataClientOptions): Promise<Place | null> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) {
+    return withActor(options.actor, async ({ db }) => {
+      const [row] = await db
+        .select({
+          category: placesTable.category,
+          id: placesTable.slug,
+          name: placesTable.name,
+          quality: placesTable.qualityScore,
+          region: placesTable.regionSlug,
+          sourceConfidence: placesTable.sourceConfidence
+        })
+        .from(placesTable)
+        .where(eq(placesTable.slug, id))
+        .limit(1);
+
+      return row ? parsePlaceRow({ ...row, source_confidence: row.sourceConfidence }) : null;
+    });
+  }
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("places")
     .select("id,name,region,category,quality,source_confidence")
     .eq("id", id)
@@ -61,7 +102,36 @@ export async function createPlace(input: CreatePlaceInput, options?: DataClientO
   const place = CreatePlaceSchema.parse(input);
   const nextId = place.id?.trim() || slugifyPlaceId(place.name);
 
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) {
+    return withActor(options.actor, async ({ db }) => {
+      const [row] = await db
+        .insert(placesTable)
+        .values({
+          category: place.category,
+          name: place.name,
+          qualityScore: place.quality === undefined || place.quality === null ? null : Math.round(place.quality),
+          regionSlug: place.region,
+          slug: nextId,
+          sourceConfidence: place.sourceConfidence
+        })
+        .returning({
+          category: placesTable.category,
+          id: placesTable.slug,
+          name: placesTable.name,
+          quality: placesTable.qualityScore,
+          region: placesTable.regionSlug,
+          sourceConfidence: placesTable.sourceConfidence
+        });
+
+      if (!row) {
+        throw new Error("Failed to create place.");
+      }
+
+      return parsePlaceRow({ ...row, source_confidence: row.sourceConfidence });
+    });
+  }
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("places")
     .insert({
       category: place.category,
@@ -83,6 +153,33 @@ export async function createPlace(input: CreatePlaceInput, options?: DataClientO
 
 export async function updatePlace(id: string, patch: UpdatePlaceInput, options?: DataClientOptions): Promise<Place | null> {
   const nextPatch = CreatePlaceSchema.partial().parse(patch);
+
+  if (options?.actor) {
+    return withActor(options.actor, async ({ db }) => {
+      const updates: Partial<typeof placesTable.$inferInsert> = {};
+      if (nextPatch.name !== undefined) updates.name = nextPatch.name;
+      if (nextPatch.region !== undefined) updates.regionSlug = nextPatch.region;
+      if (nextPatch.category !== undefined) updates.category = nextPatch.category;
+      if (nextPatch.quality !== undefined) updates.qualityScore = nextPatch.quality === null ? null : Math.round(nextPatch.quality);
+      if (nextPatch.sourceConfidence !== undefined) updates.sourceConfidence = nextPatch.sourceConfidence;
+
+      const [row] = await db
+        .update(placesTable)
+        .set(updates)
+        .where(eq(placesTable.slug, id))
+        .returning({
+          category: placesTable.category,
+          id: placesTable.slug,
+          name: placesTable.name,
+          quality: placesTable.qualityScore,
+          region: placesTable.regionSlug,
+          sourceConfidence: placesTable.sourceConfidence
+        });
+
+      return row ? parsePlaceRow({ ...row, source_confidence: row.sourceConfidence }) : null;
+    });
+  }
+
   const updates: Record<string, string | number | null> = {};
 
   if (nextPatch.name !== undefined) {
@@ -105,7 +202,7 @@ export async function updatePlace(id: string, patch: UpdatePlaceInput, options?:
     updates.source_confidence = nextPatch.sourceConfidence;
   }
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("places")
     .update(updates)
     .eq("id", id)
@@ -133,7 +230,7 @@ export const MIN_PLACE_QUALITY = 0;
 export const MAX_DECREMENT_PER_ACTION = 2;
 
 /** Audit context for `decrementPlaceQuality`. When provided, the
- *  function writes a row to `public.place_adjustment_log` after the
+ *  function writes a row to `app.place_adjustment_log` after the
  *  quality update. The log is append-only and used for:
  *    - "if N specialists flag the same place in M days" aggregations
  *      (future QStash-cron job in apps/workers)
@@ -151,9 +248,11 @@ export type SpecialistFeedbackContext = {
    *  Optional to keep the pre-PR-13 call sites compiling; when
    *  undefined, the audit row is skipped. */
   specialistId?: string;
-  /** Optional trip id — `trips.id bigint`. When the swap is on the
+  /** Optional trip id — `trips.id uuid`. When the swap is on the
    *  global map (no trip context), this is null. */
   tripId?: bigint | number | null;
+  /** RLS actor used to attribute the append-only audit row. */
+  actor?: DatabaseActor;
 };
 
 /** Specialist feedback loop: decrement a place's
@@ -171,7 +270,7 @@ export type SpecialistFeedbackContext = {
  *
  * When the third argument is a `SpecialistFeedbackContext`
  * with `specialistId` set, an audit row is written to
- * `public.place_adjustment_log` after the quality update.
+ * `app.place_adjustment_log` after the quality update.
  * The audit row is written for every call (including no-op
  * floor cases) so the action is recorded even when the
  * quality doesn't change. Without `specialistId` the function
@@ -193,7 +292,7 @@ export async function decrementPlaceQuality(
   //   - (id, delta, feedback)           — PR-13+
   // The discriminant: a feedback context has `reason`; a DataClient
   // does not. This is narrower than a proper union discriminator
-  // but safe because DataClientOptions is purely the Supabase
+  // but safe because DataClientOptions is purely the legacy data
   // client options object, never shaped like a feedback context.
   const isFeedback =
     optionsOrFeedback !== undefined &&
@@ -244,24 +343,17 @@ async function maybeWriteAdjustmentLog(args: {
 }): Promise<void> {
   if (!args.feedback?.specialistId) return;
   try {
-    const supabase = resolveDataClient(args.options);
-    const { error } = await supabase.from("place_adjustment_log").insert({
-      created_at: new Date().toISOString(),
-      delta: args.delta,
-      place_id: args.placeId,
-      reason: args.feedback.reason,
-      specialist_id: args.feedback.specialistId,
-      ...(args.feedback.tripId != null
-        ? { trip_id: typeof args.feedback.tripId === "bigint" ? args.feedback.tripId.toString() : args.feedback.tripId }
-        : {})
+    const actor = args.feedback.actor ?? args.options?.actor;
+    if (!actor) return;
+    await withActor(actor, async ({ db }) => {
+      await db.insert(placeAdjustmentLogs).values({
+        delta: args.delta,
+        placeId: args.placeId,
+        reason: args.feedback!.reason,
+        specialistId: args.feedback!.specialistId!,
+        tripId: args.feedback!.tripId == null ? null : String(args.feedback!.tripId)
+      });
     });
-    if (error) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        "[decrementPlaceQuality] place_adjustment_log insert failed:",
-        error.message
-      );
-    }
   } catch (err) {
     // eslint-disable-next-line no-console
     console.warn(
@@ -283,10 +375,12 @@ export async function recordSpecialistSwap(args: {
   reason: SpecialistFeedbackContext["reason"];
   specialistId: string;
   tripId?: bigint | number | null;
+  actor?: DatabaseActor;
 }): Promise<{ newQuality: number; place: Place } | null> {
   return decrementPlaceQuality(args.placeId, args.delta ?? 1, {
     reason: args.reason,
     specialistId: args.specialistId,
-    tripId: args.tripId ?? null
+    tripId: args.tripId ?? null,
+    actor: args.actor
   });
 }

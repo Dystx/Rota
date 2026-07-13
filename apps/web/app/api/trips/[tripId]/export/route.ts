@@ -77,7 +77,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ trip
   } catch (error) {
     markExportJobError(tripId);
     return internalError(
-      isPersistenceConfigError(error) ? "Supabase environment variables are not configured yet, so exports are unavailable." : "Could not export this trip.",
+      isPersistenceConfigError(error) ? "PostgreSQL is not configured yet, so exports are unavailable." : "Could not export this trip.",
       isPersistenceConfigError(error) ? 503 : 500
     );
   }

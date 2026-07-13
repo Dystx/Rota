@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
-import { getAdminPageAuthContext } from "@/lib/auth/admin";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 import { insertItineraryEvent, listItineraryEvents } from "./store";
 
 const BodySchema = z.object({
@@ -28,7 +28,7 @@ const QuerySchema = z.object({
 
 export async function POST(request: NextRequest) {
   const admin = await getAdminPageAuthContext();
-  if (!("client" in admin)) {
+  if (!isAdminPageAuthContext(admin)) {
     return NextResponse.json(
       { ok: false, error: `Forbidden: ${admin.reason}` },
       { status: admin.status }
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const admin = await getAdminPageAuthContext();
-  if (!("client" in admin)) {
+  if (!isAdminPageAuthContext(admin)) {
     return NextResponse.json(
       { ok: false, error: `Forbidden: ${admin.reason}` },
       { status: admin.status }
@@ -111,7 +111,6 @@ export async function GET(request: NextRequest) {
     const rows = await listItineraryEvents({
       conversationId: parsed.data.conversationId,
       limit: parsed.data.limit,
-      client: admin.client
     });
     return NextResponse.json({ ok: true, events: rows });
   } catch (error) {

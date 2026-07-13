@@ -6,7 +6,7 @@ import { parseActivityIntent, parseSavedActivityIds } from "@/lib/content/activi
 import { ActivityExplorer } from "./activity-explorer";
 
 export const metadata: Metadata = {
-  title: "What to do in Portugal | Rumia",
+  title: "What to do in Portugal",
   description:
     "Rumia helps you decide what is genuinely worth doing with the time you have in Portugal.",
   alternates: { canonical: "/explore" }

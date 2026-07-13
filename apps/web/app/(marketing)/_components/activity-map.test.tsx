@@ -39,6 +39,7 @@ vi.mock("@repo/spatial-engine", () => ({
       onActivitySelect?: (activityId: string) => void;
       onMapTelemetry?: (event: unknown) => void;
       showBuildingExtrusions?: boolean;
+      styleOverride?: { id?: string };
       testId?: string;
     },
     ref: React.ForwardedRef<{ fitBounds: () => Promise<void>; resetNorth: () => void }>
@@ -48,6 +49,7 @@ vi.mock("@repo/spatial-engine", () => ({
       <div
         data-testid={props.testId ?? "workspace-canvas"}
         data-3d-requested={props.showBuildingExtrusions ? "true" : "false"}
+        data-style-id={props.styleOverride?.id ?? "default"}
         role="application"
         aria-label="Mock activity map"
       >
@@ -121,6 +123,31 @@ describe("ActivityMap", () => {
       surface: "activity-map",
       intent: "explicit-open"
     });
+  });
+
+  it("keeps provider style and attribution decisions injectable", () => {
+    render(
+      <ActivityMap
+        activities={[reviewedPoint]}
+        selectedActivityId={reviewedPoint.activityId}
+        onSelectActivity={vi.fn()}
+        provider={{
+          style: {
+            id: "rumia-reviewed-provider",
+            name: "Reviewed provider",
+            url: "https://maps.example.test/style.json"
+          },
+          attribution: {
+            links: [{ label: "Reviewed map licence", href: "https://maps.example.test/licence" }],
+            note: "Provider attribution is reviewed before release."
+          }
+        }}
+      />
+    );
+
+    expect(screen.getByTestId("activity-map-canvas").getAttribute("data-style-id")).toBe("rumia-reviewed-provider");
+    expect(screen.getAllByRole("link", { name: "Reviewed map licence" }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("link", { name: "CARTO" })).toBeNull();
   });
 
   it("uses the complete semantic fallback when a selected point cannot be mapped", () => {

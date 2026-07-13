@@ -1,5 +1,6 @@
 import { CreateReviewerSchema, ReviewerSchema, type CreateReviewerInput, type Reviewer, type UpdateReviewerInput } from "@repo/types";
-import { resolveDataClient, type DataClientOptions } from "./clients";
+import { resolveLegacyDataClient, type DataClientOptions } from "./clients";
+import { createPostgresReviewer, getPostgresReviewerById, listPostgresReviewers, updatePostgresReviewer } from "./catalog-postgres";
 
 type RawReviewerRow = {
   id: string;
@@ -34,7 +35,9 @@ function parseReviewerRow(row: RawReviewerRow): Reviewer {
 }
 
 export async function listReviewers(limit = 100, options?: DataClientOptions): Promise<Reviewer[]> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) return listPostgresReviewers(limit, options.actor);
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("reviewers")
     .select("id,name,country,regions,languages,specialties,status,rating,bio,response_promise")
     .order("created_at", { ascending: false })
@@ -48,7 +51,9 @@ export async function listReviewers(limit = 100, options?: DataClientOptions): P
 }
 
 export async function getReviewerById(id: string, options?: DataClientOptions): Promise<Reviewer | null> {
-  const { data, error } = await resolveDataClient(options)
+  if (options?.actor) return getPostgresReviewerById(id, options.actor);
+
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("reviewers")
     .select("id,name,country,regions,languages,specialties,status,rating,bio,response_promise")
     .eq("id", id)
@@ -66,10 +71,12 @@ export async function getReviewerById(id: string, options?: DataClientOptions): 
 }
 
 export async function createReviewer(input: CreateReviewerInput, options?: DataClientOptions): Promise<Reviewer> {
+  if (options?.actor) return createPostgresReviewer(input, options.actor);
+
   const reviewer = CreateReviewerSchema.parse(input);
   const nextId = reviewer.id?.trim() || slugifyReviewerId(reviewer.name);
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("reviewers")
     .insert({
       bio: reviewer.bio,
@@ -94,6 +101,8 @@ export async function createReviewer(input: CreateReviewerInput, options?: DataC
 }
 
 export async function updateReviewer(id: string, patch: UpdateReviewerInput, options?: DataClientOptions): Promise<Reviewer | null> {
+  if (options?.actor) return updatePostgresReviewer(id, patch, options.actor);
+
   const nextPatch = CreateReviewerSchema.partial().parse(patch);
   const updates: Record<string, string | string[] | number | null> = {};
 
@@ -107,7 +116,7 @@ export async function updateReviewer(id: string, patch: UpdateReviewerInput, opt
   if (nextPatch.bio !== undefined) updates.bio = nextPatch.bio;
   if (nextPatch.responsePromise !== undefined) updates.response_promise = nextPatch.responsePromise;
 
-  const { data, error } = await resolveDataClient(options)
+  const { data, error } = await resolveLegacyDataClient(options)
     .from("reviewers")
     .update(updates)
     .eq("id", id)

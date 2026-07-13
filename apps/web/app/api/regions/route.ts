@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   try {
-    const regions = await listRegions(100, { client: auth.client });
+    const regions = await listRegions(100, { actor: auth.actor });
 
     return Response.json({ regions });
   } catch (error) {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const region = await createRegion(parsed.data, { client: auth.client });
+    const region = await createRegion(parsed.data, { actor: auth.actor });
     
     await writeAuditTrail({
       actorUserId: auth.userId,
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       entityType: "regions",
       entityId: region.id,
       after: region
-    }, { client: auth.client });
+    }, { actor: auth.actor });
 
     return Response.json(
       {

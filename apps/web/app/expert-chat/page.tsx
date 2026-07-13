@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icon } from "@repo/ui";
 import { redirect } from "next/navigation";
 import { Button } from "@repo/ui";
 import { isFeatureEnabled } from "@repo/config";
@@ -47,7 +48,7 @@ export default async function ExpertChatPage({
             data-testid="expert-chat-empty"
             className="mx-auto max-w-2xl px-container-padding-sm text-center"
           >
-            <span className="ph text-[48px] text-olive-light mb-3 block ph-chat-circle-dots">chat-circle-dots</span>
+            <Icon name="chat-circle-dots" className="text-[48px] text-olive-light mb-3 block" />
             <h1 className="font-headline-lg text-headline-lg text-primary mb-2">
               Open this chat from a trip
             </h1>

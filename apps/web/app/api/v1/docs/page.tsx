@@ -25,8 +25,8 @@ export default function DeveloperDocsPage() {
         </h1>
         <p className="text-on-surface-variant leading-loose max-w-2xl text-sm leading-relaxed">
           B2B partner API for the destination knowledge
-          graph. Read-only. Authenticated via bearer
-          token.
+          graph. The gateway is temporarily paused while
+          its API-key ledger moves to private PostgreSQL.
         </p>
       </header>
 
@@ -50,7 +50,8 @@ export default function DeveloperDocsPage() {
           GET /api/v1/destinations
         </h2>
         <p className="text-sm text-foreground">
-          Returns a paginated list of destinations.
+          Returns a paginated list of destinations once the
+          PostgreSQL API-key and rate-limit gates are enabled.
         </p>
         <h3 className="mt-3 text-sm font-medium text-foreground">Query parameters</h3>
         <table className="mt-2 w-full border-collapse text-sm">

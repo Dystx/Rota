@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PublicRouteLayout } from "../_components/public-route-layout";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Rumia",
+  title: "Privacy Policy",
   description: "How Rumia handles your travel data, in plain English.",
   alternates: { canonical: "/privacy" }
 };
@@ -11,7 +11,11 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <PublicRouteLayout>
-      <div className="min-h-screen bg-background">
+      <div
+        className="min-h-screen rumia-surface rumia-surface-linen"
+        data-surface="linen"
+        data-surface-texture="editorial"
+      >
         <article className="max-w-3xl mx-auto px-container-padding-sm md:px-container-padding-lg py-section-gap">
           <header className="mb-8">
             <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-2">
@@ -26,19 +30,19 @@ export default function PrivacyPage() {
           </header>
           <div className="space-y-4 font-body-md text-body-md text-on-surface">
             <p>
-              Rumia stores your trip briefs, chat history, and saved
-              preferences in Supabase with row-level security. We do not
-              sell your travel data. Operators see only the data tied
-              to their assignments.
+              Rumia stores the activity days you save, your trip brief, and
+              account details in private PostgreSQL infrastructure. We do not
+              sell your travel data. Access is limited to the account and
+              review work needed to provide the Rumia service.
             </p>
             <p>
-              For the full policy — including data retention, third-party
-              processors, and your GDPR + CCPA rights — see{" "}
+              For questions about retention, processors, or your GDPR and
+              CCPA rights, use our{" "}
               <Link
-                href="/account"
-                className="font-semibold text-primary underline decoration-ochre-dark decoration-2 underline-offset-2 hover:text-olive-light"
+                href="/support"
+                className="font-semibold text-primary underline decoration-ochre-dark decoration-2 underline-offset-2 hover:text-olive-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
               >
-                your account settings
+                support page
               </Link>
               .
             </p>

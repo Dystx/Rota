@@ -124,7 +124,12 @@ export async function mountMapLibreInstance(options: MapLibreInstanceOptions): P
   // implementation ports MapTiler's RadialGradientLayer as a custom
   // WebGL layer — that's a follow-up. The standard sky/fog below is
   // already a meaningful upgrade over the previous flat black.
-  if (options.fog && !options.fog.disabled) {
+  // MapLibre's fog matrix is not supported on the globe projection in the
+  // current renderer. Applying a sky/fog object there produces a repeated
+  // `calculateFogMatrix` warning and can leave the globe in a degraded state.
+  // Keep atmospheric fog available for flat/terrain views and let the globe
+  // use its basemap/overlay treatment instead.
+  if (options.fog && !options.fog.disabled && options.projection !== "globe") {
     map.setSky({
       "sky-color": options.fog.highColor ?? DEFAULT_FOG.highColor,
       "horizon-color": options.fog.color ?? DEFAULT_FOG.color,

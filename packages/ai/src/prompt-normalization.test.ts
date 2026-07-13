@@ -114,10 +114,10 @@ describe("normalizeTripPrompt", () => {
     expect("candidate" in result).toBe(false);
   });
 
-  it("has no DB, Supabase, persistence, network, or live provider imports in the normalization module", async () => {
+  it("has no database, persistence, network, or live provider imports in the normalization module", async () => {
     const source = await readFile(sourcePath, "utf8");
 
-    expect(source).not.toMatch(/@repo\/db|createTripDraft|supabase|fetch\(|openai|anthropic|@ai-sdk/);
+    expect(source).not.toMatch(/@repo\/db|createTripDraft|fetch\(|openai|anthropic|@ai-sdk/);
   });
 
   it("does not persist or create a trip for invalid short prompt input", async () => {

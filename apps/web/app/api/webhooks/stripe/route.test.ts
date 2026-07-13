@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { signStripeWebhookPayload } from "@repo/payments";
 import type { PaymentWebhookFulfillmentInput, PaymentWebhookFulfillmentResult } from "@repo/db";
-import { handleStripeWebhookRequest } from "./route";
+import { handleStripeWebhookRequest } from "./handler";
 
 const secret = "whsec_unit_test_secret";
 const now = new Date("2026-05-02T00:00:00.000Z");
@@ -72,10 +72,8 @@ describe("handleStripeWebhookRequest", () => {
       expect(verifyCalled).toBe(false);
       expect(fulfillCalled).toBe(false);
       await expect(response.json()).resolves.toEqual({
-        error: {
-          code: "internal_error",
-          message: "Stripe webhook secret is not configured."
-        }
+        code: "internal_error",
+        message: "Stripe webhook secret is not configured."
       });
     } finally {
       if (originalWebhookSecret === undefined) {

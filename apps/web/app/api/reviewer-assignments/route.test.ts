@@ -2,12 +2,10 @@ import { describe, expect, test } from "vitest";
 import { DuplicateActiveReviewerAssignmentDatabaseError, DuplicateActiveReviewerAssignmentError } from "@repo/db";
 import type { ReviewerAssignment } from "@repo/types";
 import type { AuthorizedApiContext } from "@/lib/auth/api";
-import { handleReviewerAssignmentsPostRequest } from "./route";
-
-const authClient = {};
+import { handleReviewerAssignmentsPostRequest } from "./handler";
 
 const adminAuth = {
-  client: authClient,
+  actor: { capabilities: [], reviewerId: null, roles: ["admin"], userId: "admin-user-123" },
   reviewerId: null,
   role: "admin",
   userId: "admin-user-123"

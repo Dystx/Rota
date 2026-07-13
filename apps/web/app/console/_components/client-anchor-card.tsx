@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Icon } from "@repo/ui";
 
 export type AnchorBadgeTone = "error" | "neutral" | "olive";
 
@@ -29,12 +30,7 @@ export function ClientAnchorCard({
     <article className="bg-surface-container-lowest border border-olive-dark/5 rounded-xl p-card-padding shadow-sm">
       <header className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span
-            aria-hidden
-            className="ph text-ochre-dark"
-          >
-            {icon}
-          </span>
+          <Icon aria-hidden name={icon} className="text-ochre-dark" />
           <h4 className="font-label-ui text-label-ui uppercase tracking-wider text-primary">
             {title}
           </h4>

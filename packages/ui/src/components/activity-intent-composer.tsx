@@ -53,6 +53,7 @@ export function ActivityIntentComposer({ initial, onSubmit }: ActivityIntentComp
           label="Time available"
           value={display(draft.timeWindow, "choose a time")}
           options={TIME_OPTIONS}
+          tone="inverse"
           onAccept={(timeWindow) => patch({ timeWindow })}
           onClear={() => patch({ timeWindow: "" })}
         />{" "}
@@ -61,6 +62,7 @@ export function ActivityIntentComposer({ initial, onSubmit }: ActivityIntentComp
           label="Region"
           value={display(draft.region, "choose a region")}
           options={REGION_OPTIONS}
+          tone="inverse"
           onAccept={(region) => patch({ region })}
           onClear={() => patch({ region: "" })}
         />{" "}
@@ -69,6 +71,7 @@ export function ActivityIntentComposer({ initial, onSubmit }: ActivityIntentComp
           label="Mood"
           value={display(mood, "choose a feeling")}
           options={MOOD_OPTIONS}
+          tone="inverse"
           onAccept={(nextMood) => patch({ moods: [nextMood] })}
           onClear={() => patch({ moods: [] })}
         />{" "}
@@ -77,6 +80,7 @@ export function ActivityIntentComposer({ initial, onSubmit }: ActivityIntentComp
           label="Who is going"
           value={display(draft.group, "choose who")}
           options={GROUP_OPTIONS}
+          tone="inverse"
           onAccept={(group) => patch({ group })}
           onClear={() => patch({ group: "" })}
         />.

@@ -19,6 +19,7 @@ describe("PortugalAtlas", () => {
     expect(screen.getByRole("heading", { name: /Choose a kind of day/i })).toBeTruthy();
     const porto = screen.getByRole("link", { name: /Explore Porto activities/i });
     expect(porto.getAttribute("href")).toBe("/explore?region=porto&mood=a+walk");
+    expect(screen.getByTestId("collection-index-porto").textContent).toBe("01");
     expect(screen.queryByRole("link", { name: /Plan a/i })).toBeNull();
   });
 });

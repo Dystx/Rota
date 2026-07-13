@@ -10,12 +10,7 @@ test.describe("@smoke @trip-create trip creation API", () => {
     });
 
     expect(response.status()).toBe(401);
-    await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "unauthenticated",
-        message: "Authentication required."
-      }
-    });
+    await expect(response.json()).resolves.toEqual({ code: "unauthenticated", message: "Authentication required." });
   });
 
   test("returns the standard validation error shape for malformed JSON", async ({ request }) => {
@@ -27,11 +22,6 @@ test.describe("@smoke @trip-create trip creation API", () => {
     });
 
     expect(response.status()).toBe(401);
-    await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "unauthenticated",
-        message: "Authentication required."
-      }
-    });
+    await expect(response.json()).resolves.toEqual({ code: "unauthenticated", message: "Authentication required." });
   });
 });

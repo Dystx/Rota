@@ -44,7 +44,7 @@ describe("EmptyState", () => {
         action={<button data-testid="action">Action</button>} 
       />
     );
-    expect(screen.getByTestId("icon")).toBeDefined();
+    expect(screen.getAllByTestId("icon").some((element) => element.textContent === "Icon")).toBe(true);
     expect(screen.getByTestId("action")).toBeDefined();
   });
 });

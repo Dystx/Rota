@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Icon } from "@repo/ui";
 import { PublicRouteLayout } from "../_components/public-route-layout";
 import { resolveCoverImage } from "@/lib/trip-cover";
 import { getOwnedTrip } from "@/app/lib/trip-access";
@@ -76,12 +77,7 @@ export default async function CheckoutPage({
                      a clear next step from the checkout surface. */
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
                     <div className="w-14 h-14 rounded-full bg-olive-light/15 flex items-center justify-center">
-                      <span
-                        aria-hidden
-                        className="ph text-3xl text-olive-dark"
-                      >
-                        travel_explore
-                      </span>
+                      <Icon name="travel_explore" className="text-3xl text-olive-dark" />
                     </div>
                     <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-olive-dark/80">
                       No trip linked
@@ -94,9 +90,7 @@ export default async function CheckoutPage({
                       data-testid="checkout-empty-cta"
                       className="mt-1 inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-4 py-2 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                     >
-                      <span aria-hidden className="ph text-[18px]">
-                        add_location_alt
-                      </span>
+                      <Icon name="add_location_alt" className="text-[18px]" />
                       Plan a trip
                     </Link>
                   </div>
@@ -125,7 +119,7 @@ export default async function CheckoutPage({
                     className="mt-2 inline-flex items-center gap-1 font-mono-technical text-mono-technical text-ochre-dark hover:text-primary"
                   >
                     View trip
-                    <span aria-hidden className="ph text-[16px] ph-arrow-right">arrow-right</span>
+                    <Icon name="arrow-right" className="text-[16px]" />
                   </Link>
                 ) : null}
               </div>
@@ -178,12 +172,7 @@ export default async function CheckoutPage({
                       "Vault + exports (PDF, mobile)"
                     ].map((line) => (
                       <li key={line} className="flex items-start gap-2">
-                        <span
-                          aria-hidden
-                          className="ph text-olive-light text-[18px] mt-0.5"
-                        >
-                          check_circle
-                        </span>
+                        <Icon name="check_circle" className="text-olive-light text-[18px] mt-0.5" />
                         {line}
                       </li>
                     ))}
@@ -234,13 +223,7 @@ export default async function CheckoutPage({
                       { icon: "schedule", label: "48-hour turnaround" }
                     ].map((item) => (
                       <li key={item.label} className="flex items-start gap-2">
-                        <span
-                          aria-hidden
-                          className="ph text-ochre-light text-[18px] mt-0.5"
-                          style={{ fontVariationSettings: "'FILL' 1" }}
-                        >
-                          {item.icon}
-                        </span>
+                        <Icon name={item.icon} className="text-ochre-light text-[18px] mt-0.5" />
                         {item.label}
                       </li>
                     ))}
@@ -283,7 +266,7 @@ export default async function CheckoutPage({
 
               {!tripId ? (
                 <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
-                  <span aria-hidden className="ph text-[18px] ph-info">info</span>
+                  <Icon name="info" className="text-[18px]" />
                   These tiers apply to a specific trip. Plan one first and
                   the checkout options will land here automatically.
                 </p>

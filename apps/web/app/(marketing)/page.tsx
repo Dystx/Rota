@@ -5,9 +5,10 @@ import { BrandMark } from "@repo/ui";
 import { HowItWorks } from "./_components/how-it-works";
 import { DestinationBento } from "../_components/destination-bento";
 import { HeroIntentCard } from "./_components/hero-intent-card";
+import { HeroEditorialFigure } from "./_components/hero-editorial-figure";
 
 export const metadata: Metadata = {
-  title: "What to do in Portugal, judged well | Rumia",
+  title: "What to do in Portugal, judged well",
   description:
     "A Portugal-first guide to activities genuinely worth your limited time.",
   alternates: { canonical: "/" }
@@ -38,11 +39,16 @@ export default function HomePage() {
             aria-hidden="true"
           />
 
+          <HeroEditorialFigure />
+
           <div className="absolute top-6 right-6 md:top-8 md:right-8 z-10">
             <BrandMark size="md" tone="dark" />
           </div>
 
           <div className="relative z-10 w-full max-w-4xl mx-auto px-container-padding-sm md:px-container-padding-lg pt-12 md:pt-20 flex flex-col items-center text-center gap-6">
+            <p className="font-mono-micro text-mono-micro uppercase tracking-[0.24em] text-ochre-light/90">
+              Portugal / activity edition
+            </p>
             <h1
               data-testid="home-headline"
               className="font-display-mobile text-display-mobile md:font-display md:text-display text-linen-dark tracking-tight drop-shadow-2xl"
@@ -56,6 +62,15 @@ export default function HomePage() {
               A small set of judged Portugal activities, with the timing and trade-offs that make a day work — not an endless list to research alone.
             </p>
             <HeroIntentCard />
+          </div>
+
+          <div
+            data-testid="hero-proof-rail"
+            className="absolute bottom-6 left-6 z-10 hidden w-[52%] items-center justify-between gap-6 border-t border-linen-dark/20 pt-3 font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-linen-dark/65 md:flex"
+          >
+            <span>Portugal-wide</span>
+            <span>Activity first</span>
+            <span>No paid ranking</span>
           </div>
         </section>
 

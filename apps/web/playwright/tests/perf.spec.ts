@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createAdminStorageState } from "../fixtures/admin-auth";
+import { createTravelerStorageState } from "../fixtures/traveler-auth";
 import * as fs from "fs";
 import * as path from "path";
 import { travelerTripPath } from "../fixtures/traveler-trip";
@@ -58,9 +59,12 @@ const measurements: RouteMeasurement[] = [];
 test.describe("@perf Performance & Bundle Budgets", () => {
   test.use({ storageState: createAdminStorageState() });
   const travelerRoutes = [
-    { resolve: () => travelerTripPath(), isMap: true },
-    { resolve: () => travelerTripPath("/map"), isMap: true },
-    { resolve: () => travelerTripPath("/export"), isMap: false }
+    // The trip overview keeps the map behind the viewport/intent gate. Its
+    // initial load is intentionally map-free so the core itinerary remains
+    // lightweight; the dedicated map route is the live MapLibre surface.
+    { resolve: () => travelerTripPath(), isMap: false, requiresMapMount: false },
+    { resolve: () => travelerTripPath("/map"), isMap: true, requiresMapMount: true },
+    { resolve: () => travelerTripPath("/export"), isMap: false, requiresMapMount: false }
   ];
 
   test.afterAll(() => {
@@ -265,29 +269,42 @@ test.describe("@perf Performance & Bundle Budgets", () => {
     });
   }
 
-  for (const [index, { resolve, isMap }] of travelerRoutes.entries()) {
-    test(`Measure generated traveler trip route ${index + 1}`, async ({ page }) => {
-      const routePath = resolve();
-      const budget = getBudgetForRoute(isMap);
-      await page.goto(routePath, { waitUntil: "networkidle" });
-      const resources: ResourceSummary = await page.evaluate(() => {
-        const entries = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
-        let jsBytes = 0;
-        let jsCount = 0;
-        let totalBytes = 0;
-        let hasMapProvider = false;
-        for (const entry of entries) {
-          const size = entry.transferSize || entry.encodedBodySize || entry.decodedBodySize || 0;
-          totalBytes += size;
-          const isScript = entry.initiatorType === "script" || entry.name.endsWith(".js") || entry.name.includes("/_next/static/chunks/");
-          if (isScript) { jsBytes += size; jsCount++; }
-          const urlLower = entry.name.toLowerCase();
-          if (urlLower.includes("maplibre") || urlLower.includes("workspace-canvas") || urlLower.includes("trip-workspace-canvas") || urlLower.includes("@repo/spatial-engine")) hasMapProvider = true;
+  test.describe("Traveler route budgets", () => {
+    // These routes are owner-protected. Using the admin storage state here
+    // silently redirects to /itineraries and makes the map budget test prove
+    // the wrong page.
+    test.use({ storageState: createTravelerStorageState() });
+
+    for (const [index, { resolve, isMap, requiresMapMount }] of travelerRoutes.entries()) {
+      test(`Measure generated traveler trip route ${index + 1}`, async ({ page }) => {
+        const routePath = resolve();
+        const budget = getBudgetForRoute(isMap);
+        await page.goto(routePath, { waitUntil: "networkidle" });
+        if (requiresMapMount) {
+          // A hashed Next chunk is not a stable provider signal. The mounted
+          // canvas is the user-visible contract that this route loaded the
+          // live MapLibre surface rather than the schematic fallback.
+          await expect(page.getByTestId("trip-workspace-canvas")).toBeVisible({ timeout: 15_000 });
         }
-        return { jsBytes, jsCount, totalBytes, totalCount: entries.length, hasMapProvider };
+        const resources: ResourceSummary = await page.evaluate(() => {
+          const entries = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
+          let jsBytes = 0;
+          let jsCount = 0;
+          let totalBytes = 0;
+          let hasMapProvider = false;
+          for (const entry of entries) {
+            const size = entry.transferSize || entry.encodedBodySize || entry.decodedBodySize || 0;
+            totalBytes += size;
+            const isScript = entry.initiatorType === "script" || entry.name.endsWith(".js") || entry.name.includes("/_next/static/chunks/");
+            if (isScript) { jsBytes += size; jsCount++; }
+            const urlLower = entry.name.toLowerCase();
+            if (urlLower.includes("maplibre") || urlLower.includes("workspace-canvas") || urlLower.includes("trip-workspace-canvas") || urlLower.includes("@repo/spatial-engine")) hasMapProvider = true;
+          }
+          return { jsBytes, jsCount, totalBytes, totalCount: entries.length, hasMapProvider };
+        });
+        expect(resources.totalBytes).toBeLessThanOrEqual(budget.maxTotalBytes);
+        if (!isMap) expect(resources.hasMapProvider).toBe(false);
       });
-      expect(resources.totalBytes).toBeLessThanOrEqual(budget.maxTotalBytes);
-      if (isMap) expect(resources.hasMapProvider).toBe(true);
-    });
-  }
+    }
+  });
 });

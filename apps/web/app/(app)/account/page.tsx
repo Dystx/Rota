@@ -8,7 +8,7 @@ import {
   EmptyState,
   SectionHeading
 } from "@repo/ui";
-import { getTripsForUser, isPersistenceConfigError } from "@repo/db";
+import { getTripsForUser, isPersistenceConfigError, loadPostgresAuthorizationContext } from "@repo/db";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { AccountTripCard } from "./_components/trip-card";
 import { BehaviorConsentToggle } from "./_components/behavior-consent-toggle";
@@ -16,7 +16,7 @@ import { signOutAction } from "./_actions/sign-out";
 import { SignOutButton } from "./_components/sign-out-button";
 
 export const metadata: Metadata = {
-  title: "My Account",
+  title: "Saved plans | Rumia",
   robots: { index: false, follow: false }
 };
 
@@ -49,10 +49,15 @@ export default async function AccountPage() {
   let trips: Awaited<ReturnType<typeof getTripsForUser>> = [];
   let infoMessage = "";
   try {
-    trips = await getTripsForUser(user.id);
+    const actor = await loadPostgresAuthorizationContext(user.id);
+    if (!actor) {
+      infoMessage = "Your account profile is still being provisioned. Please try again shortly.";
+    } else {
+      trips = await getTripsForUser(user.id, 24, { actor });
+    }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
-      ? "Configure Supabase environment variables to load saved draft trips here."
+      ? "Configure PostgreSQL and Better Auth environment variables to load saved draft trips here."
       : error instanceof Error
         ? error.message
         : "Could not load saved trips.";
@@ -67,9 +72,9 @@ export default async function AccountPage() {
             surface. */}
         <section className="max-w-6xl mx-auto px-container-padding-lg py-section-gap">
           <SectionHeading
-            eyebrow="Your account"
-            title="My trips"
-            description="Drafts, unlocked itineraries, and human-review status across every trip you've started."
+            eyebrow="Your Rumia shelf"
+            title="Saved plans"
+            description="The activities you chose, the days you shaped, and the exports you can revisit when the time is right."
             h1
           />
           <Card
@@ -113,7 +118,7 @@ export default async function AccountPage() {
             id="trips-heading"
             className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark mb-4"
           >
-            Saved itineraries
+            Your saved work
           </h2>
 
           {infoMessage ? (
@@ -138,12 +143,12 @@ export default async function AccountPage() {
           ) : (
             <EmptyState
               icon="luggage"
-              title="No trips yet"
-              description="Plan a trip first — your drafts and unlocked itineraries will appear here, with full delivery + export controls once you upgrade."
+              title="No saved plans yet"
+              description="Start by exploring worthwhile activities. When you save a few, this becomes the quiet place to shape, revisit, and carry them with you."
               variant="default"
               action={
                 <Button asChild>
-                  <Link href="/planner">Plan a trip</Link>
+                  <Link href="/explore">Explore activities</Link>
                 </Button>
               }
             />
@@ -168,7 +173,7 @@ export default async function AccountPage() {
           >
             <CardContent className="flex flex-1 flex-col gap-4 p-card-padding">
               <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                Control what your itineraries remember about you. Off
+                Control what your activity suggestions remember about you. Off
                 by default — nothing is recorded until you opt in.
               </p>
               <BehaviorConsentToggle />
