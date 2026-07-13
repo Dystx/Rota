@@ -5,7 +5,8 @@
 > checklist. It is subordinate to the activity-first product plan and does not
 > change Rumia's product boundary, backend, or release order.
 >
-> **Status (2026-07-13):** the canonical plan is being executed. Shared public
+> **Status (2026-07-13):** the canonical plan has been executed through the
+> private merged-main release. Shared public
 > and operator foundations are implemented: semantic page fields, deterministic
 > editorial texture, offline/recovery/loading surfaces, a useful empty desktop
 > day rail, and a texture-free linen operator field. Local PostgreSQL/Better
@@ -16,12 +17,12 @@
 > planner uses one responsive brief/context/action composition; and the console
 > uses a dense linen operator shell with fitting lanes and a stacked mobile
 > messaging workspace. Targeted visual captures and focused tests pass.
-> The last approved artifact is deployed privately on the VPS as release
-> `20260713T0128Z-provider-gate`, with the private tunnel visual check rerun against
-> that release. The current worktree contains a subsequent proof-rail, pricing
-> hierarchy, chosen-day editor, saved-traveler surface, and utility recovery
-> slices that are verified
-> on the local current-source artifact but is not yet in the VPS release. The
+> The merged implementation commit `2a8c39464390a2bfda0a62edfffc33b9af3ab920`
+> is pushed to `Dystx/Rota` main and deployed privately on the VPS as release
+> `20260713T042000Z-main-2a8c394`; the local and remote standalone server
+> entrypoints share SHA-256 `6c3fa489c72e7f8f160af78b2831b83bfea5a7eba8cbd62a209d811a0ea51608`.
+> The proof-rail, pricing hierarchy, chosen-day editor, saved-traveler surface,
+> and utility recovery slices are included in that release. The
 > saved surface pass covers `/account`, `/trip/[tripId]`, `/trip/[tripId]/map`,
 > and `/trip/[tripId]/export`: activity-first labels, reduced hero dominance,
 > explicit spatial/export language, removal of booking-source cards, and a
@@ -98,9 +99,8 @@ stale-artifact finding, not the current source baseline. Therefore:
 
 **Exit:** the browser-rendered homepage and planner copy match the checked-out
 source, and a stale-build check can identify the served commit. This exit is
-now proven on the rebuilt local standalone artifact at `127.0.0.1:3003`; the
-external 3002 tunnel still requires a separate deploy/restart before it can be
-called current.
+proven on the rebuilt standalone artifact and on the private VPS release
+through the temporary `127.0.0.1:33302` tunnel.
 
 ### 3.2 P1 — the visual system is not yet expressed as a shared background system
 
@@ -359,8 +359,8 @@ labelled region, and an unsourced/partial route now uses an intentional
 schematic map with its geometry status inside the details panel instead of an
 empty renderer canvas. The source artifact is locally verified at 1440×900 and
 393×852 with one H1, zero horizontal overflow, zero browser console errors,
-and zero serious/critical axe findings. This slice is local-only until the
-release cutover gate is approved.
+and zero serious/critical axe findings. This slice is included in the merged
+main private release.
 
 ### Phase 4 — Motion, feedback, and accessibility polish
 
@@ -477,20 +477,20 @@ standalone: `/account`, `/trip/[tripId]`, `/trip/[tripId]/map`, and
 zero horizontal overflow, zero console errors, and no serious/critical axe
 violations. The focused map-panel test and existing chosen-day tests pass; the
 full unit suite is 171 files / 885 tests. The production build emits 64 routes
-and the motion gate scans 445 files with no violations. These checks do not
-change the VPS release until a release branch/cutover is explicitly approved.
+and the motion gate scans 445 files with no violations. These checks are
+represented by the merged-main private release.
 
-The current-source proof-rail slice was also checked independently at
+The proof-rail slice was checked at
 1440×900 and 393×852: both routes render the labelled definition list with no
 horizontal overflow, zero serious/critical axe findings, and zero browser
 console errors.
 
-The same refreshed artifact is privately deployed as VPS release
-`20260713T0128Z-provider-gate` on `127.0.0.1:3002`; the Mac tunnel at
-`127.0.0.1:3302` returned 200 for the representative public, planner, and
+The merged refreshed artifact is privately deployed as VPS release
+`20260713T042000Z-main-2a8c394` on `127.0.0.1:3002`; the temporary Mac tunnel at
+`127.0.0.1:33302` returned 200 for the representative public, planner, and
 activity-detail routes at both 1440px and 393px, with no horizontal overflow or
 browser console errors. The local and remote standalone server entrypoints
-share SHA-256 `0ad9393852f225bdb93be2496f25ee79842cd9069b7cef5e5e4b0aa5d322f604`.
+share SHA-256 `6c3fa489c72e7f8f160af78b2831b83bfea5a7eba8cbd62a209d811a0ea51608`.
 Lumes remains unchanged on port 3001.
 
 **Manual evidence:** 1440×900, 1024×768, 768×768, and 390×844 captures for
@@ -555,9 +555,9 @@ The redesign is complete only when all of the following are true:
 
 ## 10. Current open decisions
 
-- Fresh Rumia 3002/3302 artifact is rebuilt and privately deployed from this
-  worktree; public visual acceptance is still intentionally deferred with the
-  public-ingress decision.
+- Fresh Rumia 3002/33302 artifact is rebuilt and privately deployed from the
+  merged `main` release; public visual acceptance is still intentionally
+  deferred with the public-ingress decision.
 - Final texture treatment and the owned asset manifest have been reviewed
   against the refreshed 1440px/393px route set; future editorial asset changes
   must continue through the same manifest gate.

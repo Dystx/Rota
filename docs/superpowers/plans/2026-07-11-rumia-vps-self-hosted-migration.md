@@ -579,11 +579,11 @@ Set `output: 'standalone'` in `apps/web/next.config.ts` with the workspace traci
 The wrapper retries the loopback health endpoint for up to 30 seconds. On
 failure, it restores the prior symlink and restarts only `rumia-web.service`.
 
-Verified 2026-07-13: release `20260713T0128Z-provider-gate` is active, the service
+Verified 2026-07-13: release `20260713T042000Z-main-2a8c394` is active, the service
 is enabled, `/api/health`, `/`, `/portugal`, `/support`, and
 `/api/auth/get-session` return HTTP 200 on port 3002, and the stylesheet and
-JavaScript URLs emitted by `/` return HTTP 200 through the private Mac tunnel
-on port 3302. Lumes remains on port 3001. The runtime `NEXT_PUBLIC_APP_URL` is now
+JavaScript URLs emitted by `/` return HTTP 200 through the temporary private Mac
+SSH tunnel on port 33302. Lumes remains on port 3001. The runtime `NEXT_PUBLIC_APP_URL` is now
 `http://127.0.0.1:3002` for the private phase.
 
 - [ ] **Step 3: Install Caddy route after loopback smoke test (deferred)**

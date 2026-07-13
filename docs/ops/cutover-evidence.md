@@ -10,8 +10,9 @@ must not be read as evidence that Rumia is publicly deployed.
 
 - Date: 2026-07-13 (frontend refresh; prior database and service evidence remains
   dated 2026-07-11/12 below)
-- Worktree: `/Users/cheng/rota/.worktrees/rumia-phase0`
-- Branch: `codex/rumia-phase0`
+- Worktree: `/Users/cheng/rota`
+- Branch: `main`
+- Merged implementation commit: `2a8c39464390a2bfda0a62edfffc33b9af3ab920`
 - Public activation: not performed
 - Private Rumia service: enabled on `127.0.0.1:3002`
 - Private runtime URL: `http://127.0.0.1:3002`
@@ -19,15 +20,15 @@ must not be read as evidence that Rumia is publicly deployed.
 
 ## Current release boundary audit
 
-- The checked-out implementation remains on feature branch
-  `codex/rumia-phase0` with uncommitted implementation changes; no
+- The implementation was merged to `main` and pushed to the canonical
+  `Dystx/Rota` repository. The release was built from that exact commit; no
   feature-branch deployment was attempted.
-- A standalone release candidate was prepared locally with the required
-  nested Next assets (`server.js`, `.next/static`, and `public`) and passed
-  the artifact-shape checks. The candidate is not active on the VPS.
+- A standalone release artifact was prepared with the required nested Next
+  assets (`server.js`, `.next/static`, and `public`) and passed the
+  artifact-shape checks. The artifact is active on the VPS.
 - VPS read-only audit: Rumia is healthy and active on `127.0.0.1:3002`, with
-  the current symlink still pointing to release
-  `20260713T0128Z-provider-gate`. Lumes remains healthy on `0.0.0.0:3001`; no
+  the current symlink pointing to release
+  `20260713T042000Z-main-2a8c394`. Lumes remains healthy on `0.0.0.0:3001`; no
   Lumes service restart or configuration change was performed.
 - Map preflight listeners remain isolated to Rumia-owned loopback ports
   `3010`, `3011`, and `3012`; production map/story/3D flags remain disabled.
@@ -41,9 +42,9 @@ must not be read as evidence that Rumia is publicly deployed.
   The documented restore check was rerun on 2026-07-13 and successfully
   restored the snapshot into `rumia_restore_check`, validated PostGIS, and
   removed its temporary database and dump staging files.
-- The next cutover requires a reviewed release branch/merge plus the
-  owner/legal map-provider decision packet. Public `rumia.pt` ingress remains
-  deferred.
+- The private cutover is complete. Remaining external work is the
+  owner/legal map-provider decision packet and, separately, public ingress;
+  public `rumia.pt` remains deferred.
 
 ## Verified evidence
 
@@ -67,11 +68,10 @@ must not be read as evidence that Rumia is publicly deployed.
 - `node scripts/check-runtime-architecture.mjs` passes and the CI workflow no
   longer starts or resets a hosted-Supabase-shaped local stack.
 - Unit suite: 171 files, 885 tests passed (including the editorial proof-rail, map-panel, and schematic-fallback component tests).
-- The current worktree also contains the subsequent proof-rail, pricing
-  hierarchy, saved-plan editor, saved-traveler surface, and utility recovery UI
-  slices; they are
-  locally verified but are not represented by the deployed
-  `20260713T0128Z-provider-gate` release.
+- The deployed commit includes the proof-rail, pricing hierarchy, saved-plan
+  editor, saved-traveler surface, and utility recovery UI slices. The release
+  was built from the merged `main` commit after the full unit and production
+  build gates passed.
 - Full smoke browser suite: 303 passed, 33 intentional skips across desktop and
   mobile projects, rerun after the schematic spatial-fallback polish.
 - Full visual matrix: 104 passed, 32 intentional skips; dedicated accessibility
@@ -92,15 +92,15 @@ must not be read as evidence that Rumia is publicly deployed.
   no browser console errors, and no serious/critical axe findings. The map
   details panel is labelled and keyboard discoverable; partial/unsourced map
   data renders a schematic fallback with the geometry status inline rather
-  than a blank canvas; export state chips have explicit contrast. This evidence
-  is local-only and does not alter the VPS release.
+  than a blank canvas; export state chips have explicit contrast. These checks
+  are represented by the deployed release.
 - The local current-source utility recovery pass covers `/offline`,
   `/feedback`, `/sign-in`, and `/support` at 1440×900 and 393×852: all return
   200 with one H1/main, no horizontal overflow, no browser console errors, and
   no serious/critical axe findings. Offline now exposes recovery context,
   feedback controls show explicit selected/disabled states, and sign-in has a
-  compact trust rail for privacy/editorial boundaries. This evidence is
-  local-only and does not alter the VPS release.
+  compact trust rail for privacy/editorial boundaries. These checks are
+  represented by the deployed release.
 - The homepage uses a static Portugal context illustration; MapLibre and DEM
   terrain remain opt-in until the provider/licence gate is approved.
 - A separate local standalone canary used `RUMIA_MAP_STYLE_URL` and the
@@ -141,20 +141,21 @@ must not be read as evidence that Rumia is publicly deployed.
 
 ### Private deployment
 
-- Release `20260713T0128Z-provider-gate` is the active `current` target. It places
+- Release `20260713T042000Z-main-2a8c394` is the active `current` target. It places
   Next's static and public assets under the nested standalone app directory,
   matching the server's working directory.
 - The local and remote standalone server entrypoints have the same SHA-256:
-  `0ad9393852f225bdb93be2496f25ee79842cd9069b7cef5e5e4b0aa5d322f604`.
+  `6c3fa489c72e7f8f160af78b2831b83bfea5a7eba8cbd62a209d811a0ea51608`.
 - The release wrapper restarted only `rumia-web.service`, rolled forward
   atomically, and its health check returned `{"status":"ok","database":"ready"}`.
-- Loopback smoke returned HTTP 200 for `/`, `/portugal`, `/support`,
-  `/api/health`, and `/api/auth/get-session` after the refresh.
+- Loopback/tunnel smoke returned HTTP 200 for `/`, `/explore`,
+  `/explore/workspace`, `/planner`, `/portugal`, `/support`, `/sign-in`, and
+  `/api/health` after the refresh.
 - The homepage-emitted `/_next/static/*.css` URL returned HTTP 200 with
-  `text/css; charset=UTF-8` through the private Mac tunnel on port 3302.
-- A private SSH tunnel on Mac port 3302 returned the refreshed Rumia homepage
-  and health responses; Mac port 3002 remains the separate local Lumes
-  development server.
+  `text/css; charset=UTF-8` through the temporary private Mac SSH tunnel on
+  port `33302`.
+- The temporary tunnel was closed after verification. Rumia remains loopback
+  only on the VPS at `127.0.0.1:3002`; Lumes remains on `0.0.0.0:3001`.
 - Fresh desktop (1440px) and mobile (393px) browser checks against the tunnel
   passed for `/`, `/explore`, `/explore/workspace`, `/planner`, `/support`,
   `/sign-in`, and `/activities/porto-ribeira-slow-walk`: all returned 200, one

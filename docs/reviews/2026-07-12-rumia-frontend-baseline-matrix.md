@@ -1,6 +1,6 @@
 # Rumia frontend baseline matrix
 
-Updated: 2026-07-13 (post editorial proof-rail, pricing, saved-plan editor, saved-traveler surface, and utility recovery slices; full local rerun and private VPS refresh remain separately identified)
+Updated: 2026-07-13 (post editorial proof-rail, pricing, saved-plan editor, saved-traveler surface, and utility recovery slices; merged main release verified privately on the VPS)
 
 This matrix records release evidence for the approved editorial rework. A
 visual mismatch is a review item, not permission to refresh a baseline.
@@ -32,8 +32,8 @@ visual mismatch is a review item, not permission to refresh a baseline.
 - Fresh route review capture — PASS for 78/78 HTTP-success routes at 1440×900 and 393×852; protected console API 401s are expected in the unauthenticated script and are covered by authenticated smoke/visual runs
 - Homepage bundle probe — PASS; no MapLibre renderer chunk requested before map intent
 - Tablet viewport contract — PASS, 120/120 at 1024×768 and 768×768; hero editorial figure is lazy-loaded to avoid cross-route preload warnings
-- Private VPS refresh — PASS; release `20260713T0128Z-provider-gate` is active on
-  loopback `127.0.0.1:3002`, and the `127.0.0.1:3302` SSH tunnel returned 200,
+- Private VPS refresh — PASS; release `20260713T042000Z-main-2a8c394` is active on
+  loopback `127.0.0.1:3002`, and the temporary `127.0.0.1:33302` SSH tunnel returned 200,
   one visible H1, no horizontal overflow, and no console errors for the
   representative public, planner, and activity-detail routes at 1440px and
   393px. Lumes remains unchanged on port 3001.
@@ -44,23 +44,23 @@ visual mismatch is a review item, not permission to refresh a baseline.
 - Pricing hierarchy slice — PASS; `/pricing` renders the free-first proof rail
   and four labelled tier states at 1440px and 393px with zero serious/critical
   axe findings, no overflow, and truthful Future access copy for concierge.
-- Saved-plan editor slice — PASS on the local current-source artifact;
+- Saved-plan editor slice — PASS on the deployed merged-main artifact;
   `/trip/new` uses activity-first copy, an explicit Explore hand-off, practical
   edit rows, and a truthful no-booking boundary at 1440px and 393px with one
   H1, zero horizontal overflow, zero serious/critical axe findings, and zero
-  browser console errors. It is not yet present in VPS release
-  `20260713T0128Z-provider-gate`.
-- Saved-traveler surface slice — PASS on the local current-source artifact;
+  browser console errors. It is represented by VPS release
+  `20260713T042000Z-main-2a8c394`.
+- Saved-traveler surface slice — PASS on the deployed merged-main artifact;
   `/account`, `/trip/[tripId]`, `/trip/[tripId]/map`, and
   `/trip/[tripId]/export` were checked at 1440×900 and 393×852 with one H1,
   zero horizontal overflow, zero serious/critical axe findings, and zero
   browser console errors. The map details panel is keyboard discoverable and
-  export status chips have explicit locked/unlocked contrast. The slice is not
-  yet present in VPS release `20260713T0128Z-provider-gate`.
-- Utility recovery slice — PASS on the local current-source artifact;
+  export status chips have explicit locked/unlocked contrast. The slice is
+  represented by VPS release `20260713T042000Z-main-2a8c394`.
+- Utility recovery slice — PASS on the deployed merged-main artifact;
   `/offline`, `/feedback`, `/sign-in`, and `/support` were checked at
   1440×900 and 393×852 with one H1/main, zero horizontal overflow, zero
   serious/critical axe findings, and zero browser console errors. Offline now
   exposes recovery context and feedback controls have explicit selected and
-  disabled states. The slice is not yet present in VPS release
-  `20260713T0128Z-provider-gate`.
+  disabled states. The slice is represented by VPS release
+  `20260713T042000Z-main-2a8c394`.
