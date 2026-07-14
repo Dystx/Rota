@@ -1,6 +1,39 @@
 # Plan Audit — Rumia activity-first roadmap and optional activity map
 
-**Date:** 2026-07-12 · **Verdict:** READY FOR PRIVATE RELEASE; NOT READY FOR MAP/PUBLIC PRODUCTION
+**Date:** 2026-07-14 · **Verdict:** TECHNICAL FRONTEND BASELINE VERIFIED; VISUAL ACCEPTANCE REOPENED; MAP/PUBLIC ENABLEMENT GATED
+
+> **2026-07-14 reconciliation:** the technical evidence in this audit remains
+> useful, but it no longer closes frontend convergence. The current baseline
+> and route ownership are recorded in
+> `docs/reviews/2026-07-14-rumia-frontend-convergence-baseline.md`; the active
+> implementation queue is
+> `docs/superpowers/plans/2026-07-14-rumia-frontend-convergence-implementation.md`.
+
+## Working-tree checkpoint
+
+The last privately released artifact remains `20260713T042000Z-main-2a8c394`.
+The current checkout is `main @ 4b394905` with an intentional, uncommitted
+plan/evidence reconciliation and a local-only frontend closeout tranche:
+activity-detail save, chosen-day actions, activity-first cards/planner copy,
+editorial console vocabulary, quiet-route proof rails, responsive banner
+wrapping, and shared contour/page-entry styling. Existing unrelated dirty
+files and scratch captures remain untouched; no destructive cleanup or broad
+staging was performed.
+
+The current tree was built successfully with explicit local PostgreSQL/Better
+Auth environment values and served at `http://127.0.0.1:3304/` for exact-artifact
+review. The full unit suite is **173 files / 890 tests**, the changed-slice
+suite is **13/13**, root build/typecheck, ESLint, PostgreSQL policy,
+motion/assets/migration/safety gates, and `git diff --check` pass, and the
+production build emits **64 routes**. Browser gates are green at **303/336
+smoke (33 expected skips), 61/62 accessibility (1 expected skip), 104/136
+visual (32 expected skips), 14/14 performance, and 120/120 viewport checks**.
+A 26-pair desktop/mobile route sweep found only successful 200 responses with
+one H1, one main, no horizontal overflow, and no browser console/page errors.
+The final local pass also fixes feedback’s nested-main landmark, the clipped
+result-card save label, and the phrase composer’s stray terminal punctuation;
+home/explore baselines were regenerated. The stale `33302` tunnel is excluded
+from this evidence. No VPS release was created from the local tranche.
 
 This audit supersedes the 2026-07-10 activity-curation audit. The canonical
 roadmap is now the activity-first master plan, with the optional map capability
@@ -10,11 +43,12 @@ core generated-plan journey.
 ## Inputs audited
 
 - `docs/superpowers/plans/2026-07-10-rumia-activity-first-master.md`
-- `docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`
+- `docs/superpowers/plans/2026-07-14-rumia-frontend-polish.md`
 - `docs/superpowers/specs/2026-07-10-rumia-activity-curation-design.md`
 - `docs/superpowers/specs/2026-07-11-rumia-activity-map-capability.md`
 - `docs/superpowers/specs/2026-07-11-rumia-vps-platform-design.md`
 - `docs/reviews/2026-07-11-rumia-browser-ui-review.md`
+- `docs/superpowers/PLAN-INDEX.md`
 - `docs/ops/rumia-content-approval.md`
 - `docs/ops/map-provider-licensing.md`
 - `docs/ops/geographic-route-contract.md`
@@ -51,7 +85,7 @@ core generated-plan journey.
 | Project rules | ✅ | `CONVENTIONS.md` records the activity-first, VPS-native, map/licence, UI, and verification boundaries. No `AGENTS.md` or `CLAUDE.md` was found, so package-specific rules still take precedence if added later. |
 | Specs layout | ✅ | `docs/superpowers/specs/` and `specs/` are present; the map capability has a dedicated spec and the master plan links to it. |
 | Commit convention | ⚠️ | Conventional-commit language appears in existing workflow guidance, but this review does not create or stage a commit. |
-| Git workflow | ✅ | Existing work is in the isolated `rumia-phase0` worktree; unrelated dirty changes must remain untouched. |
+| Git workflow | ✅ | Current work is on `main`; unrelated dirty changes, captures, and scratch files remain untouched. |
 
 ## Pre-flight answers
 
@@ -67,16 +101,16 @@ core generated-plan journey.
 
 ## Remaining gates before map/production enablement
 
-- [x] Execute UI-0/UI-1 from the full redesign plan: close the existing browser
-  P0/P1 findings and rerun desktop/mobile, keyboard, announcement, reduced-
-  motion, and browser-warning evidence. The full smoke, visual, accessibility,
-  and performance matrices are green in the current artifact at the configured
-  Desktop Chrome and 390×844 mobile viewports; manual 1440×900 evidence is also
-  recorded.
-- [x] Capture the remaining 1024px and 768px UI-5 route rows. The explicit
-  `@viewport-qa` Playwright contract passed **70/70** against a fresh
-  production artifact and wrote 70 first-viewport captures under
-  `.sisyphus/evidence/future-roadmap/viewport-contract/`.
+- [x] Execute the current-tree exact-artifact UI-0/UI-1 pass: detail save,
+  workspace shape/start, activity-first cards/planner language, console
+  editorial vocabulary, quiet-route actions, and shared contour/page-entry
+  styling were reviewed at desktop and mobile on `127.0.0.1:3304` with no
+  overflow or browser console errors. The automated route/viewport contract is
+  green; any remaining manual route sign-off is a release-boundary check.
+- [x] Capture the 1024px and 768px UI-5 route rows. The explicit `@viewport-qa`
+  Playwright contract passed **120/120** against a fresh production artifact;
+  the current responsive contract is green for the public, traveler, reviewer,
+  and operator route set.
 - [ ] Approve the reviewed Portugal activity corpus and its editorial freshness
   policy. The activity composer → judged results → save/remove/reorder →
   workspace/list journey is stable, and the automated corpus contract now
@@ -126,8 +160,8 @@ safe hosted default.
 The 12 July local review follow-up also fixed two current-surface defects:
 metadata now reflects activity curation without duplicated template suffixes,
 and the root MapLibre error suppressor is lazy so the production homepage emits
-no MapLibre chunk. The standalone review server is stable on local port 3002;
-the development compiler is not used as the review runtime.
+no MapLibre chunk. The current dirty exact-artifact review server is stable on
+local port `3304`; the stale `3002`/`33302` tunnel is not the review runtime.
 
 The 12 July frontend review is now consolidated in the single deep-redesign
 plan rather than split across overlapping UI documents. It covers the full
@@ -136,20 +170,24 @@ public/traveler/operator surfaces, and the optional map/3D boundary. It keeps
 the homepage map-free on initial load and defers 3D until chosen-day evidence
 and licensing/performance gates are proven.
 
-The current browser tunnel on 3302 still shows an older globe-first homepage
-and legacy planner chapter. That is recorded as a source/artifact parity gate,
-not accepted as the current visual baseline. The active source has the
-activity-first copy and the deep redesign plan now requires a fresh build,
-served-commit proof, route-by-route captures, and an explicit background/surface
-review before visual acceptance.
+The browser tunnel on 3302/33302 may show an older release and is not accepted
+as the current visual baseline. The active source now includes the
+activity-detail save action, activity-first bento/planner language, chosen-day
+shape actions, editorial console vocabulary, quiet-route proof rails,
+responsive console-banner wrapping, and stronger contour/page-entry surface
+treatment. The current-tree artifact at `127.0.0.1:3304` has been rebuilt and
+reviewed at desktop/mobile representative routes; the automated route/viewport
+matrix is green, and the remaining work is release-boundary sign-off and owner
+decisions, not another redesign plan.
 
-The current release evidence clears the route-wide visual, accessibility,
-reduced-motion, performance, and build gates: visual snapshots are 70/70,
-accessibility is 61 passed with one expected skip, performance/Web Vitals is
-14/14, root typecheck is 15/15 packages, the production build is 2/2 targets,
-the motion gate scans 434 files, mobile overflow is 32/32, and the viewport
-contract is 120/120. The focused activity-map suite is 20/20, spatial tests
-are 6/6, and the explicit map browser flow is 2/2 at desktop and 390x844.
+The current release evidence clears the automated visual, accessibility,
+reduced-motion, performance, build, and responsive gates: visual snapshots are
+104 passed with 32 expected skips, accessibility is 61 passed with one expected
+skip, performance is 14/14, the production build emits 64 routes, the motion
+gate scans 448 files, and the viewport contract is 120/120. The full smoke suite
+is 303 passed with 33 expected skips; unit tests are 173 files / 890 tests.
+The focused activity-map suite and spatial tests remain green, while Phase 2/3
+map enablement stays gated.
 Globe terrain remains opt-in and disabled by default, so an unapproved DEM
 provider cannot be fetched by the homepage context layer. Application
 assertions remain strict; visual actuals were reviewed before the accepted
@@ -158,13 +196,17 @@ baseline commit.
 ## Verdict
 
 **CORE FUNCTIONAL UI + ACTIVITY-MAP PHASE 1: READY FOR PRIVATE REVIEW.
-PRIVATE VPS RELEASE: VERIFIED. DEEP VISUAL REDESIGN ACCEPTANCE: OPEN. FULL
-MAP/PUBLIC PRODUCTION: NOT READY.** Automated gates and the Phase 1 map
-implementation are evidenced, but the current 3302 visual target is stale and
-the new deep-redesign background/surface pass has not yet been accepted against
-a fresh served artifact. The remaining owner decisions for map/public
-production are explicit reviewed-content approval and provider/licensing
-approval. Public ingress is intentionally deferred by the existing owner
-decision. Keep Phase 2 camera storytelling and Phase 3 3D deferred until those
-gates and additional usage evidence clear; do not start them from the
-inspiration example alone.
+PRIVATE VPS RELEASE: VERIFIED FOR THE LAST MERGED RELEASE. CURRENT LOCAL
+FRONTEND CLOSEOUT: IMPLEMENTED, EXACT-ARTIFACT REVIEWED, AND AUTOMATED GATES
+GREEN; NOT RELEASED. FULL MAP/PUBLIC PRODUCTION: NOT READY.** Automated gates,
+the Phase 1 map implementation, and the current local activity-first visual
+tranche are evidenced. The remaining release gate is artifact provenance and
+any final owner-required manual route sign-off; the local implementation has
+addressed the detail save action, primary-action hierarchy, direct planner
+language, operator vocabulary, responsive banner clipping, and closed-drawer
+overflow.
+The remaining owner decisions for map/public production are explicit
+reviewed-content approval and provider/licensing approval. Public ingress is
+intentionally deferred by the existing owner decision. Keep Phase 2 camera
+storytelling and Phase 3 3D deferred until those gates and additional usage
+evidence clear; do not start them from the inspiration example alone.
