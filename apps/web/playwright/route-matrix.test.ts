@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { HTTP_ROUTE_CATALOGUE } from "@/lib/routes/http-route-catalogue";
 import { ROUTE_PRESENTATION_CATALOGUE, ROUTE_SCENARIO_CATALOGUE, type ScenarioFixture } from "@/lib/routes/route-presentation-catalogue";
@@ -7,6 +7,7 @@ import { readReviewerTripFixture, reviewerTripPath, type ReviewerTripVariant } f
 import { readReviewedTripFixture, reviewedTripPath } from "./fixtures/reviewed-trip";
 import { readSpecialistCandidateFixture, specialistCandidatePath } from "./fixtures/specialist-candidate-auth";
 import { foreignTravelerTripPath, readTravelerTripFixture, travelerTripPath } from "./fixtures/traveler-trip";
+import { ensureReviewerAssignment, ensureTravelerTrip } from "./global-setup";
 import { ROUTE_MATRIX } from "./route-matrix";
 
 type FixtureKey = "admin-limited" | "reviewed-trip" | "reviewer-trip" | "specialist-candidate" | "traveler-trip";
@@ -103,5 +104,40 @@ describe("ROUTE_MATRIX", () => {
       const resolved = resolveFixture(row.scenario.fixture);
       expect(resolved, row.id).not.toMatch(/[\[\]]/u);
     }
+  });
+
+  it("does not mutate or reuse a traveler record that is no longer a draft", async () => {
+    const draftQuery = vi.fn(async (queryText: string) => ({
+      rows: queryText.includes("title in") ? [{ id: "00000000-0000-4000-8000-000000000410", trip_brief_id: "00000000-0000-4000-8000-000000000409" }] : []
+    }));
+    const draftOwner = { query: draftQuery } as unknown as Parameters<typeof ensureTravelerTrip>[0];
+    await expect(ensureTravelerTrip(draftOwner, "00000000-0000-4000-8000-000000000413")).resolves.toMatchObject({
+      tripId: "00000000-0000-4000-8000-000000000410"
+    });
+    expect(draftQuery).toHaveBeenCalledTimes(1);
+    expect(draftQuery.mock.calls[0]?.[0]).toContain("status = 'draft'");
+    expect(draftQuery.mock.calls[0]?.[0]).toContain("is_paid = false");
+    expect(draftQuery.mock.calls[0]?.[0]).toContain("has_human_review = false");
+    expect(draftQuery.mock.calls.every(([queryText]) => !queryText.trimStart().startsWith("update"))).toBe(true);
+
+    const contaminatedQuery = vi.fn(async () => ({ rows: [] }));
+    const contaminatedOwner = { query: contaminatedQuery } as unknown as Parameters<typeof ensureTravelerTrip>[0];
+    await ensureTravelerTrip(contaminatedOwner, "00000000-0000-4000-8000-000000000413");
+    expect(contaminatedQuery.mock.calls.some(([queryText]) => queryText.includes("insert into app.trip_briefs"))).toBe(true);
+    expect(contaminatedQuery.mock.calls.some(([queryText]) => queryText.trimStart().startsWith("update"))).toBe(false);
+  });
+
+  it("clears stale active reviewer rows before writing a completed fixture", async () => {
+    const query = vi.fn(async () => ({ rows: [] }));
+    const owner = { query } as unknown as Parameters<typeof ensureReviewerAssignment>[0];
+    await ensureReviewerAssignment(
+      owner,
+      "00000000-0000-4000-8000-000000000405",
+      "00000000-0000-4000-8000-000000000404",
+      "00000000-0000-4000-8000-000000000412",
+      "completed",
+      "Completed reviewer fixture"
+    );
+    expect(query.mock.calls.some(([queryText]) => queryText.includes("delete from app.reviewer_assignments") && queryText.includes("status in ('assigned', 'submitted')"))).toBe(true);
   });
 });

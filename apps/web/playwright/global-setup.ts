@@ -53,7 +53,9 @@ const FIXTURE_IDS = {
   completedAssignment: "00000000-0000-4000-8000-000000000405",
   unassignedBrief: "00000000-0000-4000-8000-000000000406",
   unassignedTrip: "00000000-0000-4000-8000-000000000407",
-  specialistProfile: "00000000-0000-4000-8000-000000000408"
+  specialistProfile: "00000000-0000-4000-8000-000000000408",
+  travelerBrief: "00000000-0000-4000-8000-000000000409",
+  travelerTrip: "00000000-0000-4000-8000-000000000410"
 } as const;
 
 const E2E_BASE_URL = "http://127.0.0.1:3105";
@@ -191,7 +193,7 @@ async function ensureOwnedTrip(owner: pg.Pool, seed: TripFixtureSeed): Promise<T
   return { ownerUserId: seed.ownerUserId, tripBriefId: seed.tripBriefId, tripId: seed.tripId };
 }
 
-async function ensureReviewerAssignment(
+export async function ensureReviewerAssignment(
   owner: pg.Pool,
   assignmentId: string,
   tripId: string,
@@ -199,7 +201,7 @@ async function ensureReviewerAssignment(
   status: "assigned" | "completed",
   notes: string
 ): Promise<void> {
-  if (status === "assigned") {
+  if (status === "assigned" || status === "completed") {
     await owner.query("delete from app.reviewer_assignments where trip_id = $1 and status in ('assigned', 'submitted')", [tripId]);
   }
   await owner.query(
@@ -253,25 +255,32 @@ async function captureStorageState(auth: ReturnType<typeof createRumiaAuth>, ema
   return { cookies: [parseSessionCookie(response)], origins: [{ localStorage: [], origin: E2E_BASE_URL }] };
 }
 
-async function ensureTravelerTrip(owner: pg.Pool, ownerUserId: string): Promise<{ tripId: string; tripBriefId: string; ownerUserId: string }> {
+export async function ensureTravelerTrip(owner: pg.Pool, ownerUserId: string): Promise<{ tripId: string; tripBriefId: string; ownerUserId: string }> {
   const title = "Lisbon & Douro slow route";
   const legacyTitle = "Playwright-owned Portugal route [e2e-fixture]";
   const humanBrief = "A calm five-day Portugal route with local food and room to wander.";
-  await owner.query("update app.trips set title = $1, updated_at = now() where owner_user_id = $2 and title = $3", [title, ownerUserId, legacyTitle]);
-  await owner.query(
-    "update app.trip_briefs set raw_input = $1, updated_at = now() where id in (select trip_brief_id from app.trips where owner_user_id = $2 and title = $3)",
-    [humanBrief, ownerUserId, title]
-  );
   const existing = await owner.query<{ id: string; trip_brief_id: string }>(
-    "select id, trip_brief_id from app.trips where owner_user_id = $1 and title = $2 order by created_at desc limit 1",
-    [ownerUserId, title]
+    `select id, trip_brief_id
+       from app.trips
+      where owner_user_id = $1
+        and title in ($2, $3)
+        and status = 'draft'
+        and is_paid = false
+        and has_human_review = false
+      order by case when title = $2 then 0 else 1 end, created_at desc
+      limit 1`,
+    [ownerUserId, title, legacyTitle]
   );
   if (existing.rows[0]) {
     return { ownerUserId, tripBriefId: existing.rows[0].trip_brief_id, tripId: existing.rows[0].id };
   }
 
-  const briefId = crypto.randomUUID();
-  const tripId = crypto.randomUUID();
+  const collision = await owner.query<{ id: string }>(
+    "select id from app.trip_briefs where id = $1 union all select id from app.trips where id = $2 limit 1",
+    [FIXTURE_IDS.travelerBrief, FIXTURE_IDS.travelerTrip]
+  );
+  const briefId = collision.rows[0] ? crypto.randomUUID() : FIXTURE_IDS.travelerBrief;
+  const tripId = collision.rows[0] ? crypto.randomUUID() : FIXTURE_IDS.travelerTrip;
   const normalized = {
     destinationCountry: "portugal",
     regions: ["lisbon", "douro-valley"],
