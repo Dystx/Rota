@@ -58,7 +58,6 @@ interface BentoCardData {
   activityLabel: string;
   activityCaption: string;
   activityRegion: string;
-  backgroundImage: string;
   mediaSrc: string;
   mediaAlt: string;
   gridClass: string;
@@ -75,7 +74,6 @@ const BENTO_CARDS: BentoCardData[] = [
     activityLabel: "A slower Lisbon afternoon",
     activityCaption: "Walking, culture, and a better sense of when to stop.",
     activityRegion: "Lisbon · walking + culture",
-    backgroundImage: "url('/trip-covers/lisbon-tagus.svg')",
     mediaSrc: "/trip-covers/lisbon-tagus.svg",
     mediaAlt: "Layered editorial illustration of Lisbon and the Tagus light.",
     gridClass: "md:col-span-8 row-span-2",
@@ -89,7 +87,6 @@ const BENTO_CARDS: BentoCardData[] = [
     activityLabel: "A day shaped around the Douro",
     activityCaption: "Choose the river, the view, and the right amount of time.",
     activityRegion: "Douro · landscape + food",
-    backgroundImage: "url('/media/unsplash/douro-terraces-card.webp')",
     mediaSrc: "/media/unsplash/douro-terraces-card.webp",
     mediaAlt: "Terraced vineyards descending toward the Douro River",
     gridClass: "md:col-span-4 row-span-2",
@@ -104,7 +101,6 @@ const BENTO_CARDS: BentoCardData[] = [
     activityLabel: "When the weather opens a window",
     activityCaption: "Keep the island day generous, not overfilled.",
     activityRegion: "Azores · nature + weather",
-    backgroundImage: "url('/media/unsplash/portugal-coast-card.webp')",
     mediaSrc: "/media/unsplash/portugal-coast-card.webp",
     mediaAlt: "Atlantic coast at golden hour in Portugal",
     gridClass: "md:col-span-12 row-span-1",
@@ -229,11 +225,6 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                 data-slug={card.slug}
                 aria-label={`Plan this trip to ${card.label}`}
                 onClick={(event) => handlePlanNavigation(event, card.slug, planHref)}
-                style={{
-                  backgroundImage: card.backgroundImage,
-                  backgroundPosition: "center",
-                  backgroundSize: "cover"
-                }}
                 className={`rumia-bento-card ${card.gridClass} group relative block rounded-xl overflow-hidden border border-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light`}
               >
                 {cardBody}
@@ -248,11 +239,6 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
               data-testid={`bento-card-${card.slug}`}
               data-slug={card.slug}
               aria-label={`Explore judged activities in ${card.label}`}
-              style={{
-                backgroundImage: card.backgroundImage,
-                backgroundPosition: "center",
-                backgroundSize: "cover"
-              }}
               className={`rumia-bento-card ${card.gridClass} group relative rounded-xl overflow-hidden border border-white/40 block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light group-focus-visible:ring-2 group-focus-visible:ring-ochre-light`}
             >
               {cardBody}

@@ -142,19 +142,19 @@ export function PortugalAtlas({ activities = REVIEWED_ACTIVITY_SEED }: { activit
           return (
             <li key={collection.region} className="min-w-0">
               <Link
-                className="rumia-portugal-collection-card rumia-portugal-collection-card--compact group relative flex min-h-[10.5rem] h-full flex-col overflow-hidden rounded-[24px] border border-linen/15 p-5 md:min-h-[14rem] md:p-8"
+                className="rumia-portugal-collection-card rumia-portugal-collection-card--compact group relative flex min-h-[10.5rem] h-full flex-col overflow-hidden rounded-[24px] border border-linen/15 p-5 focus-visible:outline-none focus-visible:shadow-focus md:min-h-[14rem] md:p-8"
                 href={collectionHref(collection)}
                 data-region-card="compact"
                 data-testid={`portugal-region-link-${collection.region}`}
               >
                 <span className="relative z-10 flex items-center gap-4">
-                  <span data-testid={`collection-index-${collection.region}`} className="font-mono-technical text-sm tracking-[0.24em] text-ochre-dark md:text-ochre-light">{String(index + 2).padStart(2, "0")}</span>
+                  <span data-testid={`collection-index-${collection.region}`} className="font-mono-technical text-sm tracking-[0.24em] text-ochre-on-light md:text-ochre-light">{String(index + 2).padStart(2, "0")}</span>
                   <span className="h-px w-10 bg-ochre-dark/40 md:bg-ochre-light/55" aria-hidden />
-                  <span className="font-mono-micro text-mono-micro uppercase tracking-[0.18em] text-on-surface-variant md:text-linen/55">{count} reviewed activities</span>
+                  <span data-region-metadata="true" className="font-mono-technical text-mono-technical uppercase tracking-[0.18em] text-on-surface-variant md:text-linen/55">{count} reviewed activities</span>
                 </span>
                 <span className="relative z-10 mt-5 font-display text-2xl leading-tight tracking-[-0.015em] text-primary md:text-4xl md:text-linen">{collection.title}</span>
                 <span data-region-judgement="true" className="relative z-10 mt-3 line-clamp-1 max-w-2xl text-base leading-7 text-on-surface-variant md:text-linen/65">{collection.judgement}</span>
-                <span className="relative z-10 mt-auto inline-flex min-h-11 w-fit items-center gap-2 pt-5 text-sm font-medium text-ochre-dark md:text-ochre-light">Explore {regionName(collection.region)} <span aria-hidden>→</span></span>
+                <span data-region-action="true" className="relative z-10 mt-auto inline-flex min-h-11 w-fit items-center gap-2 pt-5 text-sm font-medium text-ochre-on-light md:text-ochre-light">Explore {regionName(collection.region)} <span aria-hidden>→</span></span>
               </Link>
             </li>
           );

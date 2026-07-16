@@ -33,4 +33,26 @@ describe("PortugalAtlas", () => {
     expect(screen.getByTestId("collection-index-porto").textContent).toBe("01");
     expect(screen.queryByRole("link", { name: /Plan a/i })).toBeNull();
   });
+
+  it("keeps compact region links readable and keyboard-visible on light mobile cards", () => {
+    render(<PortugalAtlas />);
+
+    const compactLinks = Array.from(
+      screen.getByTestId("portugal-compact-region-list").querySelectorAll<HTMLAnchorElement>(
+        'a[data-region-card="compact"]'
+      )
+    );
+
+    expect(compactLinks).toHaveLength(4);
+    for (const link of compactLinks) {
+      const className = link.getAttribute("class") ?? "";
+      const metadata = link.querySelector('[data-region-metadata="true"]');
+      const action = link.querySelector('[data-region-action="true"]');
+
+      expect(className).toContain("focus-visible:shadow-focus");
+      expect(metadata?.getAttribute("class") ?? "").toContain("text-mono-technical");
+      expect(metadata?.getAttribute("class") ?? "").not.toContain("text-mono-micro");
+      expect(action?.getAttribute("class") ?? "").toContain("text-ochre-on-light");
+    }
+  });
 });

@@ -103,4 +103,14 @@ describe("DestinationBento activity mode", () => {
     );
     expect(screen.getByTestId("bento-card-lisbon").textContent).not.toMatch(/Porto/i);
   });
+
+  it("uses the card image as the only requested media layer", () => {
+    render(<DestinationBento mode="explore" />);
+
+    for (const slug of ["lisbon", "douro", "azores"] as const) {
+      const card = screen.getByTestId(`bento-card-${slug}`);
+      expect(card.getAttribute("style") ?? "").not.toMatch(/background-image/i);
+      expect(card.querySelector("img")?.getAttribute("src")).toBeTruthy();
+    }
+  });
 });
