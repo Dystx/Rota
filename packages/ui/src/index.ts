@@ -53,7 +53,6 @@ export * from "./components/choice-card";
 export * from "./components/choice-chip-group";
 export * from "./components/option-sheet";
 export * from "./components/navigation-sheet";
-export * from "./components/side-sheet";
 export * from "./components/trip-context-bar";
 export * from "./components/route-consequence";
 export * from "./components/trip-summary";

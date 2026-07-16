@@ -19,9 +19,7 @@ export default function OfflinePage() {
   return (
     <PublicRouteLayout scene="utility" footerMode="compact" surfaceTone="linen" surfaceTexture="none">
       <div
-        className="rumia-surface rumia-surface-linen px-container-padding-lg py-section-gap"
-        data-surface="linen"
-        data-surface-texture="editorial"
+        className="px-container-padding-lg py-section-gap"
       >
         <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(260px,0.7fr)] lg:items-center">
           <section className="grid gap-6" aria-labelledby="offline-heading">
