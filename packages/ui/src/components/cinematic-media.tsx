@@ -115,7 +115,10 @@ export function CinematicMedia({
   const [isIntersecting, setIsIntersecting] = useState(loadStrategy === "eager");
   const mediaRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const shouldRenderVideo = autoplay && (loadStrategy === "eager" || nearViewport);
+  // Keep the video element stable for layout and test/assistive inspection,
+  // but attach its sources only once the surface is near the viewport.
+  const shouldRenderVideo = autoplay;
+  const attachSources = autoplay && (loadStrategy === "eager" || nearViewport);
 
   useEffect(() => {
     if (!autoplay || loadStrategy === "eager") return;
@@ -133,6 +136,7 @@ export function CinematicMedia({
         const intersecting = Boolean(entry?.isIntersecting);
         setNearViewport(intersecting);
         setIsIntersecting(intersecting);
+        if (!intersecting) videoRef.current?.pause();
       },
       { rootMargin: "300px" }
     );
@@ -141,7 +145,7 @@ export function CinematicMedia({
   }, [autoplay, loadStrategy]);
 
   useEffect(() => {
-    if (!shouldRenderVideo || !pauseWhenHidden) return;
+    if (!attachSources || !pauseWhenHidden) return;
     const media = mediaRef.current;
     const video = videoRef.current;
     if (!media || !video) return;
@@ -178,7 +182,7 @@ export function CinematicMedia({
       observer?.disconnect();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [autoplay, isIntersecting, pauseWhenHidden, shouldRenderVideo]);
+  }, [attachSources, autoplay, isIntersecting, pauseWhenHidden]);
 
   const textSafeStyle = (textSafeZone || mobileTextSafeZone)
     ? ({
@@ -208,6 +212,7 @@ export function CinematicMedia({
       data-motion-policy={motionPolicy}
       data-motion-enabled={autoplay ? "true" : "false"}
       data-load-strategy={loadStrategy}
+      data-sources-attached={attachSources ? "true" : "false"}
       data-pause-when-hidden={pauseWhenHidden ? "true" : "false"}
       data-text-safe-zone={zoneValue(textSafeZone)}
       data-mobile-text-safe-zone={zoneValue(mobileTextSafeZone)}
@@ -244,15 +249,19 @@ export function CinematicMedia({
           muted
           loop
           playsInline
-          preload={priority ? "auto" : "metadata"}
+          preload={attachSources ? (priority ? "auto" : "metadata") : "none"}
           poster={poster}
           aria-hidden="true"
           data-testid="cinematic-video"
         >
-          {mobileWebmSrc ? <source media="(max-width: 767px)" src={mobileWebmSrc} type="video/webm" /> : null}
-          {mobileSrc ? <source media="(max-width: 767px)" src={mobileSrc} type="video/mp4" /> : null}
-          {webmSrc ? <source src={webmSrc} type="video/webm" /> : null}
-          <source src={src} type="video/mp4" />
+          {attachSources ? (
+            <>
+              {mobileWebmSrc ? <source media="(max-width: 767px)" src={mobileWebmSrc} type="video/webm" /> : null}
+              {mobileSrc ? <source media="(max-width: 767px)" src={mobileSrc} type="video/mp4" /> : null}
+              {webmSrc ? <source src={webmSrc} type="video/webm" /> : null}
+              <source src={src} type="video/mp4" />
+            </>
+          ) : null}
         </video>
       ) : null}
       {overlayClassName ? (

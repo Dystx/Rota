@@ -177,9 +177,11 @@ describe("CinematicMedia", () => {
     );
 
     const root = screen.getByTestId("near-viewport-media");
-    expect(root.querySelector("video")).toBeNull();
+    expect(root.querySelector("video")).toBeTruthy();
+    expect(root.querySelector("video")?.getAttribute("preload")).toBe("none");
+    expect(root.querySelectorAll("video source")).toHaveLength(0);
     observers[0]?.callback([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
-    await waitFor(() => expect(root.querySelector("video")).toBeTruthy());
+    await waitFor(() => expect(root.querySelector("video")?.getAttribute("preload")).toBe("metadata"));
     vi.unstubAllGlobals();
   });
 
