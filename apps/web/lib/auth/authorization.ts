@@ -53,7 +53,9 @@ export const loadCurrentAuthorizedActorOutcome = cache(loadCurrentAuthorizedActo
 export async function loadCurrentAuthorizedActor(
   sessionOutcome?: SessionOutcome
 ): Promise<AuthorizedActorOutcome> {
-  return loadCurrentAuthorizedActorOutcome(sessionOutcome);
+  return sessionOutcome === undefined
+    ? loadCurrentAuthorizedActorOutcome()
+    : loadCurrentAuthorizedActorOutcome(sessionOutcome);
 }
 
 export async function requireApiAccess(

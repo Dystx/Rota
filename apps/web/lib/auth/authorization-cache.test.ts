@@ -10,14 +10,13 @@ vi.mock("react", async () => {
   return {
     ...actual,
     cache: <T extends (...args: any[]) => unknown>(fn: T) => {
-      let initialized = false;
-      let result: unknown;
+      const results = new Map<string, unknown>();
       return ((...args: Parameters<T>) => {
-        if (!initialized) {
-          initialized = true;
-          result = fn(...args);
+        const key = JSON.stringify(args);
+        if (!results.has(key)) {
+          results.set(key, fn(...args));
         }
-        return result;
+        return results.get(key);
       }) as T;
     }
   };
@@ -32,7 +31,7 @@ vi.mock("@repo/db", () => ({
   loadPostgresAuthorizationContext: mocks.loadPostgresAuthorizationContext
 }));
 
-import { loadCurrentAuthorizedActorOutcome } from "./authorization";
+import { loadCurrentAuthorizedActor, loadCurrentAuthorizedActorOutcome } from "./authorization";
 
 describe("request-scoped authorization outcome", () => {
   beforeEach(() => {
@@ -49,9 +48,9 @@ describe("request-scoped authorization outcome", () => {
     });
   });
 
-  test("shares one actor probe for the reviewer/admin shell and child context", async () => {
+  test("shares one actor probe between the layout and child auth context", async () => {
     const first = await loadCurrentAuthorizedActorOutcome();
-    const second = await loadCurrentAuthorizedActorOutcome();
+    const second = await loadCurrentAuthorizedActor();
 
     expect(first).toEqual(second);
     expect(mocks.loadSessionOutcome).toHaveBeenCalledOnce();

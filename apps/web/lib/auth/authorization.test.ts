@@ -84,7 +84,7 @@ describe("loadCurrentAuthorizedActor", () => {
     expect(loadPostgresAuthorizationContext).not.toHaveBeenCalled();
   });
 
-  it("reuses an explicit session outcome without a second session probe", async () => {
+  it("uses an explicit session outcome without probing the session loader", async () => {
     const sessionOutcome = {
       kind: "ready",
       session: { user: { id: "u1" }, session: { id: "s1" } }
@@ -97,12 +97,10 @@ describe("loadCurrentAuthorizedActor", () => {
       reviewerId: null
     });
 
-    const first = await loadCurrentAuthorizedActor();
-    const second = await loadCurrentAuthorizedActor(sessionOutcome);
+    const result = await loadCurrentAuthorizedActor(sessionOutcome);
 
-    expect(first.kind).toBe("ready");
-    expect(second.kind).toBe("ready");
-    expect(loadSessionOutcome).toHaveBeenCalledOnce();
-    expect(loadPostgresAuthorizationContext).toHaveBeenCalledTimes(2);
+    expect(result.kind).toBe("ready");
+    expect(loadSessionOutcome).not.toHaveBeenCalled();
+    expect(loadPostgresAuthorizationContext).toHaveBeenCalledOnce();
   });
 });
