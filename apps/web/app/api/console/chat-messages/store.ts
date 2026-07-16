@@ -1,7 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
-import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
+import { getAdminPageAuthContext, isAdminPageAuthContext, type AdminPageAuthContext } from "@/lib/auth/admin";
 import { insertPostgresChatMessage, listPostgresChatMessages } from "@repo/db";
 
 const InsertPayloadSchema = z.object({
@@ -41,10 +41,11 @@ export type ChatMessageRow = {
  * callable from the console surface.
  */
 export async function insertChatMessage(
-  rawInput: InsertChatMessageInput
+  rawInput: InsertChatMessageInput,
+  authorizedAdmin?: AdminPageAuthContext
 ): Promise<InsertChatMessageResult> {
   const input = InsertPayloadSchema.parse(rawInput);
-  const admin = await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
   if (!isAdminPageAuthContext(admin)) {
     throw new Error(
       `insertChatMessage requires an admin actor (got: ${admin.reason})`
@@ -70,10 +71,11 @@ export async function insertChatMessage(
  * callers.
  */
 export async function listChatMessages(
-  rawInput: ListChatMessagesInput
+  rawInput: ListChatMessagesInput,
+  authorizedAdmin?: AdminPageAuthContext
 ): Promise<ChatMessageRow[]> {
   const input = ListPayloadSchema.parse(rawInput);
-  const admin = await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
   if (!isAdminPageAuthContext(admin)) throw new Error(`listChatMessages requires an admin actor (got: ${admin.reason})`);
   const rows = await listPostgresChatMessages({ conversationId: input.conversationId, limit: input.limit }, admin.actor);
   return rows.map((row) => ({

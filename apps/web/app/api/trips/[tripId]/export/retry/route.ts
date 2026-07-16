@@ -7,8 +7,9 @@ export async function POST(_request: Request, { params }: { params: Promise<{ tr
   if (isApiResponse(auth)) return auth;
 
   const { tripId } = await params;
-  const access = await getOwnedTrip(tripId);
+  const access = await getOwnedTrip(tripId, { actor: auth.actor });
   if (access.kind === "anonymous") return Response.redirect(new URL(`/sign-in?next=/trip/${tripId}/export`, _request.url), 303);
+  if (access.kind === "unavailable") return new Response("Trip access is temporarily unavailable.", { status: 503 });
   if (access.kind !== "ok") return new Response("Not found", { status: 404 });
   if (!access.trip.isPaid) return new Response("Unlock required", { status: 403 });
   retryExportJob(tripId);

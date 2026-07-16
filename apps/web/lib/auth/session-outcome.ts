@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { getCurrentSession } from "./session";
 
 type CurrentSession = Awaited<ReturnType<typeof getCurrentSession>>;
@@ -127,9 +128,16 @@ export function createSessionOutcomeLoader(dependencies: SessionOutcomeLoaderDep
   };
 }
 
-export const loadSessionOutcome = createSessionOutcomeLoader({
+const loadSessionOutcomeProbe = createSessionOutcomeLoader({
   getSession: getCurrentSession,
   environment: process.env,
   timeoutMs: 4_000,
   cooldownMs: 30_000
 });
+
+/**
+ * React's request cache makes the session outcome a per-request boundary.
+ * Layouts and their child loaders therefore share one bounded provider probe
+ * without retaining session state across requests.
+ */
+export const loadSessionOutcome = cache(loadSessionOutcomeProbe);

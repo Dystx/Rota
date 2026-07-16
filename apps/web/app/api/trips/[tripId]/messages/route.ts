@@ -25,6 +25,9 @@ async function authorize(tripId: string) {
   if (access.kind === "anonymous") {
     return { response: errorResponse(401, "UNAUTHENTICATED", "Authentication required.") } as const;
   }
+  if (access.kind === "unavailable") {
+    return { response: unavailable() } as const;
+  }
   if (access.kind === "forbidden") {
     return { response: errorResponse(403, "FORBIDDEN", "You do not have access to this trip.") } as const;
   }

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
-import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
+import { getAdminPageAuthContext, isAdminPageAuthContext, type AdminPageAuthContext } from "@/lib/auth/admin";
 import { insertPostgresItineraryEvent, listPostgresItineraryEvents } from "@repo/db";
 
 const InsertPayloadSchema = z.object({
@@ -49,10 +49,11 @@ export type ItineraryEventRow = {
  * members to insert, so we don't need the service-role client.
  */
 export async function insertItineraryEvent(
-  rawInput: InsertItineraryEventInput
+  rawInput: InsertItineraryEventInput,
+  authorizedAdmin?: AdminPageAuthContext
 ): Promise<InsertItineraryEventResult> {
   const input = InsertPayloadSchema.parse(rawInput);
-  const admin = await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
   if (!isAdminPageAuthContext(admin)) {
     throw new Error(
       `insertItineraryEvent requires an admin actor (got: ${admin.reason})`
@@ -70,10 +71,11 @@ export async function insertItineraryEvent(
  * (or another operator) just pushed onto the timeline.
  */
 export async function listItineraryEvents(
-  rawInput: ListItineraryEventsInput
+  rawInput: ListItineraryEventsInput,
+  authorizedAdmin?: AdminPageAuthContext
 ): Promise<ItineraryEventRow[]> {
   const input = ListPayloadSchema.parse(rawInput);
-  const admin = await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
   if (!isAdminPageAuthContext(admin)) throw new Error(`listItineraryEvents requires an admin actor (got: ${admin.reason})`);
   const rows = await listPostgresItineraryEvents({ conversationId: input.conversationId, limit: input.limit }, admin.actor);
   return rows.map((row) => ({

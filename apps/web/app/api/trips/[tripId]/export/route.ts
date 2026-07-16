@@ -28,7 +28,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ trip
   }
 
   try {
-    const access = await getOwnedTrip(tripId);
+    const access = await getOwnedTrip(tripId, { actor: auth.actor });
+
+    if (access.kind === "unavailable") {
+      return internalError("Trip access is temporarily unavailable.", 503);
+    }
 
     if (access.kind !== "ok") {
       return notFoundError("Trip not found.");

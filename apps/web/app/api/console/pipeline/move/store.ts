@@ -1,7 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
-import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
+import { getAdminPageAuthContext, isAdminPageAuthContext, type AdminPageAuthContext } from "@/lib/auth/admin";
 import { updatePostgresTripStatus } from "@repo/db";
 
 const MovePayloadSchema = z.object({
@@ -42,10 +42,11 @@ function localToTripsStatus(local: MoveTripStageInput["toStatus"]): string {
  * Returns the new status string on success.
  */
 export async function moveTripStage(
-  rawInput: MoveTripStageInput
+  rawInput: MoveTripStageInput,
+  authorizedAdmin?: AdminPageAuthContext
 ): Promise<MoveTripStageResult> {
   const input = MovePayloadSchema.parse(rawInput);
-  const admin = await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
   if (!isAdminPageAuthContext(admin)) {
     throw new Error(
       `moveTripStage requires an admin actor (got: ${admin.reason})`

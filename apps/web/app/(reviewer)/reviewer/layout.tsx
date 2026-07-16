@@ -41,7 +41,9 @@ export default async function ReviewerLayout({
     redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
   }
 
-  const actorOutcome = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
+  // Use the request-scoped no-argument actor loader so child reviewer
+  // contexts reuse this same authorization probe.
+  const actorOutcome = await loadCurrentAuthorizedActorOutcome();
   if (actorOutcome.kind === "unavailable") {
     return <RouteRecovery kind="unavailable" landmark="document" />;
   }

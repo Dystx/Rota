@@ -20,7 +20,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return <RouteRecovery kind="unavailable" landmark="document" />;
   }
 
-  const auth = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
+  // Use the request-scoped no-argument actor loader so child admin contexts
+  // reuse this same authorization probe.
+  const auth = await loadCurrentAuthorizedActorOutcome();
 
   if (auth.kind === "ready" && auth.actor.roles.includes("admin")) {
     const currentPath = (await headers()).get("x-pathname") ?? "/admin/places";

@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       body: parsed.data.body,
       sourceSnippetId: parsed.data.sourceSnippetId ?? null,
       authorRole: parsed.data.authorRole ?? "operator",
-    });
+    }, admin);
     return NextResponse.json({ ok: true, id: row.id, createdAt: row.createdAt });
   } catch (error) {
     return NextResponse.json(
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     const rows = await listChatMessages({
       conversationId: parsed.data.conversationId,
       limit: parsed.data.limit,
-    });
+    }, admin);
     return NextResponse.json({ ok: true, messages: rows });
   } catch (error) {
     return NextResponse.json(

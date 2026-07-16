@@ -16,8 +16,9 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { setSpecialistVerified } from "@repo/db";
+import { isPersistenceConfigError, setSpecialistVerified } from "@repo/db";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
+import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
 
 const FlipInputSchema = z.object({
   specialistId: z.string().uuid("specialistId must be a UUID"),
@@ -28,12 +29,23 @@ export type FlipInput = z.infer<typeof FlipInputSchema>;
 
 export type FlipResult =
   | { kind: "ok"; id: string }
-  | { kind: "error"; message: string };
+  | { kind: "error"; message: string }
+  | { kind: "unavailable"; message: string; retryable: true; status: 503 };
+
+const unavailableResult: FlipResult = {
+  kind: "unavailable",
+  message: "This service is temporarily unavailable. Please try again.",
+  retryable: true,
+  status: 503
+};
 
 export async function flipVerification(
   input: FlipInput
 ): Promise<FlipResult> {
   const auth = await getAdminPageAuthContext();
+  if ("reason" in auth && auth.reason === "unavailable") {
+    return unavailableResult;
+  }
   if (!isAdminPageAuthContext(auth)) {
     return { kind: "error", message: "Admin only" };
   }
@@ -54,8 +66,10 @@ export async function flipVerification(
     revalidatePath("/admin/specialists");
     revalidatePath("/guide/onboarding");
     return { kind: "ok", id: updated.id };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { kind: "error", message };
+  } catch (error) {
+    if (isPersistenceConfigError(error) || isSessionProviderFailure(error)) {
+      return unavailableResult;
+    }
+    throw error;
   }
 }

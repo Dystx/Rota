@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       eventTime: parsed.data.eventTime,
       internalNotes: parsed.data.internalNotes ?? null,
       createdBy: admin.userId,
-    });
+    }, admin);
     return NextResponse.json({ ok: true, id: row.id, createdAt: row.createdAt });
   } catch (error) {
     return NextResponse.json(
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
     const rows = await listItineraryEvents({
       conversationId: parsed.data.conversationId,
       limit: parsed.data.limit,
-    });
+    }, admin);
     return NextResponse.json({ ok: true, events: rows });
   } catch (error) {
     return NextResponse.json(

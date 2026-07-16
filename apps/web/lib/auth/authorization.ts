@@ -2,6 +2,7 @@ import "server-only";
 
 import { isPersistenceConfigError, loadPostgresAuthorizationContext } from "@repo/db";
 import type { AppRole, AuthorizedActor, Capability } from "@repo/types";
+import { cache } from "react";
 
 import { isSessionProviderFailure, loadSessionOutcome, type SessionOutcome } from "./session-outcome";
 
@@ -21,7 +22,7 @@ export type AuthorizedActorOutcome =
   | { kind: "unavailable" };
 
 /** Session + actor lookup for pages that must distinguish outage from access denial. */
-export async function loadCurrentAuthorizedActorOutcome(
+async function loadCurrentAuthorizedActorOutcomeUncached(
   sessionOutcome?: SessionOutcome
 ): Promise<AuthorizedActorOutcome> {
   const outcome = sessionOutcome ?? (await loadSessionOutcome());
@@ -38,6 +39,15 @@ export async function loadCurrentAuthorizedActorOutcome(
     throw error;
   }
 }
+
+/**
+ * Share the actor probe across a server request. Reviewer/admin layouts and
+ * their child data loaders all use the no-argument form, so a child cannot
+ * accidentally re-probe the auth provider after the shell has authorized it.
+ * Explicit outcomes remain supported for callers that already performed a
+ * session probe (and are keyed by that outcome's identity).
+ */
+export const loadCurrentAuthorizedActorOutcome = cache(loadCurrentAuthorizedActorOutcomeUncached);
 
 /** Compatibility actor helper that preserves unavailable instead of mapping it to anonymous. */
 export async function loadCurrentAuthorizedActor(

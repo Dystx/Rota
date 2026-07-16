@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     const result = await moveTripStage({
       tripId: parsed.data.tripId,
       toStatus: parsed.data.toStatus,
-    });
+    }, admin);
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
     return NextResponse.json(
