@@ -40,6 +40,23 @@ describe("LegalPage route surface", () => {
     expect(document).not.toHaveClass("rumia-surface");
     expect(document).not.toHaveAttribute("data-surface");
   });
+
+  it("allows the sustainability contract to use the cover scene", () => {
+    render(
+      <LegalPage
+        scene="cover"
+        kicker="Our promise"
+        title="Sustainability"
+        intro="A place-first promise."
+        asideTitle="Context over checklists."
+        asideText="A short summary."
+      >
+        <p>Promise content.</p>
+      </LegalPage>
+    );
+
+    expect(screen.getByTestId("public-route-layout")).toHaveAttribute("data-scene", "cover");
+  });
 });
 
 function documentElement(): HTMLElement {

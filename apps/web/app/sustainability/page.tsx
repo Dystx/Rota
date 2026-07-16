@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 export default function SustainabilityPage() {
   return (
     <LegalPage
+      scene="cover"
       kicker="Our promise"
       title="Sustainability"
       intro="How Rumia thinks about place, people, and pace without making claims a recommendation cannot support."

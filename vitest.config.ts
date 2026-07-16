@@ -71,6 +71,7 @@ export default defineConfig({
           include: [
             "packages/*/src/**/*.test.ts",
             "apps/web/app/**/*.test.ts",
+            "apps/web/content/**/*.test.ts",
             "apps/web/lib/**/*.test.ts",
             "apps/web/playwright/route-matrix.test.ts"
           ],

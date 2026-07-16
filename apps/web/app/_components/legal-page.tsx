@@ -2,8 +2,10 @@ import Link from "next/link";
 import * as React from "react";
 import type { ReactNode } from "react";
 import { PublicRouteLayout } from "./public-route-layout";
+import type { RouteSceneTone } from "./route-scene";
 
 interface LegalPageProps {
+  scene?: RouteSceneTone;
   kicker: string;
   title: string;
   updated?: string;
@@ -21,6 +23,7 @@ interface LegalPageProps {
  * visually empty full-height surface while preserving semantic article text.
  */
 export function LegalPage({
+  scene = "utility",
   kicker,
   title,
   updated,
@@ -32,7 +35,7 @@ export function LegalPage({
   children
 }: LegalPageProps) {
   return (
-    <PublicRouteLayout scene="utility" footerMode="compact" surfaceTone="linen" surfaceTexture="none">
+    <PublicRouteLayout scene={scene} footerMode="compact" surfaceTone="linen" surfaceTexture="none">
       <div className="rumia-legal-page">
         <article className="rumia-legal-document mx-auto w-full max-w-[76rem] px-container-padding-sm md:px-container-padding-lg">
           <header className="rumia-legal-header">
