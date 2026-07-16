@@ -11,14 +11,14 @@ test.describe("public discovery and trust routes", () => {
       const mobilePanel = page.getByTestId("top-nav-mobile-panel");
       await mobileToggle.click();
       await expect(mobilePanel).toBeVisible();
-      await expect(mobilePanel.getByRole("link", { name: "What to do", exact: true })).toBeVisible();
-      for (const label of ["How it works", "Local expertise", "Pricing", "Explore activities"]) {
+      await expect(mobilePanel.getByRole("link", { name: "Portugal", exact: true })).toBeVisible();
+      for (const label of ["How it works", "Local expertise", "Pricing", "What is worth doing?"]) {
         await expect(mobilePanel.getByRole("link", { name: label, exact: true })).toBeVisible();
       }
       return;
     }
     const primaryNav = page.getByRole("navigation", { name: "Primary" });
-    for (const label of ["What to do", "How it works", "Local expertise", "Pricing", "Explore activities"]) {
+    for (const label of ["Portugal", "How it works", "Local expertise", "Pricing", "What is worth doing?"]) {
       await expect(primaryNav.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
   });
@@ -115,7 +115,7 @@ test.describe("public discovery and trust routes", () => {
     await expect(canvas).toBeVisible({ timeout: 15_000 });
     await expect(canvas).toHaveAttribute("data-3d-capability", /enabled|fallback|off/);
 
-    if (test.info().project.name === "mobile-chromium") {
+    if (test.info().project.name === "mobile-390") {
       await expect(canvas).toHaveAttribute("data-3d-capability", "fallback");
     }
   });

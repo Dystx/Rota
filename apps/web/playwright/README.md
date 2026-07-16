@@ -1,7 +1,7 @@
 # Playwright conventions
 
 - `@smoke` covers minimal route and auth-state sanity checks.
-- `@visual` uses `toHaveScreenshot()` baselines named after the Playwright project, e.g. `desktop-chrome-home.png`.
+- `@visual` uses the canonical `desktop-1440`, `tablet-landscape`, `tablet-portrait`, and `mobile-390` projects. The visual suite keeps compatibility with the committed desktop/mobile snapshot filenames while selecting viewports only from those canonical projects.
 - `@a11y` runs `@axe-core/playwright` against stable public routes.
 - Auth personas use seeded storage-state helpers from `playwright/fixtures/*.ts`; they are conventions only and do not replace real Supabase sign-in coverage.
 

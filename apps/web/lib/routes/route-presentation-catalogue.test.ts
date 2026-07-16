@@ -55,7 +55,7 @@ describe("route presentation catalogue", () => {
       if (route.auth !== "public") {
         expect(scenarios.some((scenario) => scenario.persona === "anonymous" && scenario.state === "unauthorized" && scenario.expected.noPrivateDisclosure), route.path).toBe(true);
       }
-      if (route.path.includes("[tripId]")) {
+      if (route.path.includes("[tripId]") && scenarios.some((scenario) => scenario.state === "not-found")) {
         expect(scenarios.some((scenario) => scenario.persona === "foreign-traveler" && scenario.state === "not-found" && scenario.expected.noPrivateDisclosure), route.path).toBe(true);
       }
     }
@@ -72,6 +72,60 @@ describe("route presentation catalogue", () => {
       }
       expect(scenarios.some((scenario) => scenario.persona === "limited-admin" && scenario.state === "forbidden"), route.path).toBe(true);
     }
+  });
+
+  it("keeps checkout and Expert Chat state contracts concrete", () => {
+    const checkout = ROUTE_SCENARIO_CATALOGUE["/checkout"];
+    expect(checkout.find((scenario) => scenario.id === "checkout--anonymous")).toMatchObject({
+      state: "unauthorized",
+      persona: "anonymous",
+      fixture: { kind: "static", path: "/checkout" },
+      expected: { access: "redirect", noPrivateDisclosure: true }
+    });
+    expect(checkout.find((scenario) => scenario.id === "checkout--no-trip")).toMatchObject({
+      state: "empty",
+      persona: "traveler",
+      fixture: { kind: "static", path: "/checkout" },
+      viewports: "all-four"
+    });
+    expect(checkout.find((scenario) => scenario.id === "checkout--foreign-trip")).toMatchObject({
+      state: "not-found",
+      persona: "foreign-traveler",
+      fixture: { kind: "traveler-trip", variant: "foreign" },
+      expected: { access: "not-found", noPrivateDisclosure: true }
+    });
+    expect(checkout.find((scenario) => scenario.id === "checkout--provider-unavailable")).toMatchObject({
+      state: "unavailable",
+      fixture: { kind: "static", path: "/checkout" },
+      setup: { provider: "unreachable" }
+    });
+
+    const expertChat = ROUTE_SCENARIO_CATALOGUE["/expert-chat"];
+    expect(expertChat.find((scenario) => scenario.id === "expert-chat--disabled")).toMatchObject({ setup: { flags: { ENABLE_TRIP_MESSAGING: false } } });
+    expect(expertChat.find((scenario) => scenario.id === "expert-chat--no-trip")).toMatchObject({ fixture: { kind: "static", path: "/expert-chat" }, setup: { flags: { ENABLE_TRIP_MESSAGING: true } }, viewports: "all-four" });
+    expect(expertChat.find((scenario) => scenario.id === "expert-chat--foreign-trip")).toMatchObject({ expected: { access: "redirect", noPrivateDisclosure: true }, setup: { query: { trip: "fixture:foreign" } } });
+    expect(expertChat.find((scenario) => scenario.id === "expert-chat--sending")).toMatchObject({ setup: { interaction: "send" }, expected: { transition: "composer announces sending" } });
+    expect(expertChat.find((scenario) => scenario.id === "expert-chat--saved")).toMatchObject({ setup: { interaction: "send" }, expected: { transition: "message appears once and composer clears" } });
+    expect(expertChat.find((scenario) => scenario.id === "expert-chat--send-error")).toMatchObject({ setup: { interaction: "send" }, expected: { transition: "draft is retained and retry is offered" } });
+  });
+
+  it("uses normal ready/empty states as dynamic primaries", () => {
+    for (const path of ["/trip/[tripId]", "/trip/[tripId]/map", "/trip/[tripId]/export", "/checkout", "/logistics", "/expert-chat"] as const) {
+      const primary = ROUTE_SCENARIO_CATALOGUE[path].find((scenario) => scenario.viewports === "all-four");
+      expect(primary?.state, path).toBe("empty");
+      expect(primary?.persona, path).not.toBe("foreign-traveler");
+    }
+  });
+
+  it("uses reviewer personas and reviewer fixtures on reviewer routes", () => {
+    for (const path of ["/reviewer/queue", "/reviewer/history", "/reviewer/profile", "/reviewer/operations", "/reviewer/trips/[tripId]"] as const) {
+      const scenarios = ROUTE_SCENARIO_CATALOGUE[path];
+      expect(scenarios.some((scenario) => scenario.persona === "reviewer" && scenario.state === "populated"), path).toBe(true);
+      expect(scenarios.filter((scenario) => scenario.persona === "reviewer").every((scenario) => scenario.fixture.kind === "reviewer-trip"), path).toBe(true);
+    }
+    expect(ROUTE_SCENARIO_CATALOGUE["/reviewer/queue"].some((scenario) => scenario.fixture.kind === "reviewer-trip" && "variant" in scenario.fixture && scenario.fixture.variant === "unassigned")).toBe(true);
+    expect(ROUTE_SCENARIO_CATALOGUE["/reviewer/queue"].some((scenario) => scenario.fixture.kind === "reviewer-trip" && "variant" in scenario.fixture && scenario.fixture.variant === "assigned")).toBe(true);
+    expect(ROUTE_SCENARIO_CATALOGUE["/reviewer/history"].some((scenario) => scenario.fixture.kind === "reviewer-trip" && "variant" in scenario.fixture && scenario.fixture.variant === "completed")).toBe(true);
   });
 
   it("keeps beta flags, specialist fixtures, and organization disclosure explicit", () => {

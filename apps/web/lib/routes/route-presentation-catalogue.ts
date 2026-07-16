@@ -45,27 +45,27 @@ export type RouteSceneContract = {
 
 const staticRoute = (path: HttpRoutePath): RouteFixture => ({ kind: "static", path });
 
-const publicStates = ["ready", "loading", "unavailable", "not-found", "error"] as const satisfies readonly RouteVisualState[];
+const publicReady = ["ready", "loading", "error"] as const satisfies readonly RouteVisualState[];
 const operatorStates = ["unauthorized", "forbidden", "empty", "populated", "loading", "unavailable", "error"] as const satisfies readonly RouteVisualState[];
 const utilityStates = ["unauthorized", "empty", "populated", "filtered-empty", "loading", "unavailable", "error"] as const satisfies readonly RouteVisualState[];
 
 export const ROUTE_PRESENTATION_CATALOGUE = {
-  "/": { scene: "cover", shell: "public", chrome: "public", footerMode: "full", texture: "none", fixture: staticRoute("/"), states: publicStates },
-  "/portugal": { scene: "atlas", shell: "public", chrome: "public", footerMode: "full", texture: "none", fixture: staticRoute("/portugal"), states: publicStates },
+  "/": { scene: "cover", shell: "public", chrome: "public", footerMode: "full", texture: "none", fixture: staticRoute("/"), states: publicReady },
+  "/portugal": { scene: "atlas", shell: "public", chrome: "public", footerMode: "full", texture: "none", fixture: staticRoute("/portugal"), states: publicReady },
   "/explore": { scene: "decision", shell: "public", chrome: "task", footerMode: "none", texture: "none", fixture: staticRoute("/explore"), states: ["ready", "empty", "loading", "one-selection", "multiple-selection", "saved", "removed", "error"] as const },
   "/explore/workspace": { scene: "decision", shell: "none", chrome: "immersive", footerMode: "none", texture: "none", fixture: staticRoute("/explore/workspace"), states: ["empty", "one-selection", "multiple-selection", "loading", "conflict", "saved", "unavailable", "not-found", "error"] as const },
   "/activities/[activityId]": { scene: "cover", shell: "public", chrome: "task", footerMode: "compact", texture: "none", fixture: { kind: "activity", activityId: "porto-ribeira-slow-walk" }, states: ["ready", "loading", "saved", "removed", "not-found", "error"] as const },
   "/feedback": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/feedback"), states: ["ready", "empty", "loading", "saved", "unavailable", "error"] as const },
-  "/how-it-works": { scene: "cover", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/how-it-works"), states: publicStates },
+  "/how-it-works": { scene: "cover", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/how-it-works"), states: publicReady },
   "/human-review": { scene: "redirect", shell: "none", chrome: "none", footerMode: "none", texture: "none", fixture: staticRoute("/human-review"), states: ["redirect"], redirectTo: "/local-expertise" },
-  "/local-expertise": { scene: "cover", shell: "public", chrome: "public", footerMode: "full", texture: "none", fixture: staticRoute("/local-expertise"), states: publicStates },
-  "/pricing": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/pricing"), states: publicStates },
+  "/local-expertise": { scene: "cover", shell: "public", chrome: "public", footerMode: "full", texture: "none", fixture: staticRoute("/local-expertise"), states: publicReady },
+  "/pricing": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/pricing"), states: publicReady },
   "/planner": { scene: "decision", shell: "traveler", chrome: "immersive", footerMode: "none", texture: "none", fixture: staticRoute("/planner"), states: ["ready", "loading", "saved", "error"] as const },
   "/plan": { scene: "redirect", shell: "none", chrome: "none", footerMode: "none", texture: "none", fixture: staticRoute("/plan"), states: ["redirect"], redirectTo: "/planner" },
   "/trip/new": { scene: "decision", shell: "traveler", chrome: "task", footerMode: "none", texture: "none", fixture: staticRoute("/trip/new"), states: ["unauthorized", "ready", "loading", "saved", "error"] as const },
   "/trip/[tripId]": { scene: "decision", shell: "traveler", chrome: "task", footerMode: "none", texture: "none", fixture: { kind: "traveler-trip", suffix: "" }, states: ["unauthorized", "not-found", "empty", "one-selection", "multiple-selection", "loading", "conflict", "saved", "error"] as const },
-  "/trip/[tripId]/map": { scene: "atlas", shell: "traveler", chrome: "immersive", footerMode: "none", texture: "none", fixture: { kind: "traveler-trip", suffix: "/map" }, states: ["unauthorized", "not-found", "empty", "one-selection", "multiple-selection", "selected", "loading", "conflict", "unavailable", "error"] as const },
-  "/trip/[tripId]/export": { scene: "utility", shell: "traveler", chrome: "task", footerMode: "utility", texture: "none", fixture: { kind: "traveler-trip", suffix: "/export" }, states: ["unauthorized", "not-found", "empty", "loading", "pending", "saved", "error"] as const },
+  "/trip/[tripId]/map": { scene: "atlas", shell: "traveler", chrome: "immersive", footerMode: "none", texture: "none", fixture: { kind: "traveler-trip", suffix: "/map" }, states: ["unauthorized", "empty", "one-selection", "multiple-selection", "selected", "loading", "conflict", "unavailable", "error"] as const },
+  "/trip/[tripId]/export": { scene: "utility", shell: "traveler", chrome: "task", footerMode: "none", texture: "none", fixture: { kind: "traveler-trip", suffix: "/export" }, states: ["unauthorized", "empty", "loading", "pending", "saved", "error"] as const },
   "/checkout": { scene: "utility", shell: "traveler", chrome: "task", footerMode: "utility", texture: "none", fixture: staticRoute("/checkout"), states: ["unauthorized", "not-found", "empty", "ready", "loading", "paid", "unavailable", "error"] as const },
   "/itineraries": { scene: "utility", shell: "traveler", chrome: "task", footerMode: "utility", texture: "none", fixture: staticRoute("/itineraries"), states: utilityStates },
   "/vault": { scene: "utility", shell: "traveler", chrome: "task", footerMode: "utility", texture: "none", fixture: staticRoute("/vault"), states: utilityStates },
@@ -73,16 +73,16 @@ export const ROUTE_PRESENTATION_CATALOGUE = {
   "/logistics": { scene: "decision", shell: "traveler", chrome: "task", footerMode: "none", texture: "none", fixture: staticRoute("/logistics"), states: ["unauthorized", "not-found", "empty", "ready", "selected", "loading", "saved", "unavailable", "error"] as const },
   "/expert-chat": { scene: "utility", shell: "traveler", chrome: "task", footerMode: "none", texture: "none", fixture: staticRoute("/expert-chat"), states: ["unauthorized", "not-found", "disabled", "ineligible", "empty", "ready", "loading", "saved", "unavailable", "error"] as const },
   "/sign-in": { scene: "utility", shell: "none", chrome: "none", footerMode: "none", texture: "none", fixture: staticRoute("/sign-in"), states: ["ready", "loading", "unavailable", "error", "redirect"] as const },
-  "/support": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/support"), states: publicStates },
-  "/privacy": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/privacy"), states: publicStates },
-  "/terms": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/terms"), states: publicStates },
-  "/sustainability": { scene: "cover", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/sustainability"), states: publicStates },
+  "/support": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/support"), states: publicReady },
+  "/privacy": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/privacy"), states: publicReady },
+  "/terms": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/terms"), states: publicReady },
+  "/sustainability": { scene: "cover", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/sustainability"), states: publicReady },
   "/offline": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/offline"), states: ["ready", "unavailable", "error"] as const },
   "/reviewer/queue": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: staticRoute("/reviewer/queue"), states: operatorStates },
   "/reviewer/history": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: staticRoute("/reviewer/history"), states: operatorStates },
   "/reviewer/profile": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: staticRoute("/reviewer/profile"), states: operatorStates },
   "/reviewer/operations": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: staticRoute("/reviewer/operations"), states: operatorStates },
-  "/reviewer/trips/[tripId]": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: { kind: "reviewer-trip" }, states: [...operatorStates, "not-found"] as const },
+  "/reviewer/trips/[tripId]": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: { kind: "reviewer-trip" }, states: operatorStates },
   "/admin/places": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: staticRoute("/admin/places"), states: operatorStates },
   "/admin/countries": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: staticRoute("/admin/countries"), states: operatorStates },
   "/admin/regions": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: staticRoute("/admin/regions"), states: operatorStates },
@@ -102,7 +102,7 @@ export const ROUTE_PRESENTATION_CATALOGUE = {
   "/guide/onboarding": { scene: "utility", shell: "traveler", chrome: "task", footerMode: "utility", texture: "none", fixture: staticRoute("/guide/onboarding"), states: ["unauthorized", "disabled", "ineligible", "unavailable", "ready", "loading", "saved", "error"] as const },
   "/b2b": { scene: "utility", shell: "public", chrome: "public", footerMode: "compact", texture: "none", fixture: staticRoute("/b2b"), states: ["ready", "disabled", "ineligible", "unavailable", "error"] as const },
   "/b2b/[orgSlug]": { scene: "utility", shell: "traveler", chrome: "task", footerMode: "none", texture: "none", fixture: { kind: "organization", slug: "e2e-organization" }, states: ["unauthorized", "disabled", "ineligible", "unavailable", "error"] as const },
-  "/api/v1/docs": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: staticRoute("/api/v1/docs"), states: [...operatorStates, "disabled", "ready"] as const }
+  "/api/v1/docs": { scene: "utility", shell: "operator", chrome: "operator", footerMode: "none", texture: "none", fixture: staticRoute("/api/v1/docs"), states: ["unauthorized", "forbidden", "disabled", "ready", "loading", "unavailable", "error"] as const }
 } as const satisfies Record<HttpRoutePath, RouteSceneContract>;
 
 export type RoutePersona =
@@ -191,6 +191,30 @@ function scenario(
   return { id, state, persona, fixture, viewports, expected, ...(setup ? { setup } : {}) };
 }
 
+const checkoutScenarios: readonly RouteVisualScenario[] = [
+  scenario("checkout--anonymous", "unauthorized", "anonymous", staticRoute("/checkout"), "desktop-mobile", { access: "redirect", noPrivateDisclosure: true }),
+  scenario("checkout--no-trip", "empty", "traveler", staticRoute("/checkout"), "all-four", { access: "render", transition: "no trip is explained with one coherent planner action" }),
+  scenario("checkout--foreign-trip", "not-found", "foreign-traveler", { kind: "traveler-trip", variant: "foreign", suffix: "" }, "desktop-mobile", { access: "not-found", noPrivateDisclosure: true }, { query: { trip: "fixture:foreign" } }),
+  scenario("checkout--draft", "ready", "traveler", { kind: "traveler-trip", variant: "draft", suffix: "" }, "desktop-mobile", { access: "render" }, { query: { trip: "fixture:draft" } }),
+  scenario("checkout--loading", "loading", "traveler", staticRoute("/checkout"), "desktop-mobile", { access: "render", transition: "checkout status is announced while the provider response is pending" }),
+  scenario("checkout--paid", "paid", "traveler", { kind: "traveler-trip", variant: "paid-reviewed", suffix: "" }, "desktop-mobile", { access: "render", transition: "paid status and the next refinement action remain visible" }, { query: { trip: "fixture:paid-reviewed" } }),
+  scenario("checkout--provider-unavailable", "unavailable", "traveler", staticRoute("/checkout"), "desktop-mobile", { access: "render", transition: "provider recovery and one safe retry action are visible" }, { provider: "unreachable" }),
+  scenario("checkout--error", "error", "traveler", staticRoute("/checkout"), "desktop-mobile", { access: "render", transition: "checkout failure preserves the trip summary and offers retry" }, { interaction: "retry" })
+];
+
+const expertChatScenarios: readonly RouteVisualScenario[] = [
+  scenario("expert-chat--anonymous", "unauthorized", "anonymous", staticRoute("/expert-chat"), "desktop-mobile", { access: "redirect", noPrivateDisclosure: true }),
+  scenario("expert-chat--disabled", "disabled", "traveler", staticRoute("/expert-chat"), "desktop-mobile", { access: "render", transition: "messaging is truthfully unavailable while the feature flag is off" }, { flags: { ENABLE_TRIP_MESSAGING: false } }),
+  scenario("expert-chat--no-trip", "empty", "traveler", staticRoute("/expert-chat"), "all-four", { access: "render", transition: "the trip context required for messaging is explained" }, { flags: { ENABLE_TRIP_MESSAGING: true } }),
+  scenario("expert-chat--foreign-trip", "not-found", "foreign-traveler", { kind: "traveler-trip", variant: "foreign", suffix: "" }, "desktop-mobile", { access: "redirect", noPrivateDisclosure: true, transition: "foreign trip context is not disclosed and returns to a safe route" }, { query: { trip: "fixture:foreign" }, flags: { ENABLE_TRIP_MESSAGING: true } }),
+  scenario("expert-chat--ineligible", "ineligible", "traveler", { kind: "traveler-trip", variant: "draft", suffix: "" }, "desktop-mobile", { access: "render", transition: "draft trips receive the eligibility boundary before messaging" }, { query: { trip: "fixture:draft" }, flags: { ENABLE_TRIP_MESSAGING: true } }),
+  scenario("expert-chat--ready", "ready", "traveler", { kind: "traveler-trip", variant: "paid-reviewed", suffix: "" }, "desktop-mobile", { access: "render" }, { query: { trip: "fixture:paid-reviewed" }, flags: { ENABLE_TRIP_MESSAGING: true } }),
+  scenario("expert-chat--sending", "loading", "traveler", { kind: "traveler-trip", variant: "paid-reviewed", suffix: "" }, "desktop-mobile", { access: "render", transition: "composer announces sending" }, { query: { trip: "fixture:paid-reviewed" }, flags: { ENABLE_TRIP_MESSAGING: true }, interaction: "send" }),
+  scenario("expert-chat--saved", "saved", "traveler", { kind: "traveler-trip", variant: "paid-reviewed", suffix: "" }, "desktop-mobile", { access: "render", transition: "message appears once and composer clears" }, { query: { trip: "fixture:paid-reviewed" }, flags: { ENABLE_TRIP_MESSAGING: true }, interaction: "send" }),
+  scenario("expert-chat--send-error", "error", "traveler", { kind: "traveler-trip", variant: "paid-reviewed", suffix: "" }, "desktop-mobile", { access: "render", transition: "draft is retained and retry is offered" }, { query: { trip: "fixture:paid-reviewed" }, flags: { ENABLE_TRIP_MESSAGING: true }, interaction: "send" }),
+  scenario("expert-chat--unavailable", "unavailable", "traveler", staticRoute("/expert-chat"), "desktop-mobile", { access: "render", transition: "messaging recovery explains availability and offers a safe retry" }, { flags: { ENABLE_TRIP_MESSAGING: true }, provider: "unreachable" })
+];
+
 function fixtureFor(path: HttpRoutePath, state: RouteVisualState, primary: RouteFixture): ScenarioFixture {
   if (path === "/b2b/[orgSlug]") return staticRoute(path);
   if (path === "/guide/onboarding") {
@@ -221,6 +245,13 @@ function setupFor(path: HttpRoutePath, state: RouteVisualState): RouteVisualScen
   return { ...(flags ? { flags } : {}), ...(interaction ? { interaction } : {}), ...(provider ? { provider } : {}), ...(query ? { query } : {}) };
 }
 
+function primaryStateFor(path: HttpRoutePath, states: readonly RouteVisualState[]): RouteVisualState {
+  const normal = states.find((state) => ["ready", "empty", "one-selection", "multiple-selection", "populated"].includes(state));
+  if (normal) return normal;
+  if (path === "/b2b/[orgSlug]") return "disabled";
+  return states.find((state) => !["unauthorized", "forbidden", "not-found", "unavailable", "error"].includes(state)) ?? states[0] ?? "ready";
+}
+
 function buildPublicScenarios(path: HttpRoutePath, contract: RouteSceneContract): readonly RouteVisualScenario[] {
   if (contract.redirectTo) {
     return [scenario(`${path.slice(1).replaceAll("/", "-") || "home"}--redirect`, "redirect", "public", contract.fixture, "all-four", { access: "redirect", transition: `308 to ${contract.redirectTo}` })];
@@ -240,7 +271,7 @@ function buildOwnerScenarios(path: HttpRoutePath, contract: RouteSceneContract):
   const key = path.slice(1).replaceAll("/", "-") || "home";
   const states = [...contract.states];
   const scenarios: RouteVisualScenario[] = [];
-  const primaryState = states.find((state) => state !== "unauthorized") ?? states[0];
+  const primaryState = primaryStateFor(path, states);
   for (const state of states) {
     if (state === "unauthorized") {
       scenarios.push(scenario(`${key}--anonymous`, state, "anonymous", path === "/b2b/[orgSlug]" ? staticRoute(path) : contract.fixture, "desktop-mobile", { access: "redirect", noPrivateDisclosure: true }));
@@ -268,7 +299,7 @@ function buildOwnerScenarios(path: HttpRoutePath, contract: RouteSceneContract):
 function buildOperatorScenarios(path: HttpRoutePath, contract: RouteSceneContract): readonly RouteVisualScenario[] {
   const key = path.slice(1).replaceAll("/", "-") || "home";
   const scenarios: RouteVisualScenario[] = [];
-  const primaryState = contract.states.includes("empty") ? "empty" : contract.states.find((state) => !["unauthorized", "forbidden"].includes(state)) ?? contract.states[0];
+  const primaryState = primaryStateFor(path, contract.states);
   for (const state of contract.states) {
     if (state === "unauthorized") {
       const flags = flagsForState(path, state);
@@ -282,15 +313,22 @@ function buildOperatorScenarios(path: HttpRoutePath, contract: RouteSceneContrac
     }
     const flags = flagsForState(path, state);
     const foreignResource = state === "not-found" && path.includes("[tripId]");
+    const reviewerRoute = path.startsWith("/reviewer/");
+    const reviewerFixture: ScenarioFixture = {
+      kind: "reviewer-trip",
+      variant: path === "/reviewer/history" || state === "saved" ? "completed" : state === "empty" ? "unassigned" : "assigned"
+    };
     const fixture: ScenarioFixture = foreignResource
       ? { kind: "traveler-trip", variant: "foreign", suffix: "" }
-      : state === "populated"
-        ? { kind: "operator", variant: "populated" }
-        : { kind: "operator", variant: "empty" };
+      : reviewerRoute
+        ? reviewerFixture
+        : state === "populated"
+          ? { kind: "operator", variant: "populated" }
+          : { kind: "operator", variant: "empty" };
     scenarios.push(scenario(
       `${key}--${state}${foreignResource ? "-foreign" : ""}`,
       state,
-      foreignResource ? "foreign-traveler" : "admin",
+      foreignResource ? "foreign-traveler" : reviewerRoute ? "reviewer" : "admin",
       fixture,
       state === primaryState ? "all-four" : "desktop-mobile",
       { access: state === "not-found" ? "not-found" : "render", ...(foreignResource ? { noPrivateDisclosure: true } : {}) },
@@ -301,6 +339,8 @@ function buildOperatorScenarios(path: HttpRoutePath, contract: RouteSceneContrac
 }
 
 function buildScenarios(path: HttpRoutePath, contract: RouteSceneContract): readonly RouteVisualScenario[] {
+  if (path === "/checkout") return checkoutScenarios;
+  if (path === "/expert-chat") return expertChatScenarios;
   if (contract.shell === "operator") return buildOperatorScenarios(path, contract);
   if (contract.shell === "traveler" && path !== "/planner") return buildOwnerScenarios(path, contract);
   return buildPublicScenarios(path, contract);

@@ -1,4 +1,5 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
+import { execFileSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -67,7 +68,7 @@ function fixturePathFor(route: HttpRouteDefinition): { url: string; persona: str
       return { url: `/trip/${encodeURIComponent(fixture.tripId)}${suffix}`, persona: "traveler" };
     }
 
-    if (route.path === "/checkout" || route.path === "/logistics") {
+    if (route.path === "/checkout" || route.path === "/logistics" || route.path === "/expert-chat") {
       const fixture = readTravelerTripFixture();
       return { url: `${route.path}?trip=${encodeURIComponent(fixture.tripId)}`, persona: "traveler" };
     }
@@ -77,15 +78,15 @@ function fixturePathFor(route: HttpRouteDefinition): { url: string; persona: str
     }
 
     if (route.path.includes("[")) {
-      return { url: route.path.replace(/\[[^\]]+\]/gu, "missing"), persona: route.auth };
+      return { url: route.path.replace(/\[[^\]]+\]/gu, "missing"), persona: route.auth === "owner" ? "traveler" : route.auth };
     }
 
-    return { url: route.path, persona: route.auth === "public" ? "public" : route.auth };
+    return { url: route.path, persona: route.auth === "public" || route.auth === "organization" ? route.auth : route.auth === "owner" ? "traveler" : route.auth };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return {
       url: route.path.replace(/\[[^\]]+\]/gu, "missing"),
-      persona: route.auth,
+      persona: route.auth === "owner" ? "traveler" : route.auth,
       fixtureError: message
     };
   }
@@ -167,9 +168,11 @@ async function captureRenderedRoute(
   }
 
   let screenshotPath: string | null = null;
+  let rendered = false;
   try {
     await page.screenshot({ path: screenshotFile, fullPage: true });
     screenshotPath = path.relative(process.cwd(), screenshotFile);
+    rendered = navigationError === undefined;
   } catch (error) {
     navigationError ||= `screenshot: ${error instanceof Error ? error.message : String(error)}`;
   }
@@ -180,7 +183,7 @@ async function captureRenderedRoute(
     url: resolved.url,
     persona: resolved.persona,
     viewport: viewport.name,
-    rendered: true,
+    rendered,
     responseStatus,
     finalUrl,
     visibleH1Count,
@@ -235,9 +238,12 @@ test.describe("@corrective-baseline immutable current artifact", () => {
       }
     }
 
+    const gitHead = execFileSync("git", ["rev-parse", "HEAD"], { cwd: process.cwd(), encoding: "utf8" }).trim();
+    const buildId = process.env.RUMIA_BUILD_ID?.trim() || gitHead;
     const payload = {
       capturedAt: new Date().toISOString(),
-      buildId: process.env.RUMIA_BUILD_ID ?? process.env.GIT_COMMIT ?? "unknown",
+      gitHead,
+      buildId,
       renderedRoutes,
       redirects
     };

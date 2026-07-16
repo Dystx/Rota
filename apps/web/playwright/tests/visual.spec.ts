@@ -9,6 +9,22 @@ import { travelerTripPath } from "../fixtures/traveler-trip";
 // session-cookie shapes.
 const authSessionCookieName = /^(?:better-auth\.session_token|sb-[a-z0-9]+(?:-[a-z0-9]+)*-auth-token(?:\.\d+)?)$/i;
 
+// The route gate uses semantic viewport project names. Existing committed
+// desktop/mobile snapshots retain their filenames, so this compatibility map
+// affects only the screenshot argument; viewport selection stays canonical.
+function snapshotProjectName(projectName: string): string {
+  if (projectName === "desktop-1440") return "desktop-chrome";
+  if (projectName === "mobile-390") return "mobile-chromium";
+  return projectName;
+}
+
+function skipTabletVisualProject(projectName: string): void {
+  test.skip(
+    projectName === "tablet-landscape" || projectName === "tablet-portrait",
+    "Tablet projects run geometry/accessibility coverage; primary visual baselines are desktop/mobile."
+  );
+}
+
 function hasAuthSessionCookie(cookies: ReadonlyArray<{ name: string }>): boolean {
   return cookies.some((cookie) => authSessionCookieName.test(cookie.name));
 }
@@ -56,7 +72,7 @@ const adminRoutes = [
 
 const disableAnimations = async (page: any) => {
   await page.addStyleTag({
-    content: "*,*::before,*::after{animation:none!important;transition:none!important}",
+    content: "*,*::before,*::after{animation:none!important;transition:none!important}.rumia-cinematic-media__video{visibility:hidden!important;opacity:0!important}",
   });
 };
 
@@ -102,6 +118,8 @@ test.describe("@smoke @visual Marketing baselines", () => {
   for (const route of marketingRoutes) {
     const routeName = route === "/" ? "home" : route.replace(/\//g, "-").replace(/^-/, "");
     test(`marketing route ${route}`, async ({ page }, testInfo) => {
+      skipTabletVisualProject(testInfo.project.name);
+      const projectName = snapshotProjectName(testInfo.project.name);
       await page.goto(route);
       await assertRouteQuality(page, route);
       // The home page renders the GlobeWorkspace with a ~3.2s intro
@@ -127,7 +145,7 @@ test.describe("@smoke @visual Marketing baselines", () => {
       await disableAnimations(page);
       await settleForScreenshot(page);
 
-      await expect(page).toHaveScreenshot(`${testInfo.project.name}-marketing-${routeName}.png`, {
+      await expect(page).toHaveScreenshot(`${projectName}-marketing-${routeName}.png`, {
         fullPage: true,
         animations: "disabled",
         mask: maskLocators(page),
@@ -149,6 +167,8 @@ test.describe("@smoke @visual Traveler baselines", () => {
   for (const routeEntry of travelerRoutes) {
     const routeLabel = typeof routeEntry === "string" ? routeEntry : routeEntry.label;
     test(`traveler route ${routeLabel}`, async ({ page }, testInfo) => {
+      skipTabletVisualProject(testInfo.project.name);
+      const projectName = snapshotProjectName(testInfo.project.name);
       const route = typeof routeEntry === "string" ? routeEntry : routeEntry.resolve();
       const routeName = typeof routeEntry === "string"
         ? route.replace(/\//g, "-").replace(/^-/, "")
@@ -157,7 +177,7 @@ test.describe("@smoke @visual Traveler baselines", () => {
       await assertRouteQuality(page, route, true);
       await disableAnimations(page);
       await settleForScreenshot(page);
-      await expect(page).toHaveScreenshot(`${testInfo.project.name}-traveler-${routeName}.png`, {
+      await expect(page).toHaveScreenshot(`${projectName}-traveler-${routeName}.png`, {
         fullPage: true,
         animations: "disabled",
         mask: maskLocators(page),
@@ -174,11 +194,13 @@ test.describe("@smoke @visual Reviewer baselines", () => {
   for (const route of reviewerRoutes) {
     const routeName = route.replace(/\//g, "-").replace(/^-/, "");
     test(`reviewer route ${route}`, async ({ page }, testInfo) => {
+      skipTabletVisualProject(testInfo.project.name);
+      const projectName = snapshotProjectName(testInfo.project.name);
       await page.goto(route);
       await assertRouteQuality(page, route, true);
       await disableAnimations(page);
       await settleForScreenshot(page);
-      await expect(page).toHaveScreenshot(`${testInfo.project.name}-reviewer-${routeName}.png`, {
+      await expect(page).toHaveScreenshot(`${projectName}-reviewer-${routeName}.png`, {
         fullPage: true,
         animations: "disabled",
         mask: maskLocators(page),
@@ -195,11 +217,13 @@ test.describe("@smoke @visual Admin baselines", () => {
   for (const route of adminRoutes) {
     const routeName = route.replace(/\//g, "-").replace(/^-/, "");
     test(`admin route ${route}`, async ({ page }, testInfo) => {
+      skipTabletVisualProject(testInfo.project.name);
+      const projectName = snapshotProjectName(testInfo.project.name);
       await page.goto(route);
       await assertRouteQuality(page, route, true);
       await disableAnimations(page);
       await settleForScreenshot(page);
-      await expect(page).toHaveScreenshot(`${testInfo.project.name}-admin-${routeName}.png`, {
+      await expect(page).toHaveScreenshot(`${projectName}-admin-${routeName}.png`, {
         fullPage: true,
         animations: "disabled",
         mask: maskLocators(page),

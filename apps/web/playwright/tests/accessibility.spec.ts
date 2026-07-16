@@ -91,6 +91,37 @@ async function verifyLandmarksAndFocus(page: any, routePath: string) {
   await expect(page.locator("img[src*='placehold'], img[src*='placeholder'], img[src*='unsplash.com']"), `${routePath} must not contain fallback placeholder imagery`).toHaveCount(0);
 }
 
+async function verifyCustomerBodyMinimum(page: any, routePath: string) {
+  await page.waitForLoadState("networkidle");
+  const undersized = await page.locator("main p, main li, main blockquote").evaluateAll((elements: HTMLElement[]) => {
+    const metadata = /font-(?:mono|label|metadata)|text-(?:mono|label|metadata)|type-label|uppercase|tracking-|text-xs|text-ochre-dark|kicker|text-\[[0-9]+px\]/;
+    return elements
+      .map((element: HTMLElement) => {
+        const style = window.getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        const className = typeof element.className === "string" ? element.className : "";
+        const text = (element.textContent ?? "").replace(/\s+/g, " ").trim();
+        const inControl = Boolean(element.closest("nav, form, fieldset, [role='group']"));
+        const shortControlLabel = /text-sm\s+font-medium/.test(className) && text.length < 64;
+        return {
+          tag: element.tagName.toLowerCase(),
+          text: text.slice(0, 120),
+          size: Number.parseFloat(style.fontSize),
+          className,
+          visible: rect.width > 0 && rect.height > 0 && style.visibility !== "hidden",
+          inControl,
+          shortControlLabel
+        };
+      })
+      .filter((item: { visible: boolean; text: string; size: number; className: string; inControl: boolean; shortControlLabel: boolean }) => item.visible && item.text && item.size < 16 && !item.inControl && !item.shortControlLabel && !metadata.test(item.className));
+  });
+
+  expect(
+    undersized,
+    `${routePath} has customer body copy below the 16px minimum`
+  ).toEqual([]);
+}
+
 async function auditSourceHeading(routePath: string): Promise<boolean> {
   const sourceFiles: Record<string, string> = {
     [tripExportPath()]: "app/(app)/trip/[tripId]/export/page.tsx",
@@ -186,6 +217,8 @@ test.describe("Accessibility Audit - Public", () => {
     "/offline",
     "/sign-in",
     "/expert-chat",
+    "/feedback",
+    "/feedback?activity=porto-ribeira-slow-walk&source=activity-day",
     "/guide",
     "/b2b",
     "/guide/onboarding",
@@ -199,12 +232,42 @@ test.describe("Accessibility Audit - Public", () => {
       await runAxe(page, route);
     });
   }
+
+  test("@smoke @a11y public customer body copy stays at least 16px", async ({ page }) => {
+    const bodyRoutes = [
+      "/",
+      "/portugal",
+      "/explore",
+      "/explore/workspace",
+      "/activities/porto-ribeira-slow-walk",
+      "/how-it-works",
+      "/pricing",
+      "/local-expertise",
+      "/support",
+      "/privacy",
+      "/terms",
+      "/sustainability",
+      "/offline",
+      "/sign-in",
+      "/feedback",
+      "/expert-chat",
+      "/guide",
+      "/b2b/unknown-workspace",
+      "/checkout"
+    ];
+
+    for (const route of bodyRoutes) {
+      await page.goto(route);
+      await page.locator("h1:visible").first().waitFor({ state: "visible" });
+      await verifyCustomerBodyMinimum(page, route);
+    }
+  });
 });
 
 test.describe("Accessibility Audit - Traveler", () => {
   test.setTimeout(60_000);
   test.use({ storageState: createTravelerStorageState() });
-  const routes: Array<() => string> = [() => "/trip/new", tripPath, () => "/account", () => "/vault"];
+  const routes: Array<() => string> = [() => "/trip/new", tripPath, () => "/account", () => "/vault", () => "/itineraries"];
   
   for (const [index, routeFactory] of routes.entries()) {
     test(`@smoke @a11y traveler route ${index + 1}`, async ({ page }) => {
@@ -217,6 +280,40 @@ test.describe("Accessibility Audit - Traveler", () => {
       await runAxe(page, route);
     });
   }
+
+  test("@smoke @a11y itineraries filtered-empty state keeps recovery actionable", async ({ page }) => {
+    const route = "/itineraries#filtered-empty";
+    await page.goto("/itineraries");
+    await expect(page).not.toHaveURL(/\/sign-in/);
+    await page.getByRole("searchbox", { name: "Search itineraries" }).fill("Madeira");
+    await page.getByRole("button", { name: "Drafts" }).click();
+    await expect(page.getByTestId("itinerary-filtered-empty")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Clear filters" })).toBeVisible();
+    await verifyLandmarksAndFocus(page, route);
+    await runAxe(page, route);
+  });
+
+  test("@smoke @a11y traveler customer body copy stays at least 16px", async ({ page }) => {
+    const routes = [
+      "/trip/new",
+      tripPath(),
+      tripExportPath(),
+      tripMapPath(),
+      `/logistics?trip=${encodeURIComponent(tripId())}`,
+      `/expert-chat?trip=${encodeURIComponent(tripId())}`,
+      "/account",
+      "/vault",
+      "/itineraries",
+      "/checkout"
+    ];
+
+    for (const route of routes) {
+      await page.goto(route);
+      await expect(page).not.toHaveURL(/\/sign-in/);
+      await page.locator("h1:visible").first().waitFor({ state: "visible" });
+      await verifyCustomerBodyMinimum(page, route);
+    }
+  });
 });
 
 test("@smoke @a11y planner is choice-led and input-free", async ({ page }) => {
@@ -224,7 +321,82 @@ test("@smoke @a11y planner is choice-led and input-free", async ({ page }) => {
   await expect(page.locator("main")).toHaveCount(1);
   await expect(page.locator("h1:visible")).toHaveCount(1);
   await expect(page.locator("main input, main textarea"), "Planner choices must not regress to free-form inputs").toHaveCount(0);
-  await expect(page.locator("[aria-label='Destination choices'] [role='radio'], [aria-label='Destination choices'] button").first()).toBeVisible();
+  // The planner intentionally starts with a pre-filled place context. The
+  // current single-screen composition exposes that finite choice group in
+  // the first viewport; it must remain selectable without free-form input.
+  const placeChoices = page.getByLabel("Place context choices");
+  await expect(placeChoices).toBeVisible();
+  await expect(placeChoices.locator('[role="radio"], button').first()).toBeVisible();
+  await verifyCustomerBodyMinimum(page, "/planner");
+});
+
+test("@smoke @a11y cinematic media keeps a poster path for reduced motion", async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: "reduce" });
+  const page = await context.newPage();
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator('[data-testid="hero-editorial-media"]')).toBeVisible();
+  await expect(page.locator('[data-testid="hero-editorial-media"] video')).toHaveCount(0);
+  await expect(page.locator('[data-testid="hero-editorial-media"] img')).toBeVisible();
+  await expect(page.locator('[data-testid="hero-editorial-media"]')).toHaveAttribute("data-motion-enabled", "false");
+  await context.close();
+});
+
+test("@smoke @a11y cinematic media removes autoplay under reduced data", async ({ browser }) => {
+  const context = await browser.newContext();
+  await context.addInitScript(() => {
+    const nativeMatchMedia = window.matchMedia.bind(window);
+    window.matchMedia = (query: string) => {
+      const result = nativeMatchMedia(query);
+      if (query !== "(prefers-reduced-data: reduce)") return result;
+
+      return Object.defineProperties(result, {
+        matches: { configurable: true, value: true },
+        media: { configurable: true, value: query }
+      });
+    };
+  });
+
+  const page = await context.newPage();
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+
+  const hero = page.locator('[data-testid="hero-editorial-media"]');
+  await expect(hero).toBeVisible();
+  await expect(hero).toHaveAttribute("data-motion-enabled", "false");
+  await expect(hero.locator("video")).toHaveCount(0);
+  await expect(hero.locator("img")).toBeVisible();
+
+  await context.close();
+});
+
+test("@smoke @a11y 200% zoom-equivalent viewport reflows core routes", async ({ browser }) => {
+  // A 640px CSS viewport is the effective width of a 1280px desktop viewport
+  // at 200% browser zoom. This catches clipped content while preserving the
+  // browser's real responsive layout and focus behavior.
+  const context = await browser.newContext({ viewport: { width: 640, height: 1000 } });
+  const page = await context.newPage();
+  const routes = ["/", "/portugal", "/explore", "/pricing", "/sign-in"];
+
+  for (const route of routes) {
+    await page.goto(route);
+    await page.locator("h1:visible").first().waitFor({ state: "visible" });
+    const metrics = await page.evaluate(() => ({
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      bodyScrollWidth: document.body.scrollWidth
+    }));
+    expect(
+      metrics.scrollWidth,
+      `${route} must not introduce page-level horizontal overflow at the 200% zoom-equivalent width`
+    ).toBeLessThanOrEqual(metrics.clientWidth);
+    expect(
+      metrics.bodyScrollWidth,
+      `${route} body must not introduce page-level horizontal overflow at the 200% zoom-equivalent width`
+    ).toBeLessThanOrEqual(metrics.clientWidth);
+  }
+
+  await context.close();
 });
 
 test.describe("Accessibility Audit - Reviewer", () => {
@@ -254,7 +426,7 @@ test.describe("Accessibility Audit - Admin", () => {
 });
 
 test("@smoke @a11y route h1 sweep", async ({ browser }) => {
-  if (test.info().project.name !== "desktop-chrome") {
+  if (test.info().project.name !== "desktop-1440") {
     test.skip();
   }
   // The sweep visits 22 routes (5 marketing + 5 traveler + 5

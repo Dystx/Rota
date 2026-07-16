@@ -3,8 +3,8 @@
 Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presentation-catalogue.ts`. Primary scenarios run at all four viewports; additional states run at desktop-1440 and mobile-390; redirects retain behavioral assertions.
 
 - Routes: 53
-- Concrete scenarios: 342
-- Expanded evidence rows: 783
+- Concrete scenarios: 319
+- Expanded evidence rows: 737
 
 | Route | Scenario | Persona | State | Viewport | Scene | Shell | Chrome | Footer | Texture | Fixture | Access | Transition | No private disclosure | Setup |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -14,10 +14,6 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | / | home--ready | public | ready | mobile-390 | cover | public | public | full | none | static | render | — | no | — |
 | / | home--loading | public | loading | desktop-1440 | cover | public | public | full | none | static | render | — | no | — |
 | / | home--loading | public | loading | mobile-390 | cover | public | public | full | none | static | render | — | no | — |
-| / | home--unavailable | public | unavailable | desktop-1440 | cover | public | public | full | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| / | home--unavailable | public | unavailable | mobile-390 | cover | public | public | full | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| / | home--not-found | public | not-found | desktop-1440 | cover | public | public | full | none | static | not-found | — | no | — |
-| / | home--not-found | public | not-found | mobile-390 | cover | public | public | full | none | static | not-found | — | no | — |
 | / | home--error | public | error | desktop-1440 | cover | public | public | full | none | static | render | — | no | {"interaction":"retry"} |
 | / | home--error | public | error | mobile-390 | cover | public | public | full | none | static | render | — | no | {"interaction":"retry"} |
 | /portugal | portugal--ready | public | ready | desktop-1440 | atlas | public | public | full | none | static | render | — | no | — |
@@ -26,10 +22,6 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /portugal | portugal--ready | public | ready | mobile-390 | atlas | public | public | full | none | static | render | — | no | — |
 | /portugal | portugal--loading | public | loading | desktop-1440 | atlas | public | public | full | none | static | render | — | no | — |
 | /portugal | portugal--loading | public | loading | mobile-390 | atlas | public | public | full | none | static | render | — | no | — |
-| /portugal | portugal--unavailable | public | unavailable | desktop-1440 | atlas | public | public | full | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /portugal | portugal--unavailable | public | unavailable | mobile-390 | atlas | public | public | full | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /portugal | portugal--not-found | public | not-found | desktop-1440 | atlas | public | public | full | none | static | not-found | — | no | — |
-| /portugal | portugal--not-found | public | not-found | mobile-390 | atlas | public | public | full | none | static | not-found | — | no | — |
 | /portugal | portugal--error | public | error | desktop-1440 | atlas | public | public | full | none | static | render | — | no | {"interaction":"retry"} |
 | /portugal | portugal--error | public | error | mobile-390 | atlas | public | public | full | none | static | render | — | no | {"interaction":"retry"} |
 | /explore | explore--ready | public | ready | desktop-1440 | decision | public | task | none | none | static | render | — | no | — |
@@ -104,10 +96,6 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /how-it-works | how-it-works--ready | public | ready | mobile-390 | cover | public | public | compact | none | static | render | — | no | — |
 | /how-it-works | how-it-works--loading | public | loading | desktop-1440 | cover | public | public | compact | none | static | render | — | no | — |
 | /how-it-works | how-it-works--loading | public | loading | mobile-390 | cover | public | public | compact | none | static | render | — | no | — |
-| /how-it-works | how-it-works--unavailable | public | unavailable | desktop-1440 | cover | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /how-it-works | how-it-works--unavailable | public | unavailable | mobile-390 | cover | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /how-it-works | how-it-works--not-found | public | not-found | desktop-1440 | cover | public | public | compact | none | static | not-found | — | no | — |
-| /how-it-works | how-it-works--not-found | public | not-found | mobile-390 | cover | public | public | compact | none | static | not-found | — | no | — |
 | /how-it-works | how-it-works--error | public | error | desktop-1440 | cover | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /how-it-works | how-it-works--error | public | error | mobile-390 | cover | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /human-review | human-review--redirect | public | redirect | redirect | redirect | none | none | none | none | static | redirect | 308 to /local-expertise | no | — |
@@ -117,10 +105,6 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /local-expertise | local-expertise--ready | public | ready | mobile-390 | cover | public | public | full | none | static | render | — | no | — |
 | /local-expertise | local-expertise--loading | public | loading | desktop-1440 | cover | public | public | full | none | static | render | — | no | — |
 | /local-expertise | local-expertise--loading | public | loading | mobile-390 | cover | public | public | full | none | static | render | — | no | — |
-| /local-expertise | local-expertise--unavailable | public | unavailable | desktop-1440 | cover | public | public | full | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /local-expertise | local-expertise--unavailable | public | unavailable | mobile-390 | cover | public | public | full | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /local-expertise | local-expertise--not-found | public | not-found | desktop-1440 | cover | public | public | full | none | static | not-found | — | no | — |
-| /local-expertise | local-expertise--not-found | public | not-found | mobile-390 | cover | public | public | full | none | static | not-found | — | no | — |
 | /local-expertise | local-expertise--error | public | error | desktop-1440 | cover | public | public | full | none | static | render | — | no | {"interaction":"retry"} |
 | /local-expertise | local-expertise--error | public | error | mobile-390 | cover | public | public | full | none | static | render | — | no | {"interaction":"retry"} |
 | /pricing | pricing--ready | public | ready | desktop-1440 | utility | public | public | compact | none | static | render | — | no | — |
@@ -129,10 +113,6 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /pricing | pricing--ready | public | ready | mobile-390 | utility | public | public | compact | none | static | render | — | no | — |
 | /pricing | pricing--loading | public | loading | desktop-1440 | utility | public | public | compact | none | static | render | — | no | — |
 | /pricing | pricing--loading | public | loading | mobile-390 | utility | public | public | compact | none | static | render | — | no | — |
-| /pricing | pricing--unavailable | public | unavailable | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /pricing | pricing--unavailable | public | unavailable | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /pricing | pricing--not-found | public | not-found | desktop-1440 | utility | public | public | compact | none | static | not-found | — | no | — |
-| /pricing | pricing--not-found | public | not-found | mobile-390 | utility | public | public | compact | none | static | not-found | — | no | — |
 | /pricing | pricing--error | public | error | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /pricing | pricing--error | public | error | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /planner | planner--ready | public | ready | desktop-1440 | decision | traveler | immersive | none | none | static | render | — | no | — |
@@ -161,10 +141,10 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /trip/[tripId] | trip-[tripId]--anonymous | anonymous | unauthorized | desktop-1440 | decision | traveler | task | none | none | traveler-trip | redirect | — | yes | — |
 | /trip/[tripId] | trip-[tripId]--anonymous | anonymous | unauthorized | mobile-390 | decision | traveler | task | none | none | traveler-trip | redirect | — | yes | — |
 | /trip/[tripId] | trip-[tripId]--not-found-foreign | foreign-traveler | not-found | desktop-1440 | decision | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /trip/[tripId] | trip-[tripId]--not-found-foreign | foreign-traveler | not-found | tablet-landscape | decision | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /trip/[tripId] | trip-[tripId]--not-found-foreign | foreign-traveler | not-found | tablet-portrait | decision | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
 | /trip/[tripId] | trip-[tripId]--not-found-foreign | foreign-traveler | not-found | mobile-390 | decision | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
 | /trip/[tripId] | trip-[tripId]--empty | traveler | empty | desktop-1440 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
+| /trip/[tripId] | trip-[tripId]--empty | traveler | empty | tablet-landscape | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
+| /trip/[tripId] | trip-[tripId]--empty | traveler | empty | tablet-portrait | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
 | /trip/[tripId] | trip-[tripId]--empty | traveler | empty | mobile-390 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
 | /trip/[tripId] | trip-[tripId]--one-selection | traveler | one-selection | desktop-1440 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | {"interaction":"select"} |
 | /trip/[tripId] | trip-[tripId]--one-selection | traveler | one-selection | mobile-390 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | {"interaction":"select"} |
@@ -180,11 +160,9 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /trip/[tripId] | trip-[tripId]--error | traveler | error | mobile-390 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | {"interaction":"retry"} |
 | /trip/[tripId]/map | trip-[tripId]-map--anonymous | anonymous | unauthorized | desktop-1440 | atlas | traveler | immersive | none | none | traveler-trip/map | redirect | — | yes | — |
 | /trip/[tripId]/map | trip-[tripId]-map--anonymous | anonymous | unauthorized | mobile-390 | atlas | traveler | immersive | none | none | traveler-trip/map | redirect | — | yes | — |
-| /trip/[tripId]/map | trip-[tripId]-map--not-found-foreign | foreign-traveler | not-found | desktop-1440 | atlas | traveler | immersive | none | none | traveler-trip:foreign/map | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /trip/[tripId]/map | trip-[tripId]-map--not-found-foreign | foreign-traveler | not-found | tablet-landscape | atlas | traveler | immersive | none | none | traveler-trip:foreign/map | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /trip/[tripId]/map | trip-[tripId]-map--not-found-foreign | foreign-traveler | not-found | tablet-portrait | atlas | traveler | immersive | none | none | traveler-trip:foreign/map | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /trip/[tripId]/map | trip-[tripId]-map--not-found-foreign | foreign-traveler | not-found | mobile-390 | atlas | traveler | immersive | none | none | traveler-trip:foreign/map | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
 | /trip/[tripId]/map | trip-[tripId]-map--empty | traveler | empty | desktop-1440 | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | — |
+| /trip/[tripId]/map | trip-[tripId]-map--empty | traveler | empty | tablet-landscape | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | — |
+| /trip/[tripId]/map | trip-[tripId]-map--empty | traveler | empty | tablet-portrait | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | — |
 | /trip/[tripId]/map | trip-[tripId]-map--empty | traveler | empty | mobile-390 | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | — |
 | /trip/[tripId]/map | trip-[tripId]-map--one-selection | traveler | one-selection | desktop-1440 | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | {"interaction":"select"} |
 | /trip/[tripId]/map | trip-[tripId]-map--one-selection | traveler | one-selection | mobile-390 | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | {"interaction":"select"} |
@@ -200,40 +178,38 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /trip/[tripId]/map | trip-[tripId]-map--unavailable | traveler | unavailable | mobile-390 | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | {"interaction":"retry","provider":"unreachable"} |
 | /trip/[tripId]/map | trip-[tripId]-map--error | traveler | error | desktop-1440 | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | {"interaction":"retry"} |
 | /trip/[tripId]/map | trip-[tripId]-map--error | traveler | error | mobile-390 | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | {"interaction":"retry"} |
-| /trip/[tripId]/export | trip-[tripId]-export--anonymous | anonymous | unauthorized | desktop-1440 | utility | traveler | task | utility | none | traveler-trip/export | redirect | — | yes | — |
-| /trip/[tripId]/export | trip-[tripId]-export--anonymous | anonymous | unauthorized | mobile-390 | utility | traveler | task | utility | none | traveler-trip/export | redirect | — | yes | — |
-| /trip/[tripId]/export | trip-[tripId]-export--not-found-foreign | foreign-traveler | not-found | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:foreign/export | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /trip/[tripId]/export | trip-[tripId]-export--not-found-foreign | foreign-traveler | not-found | tablet-landscape | utility | traveler | task | utility | none | traveler-trip:foreign/export | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /trip/[tripId]/export | trip-[tripId]-export--not-found-foreign | foreign-traveler | not-found | tablet-portrait | utility | traveler | task | utility | none | traveler-trip:foreign/export | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /trip/[tripId]/export | trip-[tripId]-export--not-found-foreign | foreign-traveler | not-found | mobile-390 | utility | traveler | task | utility | none | traveler-trip:foreign/export | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /trip/[tripId]/export | trip-[tripId]-export--empty | traveler | empty | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | — |
-| /trip/[tripId]/export | trip-[tripId]-export--empty | traveler | empty | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | — |
-| /trip/[tripId]/export | trip-[tripId]-export--loading | traveler | loading | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | — |
-| /trip/[tripId]/export | trip-[tripId]-export--loading | traveler | loading | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | — |
-| /trip/[tripId]/export | trip-[tripId]-export--pending | traveler | pending | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | — |
-| /trip/[tripId]/export | trip-[tripId]-export--pending | traveler | pending | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | — |
-| /trip/[tripId]/export | trip-[tripId]-export--saved | traveler | saved | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | {"interaction":"save"} |
-| /trip/[tripId]/export | trip-[tripId]-export--saved | traveler | saved | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | {"interaction":"save"} |
-| /trip/[tripId]/export | trip-[tripId]-export--error | traveler | error | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | {"interaction":"retry"} |
-| /trip/[tripId]/export | trip-[tripId]-export--error | traveler | error | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft/export | render | — | no | {"interaction":"retry"} |
+| /trip/[tripId]/export | trip-[tripId]-export--anonymous | anonymous | unauthorized | desktop-1440 | utility | traveler | task | none | none | traveler-trip/export | redirect | — | yes | — |
+| /trip/[tripId]/export | trip-[tripId]-export--anonymous | anonymous | unauthorized | mobile-390 | utility | traveler | task | none | none | traveler-trip/export | redirect | — | yes | — |
+| /trip/[tripId]/export | trip-[tripId]-export--empty | traveler | empty | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
+| /trip/[tripId]/export | trip-[tripId]-export--empty | traveler | empty | tablet-landscape | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
+| /trip/[tripId]/export | trip-[tripId]-export--empty | traveler | empty | tablet-portrait | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
+| /trip/[tripId]/export | trip-[tripId]-export--empty | traveler | empty | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
+| /trip/[tripId]/export | trip-[tripId]-export--loading | traveler | loading | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
+| /trip/[tripId]/export | trip-[tripId]-export--loading | traveler | loading | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
+| /trip/[tripId]/export | trip-[tripId]-export--pending | traveler | pending | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
+| /trip/[tripId]/export | trip-[tripId]-export--pending | traveler | pending | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
+| /trip/[tripId]/export | trip-[tripId]-export--saved | traveler | saved | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | {"interaction":"save"} |
+| /trip/[tripId]/export | trip-[tripId]-export--saved | traveler | saved | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | {"interaction":"save"} |
+| /trip/[tripId]/export | trip-[tripId]-export--error | traveler | error | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | {"interaction":"retry"} |
+| /trip/[tripId]/export | trip-[tripId]-export--error | traveler | error | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | {"interaction":"retry"} |
 | /checkout | checkout--anonymous | anonymous | unauthorized | desktop-1440 | utility | traveler | task | utility | none | static | redirect | — | yes | — |
 | /checkout | checkout--anonymous | anonymous | unauthorized | mobile-390 | utility | traveler | task | utility | none | static | redirect | — | yes | — |
-| /checkout | checkout--not-found-foreign | foreign-traveler | not-found | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /checkout | checkout--not-found-foreign | foreign-traveler | not-found | tablet-landscape | utility | traveler | task | utility | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /checkout | checkout--not-found-foreign | foreign-traveler | not-found | tablet-portrait | utility | traveler | task | utility | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /checkout | checkout--not-found-foreign | foreign-traveler | not-found | mobile-390 | utility | traveler | task | utility | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /checkout | checkout--empty | traveler | empty | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | — |
-| /checkout | checkout--empty | traveler | empty | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | — |
-| /checkout | checkout--ready | traveler | ready | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | — |
-| /checkout | checkout--ready | traveler | ready | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | — |
-| /checkout | checkout--loading | traveler | loading | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | — |
-| /checkout | checkout--loading | traveler | loading | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | — |
-| /checkout | checkout--paid | traveler | paid | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:paid-reviewed | render | — | no | — |
-| /checkout | checkout--paid | traveler | paid | mobile-390 | utility | traveler | task | utility | none | traveler-trip:paid-reviewed | render | — | no | — |
-| /checkout | checkout--unavailable | traveler | unavailable | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /checkout | checkout--unavailable | traveler | unavailable | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /checkout | checkout--error | traveler | error | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | {"interaction":"retry"} |
-| /checkout | checkout--error | traveler | error | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | {"interaction":"retry"} |
+| /checkout | checkout--no-trip | traveler | empty | desktop-1440 | utility | traveler | task | utility | none | static | render | no trip is explained with one coherent planner action | no | — |
+| /checkout | checkout--no-trip | traveler | empty | tablet-landscape | utility | traveler | task | utility | none | static | render | no trip is explained with one coherent planner action | no | — |
+| /checkout | checkout--no-trip | traveler | empty | tablet-portrait | utility | traveler | task | utility | none | static | render | no trip is explained with one coherent planner action | no | — |
+| /checkout | checkout--no-trip | traveler | empty | mobile-390 | utility | traveler | task | utility | none | static | render | no trip is explained with one coherent planner action | no | — |
+| /checkout | checkout--foreign-trip | foreign-traveler | not-found | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
+| /checkout | checkout--foreign-trip | foreign-traveler | not-found | mobile-390 | utility | traveler | task | utility | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
+| /checkout | checkout--draft | traveler | ready | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | {"query":{"trip":"fixture:draft"}} |
+| /checkout | checkout--draft | traveler | ready | mobile-390 | utility | traveler | task | utility | none | traveler-trip:draft | render | — | no | {"query":{"trip":"fixture:draft"}} |
+| /checkout | checkout--loading | traveler | loading | desktop-1440 | utility | traveler | task | utility | none | static | render | checkout status is announced while the provider response is pending | no | — |
+| /checkout | checkout--loading | traveler | loading | mobile-390 | utility | traveler | task | utility | none | static | render | checkout status is announced while the provider response is pending | no | — |
+| /checkout | checkout--paid | traveler | paid | desktop-1440 | utility | traveler | task | utility | none | traveler-trip:paid-reviewed | render | paid status and the next refinement action remain visible | no | {"query":{"trip":"fixture:paid-reviewed"}} |
+| /checkout | checkout--paid | traveler | paid | mobile-390 | utility | traveler | task | utility | none | traveler-trip:paid-reviewed | render | paid status and the next refinement action remain visible | no | {"query":{"trip":"fixture:paid-reviewed"}} |
+| /checkout | checkout--provider-unavailable | traveler | unavailable | desktop-1440 | utility | traveler | task | utility | none | static | render | provider recovery and one safe retry action are visible | no | {"provider":"unreachable"} |
+| /checkout | checkout--provider-unavailable | traveler | unavailable | mobile-390 | utility | traveler | task | utility | none | static | render | provider recovery and one safe retry action are visible | no | {"provider":"unreachable"} |
+| /checkout | checkout--error | traveler | error | desktop-1440 | utility | traveler | task | utility | none | static | render | checkout failure preserves the trip summary and offers retry | no | {"interaction":"retry"} |
+| /checkout | checkout--error | traveler | error | mobile-390 | utility | traveler | task | utility | none | static | render | checkout failure preserves the trip summary and offers retry | no | {"interaction":"retry"} |
 | /itineraries | itineraries--anonymous | anonymous | unauthorized | desktop-1440 | utility | traveler | task | utility | none | static | redirect | — | yes | — |
 | /itineraries | itineraries--anonymous | anonymous | unauthorized | mobile-390 | utility | traveler | task | utility | none | static | redirect | — | yes | — |
 | /itineraries | itineraries--empty | traveler | empty | desktop-1440 | utility | traveler | task | utility | none | static | render | — | no | — |
@@ -285,10 +261,10 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /logistics | logistics--anonymous | anonymous | unauthorized | desktop-1440 | decision | traveler | task | none | none | static | redirect | — | yes | — |
 | /logistics | logistics--anonymous | anonymous | unauthorized | mobile-390 | decision | traveler | task | none | none | static | redirect | — | yes | — |
 | /logistics | logistics--not-found-foreign | foreign-traveler | not-found | desktop-1440 | decision | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /logistics | logistics--not-found-foreign | foreign-traveler | not-found | tablet-landscape | decision | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /logistics | logistics--not-found-foreign | foreign-traveler | not-found | tablet-portrait | decision | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
 | /logistics | logistics--not-found-foreign | foreign-traveler | not-found | mobile-390 | decision | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
 | /logistics | logistics--empty | traveler | empty | desktop-1440 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
+| /logistics | logistics--empty | traveler | empty | tablet-landscape | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
+| /logistics | logistics--empty | traveler | empty | tablet-portrait | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
 | /logistics | logistics--empty | traveler | empty | mobile-390 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
 | /logistics | logistics--ready | traveler | ready | desktop-1440 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
 | /logistics | logistics--ready | traveler | ready | mobile-390 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | — |
@@ -304,26 +280,26 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /logistics | logistics--error | traveler | error | mobile-390 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | {"interaction":"retry"} |
 | /expert-chat | expert-chat--anonymous | anonymous | unauthorized | desktop-1440 | utility | traveler | task | none | none | static | redirect | — | yes | — |
 | /expert-chat | expert-chat--anonymous | anonymous | unauthorized | mobile-390 | utility | traveler | task | none | none | static | redirect | — | yes | — |
-| /expert-chat | expert-chat--not-found-foreign | foreign-traveler | not-found | desktop-1440 | utility | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"flags":{"ENABLE_TRIP_MESSAGING":true},"query":{"trip":"fixture:foreign"}} |
-| /expert-chat | expert-chat--not-found-foreign | foreign-traveler | not-found | tablet-landscape | utility | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"flags":{"ENABLE_TRIP_MESSAGING":true},"query":{"trip":"fixture:foreign"}} |
-| /expert-chat | expert-chat--not-found-foreign | foreign-traveler | not-found | tablet-portrait | utility | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"flags":{"ENABLE_TRIP_MESSAGING":true},"query":{"trip":"fixture:foreign"}} |
-| /expert-chat | expert-chat--not-found-foreign | foreign-traveler | not-found | mobile-390 | utility | traveler | task | none | none | traveler-trip:foreign | not-found | — | yes | {"flags":{"ENABLE_TRIP_MESSAGING":true},"query":{"trip":"fixture:foreign"}} |
-| /expert-chat | expert-chat--disabled | traveler | disabled | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--disabled | traveler | disabled | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--ineligible | traveler | ineligible | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--ineligible | traveler | ineligible | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--empty | traveler | empty | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--empty | traveler | empty | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--ready | traveler | ready | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--ready | traveler | ready | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--loading | traveler | loading | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--loading | traveler | loading | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
-| /expert-chat | expert-chat--saved | traveler | saved | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"save"} |
-| /expert-chat | expert-chat--saved | traveler | saved | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"save"} |
-| /expert-chat | expert-chat--unavailable | traveler | unavailable | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"retry","provider":"unreachable"} |
-| /expert-chat | expert-chat--unavailable | traveler | unavailable | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"retry","provider":"unreachable"} |
-| /expert-chat | expert-chat--error | traveler | error | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"retry"} |
-| /expert-chat | expert-chat--error | traveler | error | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft | render | — | no | {"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"retry"} |
+| /expert-chat | expert-chat--disabled | traveler | disabled | desktop-1440 | utility | traveler | task | none | none | static | render | messaging is truthfully unavailable while the feature flag is off | no | {"flags":{"ENABLE_TRIP_MESSAGING":false}} |
+| /expert-chat | expert-chat--disabled | traveler | disabled | mobile-390 | utility | traveler | task | none | none | static | render | messaging is truthfully unavailable while the feature flag is off | no | {"flags":{"ENABLE_TRIP_MESSAGING":false}} |
+| /expert-chat | expert-chat--no-trip | traveler | empty | desktop-1440 | utility | traveler | task | none | none | static | render | the trip context required for messaging is explained | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--no-trip | traveler | empty | tablet-landscape | utility | traveler | task | none | none | static | render | the trip context required for messaging is explained | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--no-trip | traveler | empty | tablet-portrait | utility | traveler | task | none | none | static | render | the trip context required for messaging is explained | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--no-trip | traveler | empty | mobile-390 | utility | traveler | task | none | none | static | render | the trip context required for messaging is explained | no | {"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--foreign-trip | foreign-traveler | not-found | desktop-1440 | utility | traveler | task | none | none | traveler-trip:foreign | redirect | foreign trip context is not disclosed and returns to a safe route | yes | {"query":{"trip":"fixture:foreign"},"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--foreign-trip | foreign-traveler | not-found | mobile-390 | utility | traveler | task | none | none | traveler-trip:foreign | redirect | foreign trip context is not disclosed and returns to a safe route | yes | {"query":{"trip":"fixture:foreign"},"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--ineligible | traveler | ineligible | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft | render | draft trips receive the eligibility boundary before messaging | no | {"query":{"trip":"fixture:draft"},"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--ineligible | traveler | ineligible | mobile-390 | utility | traveler | task | none | none | traveler-trip:draft | render | draft trips receive the eligibility boundary before messaging | no | {"query":{"trip":"fixture:draft"},"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--ready | traveler | ready | desktop-1440 | utility | traveler | task | none | none | traveler-trip:paid-reviewed | render | — | no | {"query":{"trip":"fixture:paid-reviewed"},"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--ready | traveler | ready | mobile-390 | utility | traveler | task | none | none | traveler-trip:paid-reviewed | render | — | no | {"query":{"trip":"fixture:paid-reviewed"},"flags":{"ENABLE_TRIP_MESSAGING":true}} |
+| /expert-chat | expert-chat--sending | traveler | loading | desktop-1440 | utility | traveler | task | none | none | traveler-trip:paid-reviewed | render | composer announces sending | no | {"query":{"trip":"fixture:paid-reviewed"},"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"send"} |
+| /expert-chat | expert-chat--sending | traveler | loading | mobile-390 | utility | traveler | task | none | none | traveler-trip:paid-reviewed | render | composer announces sending | no | {"query":{"trip":"fixture:paid-reviewed"},"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"send"} |
+| /expert-chat | expert-chat--saved | traveler | saved | desktop-1440 | utility | traveler | task | none | none | traveler-trip:paid-reviewed | render | message appears once and composer clears | no | {"query":{"trip":"fixture:paid-reviewed"},"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"send"} |
+| /expert-chat | expert-chat--saved | traveler | saved | mobile-390 | utility | traveler | task | none | none | traveler-trip:paid-reviewed | render | message appears once and composer clears | no | {"query":{"trip":"fixture:paid-reviewed"},"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"send"} |
+| /expert-chat | expert-chat--send-error | traveler | error | desktop-1440 | utility | traveler | task | none | none | traveler-trip:paid-reviewed | render | draft is retained and retry is offered | no | {"query":{"trip":"fixture:paid-reviewed"},"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"send"} |
+| /expert-chat | expert-chat--send-error | traveler | error | mobile-390 | utility | traveler | task | none | none | traveler-trip:paid-reviewed | render | draft is retained and retry is offered | no | {"query":{"trip":"fixture:paid-reviewed"},"flags":{"ENABLE_TRIP_MESSAGING":true},"interaction":"send"} |
+| /expert-chat | expert-chat--unavailable | traveler | unavailable | desktop-1440 | utility | traveler | task | none | none | static | render | messaging recovery explains availability and offers a safe retry | no | {"flags":{"ENABLE_TRIP_MESSAGING":true},"provider":"unreachable"} |
+| /expert-chat | expert-chat--unavailable | traveler | unavailable | mobile-390 | utility | traveler | task | none | none | static | render | messaging recovery explains availability and offers a safe retry | no | {"flags":{"ENABLE_TRIP_MESSAGING":true},"provider":"unreachable"} |
 | /sign-in | sign-in--ready | public | ready | desktop-1440 | utility | none | none | none | none | static | render | — | no | — |
 | /sign-in | sign-in--ready | public | ready | tablet-landscape | utility | none | none | none | none | static | render | — | no | — |
 | /sign-in | sign-in--ready | public | ready | tablet-portrait | utility | none | none | none | none | static | render | — | no | — |
@@ -341,10 +317,6 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /support | support--ready | public | ready | mobile-390 | utility | public | public | compact | none | static | render | — | no | — |
 | /support | support--loading | public | loading | desktop-1440 | utility | public | public | compact | none | static | render | — | no | — |
 | /support | support--loading | public | loading | mobile-390 | utility | public | public | compact | none | static | render | — | no | — |
-| /support | support--unavailable | public | unavailable | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /support | support--unavailable | public | unavailable | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /support | support--not-found | public | not-found | desktop-1440 | utility | public | public | compact | none | static | not-found | — | no | — |
-| /support | support--not-found | public | not-found | mobile-390 | utility | public | public | compact | none | static | not-found | — | no | — |
 | /support | support--error | public | error | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /support | support--error | public | error | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /privacy | privacy--ready | public | ready | desktop-1440 | utility | public | public | compact | none | static | render | — | no | — |
@@ -353,10 +325,6 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /privacy | privacy--ready | public | ready | mobile-390 | utility | public | public | compact | none | static | render | — | no | — |
 | /privacy | privacy--loading | public | loading | desktop-1440 | utility | public | public | compact | none | static | render | — | no | — |
 | /privacy | privacy--loading | public | loading | mobile-390 | utility | public | public | compact | none | static | render | — | no | — |
-| /privacy | privacy--unavailable | public | unavailable | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /privacy | privacy--unavailable | public | unavailable | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /privacy | privacy--not-found | public | not-found | desktop-1440 | utility | public | public | compact | none | static | not-found | — | no | — |
-| /privacy | privacy--not-found | public | not-found | mobile-390 | utility | public | public | compact | none | static | not-found | — | no | — |
 | /privacy | privacy--error | public | error | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /privacy | privacy--error | public | error | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /terms | terms--ready | public | ready | desktop-1440 | utility | public | public | compact | none | static | render | — | no | — |
@@ -365,10 +333,6 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /terms | terms--ready | public | ready | mobile-390 | utility | public | public | compact | none | static | render | — | no | — |
 | /terms | terms--loading | public | loading | desktop-1440 | utility | public | public | compact | none | static | render | — | no | — |
 | /terms | terms--loading | public | loading | mobile-390 | utility | public | public | compact | none | static | render | — | no | — |
-| /terms | terms--unavailable | public | unavailable | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /terms | terms--unavailable | public | unavailable | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /terms | terms--not-found | public | not-found | desktop-1440 | utility | public | public | compact | none | static | not-found | — | no | — |
-| /terms | terms--not-found | public | not-found | mobile-390 | utility | public | public | compact | none | static | not-found | — | no | — |
 | /terms | terms--error | public | error | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /terms | terms--error | public | error | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /sustainability | sustainability--ready | public | ready | desktop-1440 | cover | public | public | compact | none | static | render | — | no | — |
@@ -377,10 +341,6 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /sustainability | sustainability--ready | public | ready | mobile-390 | cover | public | public | compact | none | static | render | — | no | — |
 | /sustainability | sustainability--loading | public | loading | desktop-1440 | cover | public | public | compact | none | static | render | — | no | — |
 | /sustainability | sustainability--loading | public | loading | mobile-390 | cover | public | public | compact | none | static | render | — | no | — |
-| /sustainability | sustainability--unavailable | public | unavailable | desktop-1440 | cover | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /sustainability | sustainability--unavailable | public | unavailable | mobile-390 | cover | public | public | compact | none | static | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /sustainability | sustainability--not-found | public | not-found | desktop-1440 | cover | public | public | compact | none | static | not-found | — | no | — |
-| /sustainability | sustainability--not-found | public | not-found | mobile-390 | cover | public | public | compact | none | static | not-found | — | no | — |
 | /sustainability | sustainability--error | public | error | desktop-1440 | cover | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /sustainability | sustainability--error | public | error | mobile-390 | cover | public | public | compact | none | static | render | — | no | {"interaction":"retry"} |
 | /offline | offline--ready | public | ready | desktop-1440 | utility | public | public | compact | none | static | render | — | no | — |
@@ -395,84 +355,82 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /reviewer/queue | reviewer-queue--anonymous | anonymous | unauthorized | mobile-390 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /reviewer/queue | reviewer-queue--limited-capability | limited-admin | forbidden | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
 | /reviewer/queue | reviewer-queue--limited-capability | limited-admin | forbidden | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
-| /reviewer/queue | reviewer-queue--empty | admin | empty | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/queue | reviewer-queue--empty | admin | empty | tablet-landscape | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/queue | reviewer-queue--empty | admin | empty | tablet-portrait | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/queue | reviewer-queue--empty | admin | empty | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/queue | reviewer-queue--populated | admin | populated | desktop-1440 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/queue | reviewer-queue--populated | admin | populated | mobile-390 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/queue | reviewer-queue--loading | admin | loading | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/queue | reviewer-queue--loading | admin | loading | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/queue | reviewer-queue--unavailable | admin | unavailable | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/queue | reviewer-queue--unavailable | admin | unavailable | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/queue | reviewer-queue--error | admin | error | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
-| /reviewer/queue | reviewer-queue--error | admin | error | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
+| /reviewer/queue | reviewer-queue--empty | reviewer | empty | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/queue | reviewer-queue--empty | reviewer | empty | tablet-landscape | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/queue | reviewer-queue--empty | reviewer | empty | tablet-portrait | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/queue | reviewer-queue--empty | reviewer | empty | mobile-390 | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/queue | reviewer-queue--populated | reviewer | populated | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/queue | reviewer-queue--populated | reviewer | populated | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/queue | reviewer-queue--loading | reviewer | loading | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/queue | reviewer-queue--loading | reviewer | loading | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/queue | reviewer-queue--unavailable | reviewer | unavailable | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/queue | reviewer-queue--unavailable | reviewer | unavailable | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/queue | reviewer-queue--error | reviewer | error | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
+| /reviewer/queue | reviewer-queue--error | reviewer | error | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
 | /reviewer/history | reviewer-history--anonymous | anonymous | unauthorized | desktop-1440 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /reviewer/history | reviewer-history--anonymous | anonymous | unauthorized | mobile-390 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /reviewer/history | reviewer-history--limited-capability | limited-admin | forbidden | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
 | /reviewer/history | reviewer-history--limited-capability | limited-admin | forbidden | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
-| /reviewer/history | reviewer-history--empty | admin | empty | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/history | reviewer-history--empty | admin | empty | tablet-landscape | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/history | reviewer-history--empty | admin | empty | tablet-portrait | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/history | reviewer-history--empty | admin | empty | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/history | reviewer-history--populated | admin | populated | desktop-1440 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/history | reviewer-history--populated | admin | populated | mobile-390 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/history | reviewer-history--loading | admin | loading | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/history | reviewer-history--loading | admin | loading | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/history | reviewer-history--unavailable | admin | unavailable | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/history | reviewer-history--unavailable | admin | unavailable | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/history | reviewer-history--error | admin | error | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
-| /reviewer/history | reviewer-history--error | admin | error | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
+| /reviewer/history | reviewer-history--empty | reviewer | empty | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {} |
+| /reviewer/history | reviewer-history--empty | reviewer | empty | tablet-landscape | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {} |
+| /reviewer/history | reviewer-history--empty | reviewer | empty | tablet-portrait | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {} |
+| /reviewer/history | reviewer-history--empty | reviewer | empty | mobile-390 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {} |
+| /reviewer/history | reviewer-history--populated | reviewer | populated | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {} |
+| /reviewer/history | reviewer-history--populated | reviewer | populated | mobile-390 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {} |
+| /reviewer/history | reviewer-history--loading | reviewer | loading | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {} |
+| /reviewer/history | reviewer-history--loading | reviewer | loading | mobile-390 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {} |
+| /reviewer/history | reviewer-history--unavailable | reviewer | unavailable | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/history | reviewer-history--unavailable | reviewer | unavailable | mobile-390 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/history | reviewer-history--error | reviewer | error | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {"interaction":"retry"} |
+| /reviewer/history | reviewer-history--error | reviewer | error | mobile-390 | utility | operator | operator | none | none | reviewer-trip:completed | render | — | no | {"interaction":"retry"} |
 | /reviewer/profile | reviewer-profile--anonymous | anonymous | unauthorized | desktop-1440 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /reviewer/profile | reviewer-profile--anonymous | anonymous | unauthorized | mobile-390 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /reviewer/profile | reviewer-profile--limited-capability | limited-admin | forbidden | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
 | /reviewer/profile | reviewer-profile--limited-capability | limited-admin | forbidden | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
-| /reviewer/profile | reviewer-profile--empty | admin | empty | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/profile | reviewer-profile--empty | admin | empty | tablet-landscape | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/profile | reviewer-profile--empty | admin | empty | tablet-portrait | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/profile | reviewer-profile--empty | admin | empty | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/profile | reviewer-profile--populated | admin | populated | desktop-1440 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/profile | reviewer-profile--populated | admin | populated | mobile-390 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/profile | reviewer-profile--loading | admin | loading | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/profile | reviewer-profile--loading | admin | loading | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/profile | reviewer-profile--unavailable | admin | unavailable | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/profile | reviewer-profile--unavailable | admin | unavailable | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/profile | reviewer-profile--error | admin | error | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
-| /reviewer/profile | reviewer-profile--error | admin | error | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
+| /reviewer/profile | reviewer-profile--empty | reviewer | empty | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/profile | reviewer-profile--empty | reviewer | empty | tablet-landscape | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/profile | reviewer-profile--empty | reviewer | empty | tablet-portrait | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/profile | reviewer-profile--empty | reviewer | empty | mobile-390 | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/profile | reviewer-profile--populated | reviewer | populated | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/profile | reviewer-profile--populated | reviewer | populated | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/profile | reviewer-profile--loading | reviewer | loading | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/profile | reviewer-profile--loading | reviewer | loading | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/profile | reviewer-profile--unavailable | reviewer | unavailable | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/profile | reviewer-profile--unavailable | reviewer | unavailable | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/profile | reviewer-profile--error | reviewer | error | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
+| /reviewer/profile | reviewer-profile--error | reviewer | error | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
 | /reviewer/operations | reviewer-operations--anonymous | anonymous | unauthorized | desktop-1440 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /reviewer/operations | reviewer-operations--anonymous | anonymous | unauthorized | mobile-390 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /reviewer/operations | reviewer-operations--limited-capability | limited-admin | forbidden | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
 | /reviewer/operations | reviewer-operations--limited-capability | limited-admin | forbidden | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
-| /reviewer/operations | reviewer-operations--empty | admin | empty | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/operations | reviewer-operations--empty | admin | empty | tablet-landscape | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/operations | reviewer-operations--empty | admin | empty | tablet-portrait | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/operations | reviewer-operations--empty | admin | empty | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/operations | reviewer-operations--populated | admin | populated | desktop-1440 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/operations | reviewer-operations--populated | admin | populated | mobile-390 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/operations | reviewer-operations--loading | admin | loading | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/operations | reviewer-operations--loading | admin | loading | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/operations | reviewer-operations--unavailable | admin | unavailable | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/operations | reviewer-operations--unavailable | admin | unavailable | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/operations | reviewer-operations--error | admin | error | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
-| /reviewer/operations | reviewer-operations--error | admin | error | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
+| /reviewer/operations | reviewer-operations--empty | reviewer | empty | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/operations | reviewer-operations--empty | reviewer | empty | tablet-landscape | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/operations | reviewer-operations--empty | reviewer | empty | tablet-portrait | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/operations | reviewer-operations--empty | reviewer | empty | mobile-390 | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/operations | reviewer-operations--populated | reviewer | populated | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/operations | reviewer-operations--populated | reviewer | populated | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/operations | reviewer-operations--loading | reviewer | loading | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/operations | reviewer-operations--loading | reviewer | loading | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/operations | reviewer-operations--unavailable | reviewer | unavailable | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/operations | reviewer-operations--unavailable | reviewer | unavailable | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/operations | reviewer-operations--error | reviewer | error | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
+| /reviewer/operations | reviewer-operations--error | reviewer | error | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
 | /reviewer/trips/[tripId] | reviewer-trips-[tripId]--anonymous | anonymous | unauthorized | desktop-1440 | utility | operator | operator | none | none | reviewer-trip | redirect | — | yes | — |
 | /reviewer/trips/[tripId] | reviewer-trips-[tripId]--anonymous | anonymous | unauthorized | mobile-390 | utility | operator | operator | none | none | reviewer-trip | redirect | — | yes | — |
 | /reviewer/trips/[tripId] | reviewer-trips-[tripId]--limited-capability | limited-admin | forbidden | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
 | /reviewer/trips/[tripId] | reviewer-trips-[tripId]--limited-capability | limited-admin | forbidden | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--empty | admin | empty | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--empty | admin | empty | tablet-landscape | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--empty | admin | empty | tablet-portrait | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--empty | admin | empty | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--populated | admin | populated | desktop-1440 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--populated | admin | populated | mobile-390 | utility | operator | operator | none | none | operator:populated | render | — | no | {} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--loading | admin | loading | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--loading | admin | loading | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--unavailable | admin | unavailable | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--unavailable | admin | unavailable | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry","provider":"unreachable"} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--error | admin | error | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--error | admin | error | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"interaction":"retry"} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--not-found-foreign | foreign-traveler | not-found | desktop-1440 | utility | operator | operator | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
-| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--not-found-foreign | foreign-traveler | not-found | mobile-390 | utility | operator | operator | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--empty | reviewer | empty | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--empty | reviewer | empty | tablet-landscape | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--empty | reviewer | empty | tablet-portrait | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--empty | reviewer | empty | mobile-390 | utility | operator | operator | none | none | reviewer-trip:unassigned | render | — | no | {} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--populated | reviewer | populated | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--populated | reviewer | populated | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--loading | reviewer | loading | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--loading | reviewer | loading | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--unavailable | reviewer | unavailable | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--unavailable | reviewer | unavailable | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry","provider":"unreachable"} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--error | reviewer | error | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--error | reviewer | error | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
 | /admin/places | admin-places--anonymous | anonymous | unauthorized | desktop-1440 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /admin/places | admin-places--anonymous | anonymous | unauthorized | mobile-390 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /admin/places | admin-places--limited-capability | limited-admin | forbidden | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
@@ -715,29 +673,29 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /console/config | console-config--error | admin | error | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_OPERATOR_CONSOLE":true,"ENABLE_CONSOLE_CONFIG":true},"interaction":"retry"} |
 | /guide | guide--anonymous | anonymous | unauthorized | desktop-1440 | utility | traveler | task | utility | none | static | redirect | — | yes | — |
 | /guide | guide--anonymous | anonymous | unauthorized | mobile-390 | utility | traveler | task | utility | none | static | redirect | — | yes | — |
-| /guide | guide--disabled | traveler | disabled | desktop-1440 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
-| /guide | guide--disabled | traveler | disabled | tablet-landscape | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
-| /guide | guide--disabled | traveler | disabled | tablet-portrait | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
-| /guide | guide--disabled | traveler | disabled | mobile-390 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
+| /guide | guide--disabled | traveler | disabled | desktop-1440 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":false}} |
+| /guide | guide--disabled | traveler | disabled | mobile-390 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":false}} |
 | /guide | guide--ineligible | traveler | ineligible | desktop-1440 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
 | /guide | guide--ineligible | traveler | ineligible | mobile-390 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
 | /guide | guide--unavailable | traveler | unavailable | desktop-1440 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true},"interaction":"retry","provider":"unreachable"} |
 | /guide | guide--unavailable | traveler | unavailable | mobile-390 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true},"interaction":"retry","provider":"unreachable"} |
 | /guide | guide--ready | traveler | ready | desktop-1440 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
+| /guide | guide--ready | traveler | ready | tablet-landscape | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
+| /guide | guide--ready | traveler | ready | tablet-portrait | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
 | /guide | guide--ready | traveler | ready | mobile-390 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
 | /guide | guide--error | traveler | error | desktop-1440 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true},"interaction":"retry"} |
 | /guide | guide--error | traveler | error | mobile-390 | utility | traveler | task | utility | none | static | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true},"interaction":"retry"} |
 | /guide/onboarding | guide-onboarding--anonymous | anonymous | unauthorized | desktop-1440 | utility | traveler | task | utility | none | static | redirect | — | yes | — |
 | /guide/onboarding | guide-onboarding--anonymous | anonymous | unauthorized | mobile-390 | utility | traveler | task | utility | none | static | redirect | — | yes | — |
-| /guide/onboarding | guide-onboarding--disabled | specialist-candidate | disabled | desktop-1440 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
-| /guide/onboarding | guide-onboarding--disabled | specialist-candidate | disabled | tablet-landscape | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
-| /guide/onboarding | guide-onboarding--disabled | specialist-candidate | disabled | tablet-portrait | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
-| /guide/onboarding | guide-onboarding--disabled | specialist-candidate | disabled | mobile-390 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
+| /guide/onboarding | guide-onboarding--disabled | specialist-candidate | disabled | desktop-1440 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":false}} |
+| /guide/onboarding | guide-onboarding--disabled | specialist-candidate | disabled | mobile-390 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":false}} |
 | /guide/onboarding | guide-onboarding--ineligible | specialist-candidate | ineligible | desktop-1440 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
 | /guide/onboarding | guide-onboarding--ineligible | specialist-candidate | ineligible | mobile-390 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
 | /guide/onboarding | guide-onboarding--unavailable | specialist-candidate | unavailable | desktop-1440 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true},"interaction":"retry","provider":"unreachable"} |
 | /guide/onboarding | guide-onboarding--unavailable | specialist-candidate | unavailable | mobile-390 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true},"interaction":"retry","provider":"unreachable"} |
 | /guide/onboarding | guide-onboarding--ready | specialist-candidate | ready | desktop-1440 | utility | traveler | task | utility | none | specialist:draft | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
+| /guide/onboarding | guide-onboarding--ready | specialist-candidate | ready | tablet-landscape | utility | traveler | task | utility | none | specialist:draft | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
+| /guide/onboarding | guide-onboarding--ready | specialist-candidate | ready | tablet-portrait | utility | traveler | task | utility | none | specialist:draft | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
 | /guide/onboarding | guide-onboarding--ready | specialist-candidate | ready | mobile-390 | utility | traveler | task | utility | none | specialist:draft | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
 | /guide/onboarding | guide-onboarding--loading | specialist-candidate | loading | desktop-1440 | utility | traveler | task | utility | none | specialist:draft | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
 | /guide/onboarding | guide-onboarding--loading | specialist-candidate | loading | mobile-390 | utility | traveler | task | utility | none | specialist:draft | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
@@ -745,14 +703,14 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /guide/onboarding | guide-onboarding--saved | specialist-candidate | saved | mobile-390 | utility | traveler | task | utility | none | specialist:saved | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true},"interaction":"save"} |
 | /guide/onboarding | guide-onboarding--error | specialist-candidate | error | desktop-1440 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true},"interaction":"retry"} |
 | /guide/onboarding | guide-onboarding--error | specialist-candidate | error | mobile-390 | utility | traveler | task | utility | none | specialist:new | render | — | no | {"flags":{"ENABLE_GUIDE_BETA":true},"interaction":"retry"} |
-| /guide/onboarding | guide-onboarding--specialist-new | specialist-candidate | disabled | desktop-1440 | utility | traveler | task | utility | none | specialist:new | render | onboarding is available only after eligibility | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
-| /guide/onboarding | guide-onboarding--specialist-new | specialist-candidate | disabled | mobile-390 | utility | traveler | task | utility | none | specialist:new | render | onboarding is available only after eligibility | no | {"flags":{"ENABLE_GUIDE_BETA":true}} |
+| /guide/onboarding | guide-onboarding--specialist-new | specialist-candidate | disabled | desktop-1440 | utility | traveler | task | utility | none | specialist:new | render | onboarding is available only after eligibility | no | {"flags":{"ENABLE_GUIDE_BETA":false}} |
+| /guide/onboarding | guide-onboarding--specialist-new | specialist-candidate | disabled | mobile-390 | utility | traveler | task | utility | none | specialist:new | render | onboarding is available only after eligibility | no | {"flags":{"ENABLE_GUIDE_BETA":false}} |
 | /b2b | b2b--ready | public | ready | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
 | /b2b | b2b--ready | public | ready | tablet-landscape | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
 | /b2b | b2b--ready | public | ready | tablet-portrait | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
 | /b2b | b2b--ready | public | ready | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
-| /b2b | b2b--disabled | public | disabled | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
-| /b2b | b2b--disabled | public | disabled | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
+| /b2b | b2b--disabled | public | disabled | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":false}} |
+| /b2b | b2b--disabled | public | disabled | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":false}} |
 | /b2b | b2b--ineligible | public | ineligible | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
 | /b2b | b2b--ineligible | public | ineligible | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
 | /b2b | b2b--unavailable | public | unavailable | desktop-1440 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true},"interaction":"retry","provider":"unreachable"} |
@@ -761,10 +719,10 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /b2b | b2b--error | public | error | mobile-390 | utility | public | public | compact | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true},"interaction":"retry"} |
 | /b2b/[orgSlug] | b2b-[orgSlug]--anonymous | anonymous | unauthorized | desktop-1440 | utility | traveler | task | none | none | static | redirect | — | yes | — |
 | /b2b/[orgSlug] | b2b-[orgSlug]--anonymous | anonymous | unauthorized | mobile-390 | utility | traveler | task | none | none | static | redirect | — | yes | — |
-| /b2b/[orgSlug] | b2b-[orgSlug]--disabled | traveler | disabled | desktop-1440 | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
-| /b2b/[orgSlug] | b2b-[orgSlug]--disabled | traveler | disabled | tablet-landscape | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
-| /b2b/[orgSlug] | b2b-[orgSlug]--disabled | traveler | disabled | tablet-portrait | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
-| /b2b/[orgSlug] | b2b-[orgSlug]--disabled | traveler | disabled | mobile-390 | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
+| /b2b/[orgSlug] | b2b-[orgSlug]--disabled | traveler | disabled | desktop-1440 | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":false}} |
+| /b2b/[orgSlug] | b2b-[orgSlug]--disabled | traveler | disabled | tablet-landscape | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":false}} |
+| /b2b/[orgSlug] | b2b-[orgSlug]--disabled | traveler | disabled | tablet-portrait | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":false}} |
+| /b2b/[orgSlug] | b2b-[orgSlug]--disabled | traveler | disabled | mobile-390 | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":false}} |
 | /b2b/[orgSlug] | b2b-[orgSlug]--ineligible | traveler | ineligible | desktop-1440 | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
 | /b2b/[orgSlug] | b2b-[orgSlug]--ineligible | traveler | ineligible | mobile-390 | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true}} |
 | /b2b/[orgSlug] | b2b-[orgSlug]--unavailable | traveler | unavailable | desktop-1440 | utility | traveler | task | none | none | static | render | — | no | {"flags":{"ENABLE_B2B_BETA":true},"interaction":"retry","provider":"unreachable"} |
@@ -775,19 +733,15 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /api/v1/docs | api-v1-docs--anonymous | anonymous | unauthorized | mobile-390 | utility | operator | operator | none | none | static | redirect | — | yes | {"flags":{"ENABLE_API_DOCS":true}} |
 | /api/v1/docs | api-v1-docs--limited-capability | limited-admin | forbidden | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | yes | {"flags":{"ENABLE_API_DOCS":true}} |
 | /api/v1/docs | api-v1-docs--limited-capability | limited-admin | forbidden | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | yes | {"flags":{"ENABLE_API_DOCS":true}} |
-| /api/v1/docs | api-v1-docs--empty | admin | empty | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
-| /api/v1/docs | api-v1-docs--empty | admin | empty | tablet-landscape | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
-| /api/v1/docs | api-v1-docs--empty | admin | empty | tablet-portrait | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
-| /api/v1/docs | api-v1-docs--empty | admin | empty | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
-| /api/v1/docs | api-v1-docs--populated | admin | populated | desktop-1440 | utility | operator | operator | none | none | operator:populated | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
-| /api/v1/docs | api-v1-docs--populated | admin | populated | mobile-390 | utility | operator | operator | none | none | operator:populated | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
+| /api/v1/docs | api-v1-docs--disabled | admin | disabled | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":false}} |
+| /api/v1/docs | api-v1-docs--disabled | admin | disabled | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":false}} |
+| /api/v1/docs | api-v1-docs--ready | admin | ready | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
+| /api/v1/docs | api-v1-docs--ready | admin | ready | tablet-landscape | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
+| /api/v1/docs | api-v1-docs--ready | admin | ready | tablet-portrait | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
+| /api/v1/docs | api-v1-docs--ready | admin | ready | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
 | /api/v1/docs | api-v1-docs--loading | admin | loading | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
 | /api/v1/docs | api-v1-docs--loading | admin | loading | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
 | /api/v1/docs | api-v1-docs--unavailable | admin | unavailable | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true},"interaction":"retry","provider":"unreachable"} |
 | /api/v1/docs | api-v1-docs--unavailable | admin | unavailable | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true},"interaction":"retry","provider":"unreachable"} |
 | /api/v1/docs | api-v1-docs--error | admin | error | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true},"interaction":"retry"} |
 | /api/v1/docs | api-v1-docs--error | admin | error | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true},"interaction":"retry"} |
-| /api/v1/docs | api-v1-docs--disabled | admin | disabled | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
-| /api/v1/docs | api-v1-docs--disabled | admin | disabled | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
-| /api/v1/docs | api-v1-docs--ready | admin | ready | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
-| /api/v1/docs | api-v1-docs--ready | admin | ready | mobile-390 | utility | operator | operator | none | none | operator:empty | render | — | no | {"flags":{"ENABLE_API_DOCS":true}} |
