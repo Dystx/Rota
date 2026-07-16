@@ -6,7 +6,7 @@
     "files": ["/fonts/newsreader/Newsreader-Variable.ttf"],
     "sha256": ["8a08d13f8a6c0d51be379a60af84f945f65369a67e509ee3c3bdcc421254d7c1"],
     "licenseFile": "/fonts/licenses/Newsreader-OFL.txt",
-    "licenseSha256": "fdfad38143ec470553cae82a1e45320bdd1b9ec70415d37bd0171051d8a4ded8",
+    "licenseSha256": "afdae9053282ba66bbacbc4cb20ad20b12ef46379ac587fd464fe3ff8ce1cd4a",
     "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/newsreader",
     "licenseUrl": "https://scripts.sil.org/OFL"
   },
@@ -17,7 +17,7 @@
     "files": ["/fonts/source-sans-3/SourceSans3-Variable.ttf"],
     "sha256": ["042fe2cc0b933e328410d7acbd0aa6a1873dca5aef81875f4bc214b08825c7b9"],
     "licenseFile": "/fonts/licenses/SourceSans3-OFL.txt",
-    "licenseSha256": "09746787287a289323b0ec3cff4d1a4a801331b82b7207c1e186f5d26619a392",
+    "licenseSha256": "7fac2f6c6bc47144e2c35e8f41147b3c8c895490d44b46266a5312fe93364d2e",
     "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/sourcesans3",
     "licenseUrl": "https://scripts.sil.org/OFL"
   },
@@ -36,7 +36,7 @@
       "d3c38e55c78f5b0f28009fddba4834ec503278936a5986032424c9bd2d23aa46"
     ],
     "licenseFile": "/fonts/licenses/IBMPlexMono-OFL.txt",
-    "licenseSha256": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da",
+    "licenseSha256": "d741e57d5f865e294df801f96b7b5161a88b211df65887e4358d271c9fc5fb4f",
     "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/ibmplexmono",
     "licenseUrl": "https://scripts.sil.org/OFL"
   }
