@@ -1,4 +1,5 @@
 import Link from "next/link";
+import * as React from "react";
 import type { ReactNode } from "react";
 import { PublicRouteLayout } from "./public-route-layout";
 
@@ -32,11 +33,7 @@ export function LegalPage({
 }: LegalPageProps) {
   return (
     <PublicRouteLayout scene="utility" footerMode="compact" surfaceTone="linen" surfaceTexture="none">
-      <div
-        className="rumia-legal-page rumia-surface rumia-surface-linen"
-        data-surface="linen"
-        data-surface-texture="editorial"
-      >
+      <div className="rumia-legal-page">
         <article className="rumia-legal-document mx-auto w-full max-w-[76rem] px-container-padding-sm md:px-container-padding-lg">
           <header className="rumia-legal-header">
             <div>
