@@ -11,10 +11,12 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { loadSessionOutcome, type SessionOutcome } from "@/lib/auth/session-outcome";
+import { isSessionProviderFailure, loadSessionOutcome, type SessionOutcome } from "@/lib/auth/session-outcome";
 import { loadCurrentAuthorizedActor } from "@/lib/auth/authorization";
 import {
   getSpecialistCapabilities,
+  isPersistenceConfigError,
+  isSchemaDriftError,
   setSpecialistCapabilities,
   upsertSpecialistProfile
 } from "@repo/db";
@@ -97,14 +99,22 @@ export type ProfileInput = z.infer<typeof ProfileInputSchema>;
 
 export type OnboardingResult =
   | { kind: "ok"; id: string }
-  | { kind: "error"; message: string };
+  | { kind: "error"; message: string }
+  | { kind: "unavailable"; message: string; retryable: true; status: 503 };
+
+const unavailableResult: OnboardingResult = {
+  kind: "unavailable",
+  message: "This service is temporarily unavailable. Please try again shortly.",
+  retryable: true,
+  status: 503
+};
 
 export async function submitSpecialistProfile(
   input: ProfileInput
 ): Promise<OnboardingResult> {
   const sessionOutcome = await loadSessionOutcome();
   if (sessionOutcome.kind === "unavailable") {
-    return { kind: "error", message: "This service is temporarily unavailable. Please try again shortly." };
+    return unavailableResult;
   }
   if (sessionOutcome.kind !== "ready") {
     return { kind: "error", message: "Not signed in" };
@@ -112,7 +122,7 @@ export async function submitSpecialistProfile(
   const userId = sessionOutcome.session.user.id;
   const actorOutcome = await loadCurrentAuthorizedActor(sessionOutcome);
   if (actorOutcome.kind === "unavailable") {
-    return { kind: "error", message: "This service is temporarily unavailable. Please try again shortly." };
+    return unavailableResult;
   }
   if (actorOutcome.kind !== "ready" || actorOutcome.actor.userId !== userId) {
     return { kind: "error", message: "Not signed in" };
@@ -173,9 +183,11 @@ export async function submitSpecialistProfile(
     revalidatePath("/guide/onboarding");
     revalidatePath("/admin/specialists");
     return { kind: "ok", id: result?.id ?? "" };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { kind: "error", message };
+  } catch (error) {
+    if (isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error)) {
+      return unavailableResult;
+    }
+    throw error;
   }
 }
 
