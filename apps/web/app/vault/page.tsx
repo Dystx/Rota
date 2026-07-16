@@ -26,7 +26,9 @@ export default async function VaultPage() {
   }
 
   const { user } = currentUser;
-  const actorOutcome = user ? await loadCurrentAuthorizedActorOutcome() : { kind: "anonymous" as const };
+  const actorOutcome = user
+    ? await loadCurrentAuthorizedActorOutcome(currentUser.sessionOutcome)
+    : { kind: "anonymous" as const };
   if (actorOutcome.kind === "unavailable") {
     return (
       <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">

@@ -37,6 +37,8 @@ export default async function ReviewerQueuePage() {
     authContext = await getReviewerPageAuthContext();
     if (!authContext) {
       notSignedIn = true;
+    } else if ("reason" in authContext) {
+      errorMessage = "Reviewer queue is temporarily unavailable. Please try again shortly.";
     } else {
       const { actor, reviewerId } = authContext;
       const assignments = await listReviewerAssignments(100, reviewerId, { actor });

@@ -46,6 +46,8 @@ export default async function ReviewerTripPage({
 
     if (!auth) {
       infoMessage = "Sign in with a reviewer account to open this reviewer trip workspace.";
+    } else if ("reason" in auth) {
+      errorMessage = "Reviewer trip workspace is temporarily unavailable. Please try again shortly.";
     } else {
       if (!(await reviewerHasTripAssignment(tripId, auth.reviewerId, { actor: auth.actor }))) {
         infoMessage = "This trip is not assigned to your reviewer account.";

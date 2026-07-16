@@ -8,16 +8,33 @@ export type ReviewerPageAuthContext = {
   userId: string;
 };
 
-export const getReviewerPageAuthContext = cache(async (): Promise<ReviewerPageAuthContext | null> => {
-  const actor = await loadCurrentAuthorizedActor();
+export type ReviewerPageAuthResult =
+  | ReviewerPageAuthContext
+  | { reason: "unavailable"; status: 503 }
+  | null;
 
-  if (!actor?.roles.includes("reviewer") || !actor.reviewerId) {
+export function isReviewerPageAuthContext(result: ReviewerPageAuthResult): result is ReviewerPageAuthContext {
+  return Boolean(result && "actor" in result);
+}
+
+export const getReviewerPageAuthContext = cache(async (): Promise<ReviewerPageAuthResult> => {
+  const outcome = await loadCurrentAuthorizedActor();
+
+  if (outcome.kind === "unavailable") {
+    return { reason: "unavailable", status: 503 };
+  }
+
+  if (outcome.kind !== "ready" || !outcome.actor.roles.includes("reviewer")) {
     return null;
   }
 
+  const actor = outcome.actor;
+  const reviewerId = actor.reviewerId;
+  if (!reviewerId) return null;
+
   return {
     actor,
-    reviewerId: actor.reviewerId,
+    reviewerId,
     userId: actor.userId
   };
 });

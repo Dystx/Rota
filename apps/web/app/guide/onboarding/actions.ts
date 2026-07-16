@@ -11,7 +11,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentUserId } from "@/lib/auth/current-user";
+import { loadSessionOutcome, type SessionOutcome } from "@/lib/auth/session-outcome";
 import { loadCurrentAuthorizedActor } from "@/lib/auth/authorization";
 import {
   getSpecialistCapabilities,
@@ -102,11 +102,22 @@ export type OnboardingResult =
 export async function submitSpecialistProfile(
   input: ProfileInput
 ): Promise<OnboardingResult> {
-  const userId = await getCurrentUserId();
-  const actor = await loadCurrentAuthorizedActor();
-  if (!userId || !actor || actor.userId !== userId) {
+  const sessionOutcome = await loadSessionOutcome();
+  if (sessionOutcome.kind === "unavailable") {
+    return { kind: "error", message: "This service is temporarily unavailable. Please try again shortly." };
+  }
+  if (sessionOutcome.kind !== "ready") {
     return { kind: "error", message: "Not signed in" };
   }
+  const userId = sessionOutcome.session.user.id;
+  const actorOutcome = await loadCurrentAuthorizedActor(sessionOutcome);
+  if (actorOutcome.kind === "unavailable") {
+    return { kind: "error", message: "This service is temporarily unavailable. Please try again shortly." };
+  }
+  if (actorOutcome.kind !== "ready" || actorOutcome.actor.userId !== userId) {
+    return { kind: "error", message: "Not signed in" };
+  }
+  const actor = actorOutcome.actor;
 
   const parsed = ProfileInputSchema.safeParse(input);
   if (!parsed.success) {
@@ -173,13 +184,16 @@ export async function submitSpecialistProfile(
  * capabilities. Used by the page (server component)
  * to seed the form state.
  */
-export async function loadSpecialistCapabilities(): Promise<{
+export async function loadSpecialistCapabilities(sessionOutcome?: SessionOutcome): Promise<{
   skills: readonly string[];
   languages: readonly string[];
 }> {
-  const userId = await getCurrentUserId();
-  const actor = await loadCurrentAuthorizedActor();
-  if (!userId || !actor || actor.userId !== userId) return { skills: [], languages: [] };
+  const current = sessionOutcome ?? (await loadSessionOutcome());
+  if (current.kind !== "ready") return { skills: [], languages: [] };
+  const userId = current.session.user.id;
+  const actorOutcome = await loadCurrentAuthorizedActor(current);
+  if (actorOutcome.kind !== "ready" || actorOutcome.actor.userId !== userId) return { skills: [], languages: [] };
+  const actor = actorOutcome.actor;
   const { getSpecialistProfileByUserId } = await import("@repo/db");
   const profile = await getSpecialistProfileByUserId(userId, { actor });
   if (!profile) return { skills: [], languages: [] };

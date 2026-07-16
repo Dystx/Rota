@@ -35,7 +35,7 @@ export default async function ReviewerLayout({
   const currentPath = headerList.get("x-pathname") ?? headerList.get("next-url") ?? "/reviewer/queue";
   const sessionOutcome = await loadSessionOutcome();
   if (sessionOutcome.kind === "unavailable") {
-    return <RouteRecovery kind="unavailable" />;
+    return <RouteRecovery kind="unavailable" landmark="document" />;
   }
   if (sessionOutcome.kind !== "ready") {
     redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
@@ -43,7 +43,7 @@ export default async function ReviewerLayout({
 
   const actorOutcome = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
   if (actorOutcome.kind === "unavailable") {
-    return <RouteRecovery kind="unavailable" />;
+    return <RouteRecovery kind="unavailable" landmark="document" />;
   }
   if (actorOutcome.kind !== "ready" || !actorOutcome.actor.roles.includes("reviewer") || !actorOutcome.actor.reviewerId) {
     redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);

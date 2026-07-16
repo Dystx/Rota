@@ -32,7 +32,8 @@ describe("RouteRecovery", () => {
 
     expect(screen.getAllByRole("main")).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1, name: "We hit a detour" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Return home" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Get support" })).toBeInTheDocument();
   });
 
   it("hands retry back to the segment boundary", () => {

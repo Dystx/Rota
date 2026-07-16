@@ -42,7 +42,11 @@ export default async function GuideOnboardingPage() {
 
   const sessionOutcome = await loadSessionOutcome();
   if (sessionOutcome.kind === "unavailable") {
-    return <RouteRecovery kind="unavailable" />;
+    return (
+      <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
+        <RouteRecovery kind="unavailable" />
+      </PublicRouteLayout>
+    );
   }
   if (sessionOutcome.kind !== "ready") {
     redirect("/sign-in?next=/guide/onboarding");
@@ -51,7 +55,11 @@ export default async function GuideOnboardingPage() {
   const userId = sessionOutcome.session.user.id;
   const actorOutcome = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
   if (actorOutcome.kind === "unavailable") {
-    return <RouteRecovery kind="unavailable" />;
+    return (
+      <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
+        <RouteRecovery kind="unavailable" />
+      </PublicRouteLayout>
+    );
   }
   if (actorOutcome.kind !== "ready" || actorOutcome.actor.userId !== userId) {
     redirect("/sign-in?next=/guide/onboarding");
@@ -63,7 +71,7 @@ export default async function GuideOnboardingPage() {
   // separate table. Only load them when the specialist
   // row exists; for a new user the form starts empty.
   const initialCapabilities = existing
-    ? await loadSpecialistCapabilities()
+    ? await loadSpecialistCapabilities(sessionOutcome)
     : { skills: [], languages: [] };
 
   return (

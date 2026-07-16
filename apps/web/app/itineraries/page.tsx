@@ -39,7 +39,7 @@ export default async function ItinerariesPage({
   }
 
   const { notice } = await searchParams;
-  const actorOutcome = await loadCurrentAuthorizedActorOutcome();
+  const actorOutcome = await loadCurrentAuthorizedActorOutcome(currentUser.sessionOutcome);
   if (actorOutcome.kind === "unavailable") {
     return (
       <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">

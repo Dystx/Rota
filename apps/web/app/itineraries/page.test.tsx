@@ -40,6 +40,25 @@ describe("ItinerariesPage recovery", () => {
     expect(getTripsForUser).not.toHaveBeenCalled();
   });
 
+  it("passes the ready probe to authorization instead of probing session twice", async () => {
+    const sessionOutcome = {
+      kind: "ready",
+      session: { user: { id: "traveler-1", email: "traveler@example.test" }, session: { id: "session-1" } }
+    } as const;
+    getCurrentUser.mockResolvedValue({
+      outcome: "ready",
+      sessionOutcome,
+      user: sessionOutcome.session.user,
+      session: sessionOutcome.session.session
+    });
+    loadCurrentAuthorizedActorOutcome.mockResolvedValue({ kind: "anonymous" });
+
+    await ItinerariesPage({ searchParams: Promise.resolve({}) });
+
+    expect(loadCurrentAuthorizedActorOutcome).toHaveBeenCalledOnce();
+    expect(loadCurrentAuthorizedActorOutcome).toHaveBeenCalledWith(sessionOutcome);
+  });
+
   it("keeps anonymous access as a redirect rather than an outage", async () => {
     getCurrentUser.mockResolvedValue({ outcome: "anonymous", user: null, session: null });
 

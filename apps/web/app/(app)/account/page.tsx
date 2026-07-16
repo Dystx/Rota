@@ -9,7 +9,7 @@ import {
   EmptyState,
   SectionHeading
 } from "@repo/ui";
-import { getTripsForUser, isPersistenceConfigError } from "@repo/db";
+import { getTripsForUser } from "@repo/db";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
 import { RouteRecovery } from "@/app/_components/route-recovery";
@@ -57,7 +57,7 @@ export default async function AccountPage() {
   let trips: Awaited<ReturnType<typeof getTripsForUser>> = [];
   let infoMessage = "";
   try {
-    const actorOutcome = await loadCurrentAuthorizedActorOutcome();
+    const actorOutcome = await loadCurrentAuthorizedActorOutcome(currentUser.sessionOutcome);
     if (actorOutcome.kind === "unavailable") {
       return <RouteRecovery kind="unavailable" />;
     }
@@ -67,12 +67,8 @@ export default async function AccountPage() {
     } else {
       trips = await getTripsForUser(user.id, 24, { actor });
     }
-  } catch (error) {
-    infoMessage = isPersistenceConfigError(error)
-      ? "Configure PostgreSQL and Better Auth environment variables to load saved draft trips here."
-      : error instanceof Error
-        ? error.message
-        : "Could not load saved trips.";
+  } catch {
+    return <RouteRecovery kind="unavailable" />;
   }
 
   return (

@@ -31,7 +31,7 @@ function formData(file: File) {
 describe("uploadSpecialistPortrait", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.userId.mockResolvedValue(userId);
+    mocks.userId.mockResolvedValue({ kind: "ready", userId });
     mocks.upload.mockResolvedValue({ error: null });
     mocks.createSignedUrl.mockResolvedValue({
       data: { signedUrl: "https://signed.example.test/portrait" },

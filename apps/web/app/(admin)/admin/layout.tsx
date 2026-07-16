@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const sessionOutcome = await loadSessionOutcome();
   if (sessionOutcome.kind === "unavailable") {
-    return <RouteRecovery kind="unavailable" />;
+    return <RouteRecovery kind="unavailable" landmark="document" />;
   }
 
   const auth = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
@@ -38,7 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   if (auth.kind === "unavailable") {
-    return <RouteRecovery kind="unavailable" />;
+    return <RouteRecovery kind="unavailable" landmark="document" />;
   }
 
   if (auth.kind === "anonymous") {

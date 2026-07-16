@@ -13,8 +13,8 @@ export type AdminPageAuthContext = {
 export type AdminPageAuthResult =
   | AdminPageAuthContext
   | {
-      reason: "unauthenticated" | "forbidden";
-      status: 401 | 403;
+      reason: "unauthenticated" | "forbidden" | "unavailable";
+      status: 401 | 403 | 503;
     };
 
 export function isAdminPageAuthContext(result: AdminPageAuthResult): result is AdminPageAuthContext {
@@ -22,11 +22,17 @@ export function isAdminPageAuthContext(result: AdminPageAuthResult): result is A
 }
 
 export const getAdminPageAuthContext = cache(async (): Promise<AdminPageAuthResult> => {
-  const actor = await loadCurrentAuthorizedActor();
+  const outcome = await loadCurrentAuthorizedActor();
 
-  if (!actor) {
+  if (outcome.kind === "unavailable") {
+    return { reason: "unavailable", status: 503 };
+  }
+
+  if (outcome.kind === "anonymous") {
     return { reason: "unauthenticated", status: 401 };
   }
+
+  const actor = outcome.actor;
 
   if (!actor.roles.includes("admin")) {
     return { reason: "forbidden", status: 403 };

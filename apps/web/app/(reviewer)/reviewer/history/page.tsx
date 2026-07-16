@@ -17,6 +17,8 @@ export default async function ReviewerHistoryPage() {
 
     if (!auth) {
       notSignedIn = true;
+    } else if ("reason" in auth) {
+      errorMessage = "Reviewer history is temporarily unavailable. Please try again shortly.";
     } else {
       reviewer = await getReviewerById(auth.reviewerId, { actor: auth.actor });
       assignments = await listReviewerAssignments(20, auth.reviewerId, { actor: auth.actor });

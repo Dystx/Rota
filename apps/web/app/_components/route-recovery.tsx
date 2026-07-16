@@ -23,6 +23,7 @@ export function RouteRecovery({
   onRetry,
   landmark = "content"
 }: RouteRecoveryProps) {
+  const handleRetry = onRetry ?? (() => window.location.reload());
   const panel = (
     <DecisionStatePanel
       kind={kind}
@@ -31,22 +32,13 @@ export function RouteRecovery({
       title={kind === "unavailable" ? "This part of Rumia is temporarily unavailable" : "We hit a detour"}
       description="Your saved work has not been changed. Try again, or return to support."
       primaryAction={
-        onRetry ? (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-primary px-6 py-3 font-label-ui text-label-ui text-on-primary transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-          >
-            Try again
-          </button>
-        ) : (
-          <Link
-            href="/"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-primary px-6 py-3 font-label-ui text-label-ui text-on-primary transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-          >
-            Return home
-          </Link>
-        )
+        <button
+          type="button"
+          onClick={handleRetry}
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-primary px-6 py-3 font-label-ui text-label-ui text-on-primary transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+        >
+          Try again
+        </button>
       }
       secondaryAction={
         <Link

@@ -13,6 +13,8 @@ export default async function ReviewerProfilePage() {
 
     if (!auth) {
       notSignedIn = true;
+    } else if ("reason" in auth) {
+      errorMessage = "Reviewer profile is temporarily unavailable. Please try again shortly.";
     } else {
       reviewer = await getReviewerById(auth.reviewerId, { actor: auth.actor });
     }

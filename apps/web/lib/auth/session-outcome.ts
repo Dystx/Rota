@@ -30,6 +30,9 @@ const knownProviderCodes = new Set([
   "ETIMEDOUT",
   "ENOTFOUND",
   "EAI_AGAIN",
+  "ENETUNREACH",
+  "EHOSTUNREACH",
+  "EPIPE",
   "ERR_INVALID_URL",
   "57P01",
   "57P02",
@@ -47,14 +50,17 @@ function isForcedPersistenceFailure(environment: SessionEnvironment): boolean {
   return environment.PERSISTENCE_FAILURE_MODE === "missing-config" || environment.PERSISTENCE_FAILURE_MODE === "unreachable";
 }
 
+function providerCode(error: unknown, depth = 0): string | undefined {
+  if (!error || typeof error !== "object" || depth > 4) return undefined;
+  if ("code" in error && typeof error.code === "string") return error.code;
+  if ("cause" in error) return providerCode(error.cause, depth + 1);
+  return undefined;
+}
+
 /** Provider failures are safe to classify; arbitrary programming errors still reach the normal boundary. */
 export function isSessionProviderFailure(error: unknown): boolean {
-  return Boolean(
-    error &&
-      typeof error === "object" &&
-      "code" in error &&
-      knownProviderCodes.has(String(error.code))
-  );
+  const code = providerCode(error);
+  return code ? knownProviderCodes.has(code) : false;
 }
 
 /**

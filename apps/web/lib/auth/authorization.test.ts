@@ -1,6 +1,24 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { requireApiAccess, resourceNotFound } from "./authorization";
+const { loadSessionOutcome, loadPostgresAuthorizationContext } = vi.hoisted(() => ({
+  loadSessionOutcome: vi.fn(),
+  loadPostgresAuthorizationContext: vi.fn()
+}));
+
+vi.mock("./session-outcome", async () => {
+  const actual = await vi.importActual<typeof import("./session-outcome")>("./session-outcome");
+  return { ...actual, loadSessionOutcome };
+});
+vi.mock("@repo/db", () => ({
+  isPersistenceConfigError: vi.fn(() => false),
+  loadPostgresAuthorizationContext
+}));
+
+import { loadCurrentAuthorizedActor, requireApiAccess, resourceNotFound } from "./authorization";
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 describe("requireApiAccess", () => {
   it("uses database capabilities for secure decisions", async () => {
@@ -55,5 +73,36 @@ describe("resourceNotFound", () => {
 
     expect(response.status).toBe(404);
     await expect(response.json()).resolves.toEqual({ code: "not_found", message: "Resource not found." });
+  });
+});
+
+describe("loadCurrentAuthorizedActor", () => {
+  it("preserves an unavailable session outcome", async () => {
+    loadSessionOutcome.mockResolvedValue({ kind: "unavailable" });
+
+    await expect(loadCurrentAuthorizedActor()).resolves.toEqual({ kind: "unavailable" });
+    expect(loadPostgresAuthorizationContext).not.toHaveBeenCalled();
+  });
+
+  it("reuses an explicit session outcome without a second session probe", async () => {
+    const sessionOutcome = {
+      kind: "ready",
+      session: { user: { id: "u1" }, session: { id: "s1" } }
+    } as unknown as import("./session-outcome").SessionOutcome;
+    loadSessionOutcome.mockResolvedValue(sessionOutcome);
+    loadPostgresAuthorizationContext.mockResolvedValue({
+      userId: "u1",
+      roles: ["traveler"],
+      capabilities: [],
+      reviewerId: null
+    });
+
+    const first = await loadCurrentAuthorizedActor();
+    const second = await loadCurrentAuthorizedActor(sessionOutcome);
+
+    expect(first.kind).toBe("ready");
+    expect(second.kind).toBe("ready");
+    expect(loadSessionOutcome).toHaveBeenCalledOnce();
+    expect(loadPostgresAuthorizationContext).toHaveBeenCalledTimes(2);
   });
 });

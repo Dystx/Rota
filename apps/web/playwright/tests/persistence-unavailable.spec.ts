@@ -15,6 +15,7 @@ test.describe("@persistence-unavailable bounded recovery", () => {
         level: 1,
         name: "This part of Rumia is temporarily unavailable"
       })).toBeVisible({ timeout: 5_000 });
+      await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
       await expect(page.getByRole("link", { name: "Get support" })).toHaveAttribute("href", "/support");
       await expect(page.locator("body")).not.toContainText(providerDiagnostics);
       await expect(page.locator("[data-testid$='-loading'], [data-testid='root-loading']")).toHaveCount(0);

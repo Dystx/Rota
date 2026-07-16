@@ -69,8 +69,12 @@ async function validatePortraitBytes(file: File): Promise<string | null> {
 export async function uploadSpecialistPortrait(
   formData: FormData
 ): Promise<PortraitUploadResult> {
-  const userId = await getCurrentUserId();
-  if (!userId) return { kind: "error", message: "Not signed in" };
+  const userOutcome = await getCurrentUserId();
+  if (userOutcome.kind === "unavailable") {
+    return { kind: "unavailable", message: "Portrait uploads are temporarily unavailable. Please try again later." };
+  }
+  if (userOutcome.kind !== "ready") return { kind: "error", message: "Not signed in" };
+  const userId = userOutcome.userId;
 
   const candidate = formData.get("portrait");
   const parsed = portraitUploadSchema.safeParse({ file: candidate });

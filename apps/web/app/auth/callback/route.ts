@@ -15,6 +15,15 @@ import { safeNext } from "../safe-next";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const next = safeNext(searchParams.get("next"));
-  const actor = await loadCurrentAuthorizedActor();
-  return NextResponse.redirect(new URL(actor ? resolveRoleCompatibleNext(next, actor) : `/sign-in?next=${encodeURIComponent(next)}`, origin));
+  const actorOutcome = await loadCurrentAuthorizedActor();
+  if (actorOutcome.kind === "unavailable") {
+    return NextResponse.json(
+      { code: "unavailable", message: "This service is temporarily unavailable." },
+      { status: 503 }
+    );
+  }
+  const destination = actorOutcome.kind === "ready"
+    ? resolveRoleCompatibleNext(next, actorOutcome.actor)
+    : `/sign-in?next=${encodeURIComponent(next)}`;
+  return NextResponse.redirect(new URL(destination, origin));
 }

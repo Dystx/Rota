@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createSessionOutcomeLoader } from "./session-outcome";
+import { createSessionOutcomeLoader, isSessionProviderFailure } from "./session-outcome";
 
 const validTestEnvironment = {
   DATABASE_URL: "postgresql://127.0.0.1:5432/rumia",
@@ -97,5 +97,25 @@ describe("createSessionOutcomeLoader", () => {
     });
 
     await expect(load()).rejects.toBe(failure);
+  });
+
+  it.each(["ENETUNREACH", "EHOSTUNREACH", "EPIPE"])("classifies %s network failures", (code) => {
+    expect(isSessionProviderFailure(Object.assign(new Error("network"), { code }))).toBe(true);
+  });
+
+  it("classifies a known provider code nested in cause", () => {
+    const nested = new Error("wrapped provider failure", {
+      cause: Object.assign(new Error("connection refused"), { code: "ECONNREFUSED" })
+    });
+
+    expect(isSessionProviderFailure(nested)).toBe(true);
+  });
+
+  it("does not classify unknown nested programming failures", () => {
+    const nested = new Error("unexpected programming failure", {
+      cause: Object.assign(new Error("bug"), { code: "ERR_ASSERTION" })
+    });
+
+    expect(isSessionProviderFailure(nested)).toBe(false);
   });
 });

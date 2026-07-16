@@ -47,6 +47,8 @@ export default async function ReviewerOperationsPage() {
     const authContext = await getReviewerPageAuthContext();
     if (!authContext) {
       infoMessage = "Sign in with a linked reviewer account to interact with the live operations console.";
+    } else if ("reason" in authContext) {
+      infoMessage = "Reviewer operations are temporarily unavailable. Please try again shortly.";
     }
   } catch (error) {
     if (isPersistenceConfigError(error)) {

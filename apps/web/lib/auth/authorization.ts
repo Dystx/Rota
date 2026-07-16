@@ -39,10 +39,11 @@ export async function loadCurrentAuthorizedActorOutcome(
   }
 }
 
-/** Backward-compatible actor helper for existing API/page callers. */
-export async function loadCurrentAuthorizedActor(): Promise<AuthorizedActor | null> {
-  const outcome = await loadCurrentAuthorizedActorOutcome();
-  return outcome.kind === "ready" ? outcome.actor : null;
+/** Compatibility actor helper that preserves unavailable instead of mapping it to anonymous. */
+export async function loadCurrentAuthorizedActor(
+  sessionOutcome?: SessionOutcome
+): Promise<AuthorizedActorOutcome> {
+  return loadCurrentAuthorizedActorOutcome(sessionOutcome);
 }
 
 export async function requireApiAccess(

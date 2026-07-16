@@ -46,4 +46,23 @@ describe("VaultPage recovery", () => {
     expect(screen.getByTestId("vault-gallery")).toHaveTextContent("0");
     expect(loadCurrentAuthorizedActorOutcome).not.toHaveBeenCalled();
   });
+
+  it("passes the ready probe to authorization instead of probing session twice", async () => {
+    const sessionOutcome = {
+      kind: "ready",
+      session: { user: { id: "traveler-1", email: "traveler@example.test" }, session: { id: "session-1" } }
+    } as const;
+    getCurrentUser.mockResolvedValue({
+      outcome: "ready",
+      sessionOutcome,
+      user: sessionOutcome.session.user,
+      session: sessionOutcome.session.session
+    });
+    loadCurrentAuthorizedActorOutcome.mockResolvedValue({ kind: "anonymous" });
+
+    await VaultPage();
+
+    expect(loadCurrentAuthorizedActorOutcome).toHaveBeenCalledOnce();
+    expect(loadCurrentAuthorizedActorOutcome).toHaveBeenCalledWith(sessionOutcome);
+  });
 });
