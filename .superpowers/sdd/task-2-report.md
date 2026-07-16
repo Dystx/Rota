@@ -1,322 +1,168 @@
-# Task 2 — Accessible shared choice primitives
+# Task 2 — Explicit visual foundations
 
-## Scope
+## Status
 
-Added the six shared `@repo/ui` primitives and their focused tests:
+DONE. Committed as `4e31a1b` (`feat(frontend): enforce explicit visual foundations`) with follow-up `df414d3` (`fix(frontend): keep deferred media element stable`).
 
-- `ChoiceCard`
-- `ChoiceChipGroup`
-- `OptionSheet`
-- `TripContextBar`
-- `RouteConsequence`
-- `TripSummary`
+## Scope delivered
 
-The package owns structural `TripContextValues` and `ChoiceGroupOption` types. It does not import the app-local `TripChoiceDraft` type or create any persistence contract.
+- `AppLayout` now requires explicit `surface` and `surfaceTexture` markers; `PageShell` is content-only so route shells own the single `main` landmark and field.
+- `PublicRouteLayout` requires `scene`, `surfaceTone`, `surfaceTexture`, and `footerMode`, with an opt-out navigation mode for immersive product routes.
+- `RouteScene` declares `focalLayer` and emits inspectable scene/tone/bleed markers with cover, atlas, decision, and utility field tokens.
+- Marketing pages and utility surfaces listed in the brief were migrated to explicit route frames; the marketing group layout is presentation-neutral. Trip/account/support/auth shells declare their own surface/texture/footer ownership.
+- Public navigation is the four-link Portugal / How it works / Local expertise / Pricing set plus one `What is worth doing?` action to `/explore`; the duplicate Explore link and sign-in chrome were removed.
+- `CinematicMedia` preserves MP4 callers and adds mobile WebM, mobile MP4, desktop WebM ordering, a stable near-viewport video element with source attachment at a 300px root margin, offscreen/document-hidden pause, poster-only preference behavior, and desktop/mobile text-safe-zone variables.
+- Local OFL font binaries and notices are provenance-recorded with SHA-256 checks, local-only CSS assertions, and system fallback stacks. Motion/scene/media-safe responsive tokens were added.
+- Cinematic media/asset manifest metadata now records mobile safe zones and distinguishes Unsplash source licensing from Rumia-owned derivatives.
 
-## TDD evidence
+## Changed paths
 
-### RED
+All staged paths were limited to the Task 2 allowlist from `task-2-brief.md` (57 files, including the five local font binaries and three OFL notices). Unrelated dirty worktree files remain unstaged and untouched.
 
-Command:
+## Verification
 
-```sh
-pnpm --filter @repo/ui test -- choice-card choice-chip-group option-sheet trip-context-bar route-consequence trip-summary
-```
-
-Result: exit 1, with six expected failing suites. Each failure was an unresolved import for a component not yet created:
-
-```txt
-Failed to resolve import "./choice-card"
-Failed to resolve import "./choice-chip-group"
-Failed to resolve import "./option-sheet"
-Failed to resolve import "./trip-context-bar"
-Failed to resolve import "./route-consequence"
-Failed to resolve import "./trip-summary"
-```
-
-### GREEN
-
-The first implementation run exposed a focus-restoration failure for `OptionSheet`: the wrapper unmounted `Modal` before it observed `isOpen=false`. The sheet now remains mounted and delegates closed rendering to `Modal`, allowing its focus-restoration effect to run.
-
-Fresh verification commands:
+Focused shared suite:
 
 ```sh
-pnpm --filter @repo/ui test -- choice-card choice-chip-group option-sheet trip-context-bar route-consequence trip-summary
-pnpm --filter @repo/ui typecheck
+pnpm exec vitest run packages/ui/src/components/app-layout.test.tsx packages/ui/src/components/shell.test.tsx packages/ui/src/components/cinematic-media.test.tsx packages/ui/src/lib/media-preferences.test.ts apps/web/app/_components/public-route-layout.test.tsx apps/web/app/_components/route-scene.test.tsx apps/web/app/_components/site-footer.test.tsx apps/web/app/_components/top-nav.test.tsx apps/web/content/font-provenance.test.ts apps/web/content/cinematic-media-manifest.test.ts
 ```
 
-Result:
-
-```txt
-Test Files  33 passed (33)
-Tests       158 passed (158)
-@repo/ui typecheck: tsc --noEmit (exit 0)
-```
-
-## Changed files
-
-- `packages/ui/src/components/choice-card.tsx`
-- `packages/ui/src/components/choice-card.test.tsx`
-- `packages/ui/src/components/choice-chip-group.tsx`
-- `packages/ui/src/components/choice-chip-group.test.tsx`
-- `packages/ui/src/components/option-sheet.tsx`
-- `packages/ui/src/components/option-sheet.test.tsx`
-- `packages/ui/src/components/trip-context-bar.tsx`
-- `packages/ui/src/components/trip-context-bar.test.tsx`
-- `packages/ui/src/components/route-consequence.tsx`
-- `packages/ui/src/components/route-consequence.test.tsx`
-- `packages/ui/src/components/trip-summary.tsx`
-- `packages/ui/src/components/trip-summary.test.tsx`
-- `packages/ui/src/index.ts`
-
-## Self-review
-
-- `ChoiceCard` is a native button with `role="radio"`, `aria-checked`, selected styling, keyboard activation, and a visible focus shadow.
-- `ChoiceChipGroup` reuses `ChipGroup`; its native buttons expose `aria-pressed` and preserve touch, pointer, and keyboard activation.
-- `OptionSheet` delegates dialog semantics, Escape/backdrop closing, focus trap, and focus restoration to the existing `Modal`.
-- `TripContextBar` offers an explicit, visible-focus edit button for each draft field.
-- `RouteConsequence` uses live status, alert/retry, ready, and idle states; its loading animation respects reduced-motion preference.
-- `TripSummary` contains one primary action and no secondary controls.
-- `ChoiceCard` only renders local, root-relative image paths, so the primitive does not render remote images.
-- `git diff --check` returned clean for tracked changes. The repository ESLint config ignores `packages/ui` files, producing warnings but no lint errors for the scoped command.
-
-## Concerns
-
-No blockers. The task's focused test command runs all UI package tests under the current Vitest configuration; all 158 tests passed. No visual browser test was added because the requested behaviors are covered by jsdom interaction tests and existing component primitives.
-
----
-
-## Review follow-up — Task 2 fixes
-
-### Changed files
-
-- `packages/ui/src/components/choice-card.tsx`
-- `packages/ui/src/components/choice-card.test.tsx`
-- `packages/ui/src/components/choice-chip-group.test.tsx`
-- `packages/ui/src/components/trip-summary.tsx`
-- `packages/ui/src/components/trip-summary.test.tsx`
-- `.superpowers/sdd/task-2-report.md`
-
-### Changes
-
-- `ChoiceCard` now accepts only root-relative image paths that begin with one slash; protocol-relative paths beginning with `//` are not rendered.
-- `ChoiceCard` activates selection for Enter and Space, matching the existing shared chip keyboard pattern.
-- `TripSummary` renders `1 day` and uses `days` for every other value.
-- Added Enter and Space activation assertions for `ChoiceCard` and `ChoiceChipGroup`, plus a regression test for rejected protocol-relative images and singular day wording.
-
-### Commands and outputs
-
-#### RED — regression coverage
+Result: `10` files and `31` tests passed before the deferred-media follow-up; the focused cinematic suite was rerun afterward with `9` tests passing. JSDOM prints its expected `HTMLMediaElement.prototype.play` not-implemented warning for autoplay tests; the test suite remains green and browser playback is guarded.
 
 ```sh
-pnpm --filter @repo/ui test -- choice-card choice-chip-group trip-summary
+pnpm qa:assets
+git diff --check
+pnpm typecheck
 ```
 
-Result: exit 1. `ChoiceCard` failed both new keyboard assertions because `onSelect` was not called, and failed the protocol-relative URL assertion because it rendered `//cdn.example.com/train.jpg`. `TripSummary` failed the new singular test because it rendered `1 days`. The new `ChoiceChipGroup` Enter and Space assertions passed via its existing `ChipGroup` keyboard behavior.
+All passed; typecheck completed all 15 workspace tasks successfully.
 
-```txt
-Test Files  1 failed | 32 passed (33)
-Tests       3 failed | 161 passed (164)
-```
+## Self-review and concerns
 
-#### Typecheck diagnostic
+- Existing user-owned changes in overlapping Task 2 paths were preserved; no reset, clean, broad staging, database/auth/schema change, or dev-server watcher was used.
+- The inherited Task 1 environment concern remains: its baseline Playwright setup encountered PostgreSQL `user_profiles` RLS. This task does not change DB/Auth and does not claim a browser baseline pass.
+- The focused JSDOM media tests intentionally exercise `play()` and therefore log JSDOM's unsupported-media warning; no unhandled test failures remain.
+
+## Review fix pass
+
+Reviewer findings were closed in `69c2f7f` (`fix(frontend): close shared foundation review gaps`):
+
+- Added and exported the standalone `NavigationSheet` component and focused test. The clean Task 2 head no longer relies on an uncommitted dirty UI index to compile `TopNav`.
+- Committed the explicit `LegalPage` consumers for `/privacy`, `/terms`, and `/sustainability`, so a clean checkout cannot retain implicit `PublicRouteLayout` props.
+- Removed the inner legal `rumia-surface`/texture ownership and added `legal-page.test.tsx` to assert the outer utility frame owns the field.
+- Kept the `df414d3` stable-video/source-attachment behavior unchanged.
+
+Fresh review-fix verification:
 
 ```sh
-pnpm --filter @repo/ui typecheck
+pnpm exec vitest run packages/ui/src/components/app-layout.test.tsx packages/ui/src/components/shell.test.tsx packages/ui/src/components/cinematic-media.test.tsx packages/ui/src/lib/media-preferences.test.ts packages/ui/src/components/navigation-sheet.test.tsx apps/web/app/_components/public-route-layout.test.tsx apps/web/app/_components/route-scene.test.tsx apps/web/app/_components/site-footer.test.tsx apps/web/app/_components/top-nav.test.tsx apps/web/app/_components/legal-page.test.tsx apps/web/content/font-provenance.test.ts apps/web/content/cinematic-media-manifest.test.ts
 ```
 
-Initial result: exit 2. Vitest's configured matcher types do not expose `toHaveBeenCalledExactlyOnceWith`.
-
-```txt
-src/components/choice-card.test.tsx(54,22): error TS2339: Property 'toHaveBeenCalledExactlyOnceWith' does not exist on type 'Assertion<Mock<Procedure>>'.
-```
-
-The assertion now combines the supported `toHaveBeenCalledOnce` and `toHaveBeenCalledWith` matchers, preserving the exact-one-call requirement.
-
-#### Fresh verification
+Result: `12` files and `33` tests passed (with the same expected JSDOM `HTMLMediaElement.prototype.play` warning).
 
 ```sh
-pnpm --filter @repo/ui typecheck
-pnpm --filter @repo/ui test -- choice-card choice-chip-group option-sheet trip-context-bar route-consequence trip-summary
-git diff --check -- packages/ui/src/components/choice-card.tsx packages/ui/src/components/choice-card.test.tsx packages/ui/src/components/choice-chip-group.test.tsx packages/ui/src/components/trip-summary.tsx packages/ui/src/components/trip-summary.test.tsx
+pnpm typecheck
+pnpm qa:assets
+git diff --check
 ```
 
-Result: all commands exited 0.
+All passed; typecheck completed all 15 workspace tasks successfully. No database/auth/schema files or unrelated dirty files were staged.
 
-```txt
-@repo/ui typecheck: tsc --noEmit
-Test Files  33 passed (33)
-Tests       164 passed (164)
-git diff --check: clean
-```
+## Review fix pass — clean-head dependency closure
 
-### Self-review
+The second review identified dependencies that had been present only in the dirty worktree. They are now closed in `f83109c` (`fix(frontend): close clean-head foundation dependencies`) without staging unrelated changes:
 
-```txt
-Verdict: pass
-Blocking issues: none
-Non-blocking issues: none
-Test gaps: none for the three requested review findings
-Suggested fixes: none
-Files reviewed:
-  - packages/ui/src/components/choice-card.tsx
-  - packages/ui/src/components/choice-card.test.tsx
-  - packages/ui/src/components/choice-chip-group.test.tsx
-  - packages/ui/src/components/trip-summary.tsx
-  - packages/ui/src/components/trip-summary.test.tsx
-```
+- Added `@base-ui/react` to `packages/ui/package.json` and staged only its importer, package, floating-ui, reselect, and snapshot entries in `pnpm-lock.yaml`; unrelated Wrangler, Next, and lockfile churn remains unstaged.
+- Committed the direct Task 2 route-frame dependencies `hero-editorial-media.tsx`, `portugal-editorial-chapter.tsx`, and `editorial-chapter-close.tsx`.
+- Committed `DecisionStatePanel` (source and test) because `/beta`, `/checkout`, and `/itineraries` import it from `@repo/ui`.
+- Committed `EditorialMedia` (source and test) because the Portugal editorial chapter imports it from `@repo/ui`.
+- Committed the activity-detail `ActivityDetailSaveAction` source and test used by the committed activity detail route.
+- Isolated the `side-sheet` export during the first clean-head pass; the follow-up dependency audit (closed in `3f97646` below) showed the committed itinerary export drawer requires it, so the final artifact includes its exact source/test.
+- Removed nested `rumia-surface`/`data-surface-texture="editorial"` ownership from `/offline`, leaving the outer utility frame's explicit `surfaceTexture="none"` authoritative.
 
-### Concerns
+The dependency classification is intentional: the route and UI callers are Task 2 committed surfaces; their missing helper/component files and the Base UI lock chain were pre-existing dirty/untracked dependencies. No database, auth, schema, or PNG files were staged.
 
-No blockers. The focused command runs all UI package tests under the current Vitest configuration rather than filtering to only the named test files; the complete package suite passed.
-
----
-
-## Review follow-up — single-select and image-source fixes
-
-### Changed files
-
-- `packages/ui/src/components/choice-chip-group.tsx`
-- `packages/ui/src/components/choice-chip-group.test.tsx`
-- `packages/ui/src/components/choice-card.test.tsx`
-
-### RED
-
-Command:
+Fresh focused verification:
 
 ```sh
-pnpm --filter @repo/ui test -- choice-card choice-chip-group
+pnpm exec vitest run packages/ui/src/components/app-layout.test.tsx packages/ui/src/components/shell.test.tsx packages/ui/src/components/cinematic-media.test.tsx packages/ui/src/lib/media-preferences.test.ts packages/ui/src/components/navigation-sheet.test.tsx packages/ui/src/components/decision-state-panel.test.tsx packages/ui/src/components/editorial-media.test.tsx apps/web/app/_components/public-route-layout.test.tsx apps/web/app/_components/route-scene.test.tsx apps/web/app/_components/site-footer.test.tsx apps/web/app/_components/top-nav.test.tsx apps/web/app/_components/legal-page.test.tsx 'apps/web/app/(marketing)/activities/[activityId]/_components/activity-detail-save-action.test.tsx' apps/web/content/font-provenance.test.ts apps/web/content/cinematic-media-manifest.test.ts
 ```
 
-Result: exit 1. The new direct `multiple={false}` tests found that `ChoiceChipGroup` always passed `multiple={true}` to `ChipGroup`: it exposed `role="group"` and `aria-pressed` buttons instead of a radiogroup and radios. The initial test run also caught a test-query issue for the intentionally empty-alt local image; that assertion was corrected to inspect the rendered image element directly.
-
-### GREEN
-
-Commands:
+Result: `15` files and `43` tests passed. JSDOM emitted only the expected `HTMLMediaElement.prototype.play` not-implemented warning from autoplay tests.
 
 ```sh
-pnpm --filter @repo/ui test -- choice-card choice-chip-group option-sheet trip-context-bar route-consequence trip-summary
-pnpm --filter @repo/ui typecheck
+pnpm typecheck
+pnpm qa:assets
+git diff --cached --check
+git diff --check
 ```
 
-Result: both commands exited 0.
+All passed; typecheck completed all 15 typecheck tasks across 16 packages in scope, and asset provenance checks remained green.
 
-```txt
-Test Files  33 passed (33)
-Tests       168 passed (168)
-@repo/ui typecheck: tsc --noEmit (exit 0)
+Clean-head import audit:
+
+```text
+Audited 61 changed TS/TSX files against HEAD.
+No missing local relative or @/ import targets.
 ```
 
-### Self-review
+This audit includes `packages/ui/src/index.ts` and confirms the committed route/helper/import chain resolves without relying on the remaining dirty worktree files.
 
-```txt
-Verdict: pass
-Blocking issues: none
-Non-blocking issues: none
-```
+## Final dependency closure
 
-- `ChoiceChipGroup` uses the shared `ChipGroup` single-select prop contract when `multiple={false}` and bridges its scalar callback to the public `string[]` API.
-- Direct single-select tests verify radiogroup/radio semantics, exactly one selected item from an over-specified input array, Arrow-key selection and focus movement, and a one-value callback array.
-- `ChoiceCard` image tests retain protocol-relative rejection and additionally verify root-relative asset acceptance plus absolute HTTPS rejection.
-- `git diff --check` is clean for the Task 2 files.
+The clean-head audit then followed the committed `/itineraries` chain through `ItinerarySearch` → `ItineraryExportDrawer` and found its `SideSheet`/`SideSheetClose` imports. `f83109c`'s temporary export removal was therefore corrected in `3f97646` (`fix(frontend): retain itinerary side sheet dependency`) by committing the exact `packages/ui/src/components/side-sheet.tsx` source and test and restoring that export. The Base UI dependency already staged in `f83109c` supplies the shared dialog implementation.
 
-### Concerns
-
-No blockers. The UI Vitest configuration retains rendered DOM between tests, so the keyboard regression test scopes its role queries to its own render container.
-
----
-
-## Review follow-up — image URL normalization guard
-
-### Changed files
-
-- `packages/ui/src/components/choice-card.tsx`
-- `packages/ui/src/components/choice-card.test.tsx`
-
-### RED
-
-Added a regression case for `imageSrc="/\\cdn.example.com/train.jpg"`.
+Final dependency verification:
 
 ```sh
-pnpm --filter @repo/ui test -- choice-card
+pnpm --filter web exec tsc --noEmit --pretty false
 ```
 
-Result: exit 1. The previous prefix-only guard rendered an image for the path even though URL normalization resolves it to the `cdn.example.com` origin.
-
-```txt
-ChoiceCard > does not render root-relative paths normalized to a remote origin
-expect(element).not.toBeInTheDocument()
-found <img src="/\\cdn.example.com/train.jpg" />
-
-Test Files  1 failed | 32 passed (33)
-Tests       1 failed | 168 passed (169)
-```
-
-### GREEN
-
-`ChoiceCard` now keeps the root-relative-prefix condition and additionally resolves the path against a fixed local base, rendering only when the resolved origin equals that base's origin. This rejects the backslash-normalization bypass as well as `//...` and absolute remote URLs, while accepting root-relative local assets.
+Passed with no diagnostics (non-cached direct web typecheck).
 
 ```sh
-pnpm --filter @repo/ui test -- choice-card choice-chip-group option-sheet trip-context-bar route-consequence trip-summary
-pnpm --filter @repo/ui typecheck
+pnpm exec vitest run packages/ui/src/components/app-layout.test.tsx packages/ui/src/components/shell.test.tsx packages/ui/src/components/cinematic-media.test.tsx packages/ui/src/lib/media-preferences.test.ts packages/ui/src/components/navigation-sheet.test.tsx packages/ui/src/components/side-sheet.test.tsx packages/ui/src/components/decision-state-panel.test.tsx packages/ui/src/components/editorial-media.test.tsx apps/web/app/_components/public-route-layout.test.tsx apps/web/app/_components/route-scene.test.tsx apps/web/app/_components/site-footer.test.tsx apps/web/app/_components/top-nav.test.tsx apps/web/app/_components/legal-page.test.tsx 'apps/web/app/(marketing)/activities/[activityId]/_components/activity-detail-save-action.test.tsx' apps/web/content/font-provenance.test.ts apps/web/content/cinematic-media-manifest.test.ts
+pnpm typecheck
+pnpm qa:assets
+git diff --check
+git diff --cached --check
 ```
 
-Result: both commands exited 0.
+Result: `16` files and `45` tests passed; asset provenance and whitespace checks passed. JSDOM's four expected media-play warnings remain non-failing.
 
-```txt
-Test Files  33 passed (33)
-Tests       169 passed (169)
-@repo/ui typecheck: tsc --noEmit (exit 0)
-```
+## Release-review fix wave
 
-### Concerns
+The release-review closure is complete across three commits:
 
-No blockers. The fixed base is a validation-only origin sentinel; accepted image paths are still rendered exactly as supplied.
+- `73d4457` (`fix(frontend): close release review gaps`) commits the 12 existing manifest-backed Unsplash files under `apps/web/public/media/unsplash/` without redownloading or altering bytes; adds the `apps/web/content/**/*.test.ts` Vitest include; makes `LegalPage` accept an optional scene (utility by default) and passes `scene="cover"` from `/sustainability`; adds the cover-scene assertion while retaining utility defaults for privacy/terms; removes the Task 2-added SideSheet source/test/export from the clean artifact while leaving the user's copies untracked; and normalizes the three OFL notice files to LF with trailing whitespace removed.
+- `bcf8db5` (`fix(frontend): sync normalized font provenance`) updates only the three `licenseSha256` values in `apps/web/content/font-provenance.json` to match those normalized bytes. The license text content is unchanged after stripping line endings/trailing whitespace for comparison.
+- `515bf50` (`fix(frontend): complete Base UI lock snapshot`) adds the missing `reselect@5.2.0` snapshot entry discovered by a frozen clean-archive install; this completes the previously committed `@base-ui/react` lock chain without unrelated lockfile churn.
 
----
+The committed media set is exactly: `douro-terraces-card.webp`, `douro-terraces-editorial.webp`, `douro-terraces-loop.mp4`, `douro-terraces.jpg`, `douro-terraces.webp`, `porto-cobblestone-card.webp`, `porto-cobblestone-street.jpg`, `porto-cobblestone-street.webp`, `portugal-coast-card.webp`, `portugal-coast-golden-hour-loop.mp4`, `portugal-coast-golden-hour.jpg`, and `portugal-coast-golden-hour.webp`.
 
-## Review follow-up — OptionSheet close-callback stability
-
-### Changed files
-
-- `packages/ui/src/components/option-sheet.tsx`
-- `packages/ui/src/components/option-sheet.test.tsx`
-- `.superpowers/sdd/task-2-report.md`
-
-### RED / boundary diagnostic
-
-Added a parent harness that keeps `OptionSheet` open, replaces the parent `onClose` function identity, then closes the sheet. It asserts that only the replacement callback runs and focus returns to the original opening trigger.
+Final verification:
 
 ```sh
-pnpm --filter @repo/ui test -- option-sheet
+pnpm exec vitest run packages/ui/src/components/app-layout.test.tsx packages/ui/src/components/shell.test.tsx packages/ui/src/components/cinematic-media.test.tsx packages/ui/src/lib/media-preferences.test.ts packages/ui/src/components/navigation-sheet.test.tsx packages/ui/src/components/decision-state-panel.test.tsx packages/ui/src/components/editorial-media.test.tsx apps/web/app/_components/public-route-layout.test.tsx apps/web/app/_components/route-scene.test.tsx apps/web/app/_components/site-footer.test.tsx apps/web/app/_components/top-nav.test.tsx apps/web/app/_components/legal-page.test.tsx 'apps/web/app/(marketing)/activities/[activityId]/_components/activity-detail-save-action.test.tsx' apps/web/content/font-provenance.test.ts apps/web/content/cinematic-media-manifest.test.ts
+pnpm --filter @repo/ui exec tsc --noEmit --pretty false
+pnpm --filter web exec tsc --noEmit --pretty false
+pnpm typecheck
+pnpm qa:assets
+node scripts/check-assets.mjs
+git diff --check f1dc287..HEAD
+git diff --check
 ```
 
-Result: exit 0, `33` test files and `170` tests passed. The harness confirms the parent callback identity changes, but jsdom did not expose a failing focus-restoration result when the direct-forwarding implementation was temporarily restored. Source review establishes the unstable boundary: `Modal`'s focus effect depends on `onClose`, so forwarding a changing parent callback permits it to recapture the active element while open.
+Results: `15` focused files and `44` tests passed; the only output is the existing JSDOM `HTMLMediaElement.prototype.play` warning from media tests. Direct UI/web typechecks passed. Full typecheck passed with `15` successful tasks across `16` packages in scope. Asset QA and both range/worktree diff checks passed.
 
-### GREEN
+The committed artifact itself was extracted with `git archive HEAD`; `node scripts/check-assets.mjs` passed there with no reliance on dirty files. A frozen offline install of that archive completed after `515bf50` fixed the lock snapshot. A clean-package typecheck remains separately limited by the pre-existing `packages/ui` imports of `next/link` without a package-local Next dependency; the normal workspace direct UI/web/full typechecks above pass.
 
-`OptionSheet` now stores the most recent parent callback in a ref and passes `Modal` a dependency-free `useCallback` wrapper. `Modal` therefore sees one close callback for the sheet lifetime while the close action still invokes the current parent callback.
+Clean-head import and asset audit:
 
-```sh
-pnpm --filter @repo/ui test -- choice-card choice-chip-group option-sheet trip-context-bar route-consequence trip-summary
-pnpm --filter @repo/ui typecheck
+```text
+Audited 62 changed TS/TSX files against HEAD.
+No missing local relative or @/ import targets.
+Manifest files: 21; missing in worktree: 0.
 ```
 
-Result: both commands exited 0.
-
-```txt
-Test Files  33 passed (33)
-Tests       170 passed (170)
-@repo/ui typecheck: tsc --noEmit (exit 0)
-```
-
-### Self-review
-
-- `OptionSheet` is the callback-stability boundary; `Modal` was not modified.
-- The ref is refreshed on every `OptionSheet` render, so a close immediately uses the latest parent callback.
-- The regression parent rerenders while the sheet is open, changes callback identity, asserts the original callback is not called, asserts the latest callback runs once, and confirms focus returns to the opening trigger.
-- `git diff --check` is clean for the scoped files.
-
-### Concerns
-
-No implementation blockers. The focused Vitest/jsdom scenario does not fail with the direct-forwarding baseline, so the regression test protects the requested user-facing contract but cannot independently demonstrate the prior focus-effect failure in this environment. The source-level boundary is nevertheless required because `Modal` depends on its `onClose` identity.
+The clean UI index retains `NavigationSheet` for `TopNav` and no longer exports SideSheet. No DB/Auth/schema or PNG changes were made.
