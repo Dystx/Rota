@@ -1,6 +1,47 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("public discovery and trust routes", () => {
+  test("home cover keeps the activity brief useful over the poster", async ({ page }) => {
+    await page.goto("/");
+
+    const cover = page.getByTestId("home-cover");
+    await expect(cover).toHaveAttribute("data-tone", "cover");
+    await expect(page.getByTestId("home-headline")).toBeVisible();
+    await expect(page.getByTestId("home-value-prop")).toContainText(/judged Portugal activities/i);
+    await expect(page.getByTestId("hero-intent-card")).toBeVisible();
+    await expect(page.getByTestId("home-text-contrast-overlay")).toHaveAttribute(
+      "data-contrast-treatment",
+      "frame-independent"
+    );
+    await expect(page.locator("video[autoplay]")).toHaveCount(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+
+  test("Portugal atlas exposes one featured region and every compact region link", async ({ page }) => {
+    await page.goto("/portugal");
+
+    const featured = page.getByTestId("portugal-featured-region");
+    const compact = page.getByTestId("portugal-compact-region-list");
+    await expect(featured).toBeVisible();
+    await expect(featured.locator("img")).toBeVisible();
+    await expect(featured.getByRole("link", { name: /Explore Porto activities/i })).toBeVisible();
+    await expect(compact.getByRole("link")).toHaveCount(4);
+
+    for (const region of ["lisbon", "douro", "algarve", "azores"]) {
+      await expect(compact.getByTestId(`portugal-region-link-${region}`)).toHaveAttribute(
+        "href",
+        new RegExp(`region=${region}`)
+      );
+    }
+
+    await expect(page.locator("video[autoplay]")).toHaveCount(0);
+    const compactHeights = await compact.locator('[data-region-card="compact"]').evaluateAll((cards) =>
+      cards.map((card) => Math.round(card.getBoundingClientRect().height))
+    );
+    expect(compactHeights.every((height) => height >= 120)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+
   test("renders a public shell with exact navigation", async ({ page }) => {
     await page.goto("/explore");
     const mobileToggle = page.getByTestId("top-nav-mobile-toggle").first();

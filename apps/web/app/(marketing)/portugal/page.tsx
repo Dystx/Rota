@@ -84,7 +84,9 @@ export default function PortugalPage() {
           pauseWhenHidden={CINEMATIC_MEDIA.douroField.pauseWhenHidden}
           textSafeZone={CINEMATIC_MEDIA.douroField.textSafeZone}
           mobileTextSafeZone={CINEMATIC_MEDIA.douroField.mobileTextSafeZone}
-          motionPolicy={CINEMATIC_MEDIA.douroField.motionPolicy}
+          // Portugal's atlas is poster-first; the homepage owns the only
+          // autoplay cover loop in the public discovery pair.
+          motionPolicy="poster-only"
           className="relative aspect-[4/3] min-h-[22rem] w-full rounded-[28px] shadow-overlay md:aspect-[16/6] md:min-h-[26rem]"
           posterClassName="object-center brightness-[0.8] saturate-[0.88]"
           videoClassName="object-center brightness-[0.8] saturate-[0.88]"

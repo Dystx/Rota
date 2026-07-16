@@ -1,6 +1,6 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 
@@ -12,7 +12,18 @@ vi.mock("next/link", () => ({
   )
 }));
 
+afterEach(cleanup);
+
 describe("PortugalAtlas", () => {
+  it("renders one featured Portugal collection followed by compact region entries", () => {
+    render(<PortugalAtlas />);
+
+    expect(screen.getByTestId("portugal-featured-region")).toBeTruthy();
+    expect(
+      screen.getByTestId("portugal-compact-region-list").getElementsByTagName("a").length
+    ).toBeGreaterThanOrEqual(4);
+  });
+
   it("turns Portugal regions into activity collections rather than route-shape planners", () => {
     render(<PortugalAtlas activities={REVIEWED_ACTIVITY_SEED} />);
 

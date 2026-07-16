@@ -55,7 +55,12 @@ interface BentoCardData {
   label: string;
   caption: string;
   region: string;
+  activityLabel: string;
+  activityCaption: string;
+  activityRegion: string;
   backgroundImage: string;
+  mediaSrc: string;
+  mediaAlt: string;
   gridClass: string;
   contentClass: string;
 }
@@ -67,7 +72,12 @@ const BENTO_CARDS: BentoCardData[] = [
     caption:
       "Explore the steep, historic streets, vibrant culinary scene, and nearby coastal retreats of Sintra and Cascais.",
     region: "Capital Region",
+    activityLabel: "A slower Lisbon afternoon",
+    activityCaption: "Walking, culture, and a better sense of when to stop.",
+    activityRegion: "Lisbon · walking + culture",
     backgroundImage: "url('/trip-covers/lisbon-tagus.svg')",
+    mediaSrc: "/trip-covers/lisbon-tagus.svg",
+    mediaAlt: "Layered editorial illustration of Lisbon and the Tagus light.",
     gridClass: "md:col-span-8 row-span-2",
     contentClass: "text-on-primary"
   },
@@ -76,7 +86,12 @@ const BENTO_CARDS: BentoCardData[] = [
     label: "Douro Valley",
     caption: "Terraced vineyards and ancient estates along the golden river.",
     region: "Wine Country",
-    backgroundImage: "url('/trip-covers/douro-vineyards.svg')",
+    activityLabel: "A day shaped around the Douro",
+    activityCaption: "Choose the river, the view, and the right amount of time.",
+    activityRegion: "Douro · landscape + food",
+    backgroundImage: "url('/media/unsplash/douro-terraces-card.webp')",
+    mediaSrc: "/media/unsplash/douro-terraces-card.webp",
+    mediaAlt: "Terraced vineyards descending toward the Douro River",
     gridClass: "md:col-span-4 row-span-2",
     contentClass: "text-on-primary"
   },
@@ -86,7 +101,12 @@ const BENTO_CARDS: BentoCardData[] = [
     caption:
       "Volcanic craters, thermal springs, and untouched Atlantic wilderness.",
     region: "Island Archipelago",
-    backgroundImage: "url('/trip-covers/azores-craters.svg')",
+    activityLabel: "When the weather opens a window",
+    activityCaption: "Keep the island day generous, not overfilled.",
+    activityRegion: "Azores · nature + weather",
+    backgroundImage: "url('/media/unsplash/portugal-coast-card.webp')",
+    mediaSrc: "/media/unsplash/portugal-coast-card.webp",
+    mediaAlt: "Atlantic coast at golden hour in Portugal",
     gridClass: "md:col-span-12 row-span-1",
     contentClass: "text-on-primary w-full md:w-1/2"
   }
@@ -150,7 +170,7 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
 
   return (
     <section
-      className="w-full max-w-7xl mx-auto px-container-padding-sm md:px-container-padding-lg py-section-gap relative -mt-16 z-20"
+      className="rumia-destination-bento w-full max-w-7xl mx-auto px-container-padding-sm md:px-container-padding-lg py-section-gap relative -mt-16 z-20"
       data-testid="destination-bento"
       data-mode={mode}
     >
@@ -158,25 +178,31 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
         {BENTO_CARDS.map((card) => {
           const planHref = PLANNER_HREF_FOR(card.slug);
           const exploreHref = EXPLORE_HREF_FOR(card.slug);
+          const label = mode === "explore" ? card.activityLabel : card.label;
+          const caption = mode === "explore" ? card.activityCaption : card.caption;
+          const region = mode === "explore" ? card.activityRegion : card.region;
 
           const cardBody = (
             <>
-              <div
-                className="absolute inset-0 bg-cover bg-center motion-safe:transition-transform motion-safe:duration-700 motion-safe:group-hover:scale-105"
-                style={{ backgroundImage: card.backgroundImage }}
+              <img
+                className="rumia-bento-card__media absolute inset-0 h-full w-full object-cover"
+                src={card.mediaSrc}
+                alt={card.mediaAlt}
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-olive-dark/80 via-olive-dark/20 to-transparent" />
               <div
                 className={`absolute inset-0 p-card-padding flex flex-col justify-end ${card.contentClass} z-20`}
               >
                 <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-2 bg-olive-dark/50 inline-block w-max px-2 py-1 rounded backdrop-blur-sm">
-                  {card.region}
+                  {region}
                 </span>
                 <h2 className="font-headline-lg text-headline-lg leading-tight mb-2">
-                  {card.label}
+                  {label}
                 </h2>
-                <p className="font-body-md text-body-md opacity-90 max-w-md hidden md:block">
-                  {card.caption}
+                <p className="font-body-md text-body-md max-w-md line-clamp-2 opacity-90">
+                  {caption}
                 </p>
                 {mode === "plan" ? (
                   <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-ochre-light px-3 py-1.5 font-label-ui text-label-ui text-primary shadow-sm">
@@ -184,9 +210,10 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                     <Icon name="arrow_forward" className="text-[16px]" />
                   </span>
                 ) : (
-                  <span className="mt-3 inline-flex items-center gap-1 font-label-ui text-label-ui text-ochre-light opacity-0 motion-safe:group-hover:opacity-100 transition-opacity">
+                  <span className="mt-3 inline-flex min-h-11 w-max items-center gap-2 rounded-full bg-linen-dark/95 px-4 py-2 font-label-ui text-label-ui text-primary shadow-sm motion-safe:transition-colors motion-safe:hover:bg-white">
                     <Icon name="map" className="text-base" />
-                    See what is worth doing →
+                    See worthwhile activities
+                    <Icon name="arrow_forward" className="text-base" />
                   </span>
                 )}
               </div>
@@ -202,7 +229,12 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                 data-slug={card.slug}
                 aria-label={`Plan this trip to ${card.label}`}
                 onClick={(event) => handlePlanNavigation(event, card.slug, planHref)}
-                className={`${card.gridClass} group relative block rounded-xl overflow-hidden border border-white/40 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light`}
+                style={{
+                  backgroundImage: card.backgroundImage,
+                  backgroundPosition: "center",
+                  backgroundSize: "cover"
+                }}
+                className={`rumia-bento-card ${card.gridClass} group relative block rounded-xl overflow-hidden border border-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light`}
               >
                 {cardBody}
               </Link>
@@ -216,7 +248,12 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
               data-testid={`bento-card-${card.slug}`}
               data-slug={card.slug}
               aria-label={`Explore judged activities in ${card.label}`}
-              className={`${card.gridClass} group relative rounded-xl overflow-hidden shadow-lg border border-white/40 block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light group-focus-visible:ring-2 group-focus-visible:ring-ochre-light`}
+              style={{
+                backgroundImage: card.backgroundImage,
+                backgroundPosition: "center",
+                backgroundSize: "cover"
+              }}
+              className={`rumia-bento-card ${card.gridClass} group relative rounded-xl overflow-hidden border border-white/40 block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light group-focus-visible:ring-2 group-focus-visible:ring-ochre-light`}
             >
               {cardBody}
             </Link>

@@ -85,4 +85,22 @@ describe("DestinationBento activity mode", () => {
     expect(card.getAttribute("href")).toBe("/explore?region=lisbon");
     expect(card.getAttribute("aria-label")).toMatch(/judged activities/i);
   });
+
+  it("frames each region as a worthwhile activity decision", () => {
+    render(<DestinationBento mode="explore" />);
+
+    expect(screen.getByText("A slower Lisbon afternoon")).toBeTruthy();
+    expect(screen.getByText("Walking, culture, and a better sense of when to stop.")).toBeTruthy();
+    expect(screen.getAllByText("See worthwhile activities")).toHaveLength(3);
+    expect(screen.getByText("A day shaped around the Douro")).toBeTruthy();
+  });
+
+  it("uses Lisbon artwork and does not mislabel the Porto street photo", () => {
+    render(<DestinationBento mode="explore" />);
+
+    expect(screen.getByRole("img", { name: /Lisbon and the Tagus light/i }).getAttribute("src")).toBe(
+      "/trip-covers/lisbon-tagus.svg"
+    );
+    expect(screen.getByTestId("bento-card-lisbon").textContent).not.toMatch(/Porto/i);
+  });
 });
