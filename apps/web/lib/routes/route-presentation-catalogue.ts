@@ -159,6 +159,18 @@ const flagsFor = (path: HttpRoutePath): Partial<Record<RouteFeatureFlag, boolean
   return undefined;
 };
 
+const flagsForState = (path: HttpRoutePath, state: RouteVisualState): Partial<Record<RouteFeatureFlag, boolean>> | undefined => {
+  const flags = flagsFor(path);
+  if (!flags || state !== "disabled") return flags;
+  const disabledFlag: RouteFeatureFlag | undefined =
+    path === "/expert-chat" ? "ENABLE_TRIP_MESSAGING" :
+      path === "/api/v1/docs" ? "ENABLE_API_DOCS" :
+        path === "/b2b" || path === "/b2b/[orgSlug]" ? "ENABLE_B2B_BETA" :
+          path === "/guide" || path === "/guide/onboarding" ? "ENABLE_GUIDE_BETA" :
+            undefined;
+  return disabledFlag ? { ...flags, [disabledFlag]: false } : flags;
+};
+
 const interactionFor = (state: RouteVisualState): NonNullable<RouteVisualScenario["setup"]>["interaction"] => {
   if (state === "saved" || state === "removed") return state === "saved" ? "save" : "remove";
   if (state === "selected" || state === "one-selection" || state === "multiple-selection") return "select";
@@ -199,7 +211,7 @@ function fixtureFor(path: HttpRoutePath, state: RouteVisualState, primary: Route
 }
 
 function setupFor(path: HttpRoutePath, state: RouteVisualState): RouteVisualScenario["setup"] {
-  const flags = flagsFor(path);
+  const flags = flagsForState(path, state);
   const interaction = interactionFor(state);
   const provider = state === "unavailable" ? "unreachable" : undefined;
   const query = state === "not-found" && (path.includes("[tripId]") || ["/checkout", "/logistics", "/expert-chat"].includes(path))
@@ -248,25 +260,27 @@ function buildOwnerScenarios(path: HttpRoutePath, contract: RouteSceneContract):
     ));
   }
   if (path === "/guide/onboarding") {
-    scenarios.push(scenario(`${key}--specialist-new`, "disabled", "specialist-candidate", { kind: "specialist", variant: "new" }, "desktop-mobile", { access: "render", transition: "onboarding is available only after eligibility" }, { flags: { ENABLE_GUIDE_BETA: true } }));
+    scenarios.push(scenario(`${key}--specialist-new`, "disabled", "specialist-candidate", { kind: "specialist", variant: "new" }, "desktop-mobile", { access: "render", transition: "onboarding is available only after eligibility" }, { flags: { ENABLE_GUIDE_BETA: false } }));
   }
   return scenarios;
 }
 
 function buildOperatorScenarios(path: HttpRoutePath, contract: RouteSceneContract): readonly RouteVisualScenario[] {
   const key = path.slice(1).replaceAll("/", "-") || "home";
-  const flags = flagsFor(path);
   const scenarios: RouteVisualScenario[] = [];
   const primaryState = contract.states.includes("empty") ? "empty" : contract.states.find((state) => !["unauthorized", "forbidden"].includes(state)) ?? contract.states[0];
   for (const state of contract.states) {
     if (state === "unauthorized") {
+      const flags = flagsForState(path, state);
       scenarios.push(scenario(`${key}--anonymous`, state, "anonymous", contract.fixture, "desktop-mobile", { access: "redirect", noPrivateDisclosure: true }, flags ? { flags } : undefined));
       continue;
     }
     if (state === "forbidden") {
+      const flags = flagsForState(path, state);
       scenarios.push(scenario(`${key}--limited-capability`, state, "limited-admin", { kind: "operator", variant: "empty" }, "desktop-mobile", { access: "render", noPrivateDisclosure: true }, flags ? { flags } : undefined));
       continue;
     }
+    const flags = flagsForState(path, state);
     const foreignResource = state === "not-found" && path.includes("[tripId]");
     const fixture: ScenarioFixture = foreignResource
       ? { kind: "traveler-trip", variant: "foreign", suffix: "" }
