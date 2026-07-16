@@ -78,7 +78,9 @@ function HomeActivityBrief() {
 function HomeExploreAction() {
   return (
     <div
-      className={`relative z-10 mx-auto w-full max-w-4xl px-container-padding-sm -mt-[760px] md:px-container-padding-lg md:-mt-[min(82vh,56rem)]`}
+      data-testid="home-explore-action"
+      data-cover-action="above-fold"
+      className="relative z-10 mx-auto w-full max-w-4xl px-container-padding-sm pb-8 md:px-container-padding-lg md:pb-10"
     >
       <HeroIntentCard />
     </div>
@@ -144,10 +146,12 @@ export default function HomePage() {
         <RouteScene
           tone="cover"
           bleed="full"
+          layout="overlay"
           focalLayer="media"
           data-testid="home-cover"
+          data-above-fold="cover-brief-and-action"
           data-text-safe-zone="left-top-and-lower-center"
-          className="overflow-visible bg-primary"
+          className="min-h-[760px] overflow-hidden bg-primary md:min-h-[min(82vh,56rem)]"
           media={<HomeCoverMedia />}
           foreground={<HomeActivityBrief />}
           actions={<HomeExploreAction />}

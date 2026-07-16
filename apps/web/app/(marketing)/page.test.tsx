@@ -1,6 +1,6 @@
 import * as React from "react";
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
 import HomePage from "./page";
 
 vi.mock("./hero-map", () => ({
@@ -27,7 +27,22 @@ vi.mock("../_components/destination-bento", () => ({
   DestinationBento: () => <section />
 }));
 
+afterEach(cleanup);
+
 describe("HomePage hero layout", () => {
+  it("positions the cover media, brief, and action as one above-fold overlay", async () => {
+    const page = await HomePage();
+    render(page);
+
+    const cover = screen.getByTestId("home-cover");
+    expect(cover.getAttribute("data-layout")).toBe("overlay");
+    expect(cover.getAttribute("data-above-fold")).toBe("cover-brief-and-action");
+    expect(cover.querySelector("[data-testid='route-scene-media']")?.className).toContain("absolute");
+    expect(cover.querySelector("[data-testid='route-scene-foreground']")?.className).toContain("relative");
+    expect(cover.querySelector("[data-testid='route-scene-actions']")?.className).toContain("absolute");
+    expect(cover.querySelector("[data-testid='route-scene-actions']")?.className).toContain("bottom-0");
+  });
+
   it("alternates cover, editorial, and atlas chapters", async () => {
     const page = await HomePage();
     render(page);
@@ -45,7 +60,7 @@ describe("HomePage hero layout", () => {
     const hero = container.querySelector("[data-testid='home-cover']");
 
     expect(hero).not.toBeNull();
-    expect(hero?.className).toContain("overflow-visible");
+    expect(hero?.className).toContain("overflow-hidden");
     expect(container.querySelector("[data-testid='home-cover-media']")?.className).toContain(
       "md:min-h-[720px]"
     );

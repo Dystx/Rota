@@ -7,10 +7,13 @@ export type RouteSceneTone = "cover" | "atlas" | "decision" | "utility";
 /** Whether the scene owns the viewport edge or sits inside the page measure. */
 export type RouteSceneBleed = "full" | "contained";
 export type RouteSceneFocalLayer = "media" | "typography" | "illustration" | "data";
+/** Whether authored media participates in normal flow or covers the scene. */
+export type RouteSceneLayout = "stacked" | "overlay";
 
 export interface RouteSceneProps extends Omit<HTMLAttributes<HTMLElement>, "children"> {
   tone?: RouteSceneTone;
   bleed?: RouteSceneBleed;
+  layout?: RouteSceneLayout;
   /** The single visual layer carrying this scene's primary attention. */
   focalLayer: RouteSceneFocalLayer;
   /** Primary copy and controls for the scene. Children are accepted as a shorthand. */
@@ -33,6 +36,7 @@ export interface RouteSceneProps extends Omit<HTMLAttributes<HTMLElement>, "chil
 export function RouteScene({
   tone = "decision",
   bleed = "contained",
+  layout = "stacked",
   focalLayer,
   foreground,
   media,
@@ -50,10 +54,12 @@ export function RouteScene({
       data-tone={tone}
       data-bleed={bleed}
       data-focal-layer={focalLayer}
+      data-layout={layout}
       className={[
         "rumia-route-scene relative isolate grid gap-6",
         `rumia-route-scene--${tone}`,
         `rumia-route-scene--${bleed}`,
+        `rumia-route-scene--${layout}`,
         bleed === "full"
           ? "relative left-1/2 w-screen max-w-none -translate-x-1/2"
           : "mx-auto w-full max-w-wide",
@@ -62,7 +68,13 @@ export function RouteScene({
       {...props}
     >
       {media ? (
-        <div data-testid="route-scene-media" className="rumia-route-scene__media relative">
+        <div
+          data-testid="route-scene-media"
+          className={[
+            "rumia-route-scene__media relative",
+            layout === "overlay" ? "absolute inset-0 z-0" : ""
+          ].filter(Boolean).join(" ")}
+        >
           {media}
         </div>
       ) : null}
@@ -80,7 +92,13 @@ export function RouteScene({
       ) : null}
 
       {actions ? (
-        <div data-testid="route-scene-actions" className="rumia-route-scene__actions relative z-10 flex min-h-11 min-w-11 flex-wrap items-center gap-3 [&>*]:min-h-11 [&>*]:min-w-11">
+        <div
+          data-testid="route-scene-actions"
+          className={[
+            "rumia-route-scene__actions relative z-10 flex min-h-11 min-w-11 flex-wrap items-center gap-3 [&>*]:min-h-11 [&>*]:min-w-11",
+            layout === "overlay" ? "absolute inset-x-0 bottom-0" : ""
+          ].filter(Boolean).join(" ")}
+        >
           {actions}
         </div>
       ) : null}
