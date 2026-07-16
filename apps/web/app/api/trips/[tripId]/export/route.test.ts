@@ -90,4 +90,20 @@ describe("trip export API", () => {
     expect(payload).toEqual({ code: "internal_error", message: "Could not export this trip." });
     expect(JSON.stringify(payload)).not.toMatch(/SQLSTATE|password=secret|stack trace/i);
   });
+
+  it("sanitizes schema failures during API auth", async () => {
+    const diagnostic = "schema relation details DATABASE_URL=secret SQLSTATE 42P01";
+    mocks.requireRole.mockRejectedValue(new Error(diagnostic));
+    mocks.schemaDrift.mockReturnValue(true);
+
+    const response = await GET(request(), { params });
+    const payload = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(payload).toEqual({
+      code: "internal_error",
+      message: "Trip export is temporarily unavailable. Please try again shortly."
+    });
+    expect(JSON.stringify(payload)).not.toMatch(/DATABASE_URL|SQLSTATE|schema relation/i);
+  });
 });

@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { loadSessionOutcome, loadPostgresAuthorizationContext } = vi.hoisted(() => ({
+const { loadSessionOutcome, loadPostgresAuthorizationContext, isSchemaDriftError } = vi.hoisted(() => ({
   loadSessionOutcome: vi.fn(),
-  loadPostgresAuthorizationContext: vi.fn()
+  loadPostgresAuthorizationContext: vi.fn(),
+  isSchemaDriftError: vi.fn(() => false)
 }));
 
 vi.mock("./session-outcome", async () => {
@@ -11,6 +12,7 @@ vi.mock("./session-outcome", async () => {
 });
 vi.mock("@repo/db", () => ({
   isPersistenceConfigError: vi.fn(() => false),
+  isSchemaDriftError,
   loadPostgresAuthorizationContext
 }));
 
@@ -18,6 +20,7 @@ import { loadCurrentAuthorizedActor, requireApiAccess, resourceNotFound } from "
 
 beforeEach(() => {
   vi.clearAllMocks();
+  isSchemaDriftError.mockReturnValue(false);
 });
 
 describe("requireApiAccess", () => {
@@ -102,5 +105,24 @@ describe("loadCurrentAuthorizedActor", () => {
     expect(result.kind).toBe("ready");
     expect(loadSessionOutcome).not.toHaveBeenCalled();
     expect(loadPostgresAuthorizationContext).toHaveBeenCalledOnce();
+  });
+
+  it("classifies schema drift during actor lookup as unavailable", async () => {
+    const sessionOutcome = {
+      kind: "ready",
+      session: { user: { id: "u1" }, session: { id: "s1" } }
+    } as unknown as import("./session-outcome").SessionOutcome;
+    loadPostgresAuthorizationContext.mockRejectedValue(new Error("schema details should stay server-side"));
+    isSchemaDriftError.mockReturnValue(true);
+
+    await expect(loadCurrentAuthorizedActor(sessionOutcome)).resolves.toEqual({ kind: "unavailable" });
+  });
+
+  it("classifies schema drift during session lookup as unavailable", async () => {
+    loadSessionOutcome.mockRejectedValue(new Error("session schema details should stay server-side"));
+    isSchemaDriftError.mockReturnValue(true);
+
+    await expect(loadCurrentAuthorizedActor()).resolves.toEqual({ kind: "unavailable" });
+    expect(loadPostgresAuthorizationContext).not.toHaveBeenCalled();
   });
 });

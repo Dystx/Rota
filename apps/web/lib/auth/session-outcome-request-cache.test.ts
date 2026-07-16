@@ -38,6 +38,8 @@ vi.mock("./session", () => ({ getCurrentSession: mocks.getSession }));
 
 import { loadSessionOutcome } from "./session-outcome";
 
+let requestNumber = 0;
+
 afterAll(() => {
   if (testEnvironment.databaseUrl === undefined) delete process.env.DATABASE_URL;
   else process.env.DATABASE_URL = testEnvironment.databaseUrl;
@@ -48,7 +50,7 @@ afterAll(() => {
 describe("loadSessionOutcome request isolation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    requestContext.current = "request-a";
+    requestContext.current = `request-${++requestNumber}`;
   });
 
   test("does not share a pending ready probe across request cache contexts", async () => {
@@ -79,6 +81,20 @@ describe("loadSessionOutcome request isolation", () => {
       { kind: "ready", session: { user: { id: "user-a" }, session: { id: "session-a" } } },
       { kind: "ready", session: { user: { id: "user-a" }, session: { id: "session-a" } } }
     ]);
+    expect(mocks.getSession).toHaveBeenCalledOnce();
+  });
+
+  test("reuses the resolved outcome for sequential calls in one request context", async () => {
+    mocks.getSession.mockResolvedValue({ user: { id: "user-a" }, session: { id: "session-a" } });
+
+    const first = await loadSessionOutcome();
+    const second = await loadSessionOutcome();
+
+    expect(first).toEqual({
+      kind: "ready",
+      session: { user: { id: "user-a" }, session: { id: "session-a" } }
+    });
+    expect(second).toBe(first);
     expect(mocks.getSession).toHaveBeenCalledOnce();
   });
 });

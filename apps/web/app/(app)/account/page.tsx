@@ -9,9 +9,10 @@ import {
   EmptyState,
   SectionHeading
 } from "@repo/ui";
-import { getTripsForUser } from "@repo/db";
+import { getTripsForUser, isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
 import { RouteRecovery } from "@/app/_components/route-recovery";
 import { AccountTripCard } from "./_components/trip-card";
 import { BehaviorConsentToggle } from "./_components/behavior-consent-toggle";
@@ -67,8 +68,11 @@ export default async function AccountPage() {
     } else {
       trips = await getTripsForUser(user.id, 24, { actor });
     }
-  } catch {
-    return <RouteRecovery kind="unavailable" />;
+  } catch (error) {
+    if (isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error)) {
+      return <RouteRecovery kind="unavailable" />;
+    }
+    throw error;
   }
 
   return (

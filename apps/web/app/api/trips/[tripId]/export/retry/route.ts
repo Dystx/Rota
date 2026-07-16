@@ -4,8 +4,21 @@ import { isApiResponse, requireApiRole } from "@/lib/auth/api";
 import { isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
 import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
 
+function retryFailure(error: unknown) {
+  const unavailable = isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
+  return new Response(
+    unavailable ? "Trip export is temporarily unavailable. Please try again shortly." : "Could not retry trip export.",
+    { status: unavailable ? 503 : 500 }
+  );
+}
+
 export async function POST(_request: Request, { params }: { params: Promise<{ tripId: string }> }) {
-  const auth = await requireApiRole(["traveler"]);
+  let auth: Awaited<ReturnType<typeof requireApiRole>>;
+  try {
+    auth = await requireApiRole(["traveler"]);
+  } catch (error) {
+    return retryFailure(error);
+  }
   if (isApiResponse(auth)) return auth;
 
   const { tripId } = await params;
@@ -18,10 +31,6 @@ export async function POST(_request: Request, { params }: { params: Promise<{ tr
     retryExportJob(tripId);
     return Response.redirect(new URL(`/trip/${tripId}/export?export=retry`, _request.url), 303);
   } catch (error) {
-    const unavailable = isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
-    return new Response(
-      unavailable ? "Trip export is temporarily unavailable. Please try again shortly." : "Could not retry trip export.",
-      { status: unavailable ? 503 : 500 }
-    );
+    return retryFailure(error);
   }
 }

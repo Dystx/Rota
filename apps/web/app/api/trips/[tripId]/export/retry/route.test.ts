@@ -70,4 +70,17 @@ describe("trip export retry API", () => {
     expect(body).toBe("Could not retry trip export.");
     expect(body).not.toMatch(/SQLSTATE|password=secret|stack trace/i);
   });
+
+  it("sanitizes schema failures during API auth", async () => {
+    const diagnostic = "schema relation details DATABASE_URL=secret SQLSTATE 42P01";
+    mocks.requireRole.mockRejectedValue(new Error(diagnostic));
+    mocks.schemaDrift.mockReturnValue(true);
+
+    const response = await POST(request(), { params });
+    const body = await response.text();
+
+    expect(response.status).toBe(503);
+    expect(body).toBe("Trip export is temporarily unavailable. Please try again shortly.");
+    expect(body).not.toMatch(/DATABASE_URL|SQLSTATE|schema relation/i);
+  });
 });

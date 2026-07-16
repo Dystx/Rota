@@ -13,8 +13,21 @@ import { getOwnedTrip } from "@/app/lib/trip-access";
 import { markExportJobError, markExportJobReady, queueExportJob } from "@/app/lib/export-jobs";
 import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
 
+function exportFailure(error: unknown) {
+  const unavailable = isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
+  return internalError(
+    unavailable ? "Trip export is temporarily unavailable. Please try again shortly." : "Could not export this trip.",
+    unavailable ? 503 : 500
+  );
+}
+
 export async function GET(request: Request, { params }: { params: Promise<{ tripId: string }> }) {
-  const auth = await requireApiRole(["traveler"]);
+  let auth: Awaited<ReturnType<typeof requireApiRole>>;
+  try {
+    auth = await requireApiRole(["traveler"]);
+  } catch (error) {
+    return exportFailure(error);
+  }
 
   if (isApiResponse(auth)) {
     return auth;
@@ -87,11 +100,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ trip
     } catch {
       // Keep the route boundary deterministic even when the job store is down.
     }
-    const unavailable = isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
-
-    return internalError(
-      unavailable ? "Trip export is temporarily unavailable. Please try again shortly." : "Could not export this trip.",
-      unavailable ? 503 : 500
-    );
+    return exportFailure(error);
   }
 }

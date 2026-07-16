@@ -21,7 +21,12 @@ const BodySchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const admin = await getAdminPageAuthContext();
+  let admin: Awaited<ReturnType<typeof getAdminPageAuthContext>>;
+  try {
+    admin = await getAdminPageAuthContext();
+  } catch (error) {
+    return failureResponse(error);
+  }
   if (!isAdminPageAuthContext(admin)) {
     return NextResponse.json(
       { ok: false, error: `Forbidden: ${admin.reason}` },

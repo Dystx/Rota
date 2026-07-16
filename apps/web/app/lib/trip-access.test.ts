@@ -190,6 +190,20 @@ describe("getOwnedTrip", () => {
     expect(JSON.stringify(result)).not.toMatch(/DATABASE_URL|ECONN|SQL|stack/i);
   });
 
+  test.each([
+    ["persistence configuration", "isPersistenceConfigError"],
+    ["schema drift", "isSchemaDriftError"]
+  ] as const)("sanitizes known %s owner-query failures as unavailable", async (_label, classifier) => {
+    const actor = { capabilities: [], reviewerId: null, roles: ["traveler"], userId: "traveler-user-123" } as const;
+    const hostile = new Error("DATABASE_URL=secret SQLSTATE 42P01 stack");
+    mocks.getTripDraftByIdForOwner.mockRejectedValue(hostile);
+    mocks[classifier].mockReturnValue(true);
+
+    const result = await getOwnedTrip("42", { actor });
+    expect(result).toEqual({ kind: "unavailable" });
+    expect(JSON.stringify(result)).not.toMatch(/DATABASE_URL|SQLSTATE|stack/i);
+  });
+
   test("rethrows unknown owner-query failures for the normal boundary", async () => {
     const actor = { capabilities: [], reviewerId: null, roles: ["traveler"], userId: "traveler-user-123" } as const;
     const failure = new Error("Unexpected owner-query invariant");

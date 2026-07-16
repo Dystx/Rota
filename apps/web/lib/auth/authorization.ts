@@ -1,6 +1,6 @@
 import "server-only";
 
-import { isPersistenceConfigError, loadPostgresAuthorizationContext } from "@repo/db";
+import { isPersistenceConfigError, isSchemaDriftError, loadPostgresAuthorizationContext } from "@repo/db";
 import type { AppRole, AuthorizedActor, Capability } from "@repo/types";
 import { cache } from "react";
 
@@ -21,11 +21,21 @@ export type AuthorizedActorOutcome =
   | { kind: "anonymous" }
   | { kind: "unavailable" };
 
+function isKnownAuthUnavailable(error: unknown): boolean {
+  return isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
+}
+
 /** Session + actor lookup for pages that must distinguish outage from access denial. */
 async function loadCurrentAuthorizedActorOutcomeUncached(
   sessionOutcome?: SessionOutcome
 ): Promise<AuthorizedActorOutcome> {
-  const outcome = sessionOutcome ?? (await loadSessionOutcome());
+  let outcome: SessionOutcome;
+  try {
+    outcome = sessionOutcome ?? (await loadSessionOutcome());
+  } catch (error) {
+    if (isKnownAuthUnavailable(error)) return { kind: "unavailable" };
+    throw error;
+  }
   if (outcome.kind === "unavailable") return { kind: "unavailable" };
   if (outcome.kind === "anonymous") return { kind: "anonymous" };
 
@@ -33,9 +43,7 @@ async function loadCurrentAuthorizedActorOutcomeUncached(
     const actor = await loadPostgresAuthorizationContext(outcome.session.user.id);
     return actor ? { kind: "ready", actor } : { kind: "anonymous" };
   } catch (error) {
-    if (isPersistenceConfigError(error) || isSessionProviderFailure(error)) {
-      return { kind: "unavailable" };
-    }
+    if (isKnownAuthUnavailable(error)) return { kind: "unavailable" };
     throw error;
   }
 }

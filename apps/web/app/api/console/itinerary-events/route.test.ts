@@ -87,4 +87,16 @@ describe("console itinerary event route recovery", () => {
     expect(payload).toEqual({ ok: false, error: "Could not load timeline events." });
     expect(JSON.stringify(payload)).not.toMatch(/DATABASE_URL|ECONNREFUSED|SQL|stack/i);
   });
+
+  test("returns fixed 503 copy for schema drift during console auth", async () => {
+    mocks.getAdminPageAuthContext.mockRejectedValue(new Error("schema details DATABASE_URL=secret SQLSTATE 42P01"));
+    mocks.isSchemaDriftError.mockReturnValue(true);
+
+    const response = await POST(request("POST", "/api/console/itinerary-events", eventInput));
+    const payload = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(payload).toEqual({ ok: false, error: "This service is temporarily unavailable. Please try again shortly." });
+    expect(JSON.stringify(payload)).not.toMatch(/DATABASE_URL|SQLSTATE|schema details/i);
+  });
 });

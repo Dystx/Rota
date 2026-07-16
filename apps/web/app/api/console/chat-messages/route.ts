@@ -31,7 +31,12 @@ const QuerySchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const admin = await getAdminPageAuthContext();
+  let admin: Awaited<ReturnType<typeof getAdminPageAuthContext>>;
+  try {
+    admin = await getAdminPageAuthContext();
+  } catch (error) {
+    return failureResponse(error, "Could not authenticate console request.");
+  }
   if (!isAdminPageAuthContext(admin)) {
     return NextResponse.json(
       { ok: false, error: `Forbidden: ${admin.reason}` },
@@ -75,7 +80,12 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const admin = await getAdminPageAuthContext();
+  let admin: Awaited<ReturnType<typeof getAdminPageAuthContext>>;
+  try {
+    admin = await getAdminPageAuthContext();
+  } catch (error) {
+    return failureResponse(error, "Could not authenticate console request.");
+  }
   if (!isAdminPageAuthContext(admin)) {
     return NextResponse.json(
       { ok: false, error: `Forbidden: ${admin.reason}` },
