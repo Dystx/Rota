@@ -6,9 +6,9 @@ import {
   CardContent,
   EditorialHeading,
   EditorialRule,
-  PageShell
 } from "@repo/ui";
 import { EditorialProofRail } from "../_components/editorial-proof-rail";
+import { PublicRouteLayout } from "../../_components/public-route-layout";
 
 export const metadata: Metadata = {
   title: "Local expertise",
@@ -39,7 +39,8 @@ const REVIEW_PILLARS = [
 
 export default function LocalExpertisePage() {
   return (
-    <PageShell bare>
+    <PublicRouteLayout scene="cover" surfaceTone="midnight" surfaceTexture="none" footerMode="full">
+      <div className="mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
       <EditorialHeading
         eyebrow="Local judgement"
         title="A second look at the day you chose."
@@ -111,6 +112,7 @@ export default function LocalExpertisePage() {
           </Link>
         </div>
       </section>
-    </PageShell>
+      </div>
+    </PublicRouteLayout>
   );
 }

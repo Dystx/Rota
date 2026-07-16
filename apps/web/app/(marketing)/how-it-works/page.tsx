@@ -1,8 +1,10 @@
 import * as React from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { PageShell, SectionHeading } from "@repo/ui";
+import { Button, Icon, SectionHeading } from "@repo/ui";
 import { EditorialProofRail } from "../_components/editorial-proof-rail";
+import { EditorialChapterClose } from "../_components/editorial-chapter-close";
+import { PublicRouteLayout } from "../../_components/public-route-layout";
 
 export const metadata: Metadata = {
   title: "How Rumia works",
@@ -19,7 +21,8 @@ const steps = [
 
 export default function HowItWorksPage() {
   return (
-    <PageShell bare>
+    <PublicRouteLayout scene="cover" surfaceTone="midnight" surfaceTexture="none" footerMode="compact">
+      <div className="rumia-quiet-page rumia-how-page mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
       <SectionHeading
         eyebrow="A calm way to choose"
         title="From a time window to a day worth keeping."
@@ -33,21 +36,30 @@ export default function HowItWorksPage() {
           { label: "Control", value: "Save, remove, or reorder without booking." }
         ]}
       />
-      <ol className="grid gap-8 md:grid-cols-4">
+      <ol className="rumia-process-grid grid gap-8 md:grid-cols-4">
         {steps.map(([title, text], index) => (
-          <li key={title} className="border-t border-[var(--color-border)] pt-4">
+          <li key={title} className="rumia-how-step border-t pt-4">
             <p className="text-sm text-ochre-dark">0{index + 1}</p>
             <h2 className="mt-3 font-display text-2xl text-primary">{title}</h2>
-            <p className="mt-2 text-sm text-on-surface-variant">{text}</p>
+            <p className="mt-2 text-base leading-7 text-on-surface-variant">{text}</p>
           </li>
         ))}
       </ol>
-      <Link
-        href="/explore"
-        className="mt-4 inline-block border-b border-ochre-dark text-ochre-dark"
+      <EditorialChapterClose
+        ariaLabel="Start using Rumia"
+        description="Tell Rumia about the time, mood, and company already in front of you. The result is a considered shortlist, not an automatic tour."
+        kicker="Try the decision"
+        testId="how-it-works-chapter-close"
+        title="A better day starts with less noise."
       >
-        Explore what to do
-      </Link>
-    </PageShell>
+        <div className="rumia-chapter-close__actions">
+          <Button asChild variant="secondary" tone="ochre">
+            <Link href="/explore">Explore what to do <Icon name="arrow-right" /></Link>
+          </Button>
+          <Link className="rumia-chapter-close__secondary" href="/portugal">Read the Portugal guide</Link>
+        </div>
+      </EditorialChapterClose>
+      </div>
+    </PublicRouteLayout>
   );
 }

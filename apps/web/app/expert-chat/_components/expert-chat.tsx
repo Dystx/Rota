@@ -32,9 +32,10 @@ function normalizeMessages(value: unknown): Message[] {
 
 export interface ExpertChatProps {
   tripId: string;
+  tripLabel?: string;
 }
 
-export function ExpertChat({ tripId }: ExpertChatProps) {
+export function ExpertChat({ tripId, tripLabel = "Your saved day" }: ExpertChatProps) {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [state, setState] = React.useState<LoadState>("loading");
   const [input, setInput] = React.useState("");
@@ -86,15 +87,28 @@ export function ExpertChat({ tripId }: ExpertChatProps) {
   };
 
   return (
-    <PublicRouteLayout>
+    <PublicRouteLayout scene="utility" footerMode="none" surfaceTone="linen" surfaceTexture="none" navigation="none">
       <div className="min-h-[calc(100vh-12rem)] flex flex-col font-body-md text-body-md">
         <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full px-container-padding-sm py-8">
           <h1 className="font-headline-lg text-headline-lg text-primary mb-2">Expert messages</h1>
-          <p className="text-on-surface-variant mb-6">Trip {tripId}</p>
+          <p className="text-on-surface-variant mb-6">{tripLabel}</p>
           <section aria-live="polite" className="flex-1 rounded-2xl border border-olive-light/15 bg-white/70 p-5">
             {state === "loading" && <p data-testid="chat-loading">Loading messages…</p>}
             {state === "denied" && <p data-testid="chat-denied">This conversation is not available for this trip.</p>}
-            {state === "error" && <p data-testid="chat-provider-error">Messages are temporarily unavailable. Please try again later.</p>}
+            {state === "error" && (
+              <div className="max-w-md">
+                <p data-testid="chat-provider-error">Messages are temporarily unavailable.</p>
+                <p className="mt-2 text-on-surface-variant">Try again when you are ready. Your saved day remains unchanged.</p>
+                <button
+                  type="button"
+                  data-testid="chat-retry"
+                  onClick={() => void loadMessages()}
+                  className="mt-4 min-h-11 rounded-xl bg-primary px-5 text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                >
+                  Try again
+                </button>
+              </div>
+            )}
             {state === "empty" && <p data-testid="chat-empty-state">No messages yet. Your specialist will appear here when they reply.</p>}
             {(state === "ready" || state === "empty") && messages.length > 0 && (
               <div data-testid="chat-messages" className="space-y-4">

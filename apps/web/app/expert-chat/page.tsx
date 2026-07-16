@@ -42,7 +42,7 @@ export default async function ExpertChatPage({
 
   if (!tripId) {
     return (
-      <PublicRouteLayout>
+      <PublicRouteLayout scene="utility" footerMode="none" surfaceTone="linen" surfaceTexture="none" navigation="none">
         <div className="min-h-[calc(100vh-12rem)] flex items-center justify-center">
           <div
             data-testid="expert-chat-empty"

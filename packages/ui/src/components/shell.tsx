@@ -1,17 +1,13 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "../lib/cn";
 
-type PageSurface = "linen" | "sage" | "midnight" | "ochre";
-
 export function PageShell({
   className,
   children,
   variant = "marketing",
-  bare = false,
-  surface
+  bare = false
 }: HTMLAttributes<HTMLDivElement> & {
   variant?: "marketing" | "app" | "reviewer" | "admin";
-  surface?: PageSurface;
   /**
    * When true, suppresses the built-in Cinematic Concierge header so the page
    * can be wrapped externally with a shared TopNav + SiteFooter (used by the
@@ -19,63 +15,13 @@ export function PageShell({
    */
   bare?: boolean;
 }) {
-  // Public routes now use the dedicated TopNav/AppLayout chrome. Reviewer
-  // and admin routes are rendered inside OperatorShell, so PageShell must be
-  // content-only there to avoid a second navigation bar and nested layout.
-  const renderLegacyHeader = !bare && variant === "marketing";
-  // Operator work is dense and table/card-heavy. Keep it on the readable
-  // linen field; midnight is reserved for the chosen-day/planning chapter
-  // where the page owns inverse editorial typography explicitly.
-  const resolvedSurface = surface ?? "linen";
-  const texture = variant === "reviewer" || variant === "admin" ? "none" : "editorial";
-
   return (
     <div
-      data-surface={resolvedSurface}
-      data-surface-texture={texture}
-      className={cn(
-        "min-h-screen rumia-surface",
-        `rumia-surface-${resolvedSurface}`,
-        "selection:bg-[var(--color-accent)]/30",
-        className
-      )}
+      data-layout-variant={variant}
+      data-shell-bare={bare ? "true" : "false"}
+      className={cn("rumia-page-shell rumia-page-enter", className)}
     >
-      {renderLegacyHeader && (
-        <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[rgba(247,250,249,0.7)] backdrop-blur-2xl">
-          <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-6 lg:px-12">
-            <div className="flex items-center gap-4">
-              <p className="font-display text-2xl italic text-[var(--color-foreground)]">
-                Rumia
-              </p>
-              <div className="h-4 w-px bg-[var(--color-border)]" />
-              <p className="text-[11px] uppercase tracking-[0.2em] font-medium text-[var(--color-muted-foreground)]">
-                {variant === "marketing"
-                  ? "Portugal travel concierge"
-                  : variant === "reviewer"
-                    ? "Reviewer workspace"
-                    : variant === "admin"
-                      ? "Admin CMS"
-                      : "Trip planner"}
-              </p>
-            </div>
-            <nav className="hidden gap-8 text-[13px] font-medium uppercase tracking-wider text-[var(--color-muted-foreground)] md:flex">
-              <a href="/" className="hover:text-[var(--color-foreground)] transition-colors">Home</a>
-              <a href="/trip/new" className="hover:text-[var(--color-foreground)] transition-colors">Trip brief</a>
-              <a href="/reviewer/queue" className="hover:text-[var(--color-foreground)] transition-colors">Reviewer</a>
-              <a href="/admin/places" className="hover:text-[var(--color-foreground)] transition-colors">Admin</a>
-            </nav>
-          </div>
-        </header>
-      )}
-      {bare || variant === "reviewer" || variant === "admin" ? (
-        <div className="mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
-          {children}
-        </div>
-      ) : (
-        <main id="main-content" className="mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
-          {children}
-        </main>
-      )}
+      {children}
     </div>
   );
 }

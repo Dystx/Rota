@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Icon } from "@repo/ui";
+import { DecisionStatePanel, Icon } from "@repo/ui";
 import { PublicRouteLayout } from "../_components/public-route-layout";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getTripsForUser, loadPostgresAuthorizationContext } from "@repo/db";
@@ -31,8 +31,8 @@ export default async function ItinerariesPage({
   const trips = actor ? await getTripsForUser(user.id, 24, { actor }) : [];
 
   return (
-    <PublicRouteLayout>
-      <div className="min-h-screen flex flex-col font-body-md">
+    <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
+      <div className="flex flex-col font-body-md">
         <div className="flex-1 px-container-padding-sm md:px-container-padding-lg max-w-7xl mx-auto w-full pt-8 pb-24">
           <header className="mb-8">
             <h1 className="font-display-mobile text-display-mobile md:font-display md:text-display text-primary mb-2">
@@ -42,7 +42,7 @@ export default async function ItinerariesPage({
               Your personalized archive of curated itineraries and inspirations.
             </p>
             {notice === "unavailable" ? (
-              <p role="status" className="mt-4 font-body-sm text-body-sm text-on-surface-variant">
+              <p role="status" className="mt-4 font-body-md text-body-md text-on-surface-variant">
                 That itinerary is unavailable. Choose one from your archive.
               </p>
             ) : null}
@@ -61,42 +61,32 @@ export default async function ItinerariesPage({
 
 function EmptyState({ signedIn }: { signedIn: boolean }) {
   return (
-    <div
+    <DecisionStatePanel
       data-testid="itineraries-empty"
-      className="bg-glass-light/60 backdrop-blur-md rounded-xl border border-olive-light/20 p-card-padding text-center max-w-2xl mx-auto"
-    >
-      <Icon name="map" className="text-[48px] text-olive-light mb-3 block" />
-        <h2 className="font-display-mobile text-headline-sm md:font-display md:text-headline text-primary mb-2 italic">
-          {signedIn ? "Nothing on the map yet." : "Sign in to see your trips."}
-        </h2>
-        <p className="font-body-md text-body-md text-on-surface-variant mb-6 max-w-prose mx-auto">
-          {signedIn
-            ? "Let’s plot your first route. Tell us where you want to go — once you confirm the brief, your itinerary lands here."
-            : "Your saved trips, vault exports, and human-review requests show up here. Anonymous browsing doesn’t store anything yet."}
-      </p>
-      <div className="flex flex-wrap gap-3 justify-center">
+      kind="empty"
+      tone="inverse"
+      className="mx-auto max-w-2xl rounded-xl border-olive-light/20 px-6 py-12"
+      title={signedIn ? "Nothing on the map yet." : "Sign in to see your trips."}
+      description={signedIn
+        ? "Let’s plot your first route. Tell us where you want to go — once you confirm the brief, your itinerary lands here."
+        : "Your saved trips, vault exports, and human-review requests show up here. Anonymous browsing doesn’t store anything yet."}
+      illustration={<Icon name="map" aria-hidden />}
+      primaryAction={(
         <Link
           href="/planner"
-          className="inline-flex items-center gap-2 bg-olive-light text-on-primary font-label-ui text-label-ui px-6 py-2.5 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-2 rounded-full bg-ochre-light px-6 py-3 font-label-ui text-label-ui text-primary transition-colors hover:bg-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           Plan a trip
         </Link>
-        {signedIn ? (
-          <Link
-            href="/vault"
-            className="inline-flex items-center gap-2 font-label-ui text-label-ui text-olive-dark border border-olive-light/40 px-6 py-2.5 rounded-full hover:bg-olive-light/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-          >
-            Browse the vault
-          </Link>
-        ) : (
-          <Link
-            href="/account"
-            className="inline-flex items-center gap-2 font-label-ui text-label-ui text-olive-dark border border-olive-light/40 px-6 py-2.5 rounded-full hover:bg-olive-light/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-          >
-            Sign in
-          </Link>
-        )}
-      </div>
-    </div>
+      )}
+      secondaryAction={(
+        <Link
+          href={signedIn ? "/vault" : "/account"}
+          className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 font-label-ui text-label-ui text-linen-dark transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+        >
+          {signedIn ? "Browse the vault" : "Sign in"}
+        </Link>
+      )}
+    />
   );
 }

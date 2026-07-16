@@ -1,5 +1,49 @@
 @import "tailwindcss";
 
+/* Rumia's editorial type families are shipped with the app so the exact
+ * artifact does not depend on a third-party font request. The corresponding
+ * OFL notices live under apps/web/public/fonts/licenses/. Keep system stacks
+ * below as resilient fallbacks for offline and restricted-data contexts. */
+@font-face {
+  font-family: "Newsreader Variable";
+  src: url("/fonts/newsreader/Newsreader-Variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Sans 3 Variable";
+  src: url("/fonts/source-sans-3/SourceSans3-Variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono/IBMPlexMono-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono/IBMPlexMono-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono/IBMPlexMono-SemiBold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+}
+
 /* ==============================================================================
  * Rumia v4 design tokens — 100% parity with docs/prototype.html tailwind.config
  *
@@ -23,7 +67,7 @@
   /* Cinematic Concierge legacy variables — kept so .rota-* component classes
      (referenced by existing pages) continue to resolve. v4 values now active
      (re-pointed in commit 66fc9cc) */
-  --color-paper: #e8fff0;             /* --color-background-olive */
+  --color-paper: #eee9df;             /* warm reading field */
   --color-cream: #efece6;             /* --color-linen-dark */
   --color-ink: #16281f;               /* --color-primary */
   --color-ink-soft: #2b3e34;          /* --color-primary-container */
@@ -101,13 +145,64 @@
      on dark bg. */
   --color-ochre-on-light: #8a5a1f;
 
+  /* Semantic frontend roles shared by public, traveler, and operator
+     surfaces. Route components should choose a role instead of inventing a
+     one-off colour, type scale, or elevation value. */
+  --rumia-type-display: var(--font-display);
+  --rumia-type-page: var(--font-display);
+  --rumia-type-section: var(--font-headline-sm);
+  --rumia-type-verdict: var(--font-body-md);
+  --rumia-type-body: var(--font-body-md);
+  --rumia-type-label: var(--font-label-ui);
+  --rumia-type-meta: var(--font-mono-micro);
+  --rumia-space-page-x: clamp(1.25rem, 4vw, 4rem);
+  --rumia-space-page-y: clamp(3.5rem, 8vw, 7rem);
+  --rumia-space-section: clamp(2.5rem, 6vw, 5rem);
+  --rumia-radius-dossier: 1.5rem;
+  --rumia-radius-control: 999px;
+  --rumia-border-subtle: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  --rumia-border-inverse: color-mix(in srgb, var(--color-paper) 18%, transparent);
+  --rumia-shadow-dossier: 0 18px 48px rgba(22, 40, 31, 0.1);
+  --rumia-shadow-floating: 0 18px 44px rgba(22, 40, 31, 0.16);
+  --rumia-motion-control: 180ms var(--motion-easing-cinematic);
+  --rumia-motion-chapter: 600ms var(--motion-easing-cinematic);
+  --rumia-motion-crossfade: 650ms var(--motion-easing-cinematic);
+
+  /* Responsive editorial scale. These are intentionally named tokens so a
+     route can change composition without inventing a second type system. */
+  --rumia-font-size-display: clamp(3rem, 8vw, 7.5rem);
+  --rumia-font-size-title: clamp(2rem, 4.5vw, 4.5rem);
+  --rumia-font-size-body: 1rem;
+  --rumia-font-size-metadata: 0.75rem;
+  --rumia-leading-display: 0.94;
+  --rumia-leading-title: 1.05;
+  --rumia-leading-body: 1.55;
+  --rumia-reading-measure: 65ch;
+  --rumia-space-chapter: clamp(3.5rem, 9vw, 9rem);
+  --rumia-space-stack: clamp(1rem, 2vw, 2rem);
+  --rumia-radius-scene: clamp(1rem, 2vw, 2rem);
+  --rumia-radius-control-min: 0.5rem;
+  --rumia-overlay-hero: linear-gradient(180deg, transparent 28%, rgba(16, 39, 29, 0.78) 100%);
+  --rumia-shadow-scene: 0 24px 80px rgba(22, 40, 31, 0.18);
+  --rumia-media-safe-x: 4%;
+  --rumia-media-safe-y: 8%;
+  --rumia-media-safe-width: 46%;
+  --rumia-media-safe-height: 74%;
+
   /* Editorial surface aliases. Keep these names stable so authored pages can
      move between the light reading field, discovery sage, dark planning
      chapter, and ochre judgement accent without inventing ad-hoc colours. */
   --color-linen: #efece6;
-  --color-sage: #e8fff0;
+  --color-sage: #e4e0d7;              /* neutral fallback for legacy surfaces */
   --color-midnight: #16281f;
   --color-ochre: #ce933f;
+  /* Warm reading field used by public marketing surfaces. Keep the cool
+     palette available for authored accents, but do not let it tint the whole
+     page canvas. */
+  --rumia-reading-field: #eee9df;
+  --rumia-reading-field-shadow: rgba(45, 50, 43, 0.08);
+  --rumia-reading-field-cool: rgba(57, 76, 77, 0.055);
+  --rumia-reading-field-grid: rgba(72, 63, 51, 0.038);
   --surface-texture-grid-size: 72px;
   --surface-texture-line: rgba(43, 62, 52, 0.055);
   --surface-texture-warm: rgba(206, 147, 63, 0.075);
@@ -135,8 +230,26 @@
   background-size: 100% 100%, 100% 100%, var(--surface-texture-grid-size) var(--surface-texture-grid-size), var(--surface-texture-grid-size) var(--surface-texture-grid-size);
 }
 
+/* A surface is a chapter, not a flat paint bucket. The contour layer gives
+ * long reading fields a quiet sense of place while staying fully CSS-owned,
+ * deterministic, and removable for dense/operator or reduced-data contexts. */
+.rumia-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.72;
+  background-image:
+    repeating-radial-gradient(ellipse at 10% 8%, transparent 0 74px, var(--surface-contour) 75px 76px, transparent 77px 148px),
+    repeating-radial-gradient(ellipse at 90% 92%, transparent 0 96px, var(--surface-contour-soft) 97px 98px, transparent 99px 192px);
+  background-size: 100% 100%, 100% 100%;
+}
+
 .rumia-surface-sage {
-  background-color: var(--color-sage);
+  --surface-contour: rgba(43, 62, 52, 0.075);
+  --surface-contour-soft: rgba(206, 147, 63, 0.045);
+  background-color: var(--rumia-reading-field);
   background-image:
     radial-gradient(circle at 8% 0%, var(--surface-texture-warm), transparent 34%),
     radial-gradient(circle at 92% 18%, var(--surface-texture-cool), transparent 38%),
@@ -145,6 +258,8 @@
 }
 
 .rumia-surface-linen {
+  --surface-contour: rgba(43, 62, 52, 0.065);
+  --surface-contour-soft: rgba(206, 147, 63, 0.05);
   background-color: var(--color-linen);
   background-image:
     radial-gradient(circle at 88% 0%, var(--surface-texture-warm), transparent 30%),
@@ -154,6 +269,8 @@
 }
 
 .rumia-surface-midnight {
+  --surface-contour: rgba(234, 184, 117, 0.085);
+  --surface-contour-soft: rgba(232, 255, 240, 0.045);
   background-color: var(--color-midnight);
   background-image:
     radial-gradient(circle at 16% 0%, rgba(234, 184, 117, 0.12), transparent 34%),
@@ -163,6 +280,8 @@
 }
 
 .rumia-surface-ochre {
+  --surface-contour: rgba(22, 40, 31, 0.075);
+  --surface-contour-soft: rgba(255, 255, 255, 0.065);
   background-color: var(--color-ochre);
   background-image:
     radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.14), transparent 36%),
@@ -175,7 +294,108 @@
   background-image: none;
 }
 
+.rumia-surface[data-surface-texture="none"]::before {
+  display: none;
+}
+
+/* Scene grammars provide a durable field and ink pairing. They deliberately
+ * do not prescribe a grid: each route owns its authored foreground/media
+ * arrangement while the marker remains inspectable in browser evidence. */
+.rumia-route-scene {
+  background: var(--scene-field, transparent);
+  color: var(--scene-ink, currentColor);
+  border-radius: var(--rumia-radius-scene);
+}
+
+.rumia-route-scene--cover {
+  --scene-field: var(--color-midnight);
+  --scene-ink: var(--color-linen);
+  --scene-safe-zone: var(--rumia-overlay-hero);
+}
+
+.rumia-route-scene--atlas {
+  --scene-field: var(--color-primary);
+  --scene-ink: var(--color-linen-dark);
+  --scene-safe-zone: var(--rumia-overlay-hero);
+}
+
+.rumia-route-scene--decision {
+  --scene-field: var(--color-linen);
+  --scene-ink: var(--color-primary);
+  --scene-safe-zone: linear-gradient(180deg, transparent, rgba(22, 40, 31, 0.08));
+}
+
+.rumia-route-scene--utility {
+  --scene-field: transparent;
+  --scene-ink: var(--color-primary);
+  --scene-safe-zone: none;
+}
+
+.rumia-route-scene--full {
+  border-radius: 0;
+}
+
+.rumia-route-scene__media {
+  grid-area: media;
+}
+
+.rumia-route-scene__foreground {
+  grid-area: foreground;
+}
+
+.rumia-route-scene__aside {
+  grid-area: aside;
+}
+
+.rumia-route-scene__actions {
+  grid-area: actions;
+}
+
+/* Semantic role hooks for route-level composition. These remain opt-in so
+ * existing class-heavy pages can converge incrementally without a rewrite. */
+.rumia-type-display,
+.rumia-type-page {
+  font-family: var(--rumia-type-display);
+  letter-spacing: -0.025em;
+}
+
+.rumia-type-section {
+  font-family: var(--rumia-type-section);
+}
+
+.rumia-type-verdict,
+.rumia-type-body {
+  font-family: var(--rumia-type-body);
+  line-height: 1.65;
+}
+
+.rumia-type-label {
+  font-family: var(--rumia-type-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rumia-type-meta {
+  font-family: var(--rumia-type-meta);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 @media (prefers-reduced-data: reduce) {
+  .rumia-surface::before {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-data: reduce) {
+  :root {
+    --rumia-motion-control: 0ms;
+    --rumia-motion-chapter: 0ms;
+    --rumia-motion-crossfade: 0ms;
+  }
   .rumia-surface {
     background-image: none;
   }
@@ -186,6 +406,9 @@
     --motion-duration-fast: 0ms;
     --motion-duration-base: 0ms;
     --motion-duration-slow: 0ms;
+    --rumia-motion-control: 0ms;
+    --rumia-motion-chapter: 0ms;
+    --rumia-motion-crossfade: 0ms;
   }
   /* Universal kill-switch: Tailwind utilities like `transition-colors` set
    * transition-duration directly (e.g. 150ms) without going through the
@@ -202,6 +425,25 @@
     transition-duration: 0s !important;
     transition-delay: 0s !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* The page handoff is intentionally short and spatially quiet: enough to
+ * establish hierarchy on route changes, never enough to delay a decision.
+ * Content stays opaque from the first frame; the handoff is an enhancement,
+ * not a gate for reading or acting. */
+.rumia-page-enter {
+  animation: rumia-page-enter var(--motion-duration-base) var(--motion-easing-cinematic) both;
+}
+
+@keyframes rumia-page-enter {
+  from {
+    opacity: 1;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -249,7 +491,8 @@
 }
 
 /* WCAG AA contrast fix: --color-atlantic (#ce933f) on the page background
- * (--color-background #e8fff0) yields 2.54:1, failing the 4.5:1 threshold
+ * (the legacy green background was too low-contrast and visually noisy;
+ * the warm reading field is now the default surface)
  * for normal text. Route every `text-[var(--color-atlantic)]` usage to
  * the darker --color-ochre-on-light (#8a5a1f, ~6.8:1) which already
  * exists for exactly this case (see commit 1bee143).
@@ -300,7 +543,7 @@
   --color-on-secondary-container: #784d00;
   --color-ochre-dark: #ce933f;
   --color-linen: #efece6;
-  --color-sage: #e8fff0;
+  --color-sage: #e4e0d7;
   --color-midnight: #16281f;
   --color-ochre: #ce933f;
   --color-on-tertiary-fixed: #1c1c1a;
@@ -308,16 +551,16 @@
   --color-on-surface: #0c1f16;
   --color-surface-container-lowest: #ffffff;
   --color-on-tertiary: #ffffff;
-  --color-surface-container-high: #d7eedf;
+  --color-surface-container-high: #e1ddd3;
   --color-secondary-fixed-dim: #f9bb68;
-  --color-background: #e8fff0;
+  --color-background: #eee9df;
   --color-on-primary-container: #94a99c;
   --color-on-surface-variant: #424844;
   --color-on-tertiary-container: #a5a3a0;
-  --color-surface-dim: #c9dfd1;
-  --color-surface-bright: #e8fff0;
+  --color-surface-dim: #d5d0c6;
+  --color-surface-bright: #f5f1e9;
   --color-error: #ba1a1a;
-  --color-surface: #e8fff0;
+  --color-surface: #eee9df;
   --color-primary-fixed: #d2e8d9;
   --color-inverse-surface: #22342b;
   --color-secondary: #825505;
@@ -326,24 +569,24 @@
   --color-glass-light: rgba(255, 255, 255, 0.65);
   --color-primary-fixed-dim: #b6ccbe;
   --color-grid-pattern: rgba(43, 62, 52, 0.1);
-  --color-surface-container-highest: #d2e8d9;
+  --color-surface-container-highest: #d9d5ca;
   --color-on-error: #ffffff;
   --color-olive-light: #3c5447;
   --color-outline: #737874;
-  --color-surface-container: #ddf3e5;
+  --color-surface-container: #e7e2d8;
   --color-outline-variant: #c2c8c2;
   --color-on-background: #0c1f16;
   --color-tertiary-container: #3a3a37;
   --color-on-primary: #ffffff;
   --color-tertiary: #242422;
-  --color-surface-variant: #d2e8d9;
+  --color-surface-variant: #dedad1;
   --color-on-tertiary-fixed-variant: #474744;
   --color-on-secondary-fixed-variant: #643f00;
   --color-tertiary-fixed: #e5e2de;
   --color-on-primary-fixed-variant: #384b41;
   --color-olive-dark: #1d2a23;
   --color-inverse-primary: #b6ccbe;
-  --color-surface-container-low: #e3f9ea;
+  --color-surface-container-low: #ebe7de;
   --color-ochre-light: #eab875;
   --color-secondary-container: #ffc16d;
 
@@ -382,20 +625,40 @@
      these stacks preserve the intended editorial sans/serif/mono roles while
      allowing the VPS and offline test environments to build without network
      access. */
-  --font-body-md: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono-micro: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-label-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-headline-sm: ui-serif, Georgia, Cambria, "Times New Roman", serif;
-  --font-display-mobile: ui-serif, Georgia, Cambria, "Times New Roman", serif;
-  --font-display: ui-serif, Georgia, Cambria, "Times New Roman", serif;
-  --font-mono-technical: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-headline-lg: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-body-sm: "Source Sans 3 Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body-md: "Source Sans 3 Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body-lg: "Source Sans 3 Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body-xl: "Source Sans 3 Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono-micro: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-label-ui: "Source Sans 3 Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-headline-sm: "Newsreader Variable", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-display-mobile: "Newsreader Variable", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-display: "Newsreader Variable", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-mono-technical: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-headline-lg: "Newsreader Variable", ui-serif, Georgia, Cambria, "Times New Roman", serif;
 
   /* ----- FONT SIZES (with line-height / letter-spacing / font-weight) ----- */
-  --text-body-md: 14px;
+  /* Customer-facing body copy must remain readable at the smallest supported
+     viewport. Compact operator metadata uses its own mono tokens below. */
+  --text-body-sm: 16px;
+  --text-body-sm--line-height: 1.55;
+  --text-body-sm--letter-spacing: 0;
+  --text-body-sm--font-weight: 400;
+
+  --text-body-md: 16px;
   --text-body-md--line-height: 1.6;
   --text-body-md--letter-spacing: 0;
   --text-body-md--font-weight: 400;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.55;
+  --text-body-lg--letter-spacing: 0;
+  --text-body-lg--font-weight: 400;
+
+  --text-body-xl: 20px;
+  --text-body-xl--line-height: 1.5;
+  --text-body-xl--letter-spacing: 0;
+  --text-body-xl--font-weight: 400;
 
   --text-mono-micro: 10px;
   --text-mono-micro--line-height: 12px;
@@ -624,16 +887,16 @@
 
   html {
     scroll-behavior: smooth;
-    background-color: #e8fff0;
+    background-color: #eee9df;
     color: #0c1f16;
   }
 
   body {
     margin: 0;
-    background-color: #e8fff0;
+    background-color: #eee9df;
     color: #0c1f16;
     font-family: var(--font-body-md);
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

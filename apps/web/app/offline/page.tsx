@@ -17,10 +17,10 @@ export const metadata: Metadata = {
  */
 export default function OfflinePage() {
   return (
-    <PublicRouteLayout>
+    <PublicRouteLayout scene="utility" footerMode="compact" surfaceTone="linen" surfaceTexture="none">
       <div
-        className="rumia-surface rumia-surface-sage px-container-padding-lg py-section-gap"
-        data-surface="sage"
+        className="rumia-surface rumia-surface-linen px-container-padding-lg py-section-gap"
+        data-surface="linen"
         data-surface-texture="editorial"
       >
         <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(260px,0.7fr)] lg:items-center">
@@ -48,7 +48,7 @@ export default function OfflinePage() {
                 Return to the choices that matter.
               </h2>
             </div>
-            <ul className="grid gap-3 text-sm leading-relaxed text-on-surface-variant">
+            <ul className="grid gap-3 text-base leading-relaxed text-on-surface-variant">
               <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ochre-dark" aria-hidden="true" />Retry this page to check the connection.</li>
               <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ochre-dark" aria-hidden="true" />Open a saved activity day if this device has one cached.</li>
               <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ochre-dark" aria-hidden="true" />Keep Rumia&apos;s activity list as the source of truth when you continue.</li>

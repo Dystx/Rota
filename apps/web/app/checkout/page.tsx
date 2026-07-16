@@ -1,6 +1,7 @@
+import * as React from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Icon } from "@repo/ui";
+import { DecisionStatePanel, Icon } from "@repo/ui";
 import { PublicRouteLayout } from "../_components/public-route-layout";
 import { resolveCoverImage } from "@/lib/trip-cover";
 import { getOwnedTrip } from "@/app/lib/trip-access";
@@ -10,15 +11,14 @@ import { PackageSelector } from "./_components/package-selector";
  * Checkout page — Stitch 1.5 split-screen tier ascension.
  *
  * Left panel: trip summary (cover image, trip name, brief).
- * Right panel: tier comparison (Core AI vs Hybrid Specialist
- * Review) with the premium tier carrying the "Recommended"
- * pill (Stitch 1.5 pattern).
+ * Right panel: optional chosen-day support. The page preserves the existing
+ * commerce contract while using activity-first language rather than the
+ * retired AI/concierge tier framing.
  *
- * Reads `?trip=<id>` from the URL. When present, the left
- * panel pulls owner-scoped trip data and shows
- * the cover + brief. When missing (the page is opened from
- * the marketing surface), the left panel falls back to a
- * "no trip yet" card pointing to /planner.
+ * Reads `?trip=<id>` from the URL. When present, the left panel pulls
+ * owner-scoped trip data and shows the cover + brief. When missing (the page
+ * is opened from a marketing surface), checkout stops at one saved-day
+ * handoff instead of presenting package controls without trip context.
  */
 export default async function CheckoutPage({
   searchParams
@@ -27,22 +27,66 @@ export default async function CheckoutPage({
 }) {
   const { trip: tripParam } = await searchParams;
   const tripId = tripParam?.trim() || null;
-  const tripHref = tripId ? `/trip/${tripId}` : "/account";
 
-  let trip = null;
-  if (tripId) {
-    const tripAccess = await getOwnedTrip(tripId);
+  if (!tripId) {
+    return (
+      <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
+        <div className="min-h-[calc(100vh-5rem)] px-container-padding-sm py-16 md:px-container-padding-lg md:py-24">
+          <div className="mx-auto grid max-w-4xl gap-8">
+            <header className="max-w-2xl">
+              <p className="rumia-type-label text-ochre-on-light">Saved day first</p>
+              <h1 className="mt-3 rumia-type-display text-4xl text-primary md:text-6xl">
+                Checkout follows a considered day.
+              </h1>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-on-surface-variant md:text-lg">
+                Choose the activities that earn their place, save the day, then
+                decide whether an optional refinement is worth adding.
+              </p>
+            </header>
 
-    if (tripAccess.kind === "anonymous") {
-      redirect(`/sign-in?next=${encodeURIComponent(`/checkout?trip=${tripId}`)}`);
-    }
-
-    if (tripAccess.kind !== "ok") {
-      redirect("/itineraries?notice=unavailable");
-    }
-
-    trip = tripAccess.trip;
+            <DecisionStatePanel
+              data-testid="checkout-no-trip"
+              kind="empty"
+              tone="inverse"
+              className="min-h-[20rem] md:min-h-[24rem]"
+              title="Start with one good choice."
+              description="There are no checkout options to compare until a saved day exists. Shape the brief first, and the right next step will appear here without booking or accommodation search."
+              illustration={<Icon name="bookmark-simple" aria-hidden />}
+              primaryAction={(
+                <Link
+                  href="/planner"
+                  className="inline-flex items-center justify-center rounded-full bg-ochre-light px-5 py-3 text-sm font-medium text-primary shadow-sm transition-transform hover:-translate-y-0.5 hover:bg-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                >
+                  Shape a day
+                </Link>
+              )}
+              secondaryAction={(
+                <Link
+                  href="/explore"
+                  className="inline-flex items-center justify-center rounded-full border border-white/30 px-5 py-3 text-sm font-medium text-linen-dark transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+                >
+                  Explore activities
+                </Link>
+              )}
+            />
+          </div>
+        </div>
+      </PublicRouteLayout>
+    );
   }
+
+  const tripAccess = await getOwnedTrip(tripId);
+
+  if (tripAccess.kind === "anonymous") {
+    redirect(`/sign-in?next=${encodeURIComponent(`/checkout?trip=${tripId}`)}`);
+  }
+
+  if (tripAccess.kind !== "ok") {
+    redirect("/itineraries?notice=unavailable");
+  }
+
+  const trip = tripAccess.trip;
+  const tripHref = `/trip/${tripId}`;
 
   const coverImage = trip ? resolveCoverImage(trip.brief) : null;
   const tripTitle = trip?.title ?? "Your trip is taking shape";
@@ -51,7 +95,7 @@ export default async function CheckoutPage({
     : "Plan a trip first — the tier comparison below will land on the right.";
 
   return (
-    <PublicRouteLayout>
+    <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
       <div className="min-h-screen flex flex-col font-body-md text-body-md text-on-surface">
         <div className="flex-grow py-12 md:py-20 px-container-padding-sm md:px-container-padding-lg">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-section-gap items-start">
@@ -136,19 +180,16 @@ export default async function CheckoutPage({
                   id="checkout-heading"
                   className="font-display-mobile md:font-display text-display-mobile md:text-display text-primary mb-3"
                 >
-                  Elevate Your Itinerary
+                  Keep shaping this day
                 </h1>
                 <p className="font-headline-sm text-headline-sm text-on-surface-variant">
-                  Choose the level of expertise required to finalize your
-                  journey. Core AI gives you a complete, structured route;
-                  Hybrid Specialist Review adds the irreplaceable touch of
-                  human intuition.
+                  Start with the clear activity brief, then add an optional
+                  editorial refinement when the day needs a closer read. Rumia
+                  never books, chooses accommodation, or takes over the plan.
                 </p>
-                {tripId ? (
-                  <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant/70 mt-3">
-                    for trip #{tripId}
-                  </p>
-                ) : null}
+                <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant/70 mt-3">
+                  for your saved day
+                </p>
               </header>
 
               <PackageSelector tripId={tripId} />

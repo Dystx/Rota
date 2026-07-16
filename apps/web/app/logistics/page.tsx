@@ -34,7 +34,7 @@ export default async function LogisticsPage({
   const trip = tripAccess.trip;
 
   return (
-    <PublicRouteLayout>
+    <PublicRouteLayout scene="decision" footerMode="none" surfaceTone="linen" surfaceTexture="none" navigation="none">
       <div className="min-h-screen relative overflow-hidden flex flex-col justify-center items-center p-container-padding-sm md:p-container-padding-lg">
         {/* Deep Map Blur Background */}
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -62,7 +62,7 @@ export default async function LogisticsPage({
             <MobilityTiles
               tripId={trip.id}
               initialChoice={trip.brief.transportMode === "rental-car" ? "car" : "transit"}
-              onChoiceChange={(choice) => persistLogisticsTransport(trip.id, choice)}
+              onChoiceChange={persistLogisticsTransport.bind(null, trip.id)}
             />
           </div>
         </div>

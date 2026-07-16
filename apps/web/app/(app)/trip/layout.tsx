@@ -6,7 +6,7 @@ import { SiteFooter } from "../../_components/site-footer";
 /** Shared traveler chrome for trip creation and trip workspace routes. */
 export default function TripLayout({ children }: { children: ReactNode }) {
   return (
-    <AppLayout variant="app" topNav={<TopNav />} siteFooter={<SiteFooter />}>
+    <AppLayout variant="app" topNav={<TopNav />} surface="linen" surfaceTexture="none" siteFooter={null}>
       {children}
     </AppLayout>
   );

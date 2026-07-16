@@ -6,6 +6,7 @@ import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 
 import { ActivityWorkspace } from "./activity-workspace";
 import type { ActivityMapProviderConfig } from "../../_components/activity-map";
+import { PublicRouteLayout } from "../../../_components/public-route-layout";
 
 export const metadata: Metadata = {
   title: "Your Portugal day",
@@ -56,11 +57,19 @@ export default async function WorkspacePage({
   const mapEnabled = isFeatureEnabled("activityMap") && Boolean(mapProvider);
 
   return (
-    <ActivityWorkspace
-      initialActivities={activities}
-      mapEnabled={mapEnabled}
-      map3dEnabled={mapEnabled && isFeatureEnabled("activityMap3d")}
-      mapProvider={mapProvider}
-    />
+    <PublicRouteLayout
+      scene="decision"
+      surfaceTone="linen"
+      surfaceTexture="none"
+      footerMode="none"
+      navigation="none"
+    >
+      <ActivityWorkspace
+        initialActivities={activities}
+        mapEnabled={mapEnabled}
+        map3dEnabled={mapEnabled && isFeatureEnabled("activityMap3d")}
+        mapProvider={mapProvider}
+      />
+    </PublicRouteLayout>
   );
 }

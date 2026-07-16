@@ -51,6 +51,7 @@ export default function RootLayout({
     <html
       lang="en"
       className="light relative"
+      data-font-source="local-ofl"
     >
       <head>
         <link rel="icon" href="/brand/mark.svg" type="image/svg+xml" />
@@ -75,7 +76,9 @@ export default function RootLayout({
         <WebVitalsReporter />
         <RegisterServiceWorker />
         <MapLibreErrorSuppressor />
-        <MotionProvider>{children}</MotionProvider>
+        <div className="rumia-app-root">
+          <MotionProvider>{children}</MotionProvider>
+        </div>
         <ToastViewport />
         <BackToTop />
       </body>

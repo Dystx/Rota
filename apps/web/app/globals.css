@@ -2,6 +2,13 @@
 @source "../../../packages/ui/src";
 @source "../../../packages/maps/src";
 
+/* Base UI popups render through a body portal. Keep application content in a
+   dedicated stacking context so local transforms and filters cannot cover a
+   sheet or dialog. */
+.rumia-app-root {
+  isolation: isolate;
+}
+
 /* Editorial tone hooks intentionally stay semantic. Components use these
    classes alongside the Tailwind text aliases so a surface can change
    context without introducing a one-off colour at the call site. */
@@ -52,6 +59,202 @@
     transition-duration: 200ms;
     animation: rumia-save-enter 200ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)) both;
   }
+
+  /* Poster-first media keeps the still as a stable composition while a local
+   * muted derivative fades in. The video never owns layout, and reduced
+   * motion/data users keep the same editorial frame without a blank surface. */
+  .rumia-cinematic-media {
+    isolation: isolate;
+    background: var(--color-primary, #10271d);
+  }
+
+  .rumia-cinematic-media__poster-wrap {
+    position: relative;
+    z-index: 0;
+  }
+
+  .rumia-cinematic-media__poster,
+  .rumia-cinematic-media__video {
+    display: block;
+  }
+
+  .rumia-cinematic-media__video {
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 700ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1));
+  }
+
+  [data-motion-enabled="true"] .rumia-cinematic-media__video {
+    animation: rumia-cinematic-video-in 700ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)) both;
+  }
+
+  .rumia-mobile-panel {
+    transform-origin: top center;
+    animation: rumia-mobile-panel-enter 180ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)) both;
+  }
+
+  /* Portugal is the first full editorial chapter: layered depth and a
+   * deliberate contrast break make the atlas feel like a field guide, not a
+   * long sage document. These are page-scoped so the rest of the product keeps
+   * its quieter surface contract. */
+  .rumia-portugal-page {
+    position: relative;
+    isolation: isolate;
+    overflow-x: clip;
+  }
+
+  .rumia-portugal-page::before {
+    content: "";
+    position: absolute;
+    z-index: -2;
+    inset: -8rem -20% 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 12% 6%, rgba(206, 147, 63, 0.18), transparent 22rem),
+      radial-gradient(circle at 92% 28%, rgba(60, 84, 71, 0.15), transparent 26rem),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.15), transparent 30%, rgba(22, 40, 31, 0.08) 100%);
+  }
+
+  .rumia-portugal-page::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    inset: 0 -12%;
+    opacity: 0.36;
+    background-image:
+      repeating-radial-gradient(ellipse at 3% 28%, transparent 0 110px, rgba(43, 62, 52, 0.08) 111px 112px, transparent 113px 224px),
+      repeating-linear-gradient(118deg, transparent 0 96px, rgba(206, 147, 63, 0.035) 97px 98px, transparent 99px 192px);
+  }
+
+  .rumia-portugal-hero {
+    background:
+      radial-gradient(circle at 78% 18%, rgba(206, 147, 63, 0.24), transparent 15rem),
+      radial-gradient(circle at 10% 90%, rgba(93, 133, 105, 0.35), transparent 22rem),
+      linear-gradient(122deg, #10271d 0%, #19372a 52%, #0c1f16 100%);
+  }
+
+  .rumia-portugal-hero::before {
+    content: "";
+    position: absolute;
+    inset: 1rem;
+    border: 1px solid rgba(232, 255, 240, 0.14);
+    border-radius: 22px;
+    pointer-events: none;
+    background:
+      linear-gradient(110deg, transparent 0 62%, rgba(234, 184, 117, 0.06) 62.2%, transparent 62.4%),
+      repeating-radial-gradient(ellipse at 100% 0%, transparent 0 92px, rgba(234, 184, 117, 0.07) 93px 94px, transparent 95px 188px);
+    mask-image: linear-gradient(180deg, black, transparent 86%);
+  }
+
+  .rumia-portugal-proof {
+    background: linear-gradient(100deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.28));
+    backdrop-filter: blur(8px);
+  }
+
+  .rumia-portugal-field-note {
+    position: relative;
+  }
+
+  .rumia-portugal-field-note::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 3rem 1rem -1rem;
+    border: 1px solid rgba(206, 147, 63, 0.28);
+    border-radius: 32px;
+    transform: rotate(-1deg);
+  }
+
+  .rumia-portugal-collections {
+    background:
+      radial-gradient(circle at 12% 0%, rgba(206, 147, 63, 0.2), transparent 18rem),
+      radial-gradient(circle at 92% 92%, rgba(93, 133, 105, 0.3), transparent 24rem),
+      linear-gradient(145deg, #10271d 0%, #19372a 52%, #0c1f16 100%);
+  }
+
+  .rumia-portugal-collections-intro {
+    background: transparent;
+  }
+
+  .rumia-portugal-collections::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.42;
+    background-image:
+      repeating-radial-gradient(ellipse at 90% 12%, transparent 0 80px, rgba(234, 184, 117, 0.1) 81px 82px, transparent 83px 164px),
+      linear-gradient(115deg, transparent 0 54%, rgba(234, 184, 117, 0.08) 54.2%, transparent 54.4%);
+  }
+
+  .rumia-portugal-collection-card {
+    background:
+      linear-gradient(140deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+      rgba(6, 25, 17, 0.38);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 14px 44px rgba(3, 16, 10, 0.18);
+    transition: transform 220ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)), border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease;
+  }
+
+  .rumia-portugal-collection-card::after {
+    content: "";
+    position: absolute;
+    inset: auto 1.5rem 1.25rem;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(234, 184, 117, 0.5), transparent 75%);
+    opacity: 0.45;
+  }
+
+  .rumia-portugal-collection-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(234, 184, 117, 0.48);
+    background-color: rgba(32, 63, 47, 0.68);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.11), 0 22px 56px rgba(3, 16, 10, 0.28);
+  }
+
+  @media (max-width: 767px) {
+    .rumia-portugal-collections {
+      background: transparent;
+    }
+
+    .rumia-portugal-collections::before {
+      display: none;
+    }
+
+    .rumia-portugal-collections-intro {
+      background:
+        radial-gradient(circle at 90% 0%, rgba(206, 147, 63, 0.2), transparent 14rem),
+        linear-gradient(145deg, #10271d 0%, #19372a 52%, #0c1f16 100%);
+      box-shadow: 0 14px 44px rgba(3, 16, 10, 0.16);
+    }
+
+    .rumia-portugal-collection-card--featured {
+      background:
+        radial-gradient(circle at 88% 0%, rgba(206, 147, 63, 0.18), transparent 12rem),
+        linear-gradient(145deg, #10271d 0%, #19372a 52%, #0c1f16 100%);
+      box-shadow: 0 14px 36px rgba(3, 16, 10, 0.18);
+    }
+
+    .rumia-portugal-collection-card--compact {
+      border-color: rgba(22, 40, 31, 0.14);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.42)),
+        var(--color-surface, #f7f5ef);
+      box-shadow: 0 10px 28px rgba(22, 40, 31, 0.08);
+    }
+
+    .rumia-portugal-collection-card--compact::after {
+      background: linear-gradient(90deg, rgba(145, 96, 38, 0.5), transparent 75%);
+    }
+
+    .rumia-portugal-collection-card--compact:hover {
+      border-color: rgba(145, 96, 38, 0.35);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.58)),
+        var(--color-surface, #f7f5ef);
+      box-shadow: 0 14px 34px rgba(22, 40, 31, 0.12);
+    }
+  }
 }
 
 @keyframes rumia-phrase-enter {
@@ -90,6 +293,38 @@
   }
 }
 
+@keyframes rumia-mobile-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rumia-cinematic-video-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rumia-hero-rise {
+  from { opacity: 0; transform: translateY(0.75rem) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes rumia-card-rise {
+  from { opacity: 0; transform: translateY(0.65rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rumia-phrase-transition,
   .rumia-status-transition,
@@ -102,10 +337,1254 @@
     opacity: 1 !important;
     transform: none !important;
   }
+
+  .rumia-mobile-panel {
+    animation-duration: 0ms !important;
+    transform: none !important;
+  }
+
+  .rumia-portugal-collection-card {
+    transition: none !important;
+  }
+
+  .rumia-portugal-collection-card:hover {
+    transform: none;
+  }
+
+  .rumia-cinematic-media__video {
+    animation: none !important;
+    opacity: 0 !important;
+    transition: none !important;
+  }
+}
+
+@media (prefers-reduced-data: reduce) {
+  .rumia-cinematic-media__video {
+    animation: none !important;
+    opacity: 0 !important;
+    transition: none !important;
+  }
 }
 
 body {
   min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+ * Frontend polish layer
+ *
+ * These named hooks are intentionally small and compositional. They let the
+ * route components keep their semantic Tailwind classes while giving the
+ * whole product one visual rhythm: a warmer reading field, a darker decision
+ * band, authored media cards, and compact utility chrome.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --rumia-reading-width: 70rem;
+  --rumia-prose-width: 42rem;
+  --rumia-border-soft: color-mix(in srgb, var(--color-midnight) 14%, transparent);
+  --rumia-border-dark: rgba(232, 255, 240, 0.16);
+  --rumia-shadow-card: 0 18px 48px rgba(22, 40, 31, 0.1);
+  --rumia-reading-field-wash: rgba(206, 147, 63, 0.055);
+  --rumia-reading-field-wash-strong: rgba(206, 147, 63, 0.08);
+  --rumia-reading-field-neutral: rgba(72, 63, 51, 0.045);
+}
+
+.rumia-surface-sage {
+  /* Keep the legacy surface name for compatibility, but remove the old mint
+   * canvas. Public pages now share the same warm reading field as linen. */
+  background-color: var(--rumia-reading-field);
+  background-image:
+    radial-gradient(circle at 4% 0%, var(--rumia-reading-field-wash-strong), transparent 28rem),
+    radial-gradient(circle at 96% 22%, var(--rumia-reading-field-neutral), transparent 32rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), transparent 28%, var(--rumia-reading-field-shadow) 100%);
+}
+
+.rumia-surface-linen {
+  --surface-contour: rgba(63, 58, 48, 0.052);
+  --surface-contour-soft: rgba(153, 105, 49, 0.035);
+  background-color: var(--rumia-reading-field);
+  background-image:
+    radial-gradient(circle at 92% 0%, rgba(206, 147, 63, 0.14), transparent 28rem),
+    radial-gradient(circle at 0% 76%, var(--rumia-reading-field-cool), transparent 34rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38), transparent 32%, var(--rumia-reading-field-shadow) 100%),
+    linear-gradient(90deg, transparent 0 49.5%, var(--rumia-reading-field-grid) 50%, transparent 50.5%),
+    linear-gradient(0deg, transparent 0 49.5%, var(--rumia-reading-field-grid) 50%, transparent 50.5%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, var(--surface-texture-grid-size) var(--surface-texture-grid-size), var(--surface-texture-grid-size) var(--surface-texture-grid-size);
+}
+
+.rumia-app-layout,
+.rumia-page-shell {
+  overflow-x: clip;
+}
+
+.rumia-top-nav {
+  background: color-mix(in srgb, var(--color-linen-dark) 88%, transparent) !important;
+  border-bottom-color: rgba(60, 84, 71, 0.14) !important;
+  box-shadow: 0 10px 32px rgba(22, 40, 31, 0.09);
+  backdrop-filter: blur(18px) saturate(1.05);
+}
+
+.rumia-top-nav a[data-active="true"] {
+  position: relative;
+  color: var(--color-ochre-on-light) !important;
+}
+
+.rumia-top-nav a[data-active="true"]::after {
+  content: "";
+  position: absolute;
+  right: 0.35rem;
+  bottom: -0.6rem;
+  left: 0.35rem;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--color-ochre-light);
+  box-shadow: 0 0 0 3px rgba(206, 147, 63, 0.08);
+}
+
+.rumia-top-nav a:not([data-active="true"]):hover {
+  color: var(--color-ochre-on-light) !important;
+}
+
+.rumia-top-nav::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(206, 147, 63, 0.48), transparent);
+  opacity: 0.75;
+}
+
+.rumia-site-footer {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(206, 147, 63, 0.12), transparent 24rem),
+    linear-gradient(180deg, #e8e4dc 0%, #e3dfd7 100%);
+}
+
+.rumia-site-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.32;
+  background: repeating-linear-gradient(118deg, transparent 0 96px, rgba(60, 84, 71, 0.08) 97px 98px, transparent 99px 192px);
+}
+
+.rumia-site-footer > div {
+  position: relative;
+}
+
+.rumia-how-it-works {
+  position: relative;
+  isolation: isolate;
+  padding-top: clamp(4rem, 9vw, 7.5rem);
+  /* The cinematic image chapter supplies the pause; keep this section from
+   * leaving a dead beige runway after the cards. */
+  padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  border-top: 1px solid rgba(60, 84, 71, 0.08);
+  border-bottom: 1px solid rgba(60, 84, 71, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 34%, rgba(206, 147, 63, 0.035));
+}
+
+.rumia-how-it-works::before {
+  content: "HOW RUMIA DECIDES";
+  position: absolute;
+  top: clamp(1.5rem, 4vw, 3.25rem);
+  left: max(1.5rem, calc((100% - 72rem) / 2));
+  color: var(--color-ochre-on-light);
+  font-family: var(--font-mono-micro);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.rumia-how-it-works li {
+  transition: transform 220ms var(--ease-standard), box-shadow 220ms var(--ease-standard), background-color 220ms var(--ease-standard);
+}
+
+.rumia-how-it-works li:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--rumia-shadow-card);
+  background-color: rgba(255, 255, 255, 0.96);
+}
+
+.rumia-home-editorial-chapter {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.rumia-home-editorial-chapter::before {
+  content: "PORTUGAL / FIELD NOTE";
+  position: absolute;
+  z-index: 2;
+  top: 1.25rem;
+  left: clamp(1rem, 5vw, 4.5rem);
+  color: rgba(239, 236, 230, 0.76);
+  font-family: var(--font-mono-micro);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  pointer-events: none;
+}
+
+.rumia-home-editorial-chapter::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(16, 39, 29, 0.44), transparent 17%, transparent 70%, rgba(16, 39, 29, 0.32));
+}
+
+.rumia-home-editorial-chapter [data-testid="portugal-editorial-chapter"] {
+  position: relative;
+  z-index: 0;
+}
+
+.rumia-hero-intent {
+  width: min(100%, 48rem);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid rgba(232, 255, 240, 0.18);
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, rgba(22, 40, 31, 0.76), rgba(43, 62, 52, 0.58));
+  box-shadow: 0 24px 80px rgba(6, 20, 13, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  animation: rumia-hero-rise 700ms 120ms var(--ease-cinematic, cubic-bezier(0.2, 0, 0, 1)) both;
+}
+
+.rumia-hero-intent .rumia-intent-composer {
+  margin-inline: auto;
+}
+
+.rumia-intent-submit {
+  box-shadow: 0 10px 28px rgba(234, 184, 117, 0.18);
+  transition: transform 180ms var(--ease-standard), box-shadow 180ms var(--ease-standard), background-color 180ms var(--ease-standard);
+}
+
+.rumia-intent-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(234, 184, 117, 0.28);
+}
+
+.rumia-intent-panel {
+  border: 1px solid rgba(232, 255, 240, 0.12);
+  box-shadow: 0 20px 52px rgba(22, 40, 31, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.rumia-result-list > article,
+.rumia-workspace-list > li > article {
+  border-radius: 1.25rem;
+  padding-inline: clamp(1rem, 3vw, 1.75rem);
+  transition: background-color 220ms var(--ease-standard), box-shadow 220ms var(--ease-standard), transform 220ms var(--ease-standard);
+}
+
+.rumia-result-list > article:hover,
+.rumia-workspace-list > li > article:hover {
+  background: rgba(255, 255, 255, 0.52);
+  box-shadow: 0 16px 40px rgba(22, 40, 31, 0.08);
+  transform: translateY(-2px);
+}
+
+.rumia-day-tray {
+  border: 1px solid rgba(206, 147, 63, 0.36);
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.88), var(--rumia-reading-field-wash-strong));
+  box-shadow: 0 18px 48px rgba(22, 40, 31, 0.1);
+}
+
+/* The empty workspace is an intentional state, not a missing-results error.
+ * Give it enough contrast to read as the opening chapter of a day while
+ * preserving the same editorial warmth as the rest of the public shell. */
+.rumia-workspace-empty {
+  isolation: isolate;
+  min-height: 29rem;
+  border: 1px solid rgba(234, 184, 117, 0.34);
+  color: var(--color-linen);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(234, 184, 117, 0.2), transparent 16rem),
+    radial-gradient(circle at 10% 100%, rgba(94, 139, 111, 0.26), transparent 19rem),
+    linear-gradient(132deg, #10271d 0%, #19382b 58%, #0d2017 100%);
+  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.2), inset 0 1px 0 rgba(232, 255, 240, 0.14);
+}
+
+.rumia-workspace-empty::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.48;
+  background:
+    linear-gradient(122deg, transparent 0 48%, rgba(232, 255, 240, 0.08) 48.1%, transparent 48.3%),
+    linear-gradient(26deg, transparent 0 66%, rgba(234, 184, 117, 0.1) 66.1%, transparent 66.3%);
+}
+
+.rumia-workspace-empty .text-primary {
+  color: var(--color-linen);
+}
+
+.rumia-workspace-empty .text-on-surface-variant {
+  color: rgba(247, 241, 228, 0.72);
+}
+
+.rumia-workspace-empty .text-ochre-dark {
+  color: var(--color-ochre-light);
+}
+
+.rumia-workspace-empty__compass {
+  color: rgba(234, 184, 117, 0.2);
+}
+
+.rumia-workspace-empty__shape {
+  border-color: rgba(234, 184, 117, 0.28);
+}
+
+.rumia-workspace-empty__shape .text-primary {
+  color: rgba(247, 241, 228, 0.96);
+}
+
+.rumia-workspace-empty__actions > a {
+  color: var(--color-ochre-light);
+}
+
+.rumia-workspace-empty__primary {
+  box-shadow: 0 12px 30px rgba(6, 20, 13, 0.24);
+}
+
+.rumia-bento-card {
+  isolation: isolate;
+  background-color: var(--color-olive-dark, #1d2a23);
+  background-repeat: no-repeat;
+  box-shadow: 0 20px 54px rgba(22, 40, 31, 0.2);
+  transition: transform 360ms var(--ease-cinematic), box-shadow 360ms var(--ease-cinematic), border-color 220ms ease;
+}
+
+.rumia-bento-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 72px rgba(22, 40, 31, 0.28);
+}
+
+.rumia-bento-card__media {
+  transition: transform 800ms var(--ease-cinematic), filter 360ms ease;
+}
+
+.rumia-bento-card:hover .rumia-bento-card__media {
+  transform: scale(1.05);
+  filter: saturate(1.08) contrast(1.04);
+}
+
+.rumia-dossier {
+  border-top: 1px solid var(--rumia-border-soft);
+  border-bottom: 1px solid var(--rumia-border-soft);
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.rumia-explore-page,
+.rumia-workspace-page,
+.rumia-activity-detail {
+  position: relative;
+}
+
+.rumia-explore-page::before,
+.rumia-workspace-page::before,
+.rumia-activity-detail::before {
+  content: "";
+  position: absolute;
+  inset: 0 -10% auto;
+  height: 18rem;
+  pointer-events: none;
+  background: radial-gradient(circle at 12% 0%, rgba(206, 147, 63, 0.12), transparent 22rem);
+  z-index: -1;
+}
+
+.rumia-activity-detail > .rumia-cinematic-media,
+.rumia-explore-page .rumia-cinematic-media,
+.rumia-workspace-page .rumia-cinematic-media {
+  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.16);
+}
+
+.rumia-detail-judgement-zone [data-testid="activity-detail-judgement"] {
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.58), var(--rumia-reading-field-wash));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.rumia-detail-decision {
+  padding-inline: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-left: 2px solid rgba(206, 147, 63, 0.5);
+}
+
+.rumia-detail-next {
+  position: relative;
+  isolation: isolate;
+  padding-inline: clamp(1rem, 3vw, 2rem);
+  padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(206, 147, 63, 0.13), transparent 16rem),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.52), var(--rumia-reading-field-wash));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 16px 40px rgba(22, 40, 31, 0.06);
+}
+
+/* A chapter close gives short result sets a deliberate ending. It is a
+ * judgement surface, not another generic card: the dark field echoes the
+ * intent composer, while the compact stats/actions make the next decision
+ * legible before the footer arrives. */
+.rumia-chapter-close {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: clamp(3rem, 6vw, 5.5rem);
+  border: 1px solid rgba(234, 184, 117, 0.35);
+  border-radius: 1.75rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  color: var(--color-linen);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(234, 184, 117, 0.18), transparent 18rem),
+    radial-gradient(circle at 8% 100%, rgba(93, 133, 105, 0.24), transparent 24rem),
+    linear-gradient(132deg, #10271d 0%, #19372a 55%, #0d2017 100%);
+  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.2), inset 0 1px 0 rgba(232, 255, 240, 0.14);
+}
+
+.rumia-chapter-close::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    repeating-radial-gradient(ellipse at 94% 12%, transparent 0 72px, rgba(234, 184, 117, 0.1) 73px 74px, transparent 75px 150px),
+    linear-gradient(116deg, transparent 0 68%, rgba(232, 255, 240, 0.08) 68.2%, transparent 68.5%);
+}
+
+.rumia-chapter-close__mark {
+  position: absolute;
+  top: clamp(1.5rem, 4vw, 3rem);
+  right: clamp(1.5rem, 4vw, 3rem);
+  color: rgba(234, 184, 117, 0.68);
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  line-height: 1;
+  transform: rotate(14deg);
+}
+
+.rumia-chapter-close__body {
+  position: relative;
+  max-width: 48rem;
+}
+
+.rumia-chapter-close__kicker {
+  color: var(--color-ochre-light);
+  font-family: var(--font-mono-micro);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.rumia-chapter-close__title {
+  max-width: 34rem;
+  margin-top: 0.8rem;
+  color: var(--color-linen);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.8vw, 3.75rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.rumia-chapter-close__description {
+  max-width: 38rem;
+  margin-top: 1.1rem;
+  color: rgba(239, 236, 230, 0.78);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.rumia-chapter-close__content {
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.rumia-chapter-close__stats {
+  display: grid;
+  gap: 1rem;
+  border-top: 1px solid rgba(232, 255, 240, 0.18);
+  border-bottom: 1px solid rgba(232, 255, 240, 0.18);
+  padding-block: 1rem;
+}
+
+.rumia-chapter-close__stats > div {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.rumia-chapter-close__stats span {
+  color: var(--color-ochre-light);
+  font-family: var(--font-mono-micro);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.rumia-chapter-close__stats strong {
+  color: var(--color-linen);
+  font-size: 0.96rem;
+  font-weight: 500;
+}
+
+.rumia-chapter-close__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rumia-chapter-close__primary {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(234, 184, 117, 0.5);
+  border-radius: 9999px;
+  padding: 0.65rem 1.1rem;
+  background: var(--color-ochre-light);
+  color: var(--color-midnight);
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 10px 26px rgba(234, 184, 117, 0.16);
+  transition: transform 180ms var(--ease-standard), box-shadow 180ms var(--ease-standard), background-color 180ms var(--ease-standard);
+}
+
+.rumia-chapter-close__primary:hover {
+  transform: translateY(-2px);
+  background: #f0c487;
+  box-shadow: 0 14px 32px rgba(234, 184, 117, 0.24);
+}
+
+.rumia-chapter-close__primary:focus-visible,
+.rumia-chapter-close__secondary:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.rumia-chapter-close__secondary {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  padding: 0.65rem 0.15rem;
+  color: rgba(239, 236, 230, 0.86);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: rgba(234, 184, 117, 0.72);
+  text-underline-offset: 0.35rem;
+  transition: color 180ms var(--ease-standard), text-decoration-color 180ms var(--ease-standard);
+}
+
+.rumia-chapter-close__secondary:hover {
+  color: var(--color-linen);
+  text-decoration-color: var(--color-ochre-light);
+}
+
+@media (min-width: 640px) {
+  .rumia-chapter-close__stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .rumia-chapter-close__stats > div + div {
+    border-left: 1px solid rgba(232, 255, 240, 0.18);
+    padding-left: 1.5rem;
+  }
+}
+
+.rumia-planner-page {
+  background:
+    radial-gradient(circle at 84% 12%, rgba(234, 184, 117, 0.13), transparent 22rem),
+    radial-gradient(circle at 4% 86%, rgba(60, 84, 71, 0.28), transparent 28rem),
+    linear-gradient(145deg, #10271d 0%, #162f24 52%, #0d1f16 100%);
+}
+
+.rumia-planner-page [data-testid="planner-brief"] > div,
+.rumia-planner-page aside > * {
+  animation: rumia-page-enter 450ms var(--ease-cinematic) both;
+}
+
+.rumia-vault-gallery {
+  position: relative;
+  isolation: isolate;
+}
+
+.rumia-vault-gallery::before {
+  content: "";
+  position: absolute;
+  inset: -1rem -8% auto;
+  height: 19rem;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(206, 147, 63, 0.13), transparent 20rem),
+    linear-gradient(180deg, var(--rumia-reading-field-wash), transparent 86%);
+}
+
+.rumia-vault-header {
+  position: relative;
+}
+
+.rumia-vault-empty {
+  grid-column: 1 / -1;
+  max-width: 44rem;
+  min-height: 18rem;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  margin-inline: auto;
+  padding: clamp(2rem, 5vw, 4rem);
+  /* DecisionStatePanel renders this route in its inverse tone. Keep the
+   * authored empty state dark so the inverse copy remains legible instead of
+   * inheriting the pale saved-card treatment used by populated vault cards. */
+  background:
+    radial-gradient(circle at 86% 10%, rgba(206, 147, 63, 0.2), transparent 16rem),
+    linear-gradient(145deg, #10271d 0%, #19372a 58%, #0d1f16 100%);
+  box-shadow: 0 24px 60px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(232, 255, 240, 0.12);
+}
+
+/* Operator surfaces stay utilitarian, but should still feel authored. The
+ * sidebar and content field now share a quiet depth treatment without
+ * importing the cinematic public-page language. */
+.rumia-operator-shell {
+  background:
+    radial-gradient(circle at 82% 4%, rgba(206, 147, 63, 0.08), transparent 22rem),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.2), transparent 42%),
+    var(--rumia-reading-field);
+}
+
+.rumia-operator-sidebar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.64), var(--rumia-reading-field-wash)) !important;
+  box-shadow: 12px 0 34px rgba(22, 40, 31, 0.04);
+}
+
+.rumia-operator-sidebar > div {
+  background-image: linear-gradient(165deg, transparent 0 70%, rgba(206, 147, 63, 0.06) 70% 70.2%, transparent 70.2%);
+}
+
+.rumia-operator-main {
+  position: relative;
+  isolation: isolate;
+}
+
+.rumia-operator-main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(90deg, transparent 0 49.8%, rgba(60, 84, 71, 0.08) 50%, transparent 50.2%),
+    linear-gradient(rgba(60, 84, 71, 0.06) 1px, transparent 1px);
+  background-size: 160px 160px, 100% 160px;
+  mask-image: linear-gradient(180deg, black, transparent 80%);
+}
+
+.rumia-operator-content > * {
+  animation: rumia-page-enter 420ms var(--ease-cinematic) both;
+}
+
+.rumia-operator-content > * + * {
+  animation-delay: 40ms;
+}
+
+/* The pipeline is a utility work surface, not a second marketing chapter.
+ * Keep its drop field quiet and neutral so the cards, status signal, and
+ * filters carry the hierarchy without inheriting the old mint texture. */
+.rumia-pipeline-board-field {
+  background: color-mix(in srgb, var(--color-surface-container-low) 72%, transparent);
+  background-image: none !important;
+  border: 1px solid color-mix(in srgb, var(--color-olive-light) 12%, transparent);
+}
+
+.rumia-auth-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.rumia-auth-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 8% 18%, rgba(206, 147, 63, 0.13), transparent 22rem),
+    radial-gradient(circle at 92% 78%, rgba(60, 84, 71, 0.12), transparent 28rem);
+}
+
+.rumia-auth-page aside {
+  position: relative;
+  overflow: hidden;
+}
+
+.rumia-auth-page aside::after {
+  content: "";
+  position: absolute;
+  inset: auto -10% -20% 40%;
+  height: 18rem;
+  border-radius: 50%;
+  border: 1px solid rgba(234, 184, 117, 0.2);
+  box-shadow: 0 0 0 1.5rem rgba(234, 184, 117, 0.035), 0 0 0 3rem rgba(234, 184, 117, 0.025);
+  pointer-events: none;
+}
+
+.rumia-signin-sentence {
+  display: block;
+}
+
+.rumia-signin-input {
+  transition: border-color 180ms var(--ease-standard), box-shadow 180ms var(--ease-standard);
+}
+
+.rumia-signin-input:focus-visible {
+  border-color: var(--color-ochre-on-light);
+  box-shadow: 0 3px 0 rgba(206, 147, 63, 0.24);
+}
+
+.rumia-signin-password-field {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+@media (max-width: 767px) {
+  .rumia-signin-sentence {
+    display: grid;
+    gap: 0.6rem;
+    line-height: 1.35;
+  }
+
+  .rumia-signin-copy {
+    display: block;
+  }
+
+  .rumia-signin-password-field {
+    display: block;
+  }
+
+  .rumia-signin-input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+  }
+
+  .rumia-signin-sentence button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 9999px;
+    background: var(--color-primary);
+    color: var(--color-linen);
+  }
+
+  .rumia-signin-sentence > span:last-child {
+    display: none;
+  }
+}
+
+.rumia-quiet-page {
+  position: relative;
+  gap: clamp(2.25rem, 4vw, 3.5rem) !important;
+}
+
+.rumia-quiet-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.35rem;
+  background: linear-gradient(90deg, var(--color-ochre-dark), var(--color-ochre-light), transparent 72%);
+  opacity: 0.7;
+}
+
+.rumia-quiet-page [data-tier-state] {
+  transition: background-color 220ms var(--ease-standard), padding-inline 220ms var(--ease-standard);
+}
+
+.rumia-quiet-page [data-tier-state]:hover {
+  background: rgba(255, 255, 255, 0.34);
+  padding-inline: 1rem;
+}
+
+/* Legal and promise pages are intentionally calm, but short copy still needs
+ * a visible reading architecture. The header, summary rail, and document
+ * panel keep the page from becoming a full-height blank field. */
+.rumia-legal-page {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(3.5rem, 8vw, 7rem);
+}
+
+.rumia-legal-page::after {
+  content: "";
+  position: absolute;
+  inset: 10% -10% auto;
+  height: 24rem;
+  pointer-events: none;
+  opacity: 0.42;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(206, 147, 63, 0.1), transparent 18rem),
+    radial-gradient(circle at 78% 0%, rgba(60, 84, 71, 0.08), transparent 26rem);
+}
+
+.rumia-legal-document {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4.75rem);
+}
+
+.rumia-legal-header {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 3.5rem);
+  max-width: 66rem;
+  padding-left: clamp(1rem, 3vw, 2rem);
+  border-left: 2px solid rgba(206, 147, 63, 0.58);
+}
+
+.rumia-legal-intro {
+  max-width: 44rem;
+}
+
+.rumia-legal-layout {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
+}
+
+.rumia-legal-rail {
+  align-self: start;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border: 1px solid rgba(60, 84, 71, 0.16);
+  border-radius: 1.35rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.72), var(--rumia-reading-field-wash));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 18px 42px rgba(22, 40, 31, 0.06);
+}
+
+.rumia-legal-body {
+  max-width: 48rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid rgba(60, 84, 71, 0.14);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.64);
+  box-shadow: var(--rumia-shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.rumia-legal-body p {
+  max-width: 42rem;
+}
+
+@media (min-width: 900px) {
+  .rumia-legal-header {
+    /* Keep a long single-word title such as “Sustainability” inside its
+     * editorial column instead of letting the glyphs collide with the lead. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .rumia-legal-header > * {
+    min-width: 0;
+  }
+
+  .rumia-legal-intro {
+    padding-top: clamp(0.75rem, 2vw, 1.75rem);
+  }
+
+  .rumia-legal-layout {
+    grid-template-columns: minmax(14rem, 0.72fr) minmax(0, 1.28fr);
+  }
+
+  .rumia-legal-rail {
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+/* The explanatory pages need editorial structure, not a long unbroken linen
+ * field. These panels keep the calm tone while giving each decision chapter
+ * a visible beginning, middle, and end. */
+.rumia-how-page,
+.rumia-pricing-page {
+  gap: clamp(2.25rem, 4vw, 3.75rem) !important;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(206, 147, 63, 0.1), transparent 24rem),
+    radial-gradient(circle at 8% 64%, rgba(60, 84, 71, 0.08), transparent 30rem),
+    var(--rumia-reading-field);
+}
+
+.rumia-how-page > :first-child,
+.rumia-pricing-page > :first-child {
+  position: relative;
+  max-width: 68rem;
+  overflow: hidden;
+  padding: clamp(2.25rem, 5vw, 4.5rem) clamp(1.5rem, 5vw, 4.5rem);
+  border: 1px solid rgba(234, 184, 117, 0.28);
+  border-radius: 0 1.75rem 1.75rem 0;
+  background:
+    radial-gradient(circle at 88% 14%, rgba(206, 147, 63, 0.2), transparent 17rem),
+    linear-gradient(132deg, rgba(16, 39, 29, 0.94) 0%, rgba(25, 55, 42, 0.84) 58%, rgba(13, 33, 24, 0.96) 100%),
+    url('/media/unsplash/porto-cobblestone-street.webp');
+  background-position: center, center, center 46%;
+  background-size: cover;
+  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  color: var(--color-linen);
+}
+
+.rumia-pricing-page > :first-child {
+  background-image:
+    radial-gradient(circle at 88% 14%, rgba(206, 147, 63, 0.22), transparent 17rem),
+    linear-gradient(132deg, rgba(16, 39, 29, 0.94) 0%, rgba(25, 55, 42, 0.84) 58%, rgba(13, 33, 24, 0.96) 100%),
+    url('/media/unsplash/douro-terraces.webp');
+  background-position: center, center, center 52%;
+}
+
+.rumia-how-page > :first-child::after,
+.rumia-pricing-page > :first-child::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.62;
+  background:
+    repeating-radial-gradient(ellipse at 96% 6%, transparent 0 78px, rgba(234, 184, 117, 0.08) 79px 80px, transparent 81px 158px),
+    linear-gradient(118deg, transparent 0 58%, rgba(234, 184, 117, 0.08) 58.2%, transparent 58.4%);
+  mask-image: linear-gradient(180deg, black, transparent 90%);
+}
+
+.rumia-how-page > :first-child > *,
+.rumia-pricing-page > :first-child > * {
+  position: relative;
+  z-index: 1;
+}
+
+.rumia-how-page > :first-child > :first-child p,
+.rumia-pricing-page > :first-child > :first-child p {
+  color: rgba(239, 236, 230, 0.76) !important;
+}
+
+.rumia-how-page > :first-child > :first-child p:first-child,
+.rumia-pricing-page > :first-child > :first-child p:first-child {
+  color: var(--color-ochre-light) !important;
+}
+
+.rumia-how-page > :first-child > :first-child h1,
+.rumia-pricing-page > :first-child > :first-child h1 {
+  color: var(--color-linen) !important;
+}
+
+/* PageShell wraps bare content in one layout grid. Keep the chapter treatment
+ * on the actual heading block rather than accidentally painting the whole
+ * explanatory page dark. */
+.rumia-how-page > :first-child,
+.rumia-pricing-page > :first-child {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 72rem;
+  gap: clamp(2.5rem, 4vw, 3.5rem) !important;
+  overflow: visible;
+  padding: clamp(3.5rem, 8vw, 7rem) clamp(1.5rem, 4vw, 3rem);
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none;
+  color: inherit;
+}
+
+.rumia-how-page > :first-child > :first-child,
+.rumia-pricing-page > :first-child > :first-child {
+  position: relative;
+  max-width: 68rem;
+  overflow: hidden;
+  padding: clamp(2.25rem, 5vw, 4.5rem) clamp(1.5rem, 5vw, 4.5rem);
+  border: 1px solid rgba(234, 184, 117, 0.28);
+  border-radius: 0 1.75rem 1.75rem 0;
+  background:
+    radial-gradient(circle at 88% 14%, rgba(206, 147, 63, 0.2), transparent 17rem),
+    linear-gradient(132deg, #10271d 0%, #19372a 58%, #0d2118 100%);
+  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  color: var(--color-linen);
+}
+
+.rumia-how-page > :first-child > :first-child::after,
+.rumia-pricing-page > :first-child > :first-child::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.62;
+  background:
+    repeating-radial-gradient(ellipse at 96% 6%, transparent 0 78px, rgba(234, 184, 117, 0.08) 79px 80px, transparent 81px 158px),
+    linear-gradient(118deg, transparent 0 58%, rgba(234, 184, 117, 0.08) 58.2%, transparent 58.4%);
+  mask-image: linear-gradient(180deg, black, transparent 90%);
+}
+
+.rumia-how-page > :first-child > :first-child > *,
+.rumia-pricing-page > :first-child > :first-child > * {
+  position: relative;
+  z-index: 1;
+}
+
+.rumia-how-page > :first-child > :first-child p,
+.rumia-pricing-page > :first-child > :first-child p {
+  color: rgba(239, 236, 230, 0.76) !important;
+}
+
+.rumia-how-page > :first-child > :first-child p:first-child,
+.rumia-pricing-page > :first-child > :first-child p:first-child {
+  color: var(--color-ochre-light) !important;
+}
+
+.rumia-how-page > :first-child > :first-child h1,
+.rumia-pricing-page > :first-child > :first-child h1 {
+  color: var(--color-linen) !important;
+}
+
+.rumia-how-page > :first-child > [data-testid="editorial-proof-rail"],
+.rumia-pricing-page > :first-child > [data-testid="editorial-proof-rail"] {
+  position: relative;
+  z-index: 1;
+  padding-inline: 0;
+}
+
+.rumia-how-page > :first-child > [data-testid="editorial-proof-rail"] dd,
+.rumia-pricing-page > :first-child > [data-testid="editorial-proof-rail"] dd,
+.rumia-how-page > :first-child > .rumia-process-grid p:not(:first-child),
+.rumia-pricing-page > :first-child > .rumia-pricing-tiers p {
+  color: var(--color-on-surface-variant) !important;
+}
+
+.rumia-how-page > [data-testid="editorial-proof-rail"],
+.rumia-pricing-page > [data-testid="editorial-proof-rail"] {
+  padding: 1.25rem clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid rgba(60, 84, 71, 0.13);
+  border-radius: 1.25rem;
+  background: linear-gradient(110deg, rgba(255, 255, 255, 0.64), var(--rumia-reading-field-wash));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 18px 44px rgba(22, 40, 31, 0.05);
+}
+
+.rumia-process-grid {
+  position: relative;
+}
+
+.rumia-process-grid::before {
+  content: "";
+  position: absolute;
+  top: 0.75rem;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(206, 147, 63, 0.42), rgba(60, 84, 71, 0.14), transparent);
+  pointer-events: none;
+}
+
+.rumia-process-grid li {
+  position: relative;
+  min-height: 12rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(60, 84, 71, 0.16);
+  border-radius: 1.25rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.74), var(--rumia-reading-field-wash));
+  box-shadow: 0 16px 38px rgba(22, 40, 31, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.76);
+  transition: transform 220ms var(--ease-standard), box-shadow 220ms var(--ease-standard), border-color 220ms var(--ease-standard);
+}
+
+.rumia-process-grid li:hover {
+  transform: translateY(-4px);
+  border-color: rgba(206, 147, 63, 0.42);
+  box-shadow: var(--rumia-shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+.rumia-how-it-works li,
+.rumia-process-grid li {
+  animation: rumia-card-rise 620ms var(--ease-cinematic, cubic-bezier(0.2, 0, 0, 1)) both;
+}
+
+.rumia-how-it-works li:nth-child(2),
+.rumia-process-grid li:nth-child(2) { animation-delay: 70ms; }
+
+.rumia-how-it-works li:nth-child(3),
+.rumia-process-grid li:nth-child(3) { animation-delay: 140ms; }
+
+.rumia-how-it-works li:nth-child(4),
+.rumia-process-grid li:nth-child(4) { animation-delay: 210ms; }
+
+.rumia-process-grid li > p:first-child {
+  display: inline-flex;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(206, 147, 63, 0.14);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+}
+
+.rumia-pricing-tiers {
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 18px 44px rgba(22, 40, 31, 0.05);
+}
+
+.rumia-pricing-tiers [data-tier-state] {
+  position: relative;
+  padding-block: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.rumia-pricing-tiers [data-tier-state="included"] {
+  background: linear-gradient(110deg, rgba(60, 84, 71, 0.1), rgba(255, 255, 255, 0.12));
+}
+
+.rumia-pricing-tiers [data-tier-state="future"] {
+  opacity: 0.72;
+}
+
+.rumia-planner-summary > section {
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.rumia-feedback-page,
+.rumia-support-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.rumia-feedback-page::before,
+.rumia-support-page::before {
+  content: "";
+  position: absolute;
+  inset: 0 -10% auto;
+  height: 22rem;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(circle at 82% 6%, rgba(206, 147, 63, 0.16), transparent 22rem);
+}
+
+.rumia-support-page a.group {
+  transition: transform 220ms var(--ease-standard), box-shadow 220ms var(--ease-standard), background-color 220ms var(--ease-standard);
+}
+
+.rumia-support-page a.group:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--rumia-shadow-card);
+}
+
+@media (max-width: 767px) {
+  .rumia-site-footer--compact > div {
+    padding-block: 0.8rem;
+  }
+
+  .rumia-site-footer--compact > div > div:first-child {
+    gap: 0.25rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .rumia-site-footer--compact > div > div:nth-child(2) {
+    margin-top: 1.25rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .rumia-site-footer--compact nav {
+    gap: 0.375rem;
+  }
+
+  .rumia-site-footer--compact nav ul {
+    gap: 0;
+  }
+
+  .rumia-site-footer--compact nav a {
+    min-height: 0;
+    height: 1.5rem;
+    padding-block: 0;
+    line-height: 1.25rem;
+  }
+
+  .rumia-site-footer--compact > div > div:last-child {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+  }
+
+  .rumia-site-footer .rumia-site-footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rumia-site-footer .rumia-site-footer__brand {
+    grid-column: 1 / -1;
+  }
+
+  .rumia-result-list > article,
+  .rumia-workspace-list > li > article {
+    padding-inline: 1rem;
+  }
+
+  .rumia-how-it-works::before {
+    left: 1.5rem;
+    font-size: 0.56rem;
+  }
+
+  .rumia-process-grid::before {
+    top: 0;
+    right: auto;
+    bottom: 0;
+    left: 0.75rem;
+    width: 1px;
+    height: auto;
+    background: linear-gradient(180deg, rgba(206, 147, 63, 0.42), transparent);
+  }
+
+  .rumia-process-grid li {
+    min-height: auto;
+    padding: 1.25rem;
+  }
+
+  .rumia-pricing-tiers [data-tier-state] {
+    padding-inline: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rumia-how-it-works li,
+  .rumia-result-list > article,
+  .rumia-workspace-list > li > article,
+  .rumia-bento-card,
+  .rumia-bento-card__media,
+  .rumia-intent-submit,
+  .rumia-process-grid li,
+  .rumia-operator-content > *,
+  .rumia-chapter-close__primary {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .rumia-hero-intent,
+  .rumia-how-it-works li,
+  .rumia-process-grid li {
+    animation: none !important;
+  }
 }
 
 a {
@@ -220,4 +1699,232 @@ a {
   -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
   opacity: 0.35;
   z-index: 0;
+}
+
+/* ---- Route-specific visual compositions ----
+ * These are intentionally not another shared card skin. Each public route
+ * gets a visual job: support is a wayfinding desk, pricing is a ledger with
+ * a clear recommendation, legal is a readable document with a trust rail,
+ * and the how-it-works page is a progression rather than four identical
+ * boxes. */
+.rumia-support-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2rem, 5vw, 4.25rem);
+  border: 1px solid rgba(234, 184, 117, 0.3);
+  border-radius: 0 2rem 2rem 0;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(234, 184, 117, 0.2), transparent 16rem),
+    linear-gradient(132deg, rgba(16, 39, 29, 0.95) 0%, rgba(25, 56, 43, 0.84) 58%, rgba(13, 32, 23, 0.96) 100%),
+    url('/media/unsplash/porto-cobblestone-card.webp');
+  background-position: center, center, center 42%;
+  background-size: cover;
+  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(232, 255, 240, 0.12);
+}
+
+.rumia-support-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    repeating-radial-gradient(ellipse at 95% 0%, transparent 0 82px, rgba(234, 184, 117, 0.08) 83px 84px, transparent 85px 168px),
+    linear-gradient(116deg, transparent 0 60%, rgba(232, 255, 240, 0.08) 60.2%, transparent 60.4%);
+}
+
+.rumia-support-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.rumia-support-hero .font-display,
+.rumia-support-hero h1 {
+  color: var(--color-linen) !important;
+}
+
+.rumia-support-hero p:not([class*="font-metadata"]),
+.rumia-support-hero .text-on-surface-variant {
+  color: rgba(239, 236, 230, 0.74) !important;
+}
+
+.rumia-support-hero .text-ochre-dark,
+.rumia-support-hero .text-ochre-on-light {
+  color: var(--color-ochre-light) !important;
+}
+
+.rumia-support-start {
+  border-color: rgba(234, 184, 117, 0.3);
+  background:
+    linear-gradient(110deg, rgba(234, 184, 117, 0.16), rgba(255, 255, 255, 0.3)),
+    radial-gradient(circle at 96% 0%, rgba(60, 84, 71, 0.12), transparent 18rem);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 20px 48px rgba(22, 40, 31, 0.08);
+}
+
+.rumia-support-topics {
+  counter-reset: support-topic;
+}
+
+.rumia-support-topic {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(60, 84, 71, 0.15);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(234, 229, 218, 0.42));
+  box-shadow: 0 14px 34px rgba(22, 40, 31, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition: transform 240ms var(--ease-standard), box-shadow 240ms var(--ease-standard), border-color 240ms var(--ease-standard), background-color 240ms var(--ease-standard);
+  counter-increment: support-topic;
+}
+
+.rumia-support-topic::before {
+  content: "0" counter(support-topic);
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  color: var(--color-ochre-on-light);
+  font-family: var(--font-mono-micro);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.rumia-support-topic:hover {
+  transform: translateY(-5px);
+  border-color: rgba(206, 147, 63, 0.42);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--rumia-shadow-card);
+}
+
+.rumia-how-step:nth-child(2) {
+  background: linear-gradient(145deg, rgba(234, 184, 117, 0.14), rgba(255, 255, 255, 0.58));
+}
+
+.rumia-how-step:nth-child(3) {
+  border-color: rgba(234, 184, 117, 0.34);
+  background:
+    radial-gradient(circle at 86% 12%, rgba(234, 184, 117, 0.18), transparent 12rem),
+    linear-gradient(132deg, #10271d 0%, #19382b 58%, #0d2017 100%);
+  box-shadow: 0 22px 52px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(232, 255, 240, 0.12);
+}
+
+.rumia-how-step:nth-child(3) .text-primary,
+.rumia-how-step:nth-child(3) .text-on-surface-variant,
+.rumia-how-step:nth-child(3) .text-ochre-dark {
+  color: var(--color-linen) !important;
+}
+
+.rumia-how-page > :first-child > .rumia-process-grid li:nth-child(3) p.text-on-surface-variant {
+  color: rgba(239, 236, 230, 0.76) !important;
+}
+
+.rumia-how-step:nth-child(3) .text-ochre-dark {
+  color: var(--color-ochre-light) !important;
+}
+
+.rumia-how-step:nth-child(3)::after {
+  background: rgba(234, 184, 117, 0.55) !important;
+}
+
+.rumia-tier-row {
+  position: relative;
+  padding-inline: clamp(1.25rem, 3vw, 2rem);
+  transition: transform 240ms var(--ease-standard), background-color 240ms var(--ease-standard), box-shadow 240ms var(--ease-standard);
+}
+
+.rumia-tier-row::before {
+  content: "";
+  position: absolute;
+  inset: 1.25rem auto 1.25rem 0;
+  width: 3px;
+  border-radius: 999px;
+  background: rgba(206, 147, 63, 0.32);
+}
+
+.rumia-tier-row:hover {
+  z-index: 1;
+  transform: translateX(0.35rem);
+  background: rgba(255, 255, 255, 0.52);
+  box-shadow: 0 12px 30px rgba(22, 40, 31, 0.06);
+}
+
+.rumia-tier-row[data-tier-state="included"] {
+  color: var(--color-linen);
+  background:
+    radial-gradient(circle at 92% 10%, rgba(234, 184, 117, 0.18), transparent 15rem),
+    linear-gradient(132deg, #10271d 0%, #19382b 58%, #0d2017 100%);
+}
+
+.rumia-tier-row[data-tier-state="included"]::before {
+  background: var(--color-ochre-light);
+}
+
+.rumia-tier-row[data-tier-state="included"] .text-primary,
+.rumia-tier-row[data-tier-state="included"] .text-on-surface-variant,
+.rumia-tier-row[data-tier-state="included"] .text-ochre-dark {
+  color: var(--color-linen) !important;
+}
+
+.rumia-tier-row[data-tier-state="included"] .text-ochre-dark {
+  color: var(--color-ochre-light) !important;
+}
+
+.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] p.text-on-surface-variant {
+  color: rgba(239, 236, 230, 0.76) !important;
+}
+
+.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] p.text-ochre-dark,
+.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] h2.text-primary,
+.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] strong.text-primary {
+  color: var(--color-ochre-light) !important;
+}
+
+.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] h2.text-primary,
+.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] strong.text-primary {
+  color: var(--color-linen) !important;
+}
+
+.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] a {
+  color: var(--color-linen) !important;
+  border-color: rgba(234, 184, 117, 0.58) !important;
+}
+
+.rumia-tier-row[data-tier-state="future"] {
+  filter: saturate(0.7);
+}
+
+.rumia-legal-rail {
+  color: var(--color-linen);
+  border-color: rgba(234, 184, 117, 0.3);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(234, 184, 117, 0.2), transparent 13rem),
+    linear-gradient(132deg, #10271d 0%, #19382b 58%, #0d2017 100%);
+  box-shadow: 0 22px 52px rgba(22, 40, 31, 0.16), inset 0 1px 0 rgba(232, 255, 240, 0.12);
+}
+
+.rumia-legal-rail .text-primary,
+.rumia-legal-rail .text-on-surface-variant {
+  color: rgba(239, 236, 230, 0.78) !important;
+}
+
+.rumia-legal-rail .text-primary {
+  color: var(--color-linen) !important;
+}
+
+.rumia-legal-rail .text-ochre-dark {
+  color: var(--color-ochre-light) !important;
+}
+
+.rumia-legal-rail a {
+  color: var(--color-linen) !important;
+  border-color: rgba(234, 184, 117, 0.5) !important;
+}
+
+@media (max-width: 767px) {
+  .rumia-support-hero {
+    border-radius: 0 1.5rem 1.5rem 0;
+    padding: 1.5rem;
+  }
+
+  .rumia-tier-row:hover {
+    transform: none;
+  }
 }

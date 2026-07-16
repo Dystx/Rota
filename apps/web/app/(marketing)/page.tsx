@@ -1,11 +1,13 @@
 import * as React from "react";
 import { Metadata } from "next";
 import { HeroMap } from "./hero-map";
-import { BrandMark } from "@repo/ui";
 import { HowItWorks } from "./_components/how-it-works";
 import { DestinationBento } from "../_components/destination-bento";
 import { HeroIntentCard } from "./_components/hero-intent-card";
 import { HeroEditorialFigure } from "./_components/hero-editorial-figure";
+import { HeroEditorialMedia } from "./_components/hero-editorial-media";
+import { PortugalEditorialChapter } from "./_components/portugal-editorial-chapter";
+import { PublicRouteLayout } from "../_components/public-route-layout";
 
 export const metadata: Metadata = {
   title: "What to do in Portugal, judged well",
@@ -21,9 +23,11 @@ export const metadata: Metadata = {
  */
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <PublicRouteLayout scene="cover" surfaceTone="midnight" surfaceTexture="none" footerMode="full">
+      <div className="rumia-public-home min-h-screen flex flex-col rumia-page-enter">
         <section className="relative w-full flex flex-col items-center justify-start overflow-visible bg-primary pb-12 md:h-[80vh] md:min-h-[720px] md:overflow-hidden md:pb-0">
           <HeroMap initialProjection="mercator" />
+          <HeroEditorialMedia />
 
           <div
             aria-hidden
@@ -41,23 +45,19 @@ export default function HomePage() {
 
           <HeroEditorialFigure />
 
-          <div className="absolute top-6 right-6 md:top-8 md:right-8 z-10">
-            <BrandMark size="md" tone="dark" />
-          </div>
-
           <div className="relative z-10 w-full max-w-4xl mx-auto px-container-padding-sm md:px-container-padding-lg pt-12 md:pt-20 flex flex-col items-center text-center gap-6">
             <p className="font-mono-micro text-mono-micro uppercase tracking-[0.24em] text-ochre-light/90">
               Portugal / activity edition
             </p>
             <h1
               data-testid="home-headline"
-              className="font-display-mobile text-display-mobile md:font-display md:text-display text-linen-dark tracking-tight drop-shadow-2xl"
+              className="max-w-3xl text-balance font-display-mobile text-display-mobile md:font-display md:text-display text-linen-dark tracking-tight drop-shadow-2xl"
             >
               What is actually worth your time in <span className="italic text-ochre-light">Portugal?</span>
             </h1>
             <p
               data-testid="home-value-prop"
-              className="font-body-lg md:font-body-xl text-body-lg md:text-body-xl text-linen-dark/90 max-w-xl drop-shadow-md px-2"
+              className="max-w-lg font-body-lg md:font-body-xl text-body-lg md:text-body-xl text-linen-dark/90 drop-shadow-md px-2"
             >
               A small set of judged Portugal activities, with the timing and trade-offs that make a day work — not an endless list to research alone.
             </p>
@@ -66,7 +66,7 @@ export default function HomePage() {
 
           <div
             data-testid="hero-proof-rail"
-            className="absolute bottom-6 left-6 z-10 hidden w-[52%] items-center justify-between gap-6 border-t border-linen-dark/20 pt-3 font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-linen-dark/65 md:flex"
+            className="pointer-events-none absolute bottom-6 left-6 z-10 hidden w-[52%] items-center justify-between gap-6 border-t border-linen-dark/20 pt-3 font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-linen-dark/65 md:flex"
           >
             <span>Portugal-wide</span>
             <span>Activity first</span>
@@ -75,7 +75,9 @@ export default function HomePage() {
         </section>
 
         <HowItWorks />
+        <PortugalEditorialChapter />
         <DestinationBento mode="explore" />
-    </div>
+      </div>
+    </PublicRouteLayout>
   );
 }

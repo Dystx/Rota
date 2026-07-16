@@ -42,7 +42,7 @@ export default async function B2BLandingPage({
   }
 
   return (
-    <PublicRouteLayout>
+    <PublicRouteLayout scene="utility" footerMode="none" surfaceTone="linen" surfaceTexture="none">
       <OrgBrandingApplier branding={org.branding} />
       <div className="mx-auto w-full max-w-5xl px-container-padding-sm py-16 md:px-container-padding-md">
         <header className="rota-stack-tight mb-6 flex items-center gap-4">
@@ -65,7 +65,7 @@ export default async function B2BLandingPage({
           </h1>
         </header>
         <section className="rota-stack-tight max-w-2xl">
-          <p className="text-sm leading-relaxed text-foreground">
+          <p className="text-base leading-7 text-foreground">
             Welcome to the private travel workspace for
             <strong className="font-medium"> {org.name}</strong>. Your
             partner&rsquo;s Portugal planning experience is being prepared here.

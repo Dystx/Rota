@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { getReviewedActivityById, REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
+import { Button } from "@repo/ui";
+import { EditorialProofRail } from "../_components/editorial-proof-rail";
+import { PublicRouteLayout } from "../../_components/public-route-layout";
 
 import { ActivityFeedbackForm } from "./activity-feedback-form";
 
@@ -33,13 +36,23 @@ export default async function FeedbackPage({
     .slice(0, 5);
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-16">
+    <PublicRouteLayout scene="utility" surfaceTone="linen" surfaceTexture="none" footerMode="compact">
+      <div className="rumia-feedback-page mx-auto grid max-w-5xl gap-8 px-6 py-16 lg:px-12 lg:py-20">
       <Link className="inline-flex min-h-11 items-center text-sm font-medium text-ochre-dark underline decoration-ochre-light underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href="/explore">
         Back to judged activities
       </Link>
-      <p className="mt-10 text-sm text-ochre-dark">Rumia feedback</p>
-      <h1 className="mt-3 font-display text-5xl leading-tight text-primary md:text-6xl">Did Rumia make better use of your time?</h1>
-      <p className="mt-6 max-w-2xl text-lg leading-relaxed text-on-surface-variant">We use a small, anonymous rating to test whether our activity judgement works during real Portugal trips. We do not ask for an account, email address, or booking information here.</p>
+      <div className="grid gap-3">
+        <p className="text-sm text-ochre-dark">Rumia feedback · field note</p>
+        <h1 className="font-display text-5xl leading-tight text-primary md:text-6xl">Did Rumia make better use of your time?</h1>
+        <p className="max-w-2xl text-lg leading-relaxed text-on-surface-variant">We use a small, anonymous rating to test whether our activity judgement works during real Portugal trips. We do not ask for an account, email address, or booking information here.</p>
+      </div>
+      <EditorialProofRail
+        items={[
+          { label: "Signal", value: "A quick reaction to the activities you actually chose." },
+          { label: "Privacy", value: "No account, email address, or booking data is required." },
+          { label: "Use", value: "Your note helps keep the Portugal activity corpus honest." }
+        ]}
+      />
 
       {activityIds.length > 0 ? (
         <ActivityFeedbackForm activityIds={activityIds} source={feedbackSource(source)} />
@@ -47,11 +60,12 @@ export default async function FeedbackPage({
         <section className="mt-10 border-t border-[var(--color-border)] pt-8" aria-label="Choose activities before sharing feedback">
           <h2 className="font-display text-3xl text-primary">Choose a day to review.</h2>
           <p className="mt-3 max-w-xl leading-relaxed text-on-surface-variant">Feedback is tied only to activities you selected, so the signal stays useful to the editorial team.</p>
-          <Link className="mt-6 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href="/explore">
-            Explore Portugal activities
-          </Link>
+          <Button asChild variant="primary" tone="ochre" className="mt-6 w-fit">
+            <Link href="/explore">Explore Portugal activities</Link>
+          </Button>
         </section>
       )}
-    </div>
+      </div>
+    </PublicRouteLayout>
   );
 }

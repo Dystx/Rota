@@ -24,6 +24,7 @@ export type AppLayoutVariant =
   | "auth";
 
 export type AppSurface = "linen" | "sage" | "midnight" | "ochre";
+export type AppSurfaceTexture = "editorial" | "none";
 
 interface AppLayoutProps extends HTMLAttributes<HTMLDivElement> {
   variant?: AppLayoutVariant;
@@ -45,19 +46,14 @@ interface AppLayoutProps extends HTMLAttributes<HTMLDivElement> {
   siteFooter?: ReactNode;
   children: ReactNode;
   /**
-   * Semantic page field. The default follows the layout variant, while
-   * authored routes can opt into a reading or planning chapter explicitly.
+   * Semantic page field. Every route shell declares its reading, planning,
+   * operator, or commerce field explicitly; the variant does not infer it.
    */
-  surface?: AppSurface;
+  /** Explicit route field. Every route shell must declare its surface. */
+  surface: AppSurface;
+  /** Explicit texture ownership. Content primitives must not infer a field. */
+  surfaceTexture: AppSurfaceTexture;
 }
-
-const variantSurface: Record<AppLayoutVariant, AppSurface> = {
-  marketing: "sage",
-  app: "linen",
-  operator: "midnight",
-  checkout: "linen",
-  auth: "linen"
-};
 
 const variantClassName: Record<AppLayoutVariant, string> = {
   marketing: "text-primary",
@@ -77,21 +73,20 @@ export function AppLayout({
   topNav,
   siteFooter,
   surface,
+  surfaceTexture,
   className,
   children,
   ...props
 }: AppLayoutProps) {
-  const resolvedSurface = surface ?? variantSurface[variant];
-  const texture = variant === "operator" ? "none" : "editorial";
-
   return (
     <div
-      data-surface={resolvedSurface}
-      data-surface-texture={texture}
+      data-surface={surface}
+      data-surface-texture={surfaceTexture}
+      data-layout-variant={variant}
       className={cn(
         "min-h-screen flex flex-col antialiased",
-        "rumia-surface",
-        `rumia-surface-${resolvedSurface}`,
+        "rumia-app-layout rumia-surface rumia-page-enter",
+        `rumia-surface-${surface}`,
         variantClassName[variant],
         className
       )}
