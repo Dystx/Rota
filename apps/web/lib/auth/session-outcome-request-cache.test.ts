@@ -77,6 +77,8 @@ describe("loadSessionOutcome request isolation", () => {
     const first = loadSessionOutcome();
     const second = loadSessionOutcome();
 
+    expect(second).toBe(first);
+
     await expect(Promise.all([first, second])).resolves.toEqual([
       { kind: "ready", session: { user: { id: "user-a" }, session: { id: "session-a" } } },
       { kind: "ready", session: { user: { id: "user-a" }, session: { id: "session-a" } } }

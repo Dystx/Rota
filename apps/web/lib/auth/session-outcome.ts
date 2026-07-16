@@ -143,6 +143,6 @@ const loadRequestSessionOutcome = cache(() =>
   })()
 );
 
-export async function loadSessionOutcome(): Promise<SessionOutcome> {
+export function loadSessionOutcome(): Promise<SessionOutcome> {
   return loadRequestSessionOutcome();
 }
