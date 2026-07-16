@@ -33,11 +33,19 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "desktop-chrome",
-      use: { ...devices["Desktop Chrome"] }
+      name: "desktop-1440",
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 1000 } }
     },
     {
-      name: "mobile-chromium",
+      name: "tablet-landscape",
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1024, height: 768 } }
+    },
+    {
+      name: "tablet-portrait",
+      use: { ...devices["Desktop Chrome"], viewport: { width: 768, height: 1024 } }
+    },
+    {
+      name: "mobile-390",
       use: { ...devices["Pixel 5"], viewport: { width: 390, height: 844 } }
     }
   ]

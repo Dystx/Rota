@@ -14,13 +14,15 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/", "/portugal", "/how-it-works", "/local-expertise", "/pricing", "/support", "/privacy", "/terms", "/sustainability"
 ] as const;
 
-export const HTTP_ROUTE_CATALOGUE: readonly HttpRouteDefinition[] = [
+export const HTTP_ROUTE_CATALOGUE = [
   { path: "/", responsibility: "Portugal-first acquisition", shell: "public", indexable: true, auth: "public" },
   { path: "/portugal", responsibility: "Curated Portugal discovery", shell: "public", indexable: true, auth: "public" },
-  { path: "/explore", responsibility: "Legacy discovery entry", shell: "none", indexable: false, auth: "public", redirect: { status: 308, destination: "/portugal" } },
-  { path: "/explore/workspace", responsibility: "Legacy workspace entry", shell: "none", indexable: false, auth: "public", redirect: { status: 308, destination: "/planner" } },
+  { path: "/explore", responsibility: "Judged activity results", shell: "public", indexable: false, auth: "public" },
+  { path: "/explore/workspace", responsibility: "Editable chosen-day workspace", shell: "none", indexable: false, auth: "public" },
+  { path: "/activities/[activityId]", responsibility: "Activity judgement and evidence", shell: "public", indexable: false, auth: "public" },
+  { path: "/feedback", responsibility: "Chosen-day feedback", shell: "public", indexable: false, auth: "public" },
   { path: "/how-it-works", responsibility: "Explain the planning ascension", shell: "public", indexable: true, auth: "public" },
-  { path: "/human-review", responsibility: "Explain specialist review", shell: "public", indexable: false, auth: "public" },
+  { path: "/human-review", responsibility: "Legacy specialist-review entry", shell: "none", indexable: false, auth: "public", redirect: { status: 308, destination: "/local-expertise" } },
   { path: "/local-expertise", responsibility: "Explain local specialist value", shell: "public", indexable: true, auth: "public" },
   { path: "/pricing", responsibility: "Pricing and tier comparison", shell: "public", indexable: true, auth: "public" },
   { path: "/planner", responsibility: "Natural trip brief", shell: "traveler", indexable: false, auth: "public" },
@@ -66,4 +68,7 @@ export const HTTP_ROUTE_CATALOGUE: readonly HttpRouteDefinition[] = [
   { path: "/b2b", responsibility: "B2B beta interest", shell: "public", indexable: false, auth: "public" },
   { path: "/b2b/[orgSlug]", responsibility: "Organization workspace beta", shell: "traveler", indexable: false, auth: "organization" },
   { path: "/api/v1/docs", responsibility: "Developer API documentation", shell: "none", indexable: false, auth: "admin", capability: "developer_docs:read" }
-];
+] as const satisfies readonly HttpRouteDefinition[];
+
+/** Literal route paths are the shared key space for presentation and state evidence. */
+export type HttpRoutePath = (typeof HTTP_ROUTE_CATALOGUE)[number]["path"];
