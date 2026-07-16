@@ -55,7 +55,7 @@ describe("route presentation catalogue", () => {
       if (route.auth !== "public") {
         expect(scenarios.some((scenario) => scenario.persona === "anonymous" && scenario.state === "unauthorized" && scenario.expected.noPrivateDisclosure), route.path).toBe(true);
       }
-      if (route.path.includes("[tripId]") && scenarios.some((scenario) => scenario.state === "not-found")) {
+      if (route.path.includes("[tripId]")) {
         expect(scenarios.some((scenario) => scenario.persona === "foreign-traveler" && scenario.state === "not-found" && scenario.expected.noPrivateDisclosure), route.path).toBe(true);
       }
     }
@@ -114,6 +114,25 @@ describe("route presentation catalogue", () => {
       const primary = ROUTE_SCENARIO_CATALOGUE[path].find((scenario) => scenario.viewports === "all-four");
       expect(primary?.state, path).toBe("empty");
       expect(primary?.persona, path).not.toBe("foreign-traveler");
+    }
+  });
+
+  it("uses foreign trip fixtures for every dynamic trip resource", () => {
+    const expectedSuffixes = {
+      "/trip/[tripId]": "",
+      "/trip/[tripId]/map": "/map",
+      "/trip/[tripId]/export": "/export",
+      "/reviewer/trips/[tripId]": ""
+    } as const;
+    for (const [path, suffix] of Object.entries(expectedSuffixes)) {
+      const foreign = ROUTE_SCENARIO_CATALOGUE[path as keyof typeof ROUTE_SCENARIO_CATALOGUE].find(
+        (scenario) => scenario.persona === "foreign-traveler" && scenario.state === "not-found"
+      );
+      expect(foreign, path).toMatchObject({
+        fixture: { kind: "traveler-trip", variant: "foreign", suffix },
+        setup: { query: { trip: "fixture:foreign" } },
+        expected: { access: "not-found", noPrivateDisclosure: true }
+      });
     }
   });
 

@@ -3,8 +3,8 @@
 Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presentation-catalogue.ts`. Primary scenarios run at all four viewports; additional states run at desktop-1440 and mobile-390; redirects retain behavioral assertions.
 
 - Routes: 53
-- Concrete scenarios: 319
-- Expanded evidence rows: 737
+- Concrete scenarios: 322
+- Expanded evidence rows: 743
 
 | Route | Scenario | Persona | State | Viewport | Scene | Shell | Chrome | Footer | Texture | Fixture | Access | Transition | No private disclosure | Setup |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -160,6 +160,8 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /trip/[tripId] | trip-[tripId]--error | traveler | error | mobile-390 | decision | traveler | task | none | none | traveler-trip:draft | render | — | no | {"interaction":"retry"} |
 | /trip/[tripId]/map | trip-[tripId]-map--anonymous | anonymous | unauthorized | desktop-1440 | atlas | traveler | immersive | none | none | traveler-trip/map | redirect | — | yes | — |
 | /trip/[tripId]/map | trip-[tripId]-map--anonymous | anonymous | unauthorized | mobile-390 | atlas | traveler | immersive | none | none | traveler-trip/map | redirect | — | yes | — |
+| /trip/[tripId]/map | trip-[tripId]-map--not-found-foreign | foreign-traveler | not-found | desktop-1440 | atlas | traveler | immersive | none | none | traveler-trip:foreign/map | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
+| /trip/[tripId]/map | trip-[tripId]-map--not-found-foreign | foreign-traveler | not-found | mobile-390 | atlas | traveler | immersive | none | none | traveler-trip:foreign/map | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
 | /trip/[tripId]/map | trip-[tripId]-map--empty | traveler | empty | desktop-1440 | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | — |
 | /trip/[tripId]/map | trip-[tripId]-map--empty | traveler | empty | tablet-landscape | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | — |
 | /trip/[tripId]/map | trip-[tripId]-map--empty | traveler | empty | tablet-portrait | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | — |
@@ -180,6 +182,8 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /trip/[tripId]/map | trip-[tripId]-map--error | traveler | error | mobile-390 | atlas | traveler | immersive | none | none | traveler-trip:draft/map | render | — | no | {"interaction":"retry"} |
 | /trip/[tripId]/export | trip-[tripId]-export--anonymous | anonymous | unauthorized | desktop-1440 | utility | traveler | task | none | none | traveler-trip/export | redirect | — | yes | — |
 | /trip/[tripId]/export | trip-[tripId]-export--anonymous | anonymous | unauthorized | mobile-390 | utility | traveler | task | none | none | traveler-trip/export | redirect | — | yes | — |
+| /trip/[tripId]/export | trip-[tripId]-export--not-found-foreign | foreign-traveler | not-found | desktop-1440 | utility | traveler | task | none | none | traveler-trip:foreign/export | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
+| /trip/[tripId]/export | trip-[tripId]-export--not-found-foreign | foreign-traveler | not-found | mobile-390 | utility | traveler | task | none | none | traveler-trip:foreign/export | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
 | /trip/[tripId]/export | trip-[tripId]-export--empty | traveler | empty | desktop-1440 | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
 | /trip/[tripId]/export | trip-[tripId]-export--empty | traveler | empty | tablet-landscape | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
 | /trip/[tripId]/export | trip-[tripId]-export--empty | traveler | empty | tablet-portrait | utility | traveler | task | none | none | traveler-trip:draft/export | render | — | no | — |
@@ -431,6 +435,8 @@ Generated from `ROUTE_SCENARIO_CATALOGUE` in `apps/web/lib/routes/route-presenta
 | /reviewer/trips/[tripId] | reviewer-trips-[tripId]--unavailable | reviewer | unavailable | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry","provider":"unreachable"} |
 | /reviewer/trips/[tripId] | reviewer-trips-[tripId]--error | reviewer | error | desktop-1440 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
 | /reviewer/trips/[tripId] | reviewer-trips-[tripId]--error | reviewer | error | mobile-390 | utility | operator | operator | none | none | reviewer-trip:assigned | render | — | no | {"interaction":"retry"} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--not-found-foreign | foreign-traveler | not-found | desktop-1440 | utility | operator | operator | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
+| /reviewer/trips/[tripId] | reviewer-trips-[tripId]--not-found-foreign | foreign-traveler | not-found | mobile-390 | utility | operator | operator | none | none | traveler-trip:foreign | not-found | — | yes | {"query":{"trip":"fixture:foreign"}} |
 | /admin/places | admin-places--anonymous | anonymous | unauthorized | desktop-1440 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /admin/places | admin-places--anonymous | anonymous | unauthorized | mobile-390 | utility | operator | operator | none | none | static | redirect | — | yes | — |
 | /admin/places | admin-places--limited-capability | limited-admin | forbidden | desktop-1440 | utility | operator | operator | none | none | operator:empty | render | — | yes | — |
