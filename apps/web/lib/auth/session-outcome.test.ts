@@ -111,6 +111,15 @@ describe("createSessionOutcomeLoader", () => {
     expect(isSessionProviderFailure(nested)).toBe(true);
   });
 
+  it("searches past a wrapper code for a known nested provider code", () => {
+    const nested = Object.assign(new Error("wrapped"), {
+      code: "ERR_WRAPPER",
+      cause: Object.assign(new Error("connection refused"), { code: "ECONNREFUSED" })
+    });
+
+    expect(isSessionProviderFailure(nested)).toBe(true);
+  });
+
   it("does not classify unknown nested programming failures", () => {
     const nested = new Error("unexpected programming failure", {
       cause: Object.assign(new Error("bug"), { code: "ERR_ASSERTION" })

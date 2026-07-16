@@ -52,9 +52,10 @@ function isForcedPersistenceFailure(environment: SessionEnvironment): boolean {
 
 function providerCode(error: unknown, depth = 0): string | undefined {
   if (!error || typeof error !== "object" || depth > 4) return undefined;
-  if ("code" in error && typeof error.code === "string") return error.code;
-  if ("cause" in error) return providerCode(error.cause, depth + 1);
-  return undefined;
+  const ownCode = "code" in error && typeof error.code === "string" ? error.code : undefined;
+  if (ownCode && knownProviderCodes.has(ownCode)) return ownCode;
+  if ("cause" in error) return providerCode(error.cause, depth + 1) ?? ownCode;
+  return ownCode;
 }
 
 /** Provider failures are safe to classify; arbitrary programming errors still reach the normal boundary. */
