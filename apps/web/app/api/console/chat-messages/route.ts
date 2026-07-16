@@ -1,7 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
+import { isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
+import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
 import { insertChatMessage, listChatMessages } from "./store";
+
+const unavailableMessage = "This service is temporarily unavailable. Please try again shortly.";
+
+function failureResponse(error: unknown, fallbackMessage: string) {
+  const unavailable = isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
+  return NextResponse.json(
+    { ok: false, error: unavailable ? unavailableMessage : fallbackMessage },
+    { status: unavailable ? 503 : 500 }
+  );
+}
 
 const BodySchema = z.object({
   conversationId: z.string().min(1).max(64),
@@ -58,16 +70,7 @@ export async function POST(request: NextRequest) {
     }, admin);
     return NextResponse.json({ ok: true, id: row.id, createdAt: row.createdAt });
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to send chat message",
-      },
-      { status: 500 }
-    );
+    return failureResponse(error, "Could not send chat message.");
   }
 }
 
@@ -103,15 +106,6 @@ export async function GET(request: NextRequest) {
     }, admin);
     return NextResponse.json({ ok: true, messages: rows });
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to list chat messages"
-      },
-      { status: 500 }
-    );
+    return failureResponse(error, "Could not load chat messages.");
   }
 }

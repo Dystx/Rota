@@ -1,7 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
+import { isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
+import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
 import { moveTripStage } from "./store";
+
+const unavailableMessage = "This service is temporarily unavailable. Please try again shortly.";
+
+function failureResponse(error: unknown) {
+  const unavailable = isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
+  return NextResponse.json(
+    { ok: false, error: unavailable ? unavailableMessage : "Could not move trip." },
+    { status: unavailable ? 503 : 500 }
+  );
+}
 
 const BodySchema = z.object({
   tripId: z.string().min(1).max(64),
@@ -46,15 +58,6 @@ export async function POST(request: NextRequest) {
     }, admin);
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to move trip",
-      },
-      { status: 500 }
-    );
+    return failureResponse(error);
   }
 }

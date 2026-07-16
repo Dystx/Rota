@@ -128,16 +128,19 @@ export function createSessionOutcomeLoader(dependencies: SessionOutcomeLoaderDep
   };
 }
 
-const loadSessionOutcomeProbe = createSessionOutcomeLoader({
+/**
+ * Build the mutable single-flight loader inside React's request cache. The
+ * cache itself is request-scoped, so a pending probe/cooldown from one request
+ * can never become state for another request while layouts and child loaders
+ * within the same request still share one bounded provider probe.
+ */
+const getRequestSessionOutcomeLoader = cache(() => createSessionOutcomeLoader({
   getSession: getCurrentSession,
   environment: process.env,
   timeoutMs: 4_000,
   cooldownMs: 30_000
-});
+}));
 
-/**
- * React's request cache makes the session outcome a per-request boundary.
- * Layouts and their child loaders therefore share one bounded provider probe
- * without retaining session state across requests.
- */
-export const loadSessionOutcome = cache(loadSessionOutcomeProbe);
+export async function loadSessionOutcome(): Promise<SessionOutcome> {
+  return getRequestSessionOutcomeLoader()();
+}

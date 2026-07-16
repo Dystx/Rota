@@ -1,10 +1,15 @@
 import "server-only";
 
 import type { AuthorizedActor } from "@repo/types";
-import { getTripDraftByIdForOwner, type TripDraftDetail } from "@repo/db";
+import {
+  getTripDraftByIdForOwner,
+  isPersistenceConfigError,
+  isSchemaDriftError,
+  type TripDraftDetail
+} from "@repo/db";
 import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import type { SessionOutcome } from "@/lib/auth/session-outcome";
+import { isSessionProviderFailure, type SessionOutcome } from "@/lib/auth/session-outcome";
 
 export type TripAccessResult =
   | { kind: "ok"; trip: TripDraftDetail; userId: string; actor: AuthorizedActor }
@@ -51,7 +56,15 @@ export async function getOwnedTrip(tripId: string, options: TripAccessOptions = 
     return { kind: "forbidden" };
   }
 
-  const trip = await getTripDraftByIdForOwner(tripId, userId, { actor: actorOutcome.actor });
+  let trip: TripDraftDetail | null;
+  try {
+    trip = await getTripDraftByIdForOwner(tripId, userId, { actor: actorOutcome.actor });
+  } catch (error) {
+    if (isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error)) {
+      return { kind: "unavailable" };
+    }
+    throw error;
+  }
 
   if (trip) {
     return { kind: "ok", trip, userId, actor: actorOutcome.actor };

@@ -1,5 +1,5 @@
 import { generateItineraryFromBrief } from "@repo/ai";
-import { isPersistenceConfigError } from "@repo/db";
+import { isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
 import {
   buildTripCalendarExport,
   buildTripCalendarFilename,
@@ -11,6 +11,7 @@ import {
 import { internalError, isApiResponse, notFoundError, requireApiRole, validationError, forbiddenError } from "@/lib/auth/api";
 import { getOwnedTrip } from "@/app/lib/trip-access";
 import { markExportJobError, markExportJobReady, queueExportJob } from "@/app/lib/export-jobs";
+import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
 
 export async function GET(request: Request, { params }: { params: Promise<{ tripId: string }> }) {
   const auth = await requireApiRole(["traveler"]);
@@ -79,10 +80,18 @@ export async function GET(request: Request, { params }: { params: Promise<{ trip
       }
     });
   } catch (error) {
-    markExportJobError(tripId);
+    // Export-state persistence is best effort here: a failing error marker
+    // must not replace the safe API response with a provider exception.
+    try {
+      markExportJobError(tripId);
+    } catch {
+      // Keep the route boundary deterministic even when the job store is down.
+    }
+    const unavailable = isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
+
     return internalError(
-      isPersistenceConfigError(error) ? "PostgreSQL is not configured yet, so exports are unavailable." : "Could not export this trip.",
-      isPersistenceConfigError(error) ? 503 : 500
+      unavailable ? "Trip export is temporarily unavailable. Please try again shortly." : "Could not export this trip.",
+      unavailable ? 503 : 500
     );
   }
 }

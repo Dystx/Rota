@@ -5,6 +5,9 @@ const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   getTripDraftById: vi.fn(),
   getTripDraftByIdForOwner: vi.fn(),
+  isPersistenceConfigError: vi.fn(() => false),
+  isSchemaDriftError: vi.fn(() => false),
+  isSessionProviderFailure: vi.fn(() => false),
   loadCurrentAuthorizedActorOutcome: vi.fn(),
   tripDraftExists: vi.fn()
 }));
@@ -17,9 +20,15 @@ vi.mock("@/lib/auth/authorization", () => ({
   loadCurrentAuthorizedActorOutcome: mocks.loadCurrentAuthorizedActorOutcome
 }));
 
+vi.mock("@/lib/auth/session-outcome", () => ({
+  isSessionProviderFailure: mocks.isSessionProviderFailure
+}));
+
 vi.mock("@repo/db", () => ({
   getTripDraftById: mocks.getTripDraftById,
   getTripDraftByIdForOwner: mocks.getTripDraftByIdForOwner,
+  isPersistenceConfigError: mocks.isPersistenceConfigError,
+  isSchemaDriftError: mocks.isSchemaDriftError,
   tripDraftExists: mocks.tripDraftExists
 }));
 
@@ -58,6 +67,9 @@ const ownedTrip = {
 describe("getOwnedTrip", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mocks.isPersistenceConfigError.mockReturnValue(false);
+    mocks.isSchemaDriftError.mockReturnValue(false);
+    mocks.isSessionProviderFailure.mockReturnValue(false);
     mocks.loadCurrentAuthorizedActorOutcome.mockResolvedValue({ kind: "anonymous" });
   });
 
@@ -165,5 +177,24 @@ describe("getOwnedTrip", () => {
     });
     expect(mocks.getCurrentUser).not.toHaveBeenCalled();
     expect(mocks.loadCurrentAuthorizedActorOutcome).not.toHaveBeenCalled();
+  });
+
+  test("sanitizes known owner-query provider failures as unavailable", async () => {
+    const actor = { capabilities: [], reviewerId: null, roles: ["traveler"], userId: "traveler-user-123" } as const;
+    const hostile = Object.assign(new Error("DATABASE_URL=secret ECONNREFUSED SQL stack"), { code: "ECONNREFUSED" });
+    mocks.getTripDraftByIdForOwner.mockRejectedValue(hostile);
+    mocks.isSessionProviderFailure.mockReturnValue(true);
+
+    const result = await getOwnedTrip("42", { actor });
+    expect(result).toEqual({ kind: "unavailable" });
+    expect(JSON.stringify(result)).not.toMatch(/DATABASE_URL|ECONN|SQL|stack/i);
+  });
+
+  test("rethrows unknown owner-query failures for the normal boundary", async () => {
+    const actor = { capabilities: [], reviewerId: null, roles: ["traveler"], userId: "traveler-user-123" } as const;
+    const failure = new Error("Unexpected owner-query invariant");
+    mocks.getTripDraftByIdForOwner.mockRejectedValue(failure);
+
+    await expect(getOwnedTrip("42", { actor })).rejects.toBe(failure);
   });
 });
