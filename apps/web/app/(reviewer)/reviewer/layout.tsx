@@ -1,9 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { OperatorShell } from "@repo/ui";
-import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
 import { getReviewerById } from "@repo/db";
-import { getCurrentSession } from "@/lib/auth/session";
+import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { loadSessionOutcome } from "@/lib/auth/session-outcome";
+import { RouteRecovery } from "@/app/_components/route-recovery";
 
 /**
  * Reviewer layout — shared shell + auth guard for every
@@ -32,14 +33,24 @@ export default async function ReviewerLayout({
 }) {
   const headerList = await headers();
   const currentPath = headerList.get("x-pathname") ?? headerList.get("next-url") ?? "/reviewer/queue";
-  const auth = await getReviewerPageAuthContext();
-  if (!auth) {
+  const sessionOutcome = await loadSessionOutcome();
+  if (sessionOutcome.kind === "unavailable") {
+    return <RouteRecovery kind="unavailable" />;
+  }
+  if (sessionOutcome.kind !== "ready") {
     redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
   }
 
-  const session = await getCurrentSession();
-  const user = session?.user ?? null;
-  const reviewer = await getReviewerById(auth.reviewerId, { actor: auth.actor });
+  const actorOutcome = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
+  if (actorOutcome.kind === "unavailable") {
+    return <RouteRecovery kind="unavailable" />;
+  }
+  if (actorOutcome.kind !== "ready" || !actorOutcome.actor.roles.includes("reviewer") || !actorOutcome.actor.reviewerId) {
+    redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
+  }
+
+  const user = sessionOutcome.session.user;
+  const reviewer = await getReviewerById(actorOutcome.actor.reviewerId, { actor: actorOutcome.actor });
   const displayName = reviewer?.name || user?.email || "Reviewer";
 
   // Read the current pathname for active-link highlighting.

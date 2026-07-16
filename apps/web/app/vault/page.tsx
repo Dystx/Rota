@@ -1,7 +1,10 @@
+import * as React from "react";
 import { PublicRouteLayout } from "../_components/public-route-layout";
+import { RouteRecovery } from "../_components/route-recovery";
 import { VaultGallery } from "./_components/vault-gallery";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { getTripsForUser, loadPostgresAuthorizationContext } from "@repo/db";
+import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { getTripsForUser } from "@repo/db";
 
 /**
  * Vault page — Saved Vault & Export (1.7 reference parity).
@@ -13,8 +16,26 @@ import { getTripsForUser, loadPostgresAuthorizationContext } from "@repo/db";
  * and echoes the selected trip's title.
  */
 export default async function VaultPage() {
-  const { user } = await getCurrentUser();
-  const actor = user ? await loadPostgresAuthorizationContext(user.id) : null;
+  const currentUser = await getCurrentUser();
+  if (currentUser.outcome === "unavailable") {
+    return (
+      <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
+        <RouteRecovery kind="unavailable" />
+      </PublicRouteLayout>
+    );
+  }
+
+  const { user } = currentUser;
+  const actorOutcome = user ? await loadCurrentAuthorizedActorOutcome() : { kind: "anonymous" as const };
+  if (actorOutcome.kind === "unavailable") {
+    return (
+      <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
+        <RouteRecovery kind="unavailable" />
+      </PublicRouteLayout>
+    );
+  }
+
+  const actor = actorOutcome.kind === "ready" ? actorOutcome.actor : null;
   const trips = user && actor ? await getTripsForUser(user.id, 24, { actor }) : [];
   return (
     <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">

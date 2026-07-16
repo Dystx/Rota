@@ -16,8 +16,9 @@ import { SiteFooter } from "../_components/site-footer";
 export default function MarketingLoading() {
   return (
     <div
-      className="min-h-screen pt-header-height flex flex-col rumia-surface rumia-surface-sage"
-      data-surface="sage"
+      className="min-h-screen pt-header-height flex flex-col rumia-surface rumia-surface-linen"
+      data-testid="marketing-loading"
+      data-surface="linen"
       data-surface-texture="editorial"
     >
       <TopNav />

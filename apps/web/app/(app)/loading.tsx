@@ -20,6 +20,7 @@ export default function AppLoading() {
   return (
     <div
       className="min-h-screen flex flex-col rumia-surface rumia-surface-linen"
+      data-testid="app-loading"
       data-surface="linen"
       data-surface-texture="editorial"
     >

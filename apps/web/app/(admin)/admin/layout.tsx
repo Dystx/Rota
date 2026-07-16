@@ -2,8 +2,9 @@ import { Metadata } from "next";
 import { OperatorShell, SectionHeading } from "@repo/ui";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
-import { getCurrentSession } from "@/lib/auth/session";
+import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { loadSessionOutcome } from "@/lib/auth/session-outcome";
+import { RouteRecovery } from "@/app/_components/route-recovery";
 
 export const metadata: Metadata = {
   title: "Admin Workspace",
@@ -14,17 +15,21 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const auth = await getAdminPageAuthContext();
+  const sessionOutcome = await loadSessionOutcome();
+  if (sessionOutcome.kind === "unavailable") {
+    return <RouteRecovery kind="unavailable" />;
+  }
 
-  if (isAdminPageAuthContext(auth)) {
-    const session = await getCurrentSession();
+  const auth = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
+
+  if (auth.kind === "ready" && auth.actor.roles.includes("admin")) {
     const currentPath = (await headers()).get("x-pathname") ?? "/admin/places";
 
     return (
       <OperatorShell
         section="admin"
         currentPath={currentPath}
-        user={{ name: session?.user.name || session?.user.email || "Administrator", email: session?.user.email ?? null, avatarUrl: session?.user.image ?? null }}
+        user={{ name: sessionOutcome.kind === "ready" ? sessionOutcome.session.user.name || sessionOutcome.session.user.email || "Administrator" : "Administrator", email: sessionOutcome.kind === "ready" ? sessionOutcome.session.user.email ?? null : null, avatarUrl: sessionOutcome.kind === "ready" ? sessionOutcome.session.user.image ?? null : null }}
         signOutAction="/api/auth/sign-out"
       >
         {children}
@@ -32,7 +37,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     );
   }
 
-  if (auth.reason === "unauthenticated") {
+  if (auth.kind === "unavailable") {
+    return <RouteRecovery kind="unavailable" />;
+  }
+
+  if (auth.kind === "anonymous") {
     redirect("/sign-in?next=/admin");
   }
 

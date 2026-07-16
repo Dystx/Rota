@@ -1,8 +1,8 @@
 "use client";
 
-import { RouteRecovery } from "./_components/route-recovery";
+import * as React from "react";
+import { RouteRecovery } from "@/app/_components/route-recovery";
 
-/** App-level segment boundary. The surrounding shell owns the `main`. */
 export default function AppError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return <RouteRecovery kind="error" onRetry={reset} />;
 }

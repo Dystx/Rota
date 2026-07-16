@@ -9,6 +9,8 @@ export interface DecisionStatePanelProps extends Omit<HTMLAttributes<HTMLDivElem
   tone?: DecisionStateTone;
   /** Descriptive alias for callers that name the panel surface directly. */
   surface?: DecisionStateTone;
+  /** Semantic heading level for the route context. The visual token is stable. */
+  headingLevel?: 1 | 2 | 3;
   title?: string;
   description?: string;
   illustration?: ReactNode;
@@ -64,6 +66,7 @@ export function DecisionStatePanel({
   kind,
   tone = "light",
   surface,
+  headingLevel = 2,
   title,
   description,
   illustration,
@@ -75,6 +78,7 @@ export function DecisionStatePanel({
   const resolvedTone = surface ?? tone;
   const copy = DEFAULT_COPY[kind];
   const role = kind === "error" ? "alert" : "status";
+  const Heading = `h${headingLevel}` as "h1" | "h2" | "h3";
 
   return (
     <div
@@ -104,7 +108,7 @@ export function DecisionStatePanel({
         {illustration ?? KIND_ICON[kind]}
       </div>
       <div className="grid max-w-prose gap-2">
-        <h2 className="font-display text-2xl leading-tight">{title ?? copy.title}</h2>
+        <Heading className="font-display text-2xl leading-tight">{title ?? copy.title}</Heading>
         <p className={cn("font-body text-base leading-relaxed", resolvedTone === "inverse" ? "text-linen-dark/75" : "text-on-surface-variant")}>
           {description ?? copy.description}
         </p>

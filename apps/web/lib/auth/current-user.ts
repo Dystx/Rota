@@ -1,19 +1,33 @@
 import "server-only";
 
-import { getCurrentSession } from "./session";
+import type { CurrentSession } from "./session";
+import { loadSessionOutcome, type SessionOutcome } from "./session-outcome";
+
+type CurrentUser = NonNullable<CurrentSession>["user"];
+type CurrentSessionRecord = NonNullable<CurrentSession>["session"];
 
 export type CurrentUserResult = {
-  user: NonNullable<Awaited<ReturnType<typeof getCurrentSession>>>["user"] | null;
-  session: NonNullable<Awaited<ReturnType<typeof getCurrentSession>>>["session"] | null;
+  outcome: SessionOutcome["kind"];
+  user: CurrentUser | null;
+  session: CurrentSessionRecord | null;
 };
 
 /** The single server-side session boundary for page and route consumers. */
 export async function getCurrentUser(): Promise<CurrentUserResult> {
-  const current = await getCurrentSession();
+  const outcome = await loadSessionOutcome();
+
+  if (outcome.kind !== "ready") {
+    return {
+      outcome: outcome.kind,
+      session: null,
+      user: null
+    };
+  }
 
   return {
-    session: current?.session ?? null,
-    user: current?.user ?? null
+    outcome: "ready",
+    session: outcome.session.session ?? null,
+    user: outcome.session.user ?? null
   };
 }
 

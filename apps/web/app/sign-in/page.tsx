@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AppLayout, BrandMark } from "@repo/ui";
-import { getCurrentSession } from "@/lib/auth/session";
-import { loadCurrentAuthorizedActor } from "@/lib/auth/authorization";
+import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { loadSessionOutcome } from "@/lib/auth/session-outcome";
 import { resolveRoleCompatibleNext } from "@/lib/auth/role-compatible-next";
 import { SignInForm } from "./_components/sign-in-form";
 import { safeNext } from "../auth/safe-next";
+import { RouteRecovery } from "../_components/route-recovery";
 
 export const SIGN_IN_HELP_LINK_CLASS =
   "text-ochre-dark underline underline-offset-2 hover:text-[var(--color-ochre-on-light)] transition-colors duration-fast ease-standard";
@@ -31,11 +32,28 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const sent = params.sent === "1";
   const error = params.error;
 
-  // If already signed in, send the user on to the post-auth landing.
-  const session = await getCurrentSession();
-  if (session) {
-    const actor = await loadCurrentAuthorizedActor();
-    redirect(actor ? resolveRoleCompatibleNext(next, actor) : "/account");
+  // If already signed in, send the user on to the post-auth landing. A
+  // provider outage is not anonymous access and gets an authored recovery
+  // surface instead of a redirect loop or a streamed database error.
+  const sessionOutcome = await loadSessionOutcome();
+  if (sessionOutcome.kind === "unavailable") {
+    return (
+      <AppLayout variant="auth" bare surface="linen" surfaceTexture="none">
+        <RouteRecovery kind="unavailable" />
+      </AppLayout>
+    );
+  }
+
+  if (sessionOutcome.kind === "ready") {
+    const actorOutcome = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
+    if (actorOutcome.kind === "unavailable") {
+      return (
+        <AppLayout variant="auth" bare surface="linen" surfaceTexture="none">
+          <RouteRecovery kind="unavailable" />
+        </AppLayout>
+      );
+    }
+    redirect(actorOutcome.kind === "ready" ? resolveRoleCompatibleNext(next, actorOutcome.actor) : "/account");
   }
 
   return (

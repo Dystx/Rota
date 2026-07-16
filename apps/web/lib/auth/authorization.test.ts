@@ -33,6 +33,20 @@ describe("requireApiAccess", () => {
       reviewerId: null
     });
   });
+
+  it("keeps an unavailable persistence probe distinct from unauthenticated access", async () => {
+    const result = await requireApiAccess(
+      { anyRole: ["admin"] },
+      { loadActorOutcome: async () => ({ kind: "unavailable" }) }
+    );
+
+    expect(result).toBeInstanceOf(Response);
+    expect((result as Response).status).toBe(503);
+    await expect((result as Response).json()).resolves.toEqual({
+      code: "unavailable",
+      message: "This service is temporarily unavailable."
+    });
+  });
 });
 
 describe("resourceNotFound", () => {

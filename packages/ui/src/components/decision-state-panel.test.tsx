@@ -75,4 +75,15 @@ describe("DecisionStatePanel", () => {
 
     expect(screen.getByRole("button", { name: "Continue" })).toHaveClass("min-h-11", "min-w-11");
   });
+
+  it("keeps the visual token while exposing the requested semantic heading level", () => {
+    const { rerender } = render(
+      <DecisionStatePanel kind="error" headingLevel={1} title="Route recovery" />
+    );
+
+    expect(screen.getByRole("heading", { level: 1, name: "Route recovery" })).toHaveClass("text-2xl");
+
+    rerender(<DecisionStatePanel kind="empty" headingLevel={3} title="Embedded empty state" />);
+    expect(screen.getByRole("heading", { level: 3, name: "Embedded empty state" })).toHaveClass("text-2xl");
+  });
 });

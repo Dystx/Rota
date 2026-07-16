@@ -3,9 +3,10 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button, toast } from "@repo/ui";
+import { signOutAction as defaultSignOutAction } from "../_actions/sign-out";
 
 interface SignOutButtonProps {
-  signOutAction: () => Promise<void>;
+  signOutAction?: () => Promise<void>;
   className?: string;
 }
 
@@ -30,7 +31,7 @@ export function SignOutButton({ signOutAction, className }: SignOutButtonProps) 
     startTransition(async () => {
       toast.info("Signing you out…");
       try {
-        await signOutAction();
+        await (signOutAction ?? defaultSignOutAction)();
         router.push("/");
       } catch {
         toast.error("Couldn\u2019t sign out. Try again.");

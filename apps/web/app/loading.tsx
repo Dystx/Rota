@@ -7,16 +7,15 @@ import { SiteFooter } from "./_components/site-footer";
  * shape of the loaded page so the layout doesn't shift when
  * the data arrives (no CLS).
  *
- * The hero block is a soft sage gradient with a shimmer line
- * — same palette as the loaded hero so the transition feels
- * like a fade, not a jump.
+ * The hero block uses the warm reading field with a soft shimmer line
+ * so loading never flashes the retired pale-sage marketing canvas.
  */
 export default function RootLoading() {
   return (
-    <div className="min-h-screen flex flex-col rumia-surface rumia-surface-sage" data-surface="sage" data-surface-texture="editorial" aria-busy="true" aria-live="polite">
+    <div data-testid="root-loading" role="status" className="min-h-screen flex flex-col rumia-surface rumia-surface-linen" data-surface="linen" data-surface-texture="editorial" aria-busy="true" aria-live="polite">
       <div className="flex-1">
         <div
-          className="relative h-[420px] md:h-[520px] w-full overflow-hidden bg-gradient-to-b from-sage/40 via-paper to-paper"
+          className="relative h-[420px] md:h-[520px] w-full overflow-hidden bg-gradient-to-b from-ochre-light/18 via-linen to-linen"
           aria-hidden
         >
           <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 max-w-2xl mx-auto">

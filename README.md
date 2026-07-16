@@ -61,7 +61,7 @@ Copy the root `.env.example` to `apps/web/.env.local`. The target runtime uses a
 ```env
 NEXT_PUBLIC_APP_URL=http://127.0.0.1:3105
 DATABASE_URL=postgresql://rumia_app:local-only-password@127.0.0.1:5432/rumia
-BETTER_AUTH_SECRET=local-only-random-secret
+BETTER_AUTH_SECRET=local-only-random-secret-that-is-at-least-32-characters
 ```
 
 `DATABASE_URL` and `BETTER_AUTH_SECRET` are server-only. They must never be placed in `NEXT_PUBLIC_*` variables, client components, browser headers, logs, or committed files.

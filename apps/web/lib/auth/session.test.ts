@@ -32,4 +32,11 @@ describe("getCurrentSession", () => {
     await expect(getCurrentSession()).resolves.toEqual({ user: { id: "traveler-1" } });
     expect(getSession).toHaveBeenLastCalledWith({ headers: requestHeaders });
   });
+
+  it("leaves provider failures for the typed outcome boundary to classify", async () => {
+    const providerFailure = Object.assign(new Error("provider details stay server-side"), { code: "ECONNREFUSED" });
+    getSession.mockRejectedValueOnce(providerFailure);
+
+    await expect(getCurrentSession()).rejects.toBe(providerFailure);
+  });
 });

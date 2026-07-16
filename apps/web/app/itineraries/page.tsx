@@ -1,9 +1,12 @@
+import * as React from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DecisionStatePanel, Icon } from "@repo/ui";
 import { PublicRouteLayout } from "../_components/public-route-layout";
+import { RouteRecovery } from "../_components/route-recovery";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { getTripsForUser, loadPostgresAuthorizationContext } from "@repo/db";
+import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { getTripsForUser } from "@repo/db";
 import { ItinerarySearch } from "./_components/itinerary-search";
 
 /**
@@ -21,13 +24,30 @@ export default async function ItinerariesPage({
 }: {
   searchParams: Promise<{ notice?: string }>;
 }) {
-  const { user } = await getCurrentUser();
+  const currentUser = await getCurrentUser();
+  if (currentUser.outcome === "unavailable") {
+    return (
+      <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
+        <RouteRecovery kind="unavailable" />
+      </PublicRouteLayout>
+    );
+  }
+
+  const { user } = currentUser;
   if (!user) {
     redirect("/sign-in?next=%2Fitineraries");
   }
 
   const { notice } = await searchParams;
-  const actor = await loadPostgresAuthorizationContext(user.id);
+  const actorOutcome = await loadCurrentAuthorizedActorOutcome();
+  if (actorOutcome.kind === "unavailable") {
+    return (
+      <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
+        <RouteRecovery kind="unavailable" />
+      </PublicRouteLayout>
+    );
+  }
+  const actor = actorOutcome.kind === "ready" ? actorOutcome.actor : null;
   const trips = actor ? await getTripsForUser(user.id, 24, { actor }) : [];
 
   return (

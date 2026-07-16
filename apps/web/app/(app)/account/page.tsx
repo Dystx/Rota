@@ -1,5 +1,6 @@
-import Link from "next/link";
+import * as React from "react";
 import { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   Button,
@@ -8,11 +9,12 @@ import {
   EmptyState,
   SectionHeading
 } from "@repo/ui";
-import { getTripsForUser, isPersistenceConfigError, loadPostgresAuthorizationContext } from "@repo/db";
+import { getTripsForUser, isPersistenceConfigError } from "@repo/db";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { RouteRecovery } from "@/app/_components/route-recovery";
 import { AccountTripCard } from "./_components/trip-card";
 import { BehaviorConsentToggle } from "./_components/behavior-consent-toggle";
-import { signOutAction } from "./_actions/sign-out";
 import { SignOutButton } from "./_components/sign-out-button";
 
 export const metadata: Metadata = {
@@ -40,7 +42,13 @@ export const metadata: Metadata = {
  * grid (the previous bespoke right rail is gone).
  */
 export default async function AccountPage() {
-  const { user } = await getCurrentUser();
+  const currentUser = await getCurrentUser();
+
+  if (currentUser.outcome === "unavailable") {
+    return <RouteRecovery kind="unavailable" />;
+  }
+
+  const { user } = currentUser;
 
   if (!user) {
     redirect("/sign-in?next=%2Faccount");
@@ -49,7 +57,11 @@ export default async function AccountPage() {
   let trips: Awaited<ReturnType<typeof getTripsForUser>> = [];
   let infoMessage = "";
   try {
-    const actor = await loadPostgresAuthorizationContext(user.id);
+    const actorOutcome = await loadCurrentAuthorizedActorOutcome();
+    if (actorOutcome.kind === "unavailable") {
+      return <RouteRecovery kind="unavailable" />;
+    }
+    const actor = actorOutcome.kind === "ready" ? actorOutcome.actor : null;
     if (!actor) {
       infoMessage = "Your account profile is still being provisioned. Please try again shortly.";
     } else {
@@ -99,7 +111,6 @@ export default async function AccountPage() {
                 ) : null}
               </div>
               <SignOutButton
-                signOutAction={signOutAction}
                 className="md:self-end"
               />
             </CardContent>

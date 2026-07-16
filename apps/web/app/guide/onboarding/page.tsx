@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
-import { getCurrentUserId } from "@/lib/auth/current-user";
-import { loadCurrentAuthorizedActor } from "@/lib/auth/authorization";
+import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { loadSessionOutcome } from "@/lib/auth/session-outcome";
 import { getSpecialistProfileByUserId } from "@repo/db";
 import { isFeatureEnabled } from "@repo/config";
 import { GuideOnboardingForm } from "./_components/guide-onboarding-form";
 import { loadSpecialistCapabilities } from "./actions";
 import { BetaUnavailable } from "../../_components/beta-unavailable";
 import { PublicRouteLayout } from "../../_components/public-route-layout";
+import { RouteRecovery } from "../../_components/route-recovery";
 
 /**
  * Specialist onboarding page. The unified
@@ -39,11 +40,23 @@ export default async function GuideOnboardingPage() {
     );
   }
 
-  const userId = await getCurrentUserId();
-  const actor = await loadCurrentAuthorizedActor();
-  if (!userId || !actor || actor.userId !== userId) {
+  const sessionOutcome = await loadSessionOutcome();
+  if (sessionOutcome.kind === "unavailable") {
+    return <RouteRecovery kind="unavailable" />;
+  }
+  if (sessionOutcome.kind !== "ready") {
     redirect("/sign-in?next=/guide/onboarding");
   }
+
+  const userId = sessionOutcome.session.user.id;
+  const actorOutcome = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
+  if (actorOutcome.kind === "unavailable") {
+    return <RouteRecovery kind="unavailable" />;
+  }
+  if (actorOutcome.kind !== "ready" || actorOutcome.actor.userId !== userId) {
+    redirect("/sign-in?next=/guide/onboarding");
+  }
+  const actor = actorOutcome.actor;
 
   const existing = await getSpecialistProfileByUserId(userId, { actor });
   // Capabilities (skills + languages) live in a

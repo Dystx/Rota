@@ -1,9 +1,9 @@
 import "server-only";
 
-import { loadPostgresAuthorizationContext } from "@repo/db";
+import { isPersistenceConfigError, loadPostgresAuthorizationContext } from "@repo/db";
 import type { AppRole, AuthorizedActor, Capability } from "@repo/types";
 
-import { getCurrentSession } from "./session";
+import { isSessionProviderFailure, loadSessionOutcome, type SessionOutcome } from "./session-outcome";
 
 export type AccessRequirement = {
   anyRole?: readonly AppRole[];
@@ -11,23 +11,55 @@ export type AccessRequirement = {
 };
 
 export type AuthorizationDependencies = {
-  loadActor: () => Promise<AuthorizedActor | null>;
+  loadActor?: () => Promise<AuthorizedActor | null>;
+  loadActorOutcome?: () => Promise<AuthorizedActorOutcome>;
 };
 
-export async function loadCurrentAuthorizedActor(): Promise<AuthorizedActor | null> {
-  const session = await getCurrentSession();
-  if (!session?.user.id) {
-    return null;
-  }
+export type AuthorizedActorOutcome =
+  | { kind: "ready"; actor: AuthorizedActor }
+  | { kind: "anonymous" }
+  | { kind: "unavailable" };
 
-  return loadPostgresAuthorizationContext(session.user.id);
+/** Session + actor lookup for pages that must distinguish outage from access denial. */
+export async function loadCurrentAuthorizedActorOutcome(
+  sessionOutcome?: SessionOutcome
+): Promise<AuthorizedActorOutcome> {
+  const outcome = sessionOutcome ?? (await loadSessionOutcome());
+  if (outcome.kind === "unavailable") return { kind: "unavailable" };
+  if (outcome.kind === "anonymous") return { kind: "anonymous" };
+
+  try {
+    const actor = await loadPostgresAuthorizationContext(outcome.session.user.id);
+    return actor ? { kind: "ready", actor } : { kind: "anonymous" };
+  } catch (error) {
+    if (isPersistenceConfigError(error) || isSessionProviderFailure(error)) {
+      return { kind: "unavailable" };
+    }
+    throw error;
+  }
+}
+
+/** Backward-compatible actor helper for existing API/page callers. */
+export async function loadCurrentAuthorizedActor(): Promise<AuthorizedActor | null> {
+  const outcome = await loadCurrentAuthorizedActorOutcome();
+  return outcome.kind === "ready" ? outcome.actor : null;
 }
 
 export async function requireApiAccess(
   requirement: AccessRequirement,
-  dependencies: AuthorizationDependencies = { loadActor: loadCurrentAuthorizedActor }
+  dependencies: AuthorizationDependencies = {}
 ): Promise<AuthorizedActor | Response> {
-  const actor = await dependencies.loadActor();
+  const outcome = dependencies.loadActorOutcome
+    ? await dependencies.loadActorOutcome()
+    : dependencies.loadActor
+      ? await dependencies.loadActor().then((actor) => actor ? { kind: "ready", actor } as const : { kind: "anonymous" } as const)
+      : await loadCurrentAuthorizedActorOutcome();
+
+  if (outcome.kind === "unavailable") {
+    return Response.json({ code: "unavailable", message: "This service is temporarily unavailable." }, { status: 503 });
+  }
+
+  const actor = outcome.kind === "ready" ? outcome.actor : null;
 
   if (!actor) {
     return Response.json({ code: "unauthenticated", message: "Authentication required." }, { status: 401 });

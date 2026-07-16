@@ -9,3 +9,6 @@ export async function getCurrentSession() {
     headers: await headers()
   });
 }
+
+/** Server-only Better Auth session shape used by UI-safe outcome wrappers. */
+export type CurrentSession = Awaited<ReturnType<typeof getCurrentSession>>;
