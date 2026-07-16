@@ -292,6 +292,63 @@ function buildScenarios(path: HttpRoutePath, contract: RouteSceneContract): read
   return buildPublicScenarios(path, contract);
 }
 
-export const ROUTE_SCENARIO_CATALOGUE = Object.fromEntries(
-  (Object.entries(ROUTE_PRESENTATION_CATALOGUE) as Array<[HttpRoutePath, RouteSceneContract]>).map(([path, contract]) => [path, buildScenarios(path, contract)])
-) as { readonly [K in HttpRoutePath]: readonly RouteVisualScenario[] };
+/**
+ * Concrete scenario arrays are intentionally keyed out here instead of being
+ * inferred from a route-directory glob. A missing route is therefore a
+ * compile-time parity failure and remains visible in review.
+ */
+export const ROUTE_SCENARIO_CATALOGUE = {
+  "/": buildScenarios("/", ROUTE_PRESENTATION_CATALOGUE["/"]),
+  "/portugal": buildScenarios("/portugal", ROUTE_PRESENTATION_CATALOGUE["/portugal"]),
+  "/explore": buildScenarios("/explore", ROUTE_PRESENTATION_CATALOGUE["/explore"]),
+  "/explore/workspace": buildScenarios("/explore/workspace", ROUTE_PRESENTATION_CATALOGUE["/explore/workspace"]),
+  "/activities/[activityId]": buildScenarios("/activities/[activityId]", ROUTE_PRESENTATION_CATALOGUE["/activities/[activityId]"]),
+  "/feedback": buildScenarios("/feedback", ROUTE_PRESENTATION_CATALOGUE["/feedback"]),
+  "/how-it-works": buildScenarios("/how-it-works", ROUTE_PRESENTATION_CATALOGUE["/how-it-works"]),
+  "/human-review": buildScenarios("/human-review", ROUTE_PRESENTATION_CATALOGUE["/human-review"]),
+  "/local-expertise": buildScenarios("/local-expertise", ROUTE_PRESENTATION_CATALOGUE["/local-expertise"]),
+  "/pricing": buildScenarios("/pricing", ROUTE_PRESENTATION_CATALOGUE["/pricing"]),
+  "/planner": buildScenarios("/planner", ROUTE_PRESENTATION_CATALOGUE["/planner"]),
+  "/plan": buildScenarios("/plan", ROUTE_PRESENTATION_CATALOGUE["/plan"]),
+  "/trip/new": buildScenarios("/trip/new", ROUTE_PRESENTATION_CATALOGUE["/trip/new"]),
+  "/trip/[tripId]": buildScenarios("/trip/[tripId]", ROUTE_PRESENTATION_CATALOGUE["/trip/[tripId]"]),
+  "/trip/[tripId]/map": buildScenarios("/trip/[tripId]/map", ROUTE_PRESENTATION_CATALOGUE["/trip/[tripId]/map"]),
+  "/trip/[tripId]/export": buildScenarios("/trip/[tripId]/export", ROUTE_PRESENTATION_CATALOGUE["/trip/[tripId]/export"]),
+  "/checkout": buildScenarios("/checkout", ROUTE_PRESENTATION_CATALOGUE["/checkout"]),
+  "/itineraries": buildScenarios("/itineraries", ROUTE_PRESENTATION_CATALOGUE["/itineraries"]),
+  "/vault": buildScenarios("/vault", ROUTE_PRESENTATION_CATALOGUE["/vault"]),
+  "/account": buildScenarios("/account", ROUTE_PRESENTATION_CATALOGUE["/account"]),
+  "/logistics": buildScenarios("/logistics", ROUTE_PRESENTATION_CATALOGUE["/logistics"]),
+  "/expert-chat": buildScenarios("/expert-chat", ROUTE_PRESENTATION_CATALOGUE["/expert-chat"]),
+  "/sign-in": buildScenarios("/sign-in", ROUTE_PRESENTATION_CATALOGUE["/sign-in"]),
+  "/support": buildScenarios("/support", ROUTE_PRESENTATION_CATALOGUE["/support"]),
+  "/privacy": buildScenarios("/privacy", ROUTE_PRESENTATION_CATALOGUE["/privacy"]),
+  "/terms": buildScenarios("/terms", ROUTE_PRESENTATION_CATALOGUE["/terms"]),
+  "/sustainability": buildScenarios("/sustainability", ROUTE_PRESENTATION_CATALOGUE["/sustainability"]),
+  "/offline": buildScenarios("/offline", ROUTE_PRESENTATION_CATALOGUE["/offline"]),
+  "/reviewer/queue": buildScenarios("/reviewer/queue", ROUTE_PRESENTATION_CATALOGUE["/reviewer/queue"]),
+  "/reviewer/history": buildScenarios("/reviewer/history", ROUTE_PRESENTATION_CATALOGUE["/reviewer/history"]),
+  "/reviewer/profile": buildScenarios("/reviewer/profile", ROUTE_PRESENTATION_CATALOGUE["/reviewer/profile"]),
+  "/reviewer/operations": buildScenarios("/reviewer/operations", ROUTE_PRESENTATION_CATALOGUE["/reviewer/operations"]),
+  "/reviewer/trips/[tripId]": buildScenarios("/reviewer/trips/[tripId]", ROUTE_PRESENTATION_CATALOGUE["/reviewer/trips/[tripId]"]),
+  "/admin/places": buildScenarios("/admin/places", ROUTE_PRESENTATION_CATALOGUE["/admin/places"]),
+  "/admin/countries": buildScenarios("/admin/countries", ROUTE_PRESENTATION_CATALOGUE["/admin/countries"]),
+  "/admin/regions": buildScenarios("/admin/regions", ROUTE_PRESENTATION_CATALOGUE["/admin/regions"]),
+  "/admin/partners": buildScenarios("/admin/partners", ROUTE_PRESENTATION_CATALOGUE["/admin/partners"]),
+  "/admin/reviewers": buildScenarios("/admin/reviewers", ROUTE_PRESENTATION_CATALOGUE["/admin/reviewers"]),
+  "/admin/specialists": buildScenarios("/admin/specialists", ROUTE_PRESENTATION_CATALOGUE["/admin/specialists"]),
+  "/admin/quality": buildScenarios("/admin/quality", ROUTE_PRESENTATION_CATALOGUE["/admin/quality"]),
+  "/admin/analytics": buildScenarios("/admin/analytics", ROUTE_PRESENTATION_CATALOGUE["/admin/analytics"]),
+  "/console": buildScenarios("/console", ROUTE_PRESENTATION_CATALOGUE["/console"]),
+  "/console/pipeline": buildScenarios("/console/pipeline", ROUTE_PRESENTATION_CATALOGUE["/console/pipeline"]),
+  "/console/workspace": buildScenarios("/console/workspace", ROUTE_PRESENTATION_CATALOGUE["/console/workspace"]),
+  "/console/messages": buildScenarios("/console/messages", ROUTE_PRESENTATION_CATALOGUE["/console/messages"]),
+  "/console/graph": buildScenarios("/console/graph", ROUTE_PRESENTATION_CATALOGUE["/console/graph"]),
+  "/console/metrics": buildScenarios("/console/metrics", ROUTE_PRESENTATION_CATALOGUE["/console/metrics"]),
+  "/console/config": buildScenarios("/console/config", ROUTE_PRESENTATION_CATALOGUE["/console/config"]),
+  "/guide": buildScenarios("/guide", ROUTE_PRESENTATION_CATALOGUE["/guide"]),
+  "/guide/onboarding": buildScenarios("/guide/onboarding", ROUTE_PRESENTATION_CATALOGUE["/guide/onboarding"]),
+  "/b2b": buildScenarios("/b2b", ROUTE_PRESENTATION_CATALOGUE["/b2b"]),
+  "/b2b/[orgSlug]": buildScenarios("/b2b/[orgSlug]", ROUTE_PRESENTATION_CATALOGUE["/b2b/[orgSlug]"]),
+  "/api/v1/docs": buildScenarios("/api/v1/docs", ROUTE_PRESENTATION_CATALOGUE["/api/v1/docs"])
+} satisfies Record<HttpRoutePath, readonly RouteVisualScenario[]>;
