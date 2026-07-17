@@ -24,7 +24,7 @@ export function EditorialProofRail({
           <dt className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-dark">
             {item.label}
           </dt>
-          <dd className="max-w-[24rem] text-sm leading-relaxed text-on-surface-variant">
+          <dd className="max-w-[24rem] text-base leading-relaxed text-on-surface-variant">
             {item.value}
           </dd>
         </div>

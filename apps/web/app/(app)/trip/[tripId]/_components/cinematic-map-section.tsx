@@ -90,7 +90,7 @@ export function StaticFallback({ days: _days }: { days: TripDay[] }) {
         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
         <circle cx="12" cy="10" r="3" />
       </svg>
-      <p className="text-sm text-muted-foreground mt-2">Map preview unavailable for this trip</p>
+      <p className="text-base leading-7 text-muted-foreground mt-2">Map preview unavailable for this trip</p>
     </div>
   );
 }
@@ -527,14 +527,14 @@ export default function CinematicMapSection({
           </div>
         </div>
 
-        <ol aria-label="Stops on map" className="absolute right-4 bottom-4 max-h-48 w-[min(20rem,calc(100%-2rem))] overflow-auto rounded-xl bg-background/90 p-3 text-sm shadow-lg">
+        <ol aria-label="Stops on map" className="absolute right-4 bottom-4 max-h-48 w-[min(20rem,calc(100%-2rem))] overflow-auto rounded-xl bg-background/90 p-3 text-base leading-7 shadow-lg">
           {(activeDay?.stops ?? []).map((stop, index) => {
             const stopId = `day-${activeDay?.dayIndex}-stop-${index}`;
             const coordinates = typeof stop === "string" || stop.lng === undefined || stop.lat === undefined ? undefined : ([stop.lng, stop.lat] as const);
             return <li key={stopId} className="border-b border-black/10 py-2 last:border-0"><button type="button" data-testid={`map-stop-${stopId}`} aria-pressed={activeStopId === stopId} className={`w-full rounded px-2 py-1 text-left ${activeStopId === stopId ? "bg-ochre-light/30 font-semibold" : ""}`} disabled={!coordinates} onClick={() => coordinates && useMapStore.getState().selectStop(stopId, coordinates)}>{typeof stop === "string" ? stop : stop.placeName}</button></li>;
           })}
-          {activeDay && !hasGeocodedStops ? <li className="py-2 text-xs text-muted-foreground"><SelectedDayStatus day={activeDay.dayIndex} hasGeocodedStops={false} /></li> : null}
-          {!activeDay ? <li className="py-2 text-xs text-muted-foreground">No map stops for {dayLabel} yet. Your selected day has no geocoded places.</li> : null}
+          {activeDay && !hasGeocodedStops ? <li className="py-2 text-base leading-7 text-muted-foreground"><SelectedDayStatus day={activeDay.dayIndex} hasGeocodedStops={false} /></li> : null}
+          {!activeDay ? <li className="py-2 text-base leading-7 text-muted-foreground">No map stops for {dayLabel} yet. Your selected day has no geocoded places.</li> : null}
         </ol>
 
         <div className="absolute left-4 bottom-4 pointer-events-none">

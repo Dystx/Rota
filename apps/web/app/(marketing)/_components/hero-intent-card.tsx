@@ -30,7 +30,7 @@ export function HeroIntentCard() {
   const router = useRouter();
 
   return (
-    <div data-testid="hero-intent-card">
+    <div data-testid="hero-intent-card" className="rumia-hero-intent">
       <ActivityIntentComposer
         onSubmit={(draft) => router.push(activityExplorerUrl(activityIntentFromDraft(draft)))}
       />

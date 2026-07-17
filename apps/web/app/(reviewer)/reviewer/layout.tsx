@@ -42,7 +42,7 @@ export default async function ReviewerLayout({
   }
   if (access.kind === "forbidden" || !access.actor.reviewerId) {
     return (
-      <main id="main-content" className="min-h-screen bg-linen px-6 py-16">
+      <main id="main-content" data-scene="utility" data-surface-texture="none" className="min-h-screen bg-linen px-6 py-16">
         <DecisionStatePanel
           kind="error"
           tone="light"

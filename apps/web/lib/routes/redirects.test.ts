@@ -11,8 +11,12 @@ describe("resolveLegacyRedirect", () => {
     expect(resolveLegacyRedirect("/planner")).toBeNull();
   });
 
-  it("normalizes legacy discovery fixtures", () => {
-    expect(resolveLegacyRedirect("/explore")).toEqual({ destination: "/portugal", status: 308 });
-    expect(resolveLegacyRedirect("/explore/workspace")).toEqual({ destination: "/planner", status: 308 });
+  it("keeps the active decision routes live", () => {
+    expect(resolveLegacyRedirect("/explore")).toBeNull();
+    expect(resolveLegacyRedirect("/explore/workspace")).toBeNull();
+  });
+
+  it("normalizes the retired human-review route", () => {
+    expect(resolveLegacyRedirect("/human-review")).toEqual({ destination: "/local-expertise", status: 308 });
   });
 });

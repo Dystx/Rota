@@ -25,7 +25,7 @@ export default async function ConsoleMetricsPage() {
   const state = await loadMetricsState();
 
   return (
-    <main data-testid="console-metrics" className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
+    <div data-testid="console-metrics" className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
       <header className="mb-6 border-b border-olive-light/15 pb-5">
         <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
           Operator metrics
@@ -56,7 +56,7 @@ export default async function ConsoleMetricsPage() {
           <MetricCard label="Partner clicks · last 7 days" value={formatCount(state.counts.partnerClicksLast7Days)} />
         </section>
       )}
-    </main>
+    </div>
   );
 }
 

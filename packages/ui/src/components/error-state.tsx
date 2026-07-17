@@ -10,6 +10,8 @@ export interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
   error?: Error | unknown;
   showDetails?: boolean;
   onRetry?: () => void;
+  /** A server-rendered recovery destination for routes without client state. */
+  retryHref?: string;
   retryText?: string;
   icon?: React.ReactNode;
 }
@@ -23,6 +25,7 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
       error,
       showDetails = false,
       onRetry,
+      retryHref,
       retryText = "Try again",
       icon,
       className, 
@@ -95,8 +98,16 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
           </div>
         )}
 
-        {onRetry && (
+        {retryHref ? (
+          <a
+            href={retryHref}
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-ink px-4 py-2 font-medium text-sm text-cream transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+          >
+            {retryText}
+          </a>
+        ) : onRetry ? (
           <button
+            type="button"
             onClick={onRetry}
             className={cn(
               "px-4 py-2 min-h-[44px] bg-ink text-cream rounded-full font-medium text-sm transition-opacity hover:opacity-90",
@@ -105,7 +116,7 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
           >
             {retryText}
           </button>
-        )}
+        ) : null}
       </div>
     );
   }

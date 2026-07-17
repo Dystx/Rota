@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import { Button } from "@repo/ui";
 import { isFeatureEnabled } from "@repo/config";
 import { getOwnedTrip } from "@/app/lib/trip-access";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { BetaUnavailablePanel } from "../_components/beta-unavailable";
+import { RouteRecovery } from "../_components/route-recovery";
 import { ExpertChat } from "./_components/expert-chat";
 
 /**
@@ -28,6 +30,23 @@ export default async function ExpertChatPage({
 }) {
   const { trip: tripParam } = await searchParams;
   const tripId = tripParam?.trim() || null;
+
+  let tripAccess: Awaited<ReturnType<typeof getOwnedTrip>> | null = null;
+
+  if (tripId) {
+    const currentUser = await getCurrentUser();
+    if (currentUser.outcome === "unavailable") {
+      return <RouteRecovery kind="unavailable" />;
+    }
+    if (!currentUser.user) {
+      redirect(`/sign-in?next=${encodeURIComponent(`/expert-chat?trip=${tripId}`)}`);
+    }
+
+    tripAccess = await getOwnedTrip(tripId, { sessionOutcome: currentUser.sessionOutcome });
+    if (tripAccess.kind !== "ok") {
+      redirect("/itineraries?notice=unavailable");
+    }
+  }
 
   if (!isFeatureEnabled("tripMessaging")) {
     return (
@@ -68,15 +87,7 @@ export default async function ExpertChatPage({
     );
   }
 
-  const tripAccess = await getOwnedTrip(tripId);
-
-  if (tripAccess.kind === "anonymous") {
-    redirect(`/sign-in?next=${encodeURIComponent(`/expert-chat?trip=${tripId}`)}`);
-  }
-
-  if (tripAccess.kind !== "ok") {
-    redirect("/itineraries?notice=unavailable");
-  }
+  if (!tripAccess) redirect("/itineraries?notice=unavailable");
 
   const reviewed = tripAccess.trip.hasHumanReview || tripAccess.trip.status === "reviewed";
   if (!tripAccess.trip.isPaid || !reviewed) {

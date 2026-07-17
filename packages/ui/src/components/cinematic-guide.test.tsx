@@ -43,6 +43,20 @@ describe('CinematicGuide System', () => {
     expect(screen.getByText('Content 2')).toBeTruthy();
   });
 
+  it('supports content-height chapters for task-oriented product surfaces', () => {
+    render(
+      <CinematicGuide>
+        <GuideChapter id="compact" fullHeight={false}>
+          Compact content
+        </GuideChapter>
+      </CinematicGuide>
+    );
+
+    const chapter = screen.getByText('Compact content').closest('[id="compact"]');
+    expect(chapter?.className).toContain('min-h-0');
+    expect(chapter?.className).not.toContain('min-h-[100svh]');
+  });
+
   it('renders HeroSection with title and subtitle', () => {
     render(
       <HeroSection title="Hero Title" subtitle="Hero Subtitle" />

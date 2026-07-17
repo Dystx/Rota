@@ -3,7 +3,7 @@
 > **Historical design snapshot.** The visual principles remain useful, but the
 > current product contract is the activity-first Portugal-wide plan. Booking,
 > travel-agency, and chatbot behavior are not part of the current release.
-> See the [frontend deep redesign plan](superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md)
+> See the [frontend polish and visual completion plan](superpowers/plans/2026-07-14-rumia-frontend-polish.md)
 > for the reconciled UI and roadmap.
 
 **Status**: Additive to [`docs/spec.md`](./spec.md) (v2.0 Tiered Service Model — the long-term product vision).

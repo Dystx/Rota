@@ -68,7 +68,7 @@ export function Field({
       {description ? (
         <p
           id={descriptionId}
-          className="text-[13px] leading-relaxed text-[var(--color-muted-foreground)]"
+          className="text-base leading-7 text-[var(--color-muted-foreground)]"
         >
           {description}
         </p>
@@ -118,7 +118,7 @@ export const FieldError = forwardRef<HTMLParagraphElement, FieldErrorProps>(
         role="alert"
         aria-live="polite"
         className={cn(
-          'text-[13px] leading-relaxed font-medium text-[var(--color-status-danger-fg)]',
+          'text-base leading-7 font-medium text-[var(--color-status-danger-fg)]',
           className
         )}
         {...props}

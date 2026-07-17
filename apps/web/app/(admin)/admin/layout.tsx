@@ -48,7 +48,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <main id="main-content" className="mx-auto grid min-h-screen max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
+    <main id="main-content" data-scene="utility" data-surface-texture="none" className="mx-auto grid min-h-screen max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
       <div data-testid="admin-forbidden">
         <SectionHeading
           eyebrow="Admin access"

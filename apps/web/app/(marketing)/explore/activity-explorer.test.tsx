@@ -34,12 +34,23 @@ describe("ActivityExplorer", () => {
     expect(replace).toHaveBeenCalledWith(expect.stringContaining("saved="));
   });
 
-  it("reserves mobile space for the fixed day tray and restores desktop spacing", () => {
+  it("keeps empty discovery compact while reserving space for a saved mobile tray", () => {
     render(<ActivityExplorer initialIntent={parseActivityIntent({ region: "porto" })} />);
 
     const shell = screen.getByTestId("activity-explorer");
-    expect(shell.className).toContain("pb-[calc(12rem+env(safe-area-inset-bottom))]");
+    expect(shell.className).toContain("pb-12");
     expect(shell.className).toContain("lg:pb-28");
+
+    cleanup();
+    render(
+      <ActivityExplorer
+        initialIntent={parseActivityIntent({ region: "porto", mood: "a walk" })}
+        initialSavedIds={["porto-ribeira-slow-walk"]}
+      />
+    );
+    expect(screen.getByTestId("activity-explorer").className).toContain(
+      "pb-[calc(8rem+env(safe-area-inset-bottom))]"
+    );
   });
 
   it("renders a reviewed verdict and keeps a saved activity reversible", () => {
@@ -57,7 +68,7 @@ describe("ActivityExplorer", () => {
       screen.getAllByRole("button", { name: /Remove .* from this day/i })[0]!,
     );
     expect(screen.getByTestId("activity-status").textContent).toMatch(/removed from your day/i);
-    expect(screen.queryByRole("region", { name: /Your day/i })).toBeNull();
+    expect(screen.getByTestId("activity-day-empty")).toBeTruthy();
   });
 
   it("announces a phrase replacement through the authoritative status region", () => {

@@ -1,6 +1,14 @@
-# Rumia VPS Self-Hosted Migration Implementation Plan
+# Rumia VPS Self-Hosted Migration Implementation Plan (archived after private cutover)
 
 > **For agentic workers:** Execute inline, one checked task at a time. This plan affects a shared production VPS; do not use subagents, do not apply a host change without the owner's confirmation, and do not stage or commit unrelated worktree changes.
+
+> **Status (2026-07-13): CLOSED FOR THE CURRENT PRIVATE RELEASE.** The
+> PostgreSQL/Better Auth migration, private service, backup/restore proof,
+> rollback evidence, and Lumes isolation are complete and recorded in
+> `docs/ops/cutover-evidence.md`. Remaining unchecked items are deferred
+> external hardening/public-ingress or product-order decisions; they are not an
+> active implementation queue. Use `docs/superpowers/PLAN-INDEX.md` to decide
+> whether a new operational change is actually authorized.
 
 **Goal:** Replace Rumia's Supabase backend with a self-hosted PostgreSQL/Better Auth/Drizzle stack on the existing VPS while preserving Lumes availability and keeping every Rumia private service off the public network.
 
@@ -543,7 +551,14 @@ pnpm test:a11y
 git diff --check
 ```
 
-Verified 2026-07-13: all listed gates pass; the unit suite is 170 files/882 tests, the full browser smoke suite is 303 passed/33 intentional skips, the visual matrix is 104 passed/32 intentional skips, the dedicated accessibility matrix is 61 passed/1 expected skip, the performance matrix is 14 passed, and the tablet contract is 120/120 at 1024×768 and 768×768. `check:migrations` validates Drizzle migration order rather than Supabase CLI history.
+Verified 2026-07-13: all listed gates pass; the current unit suite is **173
+files/890 tests**, the changed-slice suite is **13/13**, the full browser smoke
+suite is **303 passed/33 expected skips**, the visual matrix is **104
+passed/32 expected skips**, the dedicated accessibility matrix is **61
+passed/1 expected skip**, the performance matrix is **14/14**, and the viewport
+contract is **120/120** at 1024×768 and 768×768. `check:migrations` validates
+Drizzle migration order rather than Supabase CLI history. This evidence is for
+the current local artifact; it does not authorize a new VPS release.
 
 ## Task 7: Deploy Rumia safely beside Lumes
 

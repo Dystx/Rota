@@ -4,7 +4,7 @@
 > the earlier serverless, Supabase, and itinerary/concierge assumptions. Do not
 > use it as an implementation or release checklist. Current work follows the
 > [activity-first master plan](superpowers/plans/2026-07-10-rumia-activity-first-master.md)
-> and the [VPS migration plan](superpowers/plans/2026-07-11-rumia-vps-self-hosted-migration.md).
+> and the [archived VPS migration record](superpowers/archive/plans/2026-07-11-rumia-vps-self-hosted-migration.md).
 
 > Archived cross-reference for the former `docs/roadmap.md` plan. It is retained
 > for historical sequencing only; update the current activity-first plan and

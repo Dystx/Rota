@@ -122,7 +122,7 @@ export default async function TripMapPage({
     [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" data-scene="atlas">
       <CinematicGuide>
         <GuideProgress chapters={chapters} />
 

@@ -2,11 +2,15 @@
 
 > **Canonical plan.** This document supersedes the public-acquisition and route-normalization portions of `rumia-full-rework-master.md`, Phase 1 Public Discovery, and Phase 2 Living Brief. It preserves their security, operations, commerce, and quality gates unless this document states otherwise.
 >
+> The reconciled authority map is [`../PLAN-INDEX.md`](../PLAN-INDEX.md). Use it
+> before opening any older plan; completed and superseded work is retained for
+> provenance but is not an execution queue.
+>
 > **Infrastructure decision — 11 July 2026.** Rumia retires Supabase as its future backend. The production target is the existing Debian VPS beside Lumes: Caddy → Next.js/Better Auth → private PostgreSQL 17 with PostGIS, pgvector when needed, and Drizzle migrations. The Mac remains local development/test. See `docs/superpowers/specs/2026-07-11-rumia-vps-platform-design.md` for the required host, backup, authorization, and migration constraints.
 >
-> **UI redesign decision — 12 July 2026.** The redesign is a cross-cutting clarity and quality program, not a decorative rewrite. Its screen-by-screen hierarchy, component states, responsive rules, accessibility gates, browser-finding mapping, and release sequence live in `docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`.
+> **UI redesign decision — reconciled 16 July 2026.** The redesign is a cross-cutting clarity and quality program, not a decorative rewrite. Its current screen hierarchy, component states, responsive rules, accessibility gates, browser-finding mapping, and release sequence live in `docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`.
 >
-> **Frontend aesthetic decision — 12 July 2026.** The deeper component, art-direction, texture, motion, and progressive 3D work is consolidated in `docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`. It is a frontend workstream, not a new product roadmap or permission to make the homepage map-first.
+> **Frontend aesthetic decision — reconciled 16 July 2026.** The component, art-direction, texture, motion, responsive, state-recovery, operator, and visual-acceptance work is consolidated in `docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`. It is a frontend workstream, not a new product roadmap or permission to make the homepage map-first.
 
 **Goal:** Build Rumia into Portugal’s trusted activity-decision layer: travellers state the time and kind of day they have, receive a small set of independently judged activities, save a transparent day, and only then use planning, purchase, review, and export tools when needed.
 
@@ -202,8 +206,8 @@ Retain the existing foundations: shared shells, route catalogue, API envelopes, 
 
 **Gate:** at 1440px and 390px, a visitor can enter a situation, save/remove an activity, reach workspace, and encounter a truthful empty/error state with one main/h1 and no overflow.
 
-The cross-cutting UI redesign sequence is Phase 0 through Phase 7 in
-[`docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`](2026-07-12-rumia-frontend-deep-redesign.md): artifact truth first, then shared surfaces, the public activity journey, chosen-day continuity, feedback/accessibility, utility/operator quality, optional spatial enhancement, and final hardening. UI work does not change the release order or authorize implementation of gated commerce.
+The cross-cutting UI redesign sequence is the 17-task corrective queue in
+[`docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`](2026-07-15-rumia-frontend-finish.md): executable route/state truth first, then shared visual foundations and recovery, public activity judgement, chosen-day continuity, quiet routes, operator access/quality, and final human visual acceptance. UI work does not change the release order or authorize implementation of gated commerce.
 
 ### Release 2 — Chosen-day composition and preview
 
@@ -379,7 +383,7 @@ and 3D-building terms.
 - MapLibre examples (GeoJSON, camera, attribution, and 3D patterns): <https://maplibre.org/maplibre-gl-js/docs/examples/>
 - MapLibre GL JS licence: <https://github.com/maplibre/maplibre-gl-js/blob/main/LICENSE.txt>
 - Interactive 3D inspiration reviewed for concepts only: <https://github.com/siddsachar/gpt5.6-sol-test/tree/main/london-3d>
-- Frontend deep redesign and polish plan: [`docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md`](2026-07-12-rumia-frontend-deep-redesign.md)
+- Frontend corrective convergence and visual completion plan: [`docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`](2026-07-15-rumia-frontend-finish.md)
 - Editorial travel interaction inspiration (not a product model): <https://www.awwwards.com/sites/when-to-travel%20>
 
 ## 10. Master completion condition

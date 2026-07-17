@@ -67,7 +67,7 @@ export default function LocalExpertisePage() {
               What reviewers check
             </h2>
           </div>
-          <ul className="grid gap-3 text-base leading-8 text-on-surface-variant">
+          <ul className="rumia-local-expertise-list grid gap-3 text-base leading-8 text-on-surface-variant">
             {REVIEW_CHECKS.map((item) => (
               <li key={item} className="rounded-[22px] border border-[var(--color-border)] bg-white/55 px-5 py-4">
                 {item}
@@ -87,7 +87,7 @@ export default function LocalExpertisePage() {
               What they do not promise
             </h2>
           </div>
-          <ul className="grid gap-3 text-base leading-8 text-on-surface-variant">
+          <ul className="rumia-local-expertise-list grid gap-3 text-base leading-8 text-on-surface-variant">
             {REVIEW_BOUNDARIES.map((item) => (
               <li key={item} className="rounded-[22px] border border-[var(--color-border)] bg-white/55 px-5 py-4">
                 {item}

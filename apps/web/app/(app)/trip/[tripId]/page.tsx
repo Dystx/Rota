@@ -186,7 +186,7 @@ export default async function TripDetailPage({
     : [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" data-scene="decision">
       <div className="mx-auto max-w-[1100px] px-6 pt-6">
         <Breadcrumb
           items={[

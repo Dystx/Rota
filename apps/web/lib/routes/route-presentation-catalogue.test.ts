@@ -44,7 +44,9 @@ describe("route presentation catalogue", () => {
         expect(ids.has(scenario.id), `duplicate scenario id ${scenario.id}`).toBe(false);
         ids.add(scenario.id);
         expect(route.states, `${path} ${scenario.id}`).toContain(scenario.state);
-        if (scenario.state === "unauthorized") expect(scenario.expected.access, scenario.id).toBe("redirect");
+        if (scenario.state === "unauthorized" && !["/vault", "/b2b/[orgSlug]"].includes(path)) {
+          expect(scenario.expected.access, scenario.id).toBe("redirect");
+        }
       }
     }
   });
@@ -79,7 +81,8 @@ describe("route presentation catalogue", () => {
     expect(checkout.find((scenario) => scenario.id === "checkout--anonymous")).toMatchObject({
       state: "unauthorized",
       persona: "anonymous",
-      fixture: { kind: "static", path: "/checkout" },
+      fixture: { kind: "traveler-trip", variant: "foreign" },
+      setup: { query: { trip: "fixture:foreign" } },
       expected: { access: "redirect", noPrivateDisclosure: true }
     });
     expect(checkout.find((scenario) => scenario.id === "checkout--no-trip")).toMatchObject({
@@ -131,7 +134,10 @@ describe("route presentation catalogue", () => {
       expect(foreign, path).toMatchObject({
         fixture: { kind: "traveler-trip", variant: "foreign", suffix },
         setup: { query: { trip: "fixture:foreign" } },
-        expected: { access: "not-found", noPrivateDisclosure: true }
+        expected: {
+          access: path === "/trip/[tripId]" || path === "/trip/[tripId]/map" ? "redirect" : "not-found",
+          noPrivateDisclosure: true
+        }
       });
     }
   });

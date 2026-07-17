@@ -30,7 +30,11 @@ export function RevealSection({
 
   return (
     <m.div
-      initial={{ opacity: 0, y: translateY }}
+      // Keep content visible before IntersectionObserver fires. A hidden
+      // initial state makes full-page capture, keyboard navigation, and
+      // reduced-data contexts dependent on scroll position; the in-view
+      // transition still provides a gentle entrance once the section enters.
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ amount, once }}
       transition={{
@@ -87,7 +91,10 @@ export function RevealStagger({
 
   return (
     <m.div
-      initial="hidden"
+      // Do not hide offscreen information while waiting for the observer.
+      // Motion is an enhancement; content must remain present in full-page
+      // captures and for users who do not scroll through every chapter.
+      initial={false}
       whileInView="visible"
       viewport={{ amount, once }}
       variants={{

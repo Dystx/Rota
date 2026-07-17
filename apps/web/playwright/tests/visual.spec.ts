@@ -56,7 +56,7 @@ test.describe("@smoke @visual manifest-driven primary baselines", () => {
       });
       const page = await context.newPage();
       try {
-        await page.goto(row.url, { waitUntil: "domcontentloaded" });
+        await page.goto(row.url, { waitUntil: "load" });
         await assertVisualContract(page, row);
         await disableMotion(page);
         await page.waitForTimeout(100);

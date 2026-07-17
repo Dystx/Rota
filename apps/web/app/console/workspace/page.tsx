@@ -20,7 +20,7 @@ export default function ConsoleWorkspacePage() {
   const [activePane, setActivePane] = React.useState<WorkspacePane>("anchors");
 
   return (
-    <main className="min-w-0 min-h-screen overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
+    <div className="min-w-0 min-h-screen overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
       <header className="mb-5 flex min-w-0 flex-col gap-3 border-b border-olive-light/15 pb-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
@@ -75,6 +75,6 @@ export default function ConsoleWorkspacePage() {
           />
         </aside>
       </div>
-    </main>
+    </div>
   );
 }

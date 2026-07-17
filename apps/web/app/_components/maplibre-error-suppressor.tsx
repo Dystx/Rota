@@ -37,9 +37,11 @@ export function MapLibreErrorSuppressor(): null {
       // Keep the activity-first homepage and initial public routes free of the
       // MapLibre bundle. Load the helper only after a map-capable surface is
       // actually mounted.
-      void import("@repo/spatial-engine").then(({ setupMapLibreErrorSuppression }) => {
-        if (!cancelled) setupMapLibreErrorSuppression();
-      });
+      void import("@repo/spatial-engine/error-suppression").then(
+        ({ setupMapLibreErrorSuppression }) => {
+          if (!cancelled) setupMapLibreErrorSuppression();
+        }
+      );
     };
 
     installIfMapIsPresent();

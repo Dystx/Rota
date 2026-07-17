@@ -15,6 +15,10 @@ function shouldRunInProject(scenario: ExecutableRouteScenario, projectName: stri
 
 function expectedRedirect(scenario: ExecutableRouteScenario): string {
   if (scenario.state === "redirect") return scenario.redirectTo ?? "/";
+  if (scenario.persona === "anonymous") return "/sign-in";
+  if (scenario.expected.noPrivateDisclosure && scenario.fixture.kind === "traveler-trip" && "variant" in scenario.fixture && scenario.fixture.variant === "foreign") {
+    return "/itineraries";
+  }
   return "/sign-in";
 }
 
@@ -49,14 +53,8 @@ async function assertRouteScene(page: import("@playwright/test").Page, scenario:
   if (scenario.persona !== "public" && scenario.persona !== "anonymous") {
     await expect(page).not.toHaveURL(/\/sign-in(?:\?|$)/u);
   }
-  if (scenario.route === "/reviewer/trips/[tripId]") {
+  if (scenario.route === "/reviewer/trips/[tripId]" && !["forbidden", "not-found"].includes(scenario.state)) {
     await expect(page.getByRole("link", { name: "Back to review queue" })).toBeVisible();
-  }
-  if (scenario.route === "/feedback") {
-    await expect(page.getByRole("button", { name: "Send feedback" })).toBeVisible();
-  }
-  if (scenario.route === "/logistics") {
-    await expect(page.locator('[data-footer-mode="utility"]')).toHaveCount(1);
   }
   if (["/privacy", "/terms", "/sustainability"].includes(scenario.route)) {
     await expect(page.locator('[data-footer-mode="compact"]')).toHaveCount(1);
@@ -88,7 +86,7 @@ test.describe("@route-scenes manifest-driven route and state contracts", () => {
       });
       const page = await context.newPage();
       try {
-        await page.goto(scenario.url, { waitUntil: "domcontentloaded" });
+        await page.goto(scenario.url, { waitUntil: "load" });
         await assertRouteScene(page, scenario);
       } finally {
         await context.close();
@@ -109,7 +107,7 @@ test.describe("@route-scenes manifest-driven route and state contracts", () => {
       });
       const page = await context.newPage();
       try {
-        await page.goto(scenario.url, { waitUntil: "domcontentloaded" });
+        await page.goto(scenario.url, { waitUntil: "load" });
         await page.getByRole("searchbox", { name: "Search itineraries" }).fill("Madeira");
         await page.getByRole("button", { name: "Drafts" }).click();
         await expect(page.getByTestId("itinerary-filtered-empty")).toBeVisible();

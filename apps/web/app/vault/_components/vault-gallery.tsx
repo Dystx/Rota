@@ -71,7 +71,7 @@ export function VaultGallery({ trips }: { trips: TripDraftListItem[] }) {
             <h1 className="font-display-mobile text-display-mobile md:font-display md:text-display text-primary">
               Saved days
             </h1>
-            <p className="font-body-md text-body-md text-on-surface-variant mt-2">
+            <p className="mt-2 text-base leading-7 text-on-surface-variant">
               Your private shelf of considered activity days, ready to revisit,
               reshape, or share.
             </p>
@@ -309,7 +309,7 @@ function VaultCardButton({
           <h2 className="mb-1 font-headline-sm text-headline-sm text-primary">
             {card.title}
           </h2>
-          <p className="mb-3 font-body-md text-body-md text-on-surface-variant">
+          <p className="mb-3 text-base leading-7 text-on-surface-variant">
             {card.subtitle}
           </p>
         </div>

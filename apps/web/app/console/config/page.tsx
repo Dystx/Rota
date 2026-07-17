@@ -31,19 +31,19 @@ export default async function ConsoleConfigPage() {
 
   if (!isFeatureEnabled("consoleConfig")) {
     return (
-      <main data-testid="console-config" className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
+      <div data-testid="console-config" className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
         <DecisionStatePanel
           kind="unavailable"
           headingLevel={1}
           title="Console configuration is disabled"
           description="ENABLE_CONSOLE_CONFIG is not enabled for this environment. No deployment controls are exposed."
         />
-      </main>
+      </div>
     );
   }
 
   return (
-    <main data-testid="console-config" className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
+    <div data-testid="console-config" className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
       <header className="mb-6 border-b border-olive-light/15 pb-5">
         <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">Operator configuration</p>
         <h1 className="mt-2 font-headline-lg text-headline-lg text-primary">System configuration</h1>
@@ -57,6 +57,6 @@ export default async function ConsoleConfigPage() {
         title="Configuration persistence is unavailable"
         description="The feature flag is enabled, but there is no confirmed persistence path. No values or deployment success are invented."
       />
-    </main>
+    </div>
   );
 }

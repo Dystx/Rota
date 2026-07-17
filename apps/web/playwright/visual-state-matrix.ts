@@ -4,9 +4,10 @@ import { createAdminLimitedStorageState } from "./fixtures/admin-limited-auth";
 import { createAdminStorageState } from "./fixtures/admin-auth";
 import { createReviewerStorageState } from "./fixtures/reviewer-auth";
 import { createSpecialistCandidateStorageState } from "./fixtures/specialist-candidate-auth";
-import { reviewerTripPath, type ReviewerTripVariant } from "./fixtures/reviewer-trip";
-import { reviewedTripPath } from "./fixtures/reviewed-trip";
-import { foreignTravelerTripPath, travelerTripPath } from "./fixtures/traveler-trip";
+import { readReviewerTripFixture, reviewerTripPath, type ReviewerTripVariant } from "./fixtures/reviewer-trip";
+import { readReviewedTripFixture, reviewedTripPath } from "./fixtures/reviewed-trip";
+import { createTravelerStorageState } from "./fixtures/traveler-auth";
+import { foreignTravelerTripPath, getTravelerTripId, travelerTripPath } from "./fixtures/traveler-trip";
 import { ROUTE_MATRIX, type RouteMatrixRow, type RouteMatrixViewport } from "./route-matrix";
 
 export const ACCEPTANCE_VIEWPORTS = {
@@ -26,6 +27,17 @@ function appendQuery(url: string, query: Readonly<Record<string, string>> | unde
   if (!query) return url;
   const search = new URLSearchParams(query).toString();
   return search ? `${url}${url.includes("?") ? "&" : "?"}${search}` : url;
+}
+
+function materializeFixtureQuery(query: Readonly<Record<string, string>> | undefined): Readonly<Record<string, string>> | undefined {
+  if (!query) return query;
+  return Object.fromEntries(Object.entries(query).map(([key, value]) => {
+    if (key !== "trip") return [key, value];
+    if (value === "fixture:draft") return [key, getTravelerTripId()];
+    if (value === "fixture:paid-reviewed") return [key, readReviewedTripFixture().tripId];
+    if (value === "fixture:foreign") return [key, readReviewerTripFixture("unassigned").tripId];
+    return [key, value];
+  }));
 }
 
 function dynamicPath(row: RouteMatrixRow): string {
@@ -56,9 +68,9 @@ function dynamicPath(row: RouteMatrixRow): string {
 }
 
 export function resolveScenarioUrl(row: RouteMatrixRow): string {
-  // Checkout, logistics, and messaging intentionally use the route-level
-  // fixture token in their query rather than navigating to the trip itself.
-  return appendQuery(dynamicPath(row), row.scenario.setup?.query);
+  // Checkout, logistics, and messaging use a route-level fixture token in the
+  // catalogue; resolve it to the seeded UUID before the app receives it.
+  return appendQuery(dynamicPath(row), materializeFixtureQuery(row.scenario.setup?.query));
 }
 
 export function storageStateForPersona(persona: RouteMatrixRow["persona"]): string | undefined {
@@ -89,7 +101,11 @@ export function resolveRouteScenarios(): readonly ExecutableRouteScenario[] {
   return ROUTE_MATRIX.map((row) => ({
     ...row,
     url: resolveScenarioUrl(row),
-    ...(row.scene === "redirect" ? { redirectTo: row.route === "/human-review" ? "/local-expertise" : "/planner" } : {}),
+    ...(row.scene === "redirect"
+      ? { redirectTo: row.route === "/human-review" ? "/local-expertise" : "/planner" }
+      : row.route === "/sign-in" && row.state === "redirect"
+        ? { redirectTo: "/account" }
+        : {}),
     ...(storageStateForPersona(row.persona) ? { storageState: storageStateForPersona(row.persona) } : {})
   }));
 }

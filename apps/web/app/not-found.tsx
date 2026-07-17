@@ -28,6 +28,7 @@ export default function NotFound() {
       className="min-h-screen flex flex-col rumia-surface rumia-surface-linen"
       data-surface="linen"
       data-surface-texture="none"
+      data-scene="utility"
       data-testid="not-found-recovery"
     >
       <main

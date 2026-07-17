@@ -56,6 +56,7 @@ export function TopNav() {
         {/* Brand */}
         <Link
           href="/"
+          prefetch={false}
           aria-current={isActivePath(pathname, "/") ? "page" : undefined}
           aria-label="Rumia — go to home"
           className="inline-flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
@@ -74,6 +75,7 @@ export function TopNav() {
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  prefetch={false}
                   aria-current={active ? "page" : undefined}
                   data-testid={`top-nav-link-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                   data-active={active ? "true" : "false"}
@@ -95,6 +97,7 @@ export function TopNav() {
         <div className="flex items-center gap-3 md:gap-6">
           <Link
             href="/explore"
+            prefetch={false}
             data-testid="top-nav-worth-doing"
             className="hidden min-h-11 min-w-11 items-center justify-center md:inline-flex bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-2 rounded-full hover:bg-olive-dark transition-colors duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
           >
@@ -133,6 +136,7 @@ export function TopNav() {
                       <Link
                         ref={index === 0 ? firstMobileLinkRef : undefined}
                         href={item.href}
+                        prefetch={false}
                         onClick={() => setMobileOpen(false)}
                         aria-current={active ? "page" : undefined}
                         data-testid={`top-nav-mobile-link-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
@@ -151,6 +155,7 @@ export function TopNav() {
                 <li>
                   <Link
                     href="/explore"
+                    prefetch={false}
                     onClick={() => setMobileOpen(false)}
                     data-testid="top-nav-mobile-worth-doing"
                     className="mt-2 inline-flex min-h-11 min-w-11 w-full items-center justify-center bg-olive-light text-on-primary font-label-ui text-label-ui px-5 py-3 rounded-full hover:bg-olive-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"

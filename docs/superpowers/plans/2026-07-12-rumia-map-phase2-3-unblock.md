@@ -2,8 +2,12 @@
 
 Date: 2026-07-12
 Branch: `codex/rumia-phase0`
-Status: technical implementation and provider preflight complete; production
-enablement remains gated by owner/legal and provider decisions
+Status (2026-07-13): **DEFERRED / PROVIDER-LEGAL GATED.** Technical
+implementation and provider preflight are complete. Production enablement,
+camera storytelling, route geometry, and 3D remain disabled until the owner
+approves provider/licence, attribution, quota, privacy, performance, transit,
+and rollback decisions. This is a deferred release packet, not an active build
+queue; see `docs/superpowers/PLAN-INDEX.md`.
 
 The remaining decisions are tracked in
 `docs/ops/rumia-map-launch-decision.md`; this packet does not grant approval.

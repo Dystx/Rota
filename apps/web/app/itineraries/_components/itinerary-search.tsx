@@ -126,7 +126,7 @@ export function ItinerarySearch({ trips }: { trips: TripDraftListItem[] }) {
               </h2>
               <p
                 data-testid="itinerary-result-count"
-                className="font-mono-micro text-mono-micro text-on-surface-variant/70"
+                className="font-mono-micro text-mono-micro text-on-surface-variant"
               >
                 {visible.length === trips.length
                   ? `${trips.length} ${trips.length === 1 ? "itinerary" : "itineraries"}`

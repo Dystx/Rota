@@ -60,7 +60,7 @@ The health check must return 200. The PostgreSQL connection must fail.
 3. If a data defect cannot be repaired with a forward migration, restore the verified R2 backup into a separate database, verify it, and schedule a controlled database replacement.
 4. Do not restart, roll back, or reconfigure Lumes as part of Rumia rollback.
 
-See [the VPS self-hosted migration plan](../superpowers/plans/2026-07-11-rumia-vps-self-hosted-migration.md) for the exact execution order.
+See [the archived VPS self-hosted migration record](../superpowers/archive/plans/2026-07-11-rumia-vps-self-hosted-migration.md) for the completed execution order.
 
 See [the cutover evidence record](cutover-evidence.md) for the current
 rehearsal evidence and the remaining owner-controlled gates.

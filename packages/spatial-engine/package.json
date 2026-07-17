@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./error-suppression": "./src/error-suppression.ts",
     "./globe": "./src/components/globe-workspace.tsx"
   },
   "dependencies": {

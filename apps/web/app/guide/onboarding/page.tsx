@@ -31,15 +31,6 @@ import { RouteRecovery } from "../../_components/route-recovery";
  * by RLS (not by service-role).
  */
 export default async function GuideOnboardingPage() {
-  if (!isFeatureEnabled("guideBeta")) {
-    return (
-      <BetaUnavailablePanel
-        title="Specialist onboarding is in private beta"
-        description="This onboarding flow opens to approved specialists as verification capacity becomes available."
-      />
-    );
-  }
-
   const sessionOutcome = await loadSessionOutcome();
   if (sessionOutcome.kind === "unavailable") {
     return <RouteRecovery kind="unavailable" />;
@@ -56,6 +47,16 @@ export default async function GuideOnboardingPage() {
   if (actorOutcome.kind !== "ready" || actorOutcome.actor.userId !== userId) {
     redirect("/sign-in?next=/guide/onboarding");
   }
+
+  if (!isFeatureEnabled("guideBeta")) {
+    return (
+      <BetaUnavailablePanel
+        title="Specialist onboarding is in private beta"
+        description="This onboarding flow opens to approved specialists as verification capacity becomes available."
+      />
+    );
+  }
+
   const actor = actorOutcome.actor;
 
   let existing;

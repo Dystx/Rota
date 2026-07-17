@@ -3,14 +3,14 @@
 > **Historical snapshot (2026-07-04).** This document preserves the earlier
 > tiered/Cloudflare/Supabase roadmap for context. It is not the current launch
 > contract. Use the [activity-first master plan](superpowers/plans/2026-07-10-rumia-activity-first-master.md),
-> [VPS migration plan](superpowers/plans/2026-07-11-rumia-vps-self-hosted-migration.md),
+> [archived VPS migration record](superpowers/archive/plans/2026-07-11-rumia-vps-self-hosted-migration.md),
 > and [latest plan audit](../specs/PLAN-AUDIT_LATEST.md) for current scope,
 > architecture, and release status.
 
 > **Historical cross-reference only.** The three older specs below are retained
 > for context; none is the current release source of truth.
 >
-> - **v4.0 (current authoritative)** → [`docs/spec-v4.md`](./spec-v4.md) — 4-tier ascension model (Tier 1 Core / Tier 2 Curation / Tier 3 Concierge / Tier 4 Marketplace).
+> - **v4.0 (former long-term authority)** → [`docs/spec-v4.md`](./spec-v4.md) — historical 4-tier ascension model (Tier 1 Core / Tier 2 Curation / Tier 3 Concierge / Tier 4 Marketplace).
 > - **v2.0 long-term vision** → [`docs/spec.md`](./spec.md) — 3-tier Tiered Service Model (preserved for historical reference).
 > - **Refined 2026 scope** → [`docs/spec-refined-2026.md`](./spec-refined-2026.md) — visual identity (olive/ochre) + UI/UX details; Tier 3 + Mobile deferred.
 > - **Former operational launch-readiness** → §3 below. It is superseded by the

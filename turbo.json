@@ -3,7 +3,11 @@
   "globalEnv": ["NEXT_PUBLIC_APP_URL", "DATABASE_URL", "BETTER_AUTH_SECRET"],
   "tasks": {
     "build": {
+      "dependsOn": ["^build"]
+    },
+    "web#build": {
       "dependsOn": ["^build"],
+      "cache": false,
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "dev": {

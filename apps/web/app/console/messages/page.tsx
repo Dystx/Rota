@@ -7,7 +7,7 @@ import { DAYS } from "./_lib/conversations";
 export default function ConsoleMessagesPage() {
   if (DAYS.length === 0) {
     return (
-      <main className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
+      <div className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
         <header className="mb-6 border-b border-olive-light/15 pb-5">
           <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
             Operator messages
@@ -23,18 +23,18 @@ export default function ConsoleMessagesPage() {
           title="Messaging data is unavailable"
           description="No persisted conversations are connected to this operator workspace, so illustrative threads are not shown."
         />
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
+    <div className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
       <DecisionStatePanel
         kind="unavailable"
         headingLevel={1}
         title="Messaging data is unavailable"
         description="The conversation source is not available for this workspace."
       />
-    </main>
+    </div>
   );
 }

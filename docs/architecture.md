@@ -2,8 +2,9 @@
 
 **Current source of truth:**
 
+- [Rumia plan index](superpowers/PLAN-INDEX.md)
 - [Rumia activity-first master plan](superpowers/plans/2026-07-10-rumia-activity-first-master.md)
-- [Frontend deep redesign and polish plan](superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md)
+- [Frontend polish and visual completion plan](superpowers/plans/2026-07-14-rumia-frontend-polish.md)
 - [VPS platform design](superpowers/specs/2026-07-11-rumia-vps-platform-design.md)
 - [Latest plan audit](../specs/PLAN-AUDIT_LATEST.md)
 

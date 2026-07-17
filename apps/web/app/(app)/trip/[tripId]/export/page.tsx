@@ -40,7 +40,7 @@ function renderPrintView(
   autoPrint: boolean
 ) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" data-scene="utility">
       <div data-testid="print-view" className="hidden" />
       <PrintAutoTrigger auto={autoPrint} />
       <SectionHeading
@@ -149,7 +149,7 @@ export default async function TripExportPage({
   const specialistReviewLabel = tripCommerceState.reviewLabel.replace("Human review", "Specialist review");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" data-scene="utility">
       <CinematicGuide>
         <GuideProgress chapters={chapters} />
 

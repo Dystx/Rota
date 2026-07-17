@@ -35,6 +35,6 @@ proof.
    records the rollback decision.
 
 See [VPS operations](../../ops/vps/README.md), the
-[self-hosted migration plan](../superpowers/plans/2026-07-11-rumia-vps-self-hosted-migration.md),
+[archived self-hosted migration record](../superpowers/archive/plans/2026-07-11-rumia-vps-self-hosted-migration.md),
 and [Supabase retirement](supabase-retirement.md) for the boundaries between
 active recovery and historical rollback evidence.

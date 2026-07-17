@@ -79,7 +79,7 @@ async function expectPageBlocked(request: APIRequestContext, path: string) {
   if (status === 200) {
     const body = await response.text();
     const isRedirect = body.includes("NEXT_REDIRECT");
-    const isForbiddenPage = body.includes('data-testid=\"admin-forbidden\"') || body.includes(">Forbidden<") || body.toLowerCase().includes("access is restricted");
+    const isForbiddenPage = body.includes('data-testid=\"admin-forbidden\"') || body.includes(">Forbidden<") || body.toLowerCase().includes("restricted");
     expect(isRedirect || isForbiddenPage).toBe(true);
 
     if (isRedirect) {

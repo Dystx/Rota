@@ -1,24 +1,37 @@
-# Task 12 report — truthful trip messaging
+# Task 12 report — traveler utility routes
 
-Trip messaging remains opt-in behind `ENABLE_TRIP_MESSAGING`. The trip-scoped
-API now authenticates the traveler, verifies ownership plus paid/reviewed status,
-and reads/writes only the `trip_messages` provider table. Missing schema,
-provider failures, and a disabled capability return a structured 503
-`MESSAGING_UNAVAILABLE` response; no in-memory or fabricated messages are used.
+Status: DONE_WITH_CONCERNS
 
-The client treats 401/403 responses as denied and provider 503 responses as a
-provider-error state. Sends are acknowledged only after the API succeeds and
-the canonical message list is reloaded.
+## Implementation
 
-Final review follow-up:
+- Kept Itineraries, Vault, and Account on distinct route contracts with stable
+  `itineraries-archive`, `vault-assets`, and `account-settings` markers.
+- Preserved the archive search/filter and export-drawer task in Itineraries,
+  asset/status/download behavior in Vault, and identity/preferences/saved-work
+  hierarchy in Account.
+- Kept no-trip checkout at one truthful saved-day decision panel with no
+  package selector.
+- Added an owned paid-trip checkout state that shows the saved-day summary and
+  one `Open your day` handoff without a package selector or unlock form.
 
-- GET and POST responses with status 404 now map to the denied state, matching
-  the trip-scoped API's missing-trip response instead of presenting a provider
-  outage.
-- Message normalization now requires a nonempty string id, nonempty body, and
-  an explicit traveler/user or specialist role; malformed rows are discarded
-  rather than rendered with fabricated IDs or specialist defaults.
-- Verification: focused expert-chat plus trip-messaging API tests — PASS (9
-  tests). `pnpm --filter web typecheck` — PASS. Route tests now narrow the
-  handler's optional response through an assertion helper without weakening
-  status/body assertions.
+## Verification
+
+- Focused Task 12 Vitest — PASS, 8 files / 22 tests.
+- `corepack pnpm --dir apps/web typecheck` — PASS.
+- `corepack pnpm lint:eslint` — PASS.
+- `git diff --check` — PASS.
+- In-app browser: `/vault` rendered the `vault-assets` route boundary and
+  `/checkout` rendered the no-trip decision state with no package selector.
+
+## Browser concern
+
+- The focused Playwright traveler slice still requires the standalone web
+  server/build database environment; local PostgreSQL is not listening on
+  `127.0.0.1:5432`. Public browser proof is complete, while authenticated
+  populated/paid traveler proof remains open for Task 17.
+
+## Dirty-boundary notes
+
+Only Task 12 utility-route paths and the directly related route-contract tests
+were staged. Existing account consent, unrelated routes, snapshots, docs,
+database, and deployment changes remain unstaged.

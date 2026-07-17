@@ -53,10 +53,12 @@ export interface GuideChapterProps {
   id: string;
   children: ReactNode;
   className?: string;
+  /** Keep a full viewport beat by default; product surfaces can opt into content height. */
+  fullHeight?: boolean;
 }
 
 export const GuideChapter = forwardRef<HTMLDivElement, GuideChapterProps>(
-  ({ id, children, className }, ref) => {
+  ({ id, children, className, fullHeight = true }, ref) => {
     const { setActiveChapter, registerChapter, unregisterChapter } = useCinematicGuide();
     const internalRef = useRef<HTMLDivElement>(null);
 
@@ -92,7 +94,11 @@ export const GuideChapter = forwardRef<HTMLDivElement, GuideChapterProps>(
           if (typeof ref === 'function') ref(node);
           else if (ref) ref.current = node;
         }}
-        className={cn("min-h-[100svh] py-[var(--spacing-section)] px-[var(--spacing-gutter)]", className)}
+        className={cn(
+          fullHeight ? "min-h-[100svh]" : "min-h-0",
+          "py-[var(--spacing-section)] px-[var(--spacing-gutter)]",
+          className
+        )}
       >
         {children}
       </div>

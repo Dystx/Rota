@@ -1,5 +1,11 @@
 # Rumia — Master Product Specification & Architecture Blueprint
 
+> **Historical product specification.** This itinerary/tier blueprint is not
+> current execution authority. The active product contract is the
+> [Portugal-wide activity-first plan](superpowers/plans/2026-07-10-rumia-activity-first-master.md),
+> and current frontend work is the
+> [visual completion plan](superpowers/plans/2026-07-14-rumia-frontend-polish.md).
+
 **Version**: 2.0 (Integrated Tiered Service Model)
 **Target Launch Market**: Portugal (Phased Expansion)
 

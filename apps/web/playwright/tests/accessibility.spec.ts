@@ -108,6 +108,7 @@ async function verifyCustomerBodyMinimum(page: any, routePath: string) {
         const text = (element.textContent ?? "").replace(/\s+/g, " ").trim();
         const inControl = Boolean(element.closest("nav, form, fieldset, [role='group']"));
         const shortControlLabel = /text-sm\s+font-medium/.test(className) && text.length < 64;
+        const ariaHidden = Boolean(element.closest("[aria-hidden='true']"));
         return {
           tag: element.tagName.toLowerCase(),
           text: text.slice(0, 120),
@@ -115,10 +116,11 @@ async function verifyCustomerBodyMinimum(page: any, routePath: string) {
           className,
           visible: rect.width > 0 && rect.height > 0 && style.visibility !== "hidden",
           inControl,
-          shortControlLabel
+          shortControlLabel,
+          ariaHidden
         };
       })
-      .filter((item: { visible: boolean; text: string; size: number; className: string; inControl: boolean; shortControlLabel: boolean }) => item.visible && item.text && item.size < 16 && !item.inControl && !item.shortControlLabel && !metadata.test(item.className));
+      .filter((item: { visible: boolean; text: string; size: number; className: string; inControl: boolean; shortControlLabel: boolean; ariaHidden: boolean }) => item.visible && item.text && item.size < 16 && !item.inControl && !item.shortControlLabel && !item.ariaHidden && !metadata.test(item.className));
   });
 
   expect(
@@ -233,6 +235,9 @@ test.describe("Accessibility Audit - Public", () => {
   for (const route of publicRoutes) {
     test(`@smoke @a11y public route ${route}`, async ({ page }) => {
       await page.goto(route);
+      if (route === "/human-review") {
+        await expect(page).toHaveURL(/\/local-expertise(?:\?|$)/u);
+      }
       await verifyLandmarksAndFocus(page, route);
       await runAxe(page, route);
     });

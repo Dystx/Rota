@@ -39,7 +39,7 @@ The following documents retain their existing authority:
 | Document | Authority | This design's relationship |
 | --- | --- | --- |
 | `docs/superpowers/plans/2026-07-10-rumia-activity-first-master.md` | Product and release authority | Owns Portugal-wide coverage, activity-first positioning, non-goals, and release order. |
-| `docs/superpowers/plans/2026-07-12-rumia-frontend-deep-redesign.md` | Frontend execution authority | Owns route responsibilities, visual polish sequencing, accessibility, responsive rules, component state coverage, and release gates. |
+| `docs/superpowers/plans/2026-07-14-rumia-frontend-polish.md` | Frontend execution authority | Owns current route responsibilities, visual polish sequencing, accessibility, responsive rules, component state coverage, and aesthetic acceptance gates. |
 | `docs/superpowers/specs/2026-07-10-rumia-activity-curation-design.md` | Activity domain contract | Owns editorial fields, review status, judgement semantics, and user-facing boundaries. |
 | `docs/superpowers/specs/2026-07-11-rumia-activity-map-capability.md` | Spatial capability contract | Owns map phases, route truth, fallback behavior, and licensing constraints. |
 | `docs/superpowers/specs/2026-07-11-rumia-vps-platform-design.md` | Runtime and deployment authority | Owns the VPS-native stack; this design introduces no hosting or database change. |
@@ -98,7 +98,24 @@ The existing stack remains authoritative:
 - Activity state remains authoritative in the existing activity-first flow; the
   first slice does not invent a new state store or persistence contract.
 - No new dependency is introduced solely for visual polish without a measured
-  need and a bundle/performance review.
+  need and a bundle/performance review. **Addendum (2026-07-13):** Base UI may
+  be introduced incrementally as an unstyled behavior layer for dialogs,
+  drawers, action sheets, menus, and select/combobox controls. It must be
+  wrapped by `packages/ui`, must not impose a visual theme, and must pass the
+  existing accessibility, reduced-motion, visual, and bundle gates before any
+  further adoption.
+
+### Behavior-library addendum (2026-07-13)
+
+The design system remains Rumia-owned. Base UI is selected only to reduce the
+amount of hand-rolled focus, portal, keyboard, and dismissal behavior. The
+implemented slices are the mobile navigation sheet, planner/trip-new choice
+sheet, and authenticated export side sheet. Route files must consume Rumia
+wrappers, not Base UI directly. Radix and React Aria remain alternatives only
+if a concrete interaction requirement cannot be met; shadcn is not a wholesale
+replacement strategy. The one-day activity save/remove action remains direct;
+an action sheet is deferred until a real multi-day or replacement-choice
+workflow exists.
 
 The component boundary is:
 
@@ -109,6 +126,11 @@ route surface
       → activity and chosen-day components
         → state feedback and optional map/list enhancement
 ```
+
+**Implementation checkpoint (2026-07-13):** the mobile navigation,
+planner/trip-new choice, and authenticated export side-sheet slices are
+implemented through `packages/ui` wrappers. Base UI is not imported by route
+files. This addendum does not make the optional map/3D work complete.
 
 The list and text state must remain usable if imagery, motion, map tiles, or
 WebGL are unavailable.
@@ -161,6 +183,31 @@ Brand-owned graphics may use contour lines, cartographic annotation, azulejo-
 like geometry, and simple line illustrations. No specific award-site layout or
 asset is copied.
 
+#### Full-bleed media contract
+
+The current abstract/contour language is retained, but important public
+chapters may use one place-specific full-bleed image as an authored anchor:
+
+- home cover;
+- activity detail;
+- Portugal/explore chapter break;
+- chosen-day route/atmosphere preview after activities are saved.
+
+Explore result cards, planner inputs, empty states, sign-in, support, feedback,
+and operator surfaces remain readable without a media layer. Video is not the
+default: it may be introduced only as one silent 6–10 second ambient loop after
+the still-image baseline passes. Every video has a poster, inline muted playback,
+captions/transcript policy where informative, and a reduced-motion/reduced-data
+still path.
+
+The existing asset manifest is the source of truth for route/activity/chapter
+references, responsive variants, dimensions/bytes, alt/caption, source and
+licence, focal point/text-safe zone, poster/fallback, review dates, and motion
+policy. Responsive `srcset`/`sizes`, reserved aspect ratios, lazy below-fold
+loading, and a measured LCP/CLS budget are required. Full-bleed media must
+support the activity judgement; it cannot become a map-first or cinematic
+homepage dependency.
+
 ## Component and state contract
 
 Shared primitives to audit or refactor include:
@@ -189,6 +236,21 @@ The existing activity-first contract remains:
 - Anonymous state remains editable until the user chooses to save or claim it.
 - No selection silently disappears between explorer, workspace, planner, sign-in,
   or a claimed trip.
+
+### Base UI behavior checkpoints — 2026-07-13
+
+`NavigationSheet`, the controlled `OptionSheet`, and the utility `SideSheet`
+now use Base UI underneath Rumia-owned wrappers. The choice sheet is used by
+planner and trip-new to keep
+place, time, transport, pace, and interest decisions in a mobile bottom sheet
+and desktop centered dialog with the same linen/editorial treatment. The
+wrapper owns the controlled-trigger focus handoff, while Base UI owns dialog
+semantics, inert background, focus containment, portal mounting, and Escape or
+backdrop dismissal. Focused behavior tests and fresh 390px/1440px browser
+smoke are required evidence. The authenticated itineraries export drawer now
+uses the right-anchored `SideSheet` wrapper. Activity save/replace remains a
+direct reversible action in the one-day MVP and should only become a sheet
+when a real multi-day or replacement-choice workflow exists.
 
 Feedback behavior:
 
@@ -337,9 +399,14 @@ The design is successfully implemented when:
 ## References
 
 - [Awwwards storytelling collection](https://www.awwwards.com/websites/storytelling/)
+- [Awwwards fullscreen inspiration](https://www.awwwards.com/websites/fullscreen/?from=gyagbbb3&mobile=1&page=79)
+- [Awwwards fullscreen video guidance](https://www.awwwards.com/20-websites-with-fullscreen-video.html)
 - [Awwwards When to Travel](https://www.awwwards.com/sites/when-to-travel)
 - [W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/)
 - [MDN prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40media/prefers-reduced-motion)
+- [MDN video element](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/video)
+- [web.dev responsive images](https://web.dev/learn/design/responsive-images?hl=en)
+- [web.dev video performance](https://web.dev/learn/performance/video-performance)
 - [web.dev Core Web Vitals](https://web.dev/articles/vitals)
 - [MapLibre GL JS documentation](https://maplibre.org/maplibre-gl-js/docs/)
 - [MapLibre style layers and extrusion](https://maplibre.org/maplibre-style-spec/layers/)

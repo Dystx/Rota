@@ -45,7 +45,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const sessionOutcome = await loadSessionOutcome();
   if (sessionOutcome.kind === "unavailable") {
     return (
-      <AppLayout variant="auth" bare surface="linen" surfaceTexture="none">
+      <AppLayout variant="auth" bare surface="linen" surfaceTexture="none" data-scene="utility">
         <RouteRecovery kind="unavailable" />
       </AppLayout>
     );
@@ -55,7 +55,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
     const actorOutcome = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
     if (actorOutcome.kind === "unavailable") {
       return (
-        <AppLayout variant="auth" bare surface="linen" surfaceTexture="none">
+        <AppLayout variant="auth" bare surface="linen" surfaceTexture="none" data-scene="utility">
           <RouteRecovery kind="unavailable" />
         </AppLayout>
       );
@@ -64,7 +64,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   }
 
   return (
-    <AppLayout variant="auth" bare surface="linen" surfaceTexture="none">
+    <AppLayout variant="auth" bare surface="linen" surfaceTexture="none" data-scene="utility">
       <div className="rumia-auth-page min-h-full bg-transparent">
         <div className="mx-auto grid w-full max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(24rem,28rem)] lg:items-center lg:gap-20 lg:px-12 lg:py-24">
           <aside className="order-2 overflow-hidden rounded-[32px] bg-midnight px-7 py-8 text-linen shadow-raised lg:order-1 lg:px-10 lg:py-11">

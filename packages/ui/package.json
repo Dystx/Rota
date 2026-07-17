@@ -22,8 +22,8 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "jsdom": "^25",
-    "vitest": "^2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^2"
   },
   "scripts": {
     "build": "tsc --noEmit",

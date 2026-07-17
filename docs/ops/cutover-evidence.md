@@ -8,13 +8,15 @@ must not be read as evidence that Rumia is publicly deployed.
 
 ## Rehearsal identity
 
-- Date: 2026-07-13 (frontend refresh; prior database and service evidence remains
+- Date: 2026-07-13 (cinematic frontend refresh; prior database and service evidence remains
   dated 2026-07-11/12 below)
 - Worktree: `/Users/cheng/rota`
 - Branch: `main`
-- Merged implementation commit: `2a8c39464390a2bfda0a62edfffc33b9af3ab920`
+- Source baseline: `main @ 4b394905` plus the approved dirty-worktree
+  cinematic tranche; release artifact identity is recorded below.
 - Public activation: not performed
-- Private Rumia service: enabled on `127.0.0.1:3002`
+- Private Rumia service: enabled on `127.0.0.1:3002`, release
+  `20260713T204125Z-cinematic-fix`
 - Private runtime URL: `http://127.0.0.1:3002`
 - Lumes mutation: none
 
@@ -26,9 +28,9 @@ must not be read as evidence that Rumia is publicly deployed.
 - A standalone release artifact was prepared with the required nested Next
   assets (`server.js`, `.next/static`, and `public`) and passed the
   artifact-shape checks. The artifact is active on the VPS.
-- VPS read-only audit: Rumia is healthy and active on `127.0.0.1:3002`, with
-  the current symlink pointing to release
-  `20260713T042000Z-main-2a8c394`. Lumes remains healthy on `0.0.0.0:3001`; no
+- VPS audit after the cinematic refresh: Rumia is healthy and active on
+  `127.0.0.1:3002`, with the current symlink pointing to release
+  `20260713T204125Z-cinematic-fix`. Lumes remains healthy on `0.0.0.0:3001`; no
   Lumes service restart or configuration change was performed.
 - Map preflight listeners remain isolated to Rumia-owned loopback ports
   `3010`, `3011`, and `3012`; production map/story/3D flags remain disabled.
@@ -45,6 +47,28 @@ must not be read as evidence that Rumia is publicly deployed.
 - The private cutover is complete. Remaining external work is the
   owner/legal map-provider decision packet and, separately, public ingress;
   public `rumia.pt` remains deferred.
+
+### Cinematic frontend refresh — 2026-07-13
+
+- Local full unit suite passed at **177 files / 897 tests**; web typecheck and
+  production build passed with **64 routes**. Asset, motion, diff, live
+  autoplay, reduced-motion, console, and media-byte checks passed.
+- The exact standalone artifact was uploaded and activated atomically as
+  `20260713T204125Z-cinematic-fix` with
+  `/usr/local/sbin/deploy-rumia.sh`; only `rumia-web.service` was restarted.
+- Loopback health returned `{"status":"ok","database":"ready"}`. The
+  rendered CSS returned HTTP 200 with `text/css`, and both local MP4 derivatives
+  returned HTTP 200 as `video/mp4` at 565,629 and 1,276,925 bytes.
+- Through the temporary `127.0.0.1:33302` tunnel, desktop/mobile route smoke
+  passed for `/`, `/portugal`, `/explore`, `/explore/workspace`, `/planner`,
+  `/support`, `/sign-in`, and the activity detail. Each route had one H1/main,
+  no horizontal overflow, and no console/page errors. Reduced-motion rendered
+  poster-only media.
+- The activity situation → save → chosen day → feedback flow completed through
+  the deployed artifact. The homepage proof rail was made pointer-transparent
+  after the first remote interaction smoke found it intercepting the CTA.
+- Port 3001/Lumes remained unchanged; no Caddy, DNS, or public ingress change
+  was made.
 
 ## Verified evidence
 
@@ -67,7 +91,10 @@ must not be read as evidence that Rumia is publicly deployed.
   Supabase client reference in `apps`, `packages`, or `scripts`.
 - `node scripts/check-runtime-architecture.mjs` passes and the CI workflow no
   longer starts or resets a hosted-Supabase-shaped local stack.
-- Unit suite: 171 files, 885 tests passed (including the editorial proof-rail, map-panel, and schematic-fallback component tests).
+- Deployed merged-artifact unit evidence: 171 files, 885 tests passed. The
+  latest un-deployed local closeout adds the current **173 files / 890 tests**
+  suite and **13/13** changed-slice suite; it is recorded separately from this
+  private release and does not alter the VPS release identity.
 - The deployed commit includes the proof-rail, pricing hierarchy, saved-plan
   editor, saved-traveler surface, and utility recovery UI slices. The release
   was built from the merged `main` commit after the full unit and production

@@ -6,7 +6,7 @@ import { SiteFooter } from "../../_components/site-footer";
 /** Shared traveler chrome for the account utility surface. */
 export default function AccountLayout({ children }: { children: ReactNode }) {
   return (
-    <AppLayout variant="app" topNav={<TopNav />} surface="linen" surfaceTexture="none" siteFooter={<SiteFooter mode="utility" />}>
+    <AppLayout variant="app" topNav={<TopNav />} surface="linen" surfaceTexture="none" data-scene="utility" siteFooter={<SiteFooter mode="utility" />}>
       {children}
     </AppLayout>
   );

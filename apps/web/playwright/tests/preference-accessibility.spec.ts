@@ -13,12 +13,24 @@ async function assertPreferenceContract(page: Page, route: string): Promise<void
   await expect(page.locator("main"), `${route} should expose one main landmark`).toHaveCount(1);
   await expect(page.locator("h1:visible"), `${route} should expose one visible heading`).toHaveCount(1);
   await expect(page.locator("video[autoplay]"), `${route} must not autoplay media under reduced motion/data`).toHaveCount(0);
-  const hiddenMotionContent = await page.locator("[aria-hidden='true']").evaluateAll((elements) =>
-    elements.filter((element) => {
+  const hiddenMotionContent = await page.locator("[aria-hidden='true']").evaluateAll((elements) => {
+      const hasVisibleText = (element: Element): boolean => {
+        if (element.getAttribute("data-a11y-hidden") === "decorative") return false;
+        const style = window.getComputedStyle(element);
       const rect = element.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0;
-    }).length
-  );
+      if (style.display === "none" || style.visibility === "hidden" || rect.width <= 0 || rect.height <= 0) return false;
+      const directText = Array.from(element.childNodes)
+        .filter((node) => node.nodeType === 3)
+        .map((node) => node.textContent ?? "")
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (directText) return /[\p{L}\p{N}]/u.test(directText);
+      return Array.from(element.children).some((child) => hasVisibleText(child));
+    };
+
+    return elements.filter((element) => hasVisibleText(element)).length;
+  });
   expect(hiddenMotionContent, `${route} should not hide visible content from assistive technology`).toBe(0);
 }
 

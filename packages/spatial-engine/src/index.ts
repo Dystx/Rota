@@ -17,11 +17,6 @@
  * `WorkspaceTripCanvas` wrapper in `apps/web`.
  */
 
-import { AMBIENT_PULSE_LAYER_ID } from "./adapters/maplibre/layers/ambient-pulse";
-import { SYMBOL_BADGES_LAYER_ID } from "./adapters/maplibre/layers/symbol-badges";
-import { ROUTE_STOPS_LAYER_ID } from "./adapters/maplibre/layers/route-layer";
-import { ACTIVITY_POINTS_LAYER_ID, ACTIVITY_POINTS_LABEL_LAYER_ID } from "./adapters/maplibre/layers/activity-points";
-
 export * from "./core/types";
 export * from "./core/map-style-provider";
 export * from "./core/camera-controller";
@@ -67,17 +62,7 @@ export {
   type StarfieldOptions
 } from "./adapters/maplibre/layers/starfield";
 
-/**
- * Layer IDs that participate in the click → `onStopClick` forwarding.
- * Workspace / globe consumers query this set to filter `queryRenderedFeatures`.
- */
-export const CLICKABLE_LAYER_IDS: readonly string[] = [
-  AMBIENT_PULSE_LAYER_ID,
-  SYMBOL_BADGES_LAYER_ID,
-  ROUTE_STOPS_LAYER_ID,
-  ACTIVITY_POINTS_LAYER_ID,
-  ACTIVITY_POINTS_LABEL_LAYER_ID
-] as const;
+export { CLICKABLE_LAYER_IDS } from "./adapters/maplibre/clickable-layer-ids";
 
 export { GlobeWorkspace, DEFAULT_ATMOSPHERE, type GlobeWorkspaceProps } from "./components/globe-workspace";
 export {

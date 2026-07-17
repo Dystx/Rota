@@ -43,6 +43,20 @@ describe("ActivityResultCard", () => {
     expect(screen.getByText("Miguel Bombarda for contemporary art and design")).toBeTruthy();
   });
 
+  it("makes saving the activity read as the primary action", () => {
+    render(
+      <ActivityResultCard
+        activity={REVIEWED_ACTIVITY_SEED[0]!}
+        saved={false}
+        onToggle={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole("button", { name: /Save Ribeira and Miragaia/i }).className).toContain(
+      "rounded-full"
+    );
+  });
+
   it("exposes the saved marker and reversible pressed state", () => {
     render(
       <ActivityResultCard

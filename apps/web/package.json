@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS=--max-old-space-size=2048 next dev --webpack",
+    "dev:turbopack": "NODE_OPTIONS=--max-old-space-size=2048 next dev --turbopack",
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit -p tsconfig.json",

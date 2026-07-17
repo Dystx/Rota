@@ -9,4 +9,4 @@ The hosted Supabase project is a read-only rollback archive, not a Rumia runtime
 5. Record a rollback-expiry date. Before that date, do not delete the project or its archive.
 6. After the expiry date, obtain an explicit owner decision, rotate/delete the hosted credentials, remove the historical archive, and then delete the hosted project.
 
-The active platform instructions are the [VPS platform design](../superpowers/specs/2026-07-11-rumia-vps-platform-design.md) and [self-hosted migration plan](../superpowers/plans/2026-07-11-rumia-vps-self-hosted-migration.md).
+The active platform instructions are the [VPS platform design](../superpowers/specs/2026-07-11-rumia-vps-platform-design.md); the completed cutover sequence is retained in the [archived self-hosted migration record](../superpowers/archive/plans/2026-07-11-rumia-vps-self-hosted-migration.md).

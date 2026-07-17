@@ -162,7 +162,7 @@ export function TripCard({
       </CardHeader>
       <CardContent className="p-4 md:p-5 pt-0 md:pt-0 flex flex-1 flex-col gap-3">
         {caption && (
-          <p className="text-sm leading-relaxed text-[var(--color-muted-foreground)]">
+          <p className="text-base leading-7 text-[var(--color-muted-foreground)]">
             {caption}
           </p>
         )}

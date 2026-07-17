@@ -15,7 +15,10 @@ export function HeroEditorialMedia() {
       alt=""
       width={CINEMATIC_MEDIA.portugalCover.width}
       height={CINEMATIC_MEDIA.portugalCover.height}
-      priority
+      // Keep the cover eager in its own route, but do not emit a high-priority
+      // fallback JPEG preload into every route that prefetches the homepage.
+      // The WebP poster remains the first visual frame for modern browsers.
+      priority={false}
       loadStrategy={CINEMATIC_MEDIA.portugalCover.loadStrategy}
       pauseWhenHidden={CINEMATIC_MEDIA.portugalCover.pauseWhenHidden}
       textSafeZone={CINEMATIC_MEDIA.portugalCover.textSafeZone}

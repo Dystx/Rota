@@ -79,7 +79,9 @@ export default function PortugalPage() {
           width={CINEMATIC_MEDIA.douroField.width}
           height={CINEMATIC_MEDIA.douroField.height}
           sizes="(min-width: 1024px) 1152px, 100vw"
-          priority={true}
+          // Keep the field note poster-first without preloading the large JPEG
+          // fallback on every route that prefetches the Portugal chapter.
+          priority={false}
           loadStrategy={CINEMATIC_MEDIA.douroField.loadStrategy}
           pauseWhenHidden={CINEMATIC_MEDIA.douroField.pauseWhenHidden}
           textSafeZone={CINEMATIC_MEDIA.douroField.textSafeZone}

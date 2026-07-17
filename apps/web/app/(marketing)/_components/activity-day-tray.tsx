@@ -16,7 +16,7 @@ export function ActivityDayTray({
 
   if (activities.length === 0) {
     return (
-      <aside
+      <section
         aria-label="Your day"
         data-empty="true"
         data-testid="activity-day-empty"
@@ -28,11 +28,11 @@ export function ActivityDayTray({
         <h2 className="mt-3 font-display text-3xl leading-tight text-primary">
           Your day is open.
         </h2>
-        <p className="mt-3 max-w-xs text-sm leading-relaxed text-on-surface-variant">
+        <p className="mt-3 max-w-xs text-base leading-7 text-on-surface-variant">
           Save an activity and it will appear here with its time cost, verdict,
           and practical shape.
         </p>
-        <ol className="mt-8 grid gap-4 border-t border-[var(--color-border)] pt-5 text-sm text-on-surface-variant">
+        <ol className="mt-8 grid gap-4 border-t border-[var(--color-border)] pt-5 text-base leading-7 text-on-surface-variant">
           <li className="flex gap-3">
             <span className="font-mono-micro text-mono-micro text-ochre-dark">01</span>
             <span>Compare the judgement before you keep anything.</span>
@@ -48,7 +48,7 @@ export function ActivityDayTray({
         >
           Browse the judged activities
         </a>
-      </aside>
+      </section>
     );
   }
 
@@ -57,19 +57,19 @@ export function ActivityDayTray({
   const motionKey = activities.map((activity) => activity.id).join("|");
 
   return (
-    <aside data-testid="activity-day-tray" aria-label="Your day" data-reduced-motion={reducedMotion ? "true" : "false"} data-motion-key={motionKey} className={`fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex min-h-16 items-center gap-3 border border-[var(--color-border)] bg-surface p-3 shadow-[0_12px_28px_rgba(43,62,52,0.16)] md:static md:inset-auto md:z-auto md:block md:p-5 md:shadow-[0_12px_28px_rgba(43,62,52,0.08)] ${transitionClass}`} role="region">
-      <p className="min-w-0 text-sm text-primary md:hidden">
+    <section data-testid="activity-day-tray" aria-label="Your day" data-reduced-motion={reducedMotion ? "true" : "false"} data-motion-key={motionKey} className={`fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex min-h-16 items-center gap-3 border border-[var(--color-border)] bg-surface p-3 shadow-[0_12px_28px_rgba(43,62,52,0.16)] md:static md:inset-auto md:z-auto md:block md:p-5 md:shadow-[0_12px_28px_rgba(43,62,52,0.08)] ${transitionClass}`}>
+      <p className="min-w-0 text-base text-primary md:hidden">
         <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">Your day</span>
         {activities.length} {activities.length === 1 ? "activity" : "activities"} · {Math.round(totalMinutes / 30) / 2} hr
       </p>
       <div className="hidden md:block">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">Your day</p>
         <h2 className="mt-2 font-display text-2xl text-primary">{activities.length} {activities.length === 1 ? "activity" : "activities"} saved</h2>
-        <p className="mt-2 text-sm text-on-surface-variant">About {Math.round(totalMinutes / 30) / 2} hours before travel, pauses, or a meal.</p>
+        <p className="mt-2 text-base leading-7 text-on-surface-variant">About {Math.round(totalMinutes / 30) / 2} hours before travel, pauses, or a meal.</p>
         <ul className="mt-4 space-y-3">
           {activities.map((activity) => (
             <li className={`flex items-start justify-between gap-3 ${transitionClass}`} key={activity.id}>
-              <span className="text-sm text-primary">{activity.title}</span>
+              <span className="text-base text-primary">{activity.title}</span>
               <button
                 aria-label={`Remove ${activity.title} from this day`}
                 className="min-h-11 min-w-11 scroll-mb-[calc(8rem+env(safe-area-inset-bottom))] text-sm text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
@@ -89,6 +89,6 @@ export function ActivityDayTray({
       >
         See this day
       </button>
-    </aside>
+    </section>
   );
 }

@@ -7,7 +7,7 @@ interface MotionDivProps {
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
-  initial?: { opacity: number; y: number };
+  initial?: { opacity: number; y: number } | false;
   whileInView?: { opacity: number; y: number };
   viewport?: { amount: number; once: boolean };
   transition?: { duration: number; ease: number[]; delay: number };
@@ -79,7 +79,7 @@ describe('RevealSection integration', () => {
     const [motionProps] = motionDivMock.mock.calls[0] ?? [];
 
     expect(motionProps).toMatchObject({
-      initial: { opacity: 0, y: 32 },
+      initial: false,
       whileInView: { opacity: 1, y: 0 },
       viewport: { amount: 0.5, once: true },
       transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.12 },
@@ -113,7 +113,7 @@ describe('RevealSection integration', () => {
     const [motionProps] = motionDivMock.mock.calls[0] ?? [];
 
     expect(motionProps).toMatchObject({
-      initial: { opacity: 0, y: 24 },
+      initial: false,
       whileInView: { opacity: 1, y: 0 },
       viewport: { amount: 0.3, once: true },
       transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0 },

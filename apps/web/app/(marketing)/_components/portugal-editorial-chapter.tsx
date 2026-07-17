@@ -16,7 +16,9 @@ export function PortugalEditorialChapter() {
         credit="Photo · Bruno Ferreira / Unsplash"
         width={2400}
         height={1495}
-        priority
+        // This chapter is below the homepage decision surface. Avoid making
+        // its large JPEG fallback a global preload when the route is prefetched.
+        priority={false}
         sizes="100vw"
         testId="portugal-editorial-chapter"
         className="relative aspect-[4/3] min-h-[22rem] w-full md:aspect-[16/6] md:min-h-[26rem]"

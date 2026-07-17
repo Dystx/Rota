@@ -321,6 +321,16 @@ exact-artifact convergence is in progress
   suite now passes 104/104 with 32 intentional desktop overflow skips after
   regenerating the 72 inspected pre-redesign baselines. No deployment or schema
   change was made.
+- Final 2026-07-17 Task 17 closeout: the exact artifact receipt is build
+  `F5CzHygTrY-JgoMIi9Sxt` with digest
+  `e839dcd3790d560ffbd2fb8c694d1c02277c5353a628440b9e70358aed6277e0`.
+  The final standalone gate passed 1,640 non-visual tests with 2,424
+  intentional skips and 102/102 visual rows with 306 intentional skips;
+  port 3105 closed cleanly. The focused accessibility rerun passed 157 rows
+  with 3 intentional skips, and the approved snapshot update passed 102 visual
+  rows plus 32/32 mobile overflow checks. The owner approved the exact served
+  desktop/mobile family on 2026-07-17. No deployment, schema, or environment
+  file change was made.
 
 ## Active phases
 
@@ -330,21 +340,24 @@ exact-artifact convergence is in progress
 - [x] Phase 4 — trust, acquisition, and utility route convergence
 - [x] Phase 5 — traveler product and saved-work states
 - [x] Phase 6 — beta, organization, developer, and operator surfaces
-- [x] Phase 7 — exact-artifact visual and release acceptance
+- [x] Phase 7 — exact-artifact visual and release acceptance (Task 17 exact gate, approved visual family, and release checks complete)
 
 Task checkpoint: route authority contracts are red-green verified. `/explore`
 and `/explore/workspace` are live catalogue entries, `/human-review` now
 redirects to `/local-expertise`, and activity-detail/feedback routes are in the
 catalogue. Shared-contract review is approved; media/font verification,
-pricing/account/beta focused slices, exact-artifact public-route checks, and
-the regenerated visual baselines are green. The authenticated acceptance matrix
-is complete.
+pricing/account/beta focused slices, and the Task 17 exact-artifact harness are
+green. The final exact artifact was served from the recorded standalone build;
+the authenticated route/state matrix completed, the approved 102-row visual
+family was materialized, and the final non-visual and visual suites passed.
+Remaining skips are intentional contract exclusions documented by the runner,
+not unresolved acceptance failures.
 
 ## Completion rule
 
-Tests and visual snapshots are necessary but do not close the plan. The final
-desktop/mobile candidate must receive explicit aesthetic approval on the exact
-served artifact.
+Tests and visual snapshots are necessary but do not close the plan. This rule
+is satisfied: the final desktop/mobile candidate received explicit owner
+aesthetic approval on the exact served artifact on 2026-07-17.
 
 ## Corrective-plan SDD ledger
 
@@ -364,3 +377,4 @@ served artifact.
 - Task 14: complete with concerns (commit 6408798, catalogue-derived page access, capability-enforced API and server-action boundaries, one reviewer/admin/console/developer shell, sanitized console envelopes, and expanded protected-route scenarios; exact auth/shell 19/19, boundary 42/42, catalogue/shell 39/39, typechecks, ESLint, and diff check pass; anonymous in-app browser redirects verified; authenticated Playwright setup remains blocked by missing DATABASE_URL and local user_profiles RLS)
 - Task 15: complete with concerns (commit 9cb75c3, reviewer/admin density and truthful triage surfaces, mobile action/card contracts, and unassigned-trip safety are implemented; focused tests 53/53, web/UI typechecks, ESLint, production build, and diff checks pass; anonymous in-app browser protected-route redirects verified; authenticated Playwright remains blocked by local user_profiles RLS in global setup)
 - Task 16: complete with concerns (commit d228fca, console truth states, persisted pipeline data, explicit mobile workspace/lane switching, safe non-drag moves, truthful metrics/config boundaries, and capability/flag-gated API docs; console/API focused tests 22/22, typechecks, ESLint, production build 64/64, and diff checks pass; authenticated Playwright remains blocked by local user_profiles RLS in global setup)
+- Task 17: complete (exact standalone runner, external-server Playwright mode, manifest-driven route scenes, deterministic recovery/preferences checks, 102-row approval ledger, migrated visual assertions, contrast corrections, and prefetch/media performance corrections; final receipt `F5CzHygTrY-JgoMIi9Sxt` / `e839dcd3790d560ffbd2fb8c694d1c02277c5353a628440b9e70358aed6277e0`; exact gate 1,640 non-visual passed with 2,424 intentional skips and 102/102 visual passed with 306 intentional skips; owner approved the exact served family on 2026-07-17)

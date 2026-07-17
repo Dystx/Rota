@@ -2,6 +2,7 @@ import * as React from "react";
 import Link from "next/link";
 
 import type { EditorialActivity } from "@/lib/content/activities";
+import { Button } from "@repo/ui";
 
 export function ActivityResultCard({
   activity,
@@ -57,25 +58,30 @@ export function ActivityResultCard({
           </p>
         </div>
 
-        <aside className="border-l border-ochre-dark/30 pl-5 md:mt-1 md:pl-6">
+        <div className="border-l border-ochre-dark/30 pl-5 md:mt-1 md:pl-6">
           <p className="font-mono-micro text-mono-micro uppercase tracking-[0.2em] text-ochre-dark">
             The trade-off
           </p>
-          <p className="mt-3 text-sm leading-6 text-on-surface-variant">
+          <p className="mt-3 text-base leading-7 text-on-surface-variant">
             {activity.avoidWhen ?? "Worth choosing when it matches the pace you have available."}
           </p>
-          <button
-            className="mt-5 min-h-11 min-w-11 scroll-mb-[calc(8rem+env(safe-area-inset-bottom))] border-b border-ochre-dark px-0.5 py-2 text-left text-sm font-medium text-ochre-dark transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-            type="button"
+          <Button
+            aria-label={saved ? `Remove ${activity.title} from this day` : `Save ${activity.title} to this day`}
             aria-pressed={saved}
+            leadingIcon={saved ? "check" : "bookmark-simple"}
             onClick={() => onToggle(activity.id)}
+            size="sm"
+            tone={saved ? "olive" : "ochre"}
+            type="button"
+            variant={saved ? "secondary" : "primary"}
+            className="mt-4 min-h-11 min-w-11 w-full scroll-mb-[calc(8rem+env(safe-area-inset-bottom))] sm:w-auto"
           >
-            {saved ? `Remove ${activity.title} from this day` : `Save ${activity.title} to this day`}
-          </button>
-        </aside>
+            {saved ? "Remove from day" : "Save to this day"}
+          </Button>
+        </div>
       </div>
 
-      <dl className="mt-8 grid gap-x-6 gap-y-5 border-t border-[var(--color-border)]/70 pl-5 pt-5 text-sm text-on-surface-variant sm:grid-cols-2 md:ml-7 md:pl-0 lg:grid-cols-5">
+      <dl className="mt-8 grid gap-x-6 gap-y-5 border-t border-[var(--color-border)]/70 pl-5 pt-5 text-base leading-7 text-on-surface-variant sm:grid-cols-2 md:ml-7 md:pl-0 lg:grid-cols-5">
         <div>
           <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-primary">Best for</dt>
           <dd className="mt-2 leading-6">{activity.bestFor.join(" · ")}</dd>

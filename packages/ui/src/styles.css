@@ -144,6 +144,11 @@
      labels, links) where the regular ochre-light is decorative-only
      on dark bg. */
   --color-ochre-on-light: #8a5a1f;
+  /* A darker ink for translucent light surfaces such as the global nav.
+     The regular light-surface accent drops below 4.5:1 when composited over
+     the nav's backdrop-blurred linen; keep the ochre character without
+     relying on opacity to carry the contrast. */
+  --color-ochre-ink: #6c4518;
 
   /* Semantic frontend roles shared by public, traveler, and operator
      surfaces. Route components should choose a role instead of inventing a
@@ -603,6 +608,7 @@
   /* Darker ochre for AA-compliant use on light surfaces. See :root
      alias above for the rationale. */
   --color-ochre-on-light: #8a5a1f;
+  --color-ochre-ink: #6c4518;
 
   /* ----- BORDER RADIUS ----- */
   --radius: 0.25rem;

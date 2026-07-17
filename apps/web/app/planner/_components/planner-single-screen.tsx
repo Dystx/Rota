@@ -147,6 +147,8 @@ function TripPlannerSingleScreen({
       className="rumia-planner-page min-h-screen rumia-surface rumia-surface-midnight rumia-page-enter text-linen-dark"
       data-testid="planner-single-screen"
       data-planner="single-screen"
+      data-scene="decision"
+      data-surface-texture="none"
     >
       <header className="border-b border-ochre-light/15" data-testid="planner-editorial-shell">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-8 lg:px-12">

@@ -26,7 +26,7 @@ export function RouteConsequence(props: {
             !reducedMotion && "animate-spin"
           )}
         />
-        <p className="text-sm text-[var(--color-muted-foreground)]">Updating route…</p>
+        <p className="text-base leading-7 text-[var(--color-muted-foreground)]">Updating route…</p>
       </Card>
     );
   }
@@ -35,7 +35,7 @@ export function RouteConsequence(props: {
     return (
       <Card as="section" role="alert" className="grid gap-3 p-5">
         <p className="font-medium text-[var(--color-foreground)]">We couldn&apos;t update the route.</p>
-        <p className="text-sm leading-relaxed text-[var(--color-muted-foreground)]">
+        <p className="text-base leading-7 text-[var(--color-muted-foreground)]">
           Your choices are saved locally. Try updating again when you&apos;re ready.
         </p>
         {props.onRetry ? (
@@ -66,7 +66,7 @@ export function RouteConsequence(props: {
           {props.transportLabel ? <span>{props.transportLabel}</span> : null}
         </div>
         {props.warnings && props.warnings.length > 0 ? (
-          <ul className="grid gap-1 text-sm leading-relaxed text-[var(--color-status-danger-fg)]">
+          <ul className="grid gap-1 text-base leading-7 text-[var(--color-status-danger-fg)]">
             {props.warnings.map((warning) => <li key={warning}>{warning}</li>)}
           </ul>
         ) : null}
@@ -76,7 +76,7 @@ export function RouteConsequence(props: {
 
   return (
     <Card as="section" aria-label="Route consequences" className="p-5">
-      <p className="text-sm text-[var(--color-muted-foreground)]">
+      <p className="text-base leading-7 text-[var(--color-muted-foreground)]">
         Choose an option to see how it changes your route.
       </p>
     </Card>

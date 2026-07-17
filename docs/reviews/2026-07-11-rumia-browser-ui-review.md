@@ -1,6 +1,9 @@
 # Rumia browser UI review — 11 July 2026
 
-Status: **P0/P1 UI findings implemented and verified in the current artifact; remaining release gates are content, provider/licence, route-contract, and VPS-operations decisions.**
+Status: **Functional P0/P1 findings from this review were implemented and
+verified in the then-current artifact. This document is historical evidence;
+the 2026-07-13 UI/UX and visual-design review records the remaining aesthetic
+and flow closeout work.**
 
 This review inspected the live private Rumia release through the Mac SSH
 tunnel at `http://127.0.0.1:3302`. It used the in-app browser at `1440x900`

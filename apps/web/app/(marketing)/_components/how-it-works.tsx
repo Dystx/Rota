@@ -53,7 +53,7 @@ export function HowItWorks() {
       // Top padding matches the section-gap token; bottom padding is
       // doubled so the white step cards don't bleed visually into
       // the dark bento photos below.
-      className="max-w-6xl mx-auto px-container-padding-lg pt-section-gap pb-[64px] md:pb-[96px]"
+      className="rumia-how-it-works max-w-6xl mx-auto px-container-padding-lg"
       data-testid="how-it-works"
     >
       <header className="text-center mb-12 md:mb-16">

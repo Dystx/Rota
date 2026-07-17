@@ -5,9 +5,9 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { useReducedMotion } from "@repo/ui";
 import { CartoBasemapStyleProvider } from "../core/map-style-provider";
 import { createDiscoveryEngine, type MapLibreSpatialEngine } from "../adapters/maplibre/spatial-engine";
+import { CLICKABLE_LAYER_IDS } from "../adapters/maplibre/clickable-layer-ids";
 import { CameraChoreography } from "../core/camera-choreography";
 import { fixtureAllCollections } from "../fixtures/travelers";
-import { CLICKABLE_LAYER_IDS } from "../index";
 import type { ViewportState } from "../core/viewport";
 import type {
   AtmosphereOptions,
@@ -437,6 +437,7 @@ export function GlobeWorkspace({
       ref={containerRef}
       data-testid={testId}
       data-map-container=""
+      data-map-capable=""
       role="application"
       aria-label={`Interactive ${projection === "globe" ? "globe" : "2D"} map of ${initialFocus ? "the selected destination" : "Portugal"} — use arrow keys to pan, plus and minus to zoom`}
       tabIndex={0}

@@ -35,8 +35,16 @@ describe("ErrorState", () => {
     const onRetry = vi.fn();
     render(<ErrorState onRetry={onRetry} retryText="Reload page" />);
     const btn = screen.getByText("Reload page");
+    expect(btn.getAttribute("type")).toBe("button");
     fireEvent.click(btn);
     expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders a server-rendered recovery link when no client retry exists", () => {
+    render(<ErrorState retryHref="/reviewer/queue" retryText="Back to queue" />);
+    const link = screen.getByRole("link", { name: "Back to queue" });
+    expect(link.getAttribute("href")).toBe("/reviewer/queue");
+    expect(link.className).toContain("min-h-[44px]");
   });
 
   it("renders compact variant correctly", () => {

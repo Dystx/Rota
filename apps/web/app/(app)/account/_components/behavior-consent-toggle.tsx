@@ -36,7 +36,7 @@ export function BehaviorConsentToggle() {
         data-testid="behavior-consent-loading"
         suppressHydrationWarning
       >
-        <p className="text-sm text-[var(--color-muted-foreground)]">
+        <p className="text-base leading-7 text-[var(--color-muted-foreground)]">
           Loading personalization preferences…
         </p>
       </div>
@@ -61,7 +61,7 @@ export function BehaviorConsentToggle() {
           <span className="text-sm font-medium text-[var(--color-foreground)]">
             Personalize my activity suggestions
           </span>
-          <span className="text-xs text-[var(--color-muted-foreground)] leading-relaxed">
+          <span className="text-base leading-7 text-[var(--color-muted-foreground)]">
             When this is on, the platform remembers which suggested stops you skip, extend,
             or replace (stored only in your browser until you turn this off or clear the
             data). Off by default — nothing is recorded until you opt in.

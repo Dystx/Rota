@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { AcceptedPhrase } from "./accepted-phrase";
+import { Icon } from "./icon";
 
 export type ActivityIntentDraft = {
   timeWindow: string;
@@ -46,7 +47,7 @@ export function ActivityIntentComposer({ initial, onSubmit }: ActivityIntentComp
   }
 
   return (
-    <div className="max-w-3xl text-center text-xl leading-relaxed text-linen-dark md:text-2xl">
+    <div className="rumia-intent-composer max-w-3xl text-center text-xl leading-relaxed text-linen-dark md:text-2xl">
       <div aria-label="Describe your activity situation" role="group">
         I have{" "}
         <AcceptedPhrase
@@ -83,7 +84,7 @@ export function ActivityIntentComposer({ initial, onSubmit }: ActivityIntentComp
           tone="inverse"
           onAccept={(group) => patch({ group })}
           onClear={() => patch({ group: "" })}
-        />.
+        />
       </div>
 
       {isDetailOpen ? (
@@ -118,11 +119,12 @@ export function ActivityIntentComposer({ initial, onSubmit }: ActivityIntentComp
       )}
 
       <button
-        className="mt-6 border-b border-ochre-light px-1 py-3 font-medium text-ochre-light hover:text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+        className="rumia-intent-submit mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ochre-light px-5 py-3 font-label-ui text-label-ui text-primary hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
         type="button"
         onClick={() => onSubmit(draft)}
       >
         Show me what is worth doing
+        <Icon aria-hidden name="arrow_forward" className="text-[18px]" />
       </button>
     </div>
   );

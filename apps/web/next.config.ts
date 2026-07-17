@@ -19,6 +19,13 @@ const nextConfig: NextConfig = {
   // build. See docs/ops/serverless-database-connections.md for the
   // corresponding operational notes (PostgreSQL pooler, body size, etc.).
   experimental: {
+    // The July 2026 development OOM showed the persistent Turbo cache
+    // compacting hundreds of thousands of keys while native memory and
+    // Node child processes kept growing. Keep Turbopack an explicit opt-in,
+    // avoid restoring that pathological cache, and bound its native target.
+    turbopackFileSystemCacheForDev: false,
+    turbopackMemoryLimit: 2 * 1024 * 1024 * 1024,
+    turbopackPluginRuntimeStrategy: "workerThreads",
     serverActions: {
       bodySizeLimit: "4mb"
     }

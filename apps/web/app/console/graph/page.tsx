@@ -3,7 +3,7 @@ import { DecisionStatePanel } from "@repo/ui";
 
 export default function ConsoleGraphPage() {
   return (
-    <main className="min-h-screen min-w-0 overflow-x-hidden bg-olive-dark p-container-padding-sm text-linen-dark lg:p-container-padding-lg">
+    <div className="min-h-screen min-w-0 overflow-x-hidden bg-olive-dark p-container-padding-sm text-linen-dark lg:p-container-padding-lg">
       <header className="mb-6 border-b border-white/10 pb-5">
         <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light">
           Knowledge graph
@@ -22,6 +22,6 @@ export default function ConsoleGraphPage() {
           description="No persisted graph evidence is available, so vectors, counts, and map coordinates are not presented as operational data."
         />
       </div>
-    </main>
+    </div>
   );
 }

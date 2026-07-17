@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, StatPill } from "@repo/ui";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { RouteRecovery } from "@/app/_components/route-recovery";
 import { TripBriefFormBoundary } from "./trip-brief-form";
 
 export const metadata: Metadata = {
@@ -11,9 +14,17 @@ export const metadata: Metadata = {
   }
 };
 
-export default function NewTripPage() {
+export default async function NewTripPage() {
+  const currentUser = await getCurrentUser();
+  if (currentUser.outcome === "unavailable") {
+    return <RouteRecovery kind="unavailable" />;
+  }
+  if (!currentUser.user) {
+    redirect("/sign-in?next=%2Ftrip%2Fnew");
+  }
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" data-scene="decision">
       <section className="relative isolate w-full overflow-hidden border-b border-olive-light/20">
         <div className="absolute inset-0 w-full h-full -z-10">
           <div
@@ -97,7 +108,7 @@ export default function NewTripPage() {
           </Card>
 
           <div className="rounded-2xl border border-olive-light/20 bg-olive-light/10 p-5">
-            <p className="font-label-ui text-label-ui uppercase tracking-[0.18em] text-primary/65">Need recommendations first?</p>
+            <p className="font-label-ui text-label-ui uppercase tracking-[0.18em] text-primary/80">Need recommendations first?</p>
             <p className="mt-2 text-base leading-7 text-on-surface-variant">Explore Portugal by situation, then return here when you have a shortlist worth shaping.</p>
             <Link href="/explore" className="mt-4 inline-flex items-center font-label-ui text-label-ui text-primary underline decoration-olive-light/60 underline-offset-4 hover:decoration-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2">
               Browse worthwhile activities

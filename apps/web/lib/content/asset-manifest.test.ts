@@ -3,8 +3,15 @@ import { describe, expect, it } from "vitest";
 import { ASSET_MANIFEST } from "./asset-manifest";
 
 describe("ASSET_MANIFEST", () => {
-  it("uses owned local editorial assets", () => {
-    expect(ASSET_MANIFEST.every((asset) => asset.licence === "Rumia-owned" && asset.files.every((file) => file.src.startsWith("/")))).toBe(true);
+  it("uses approved local editorial assets with provenance", () => {
+    expect(
+      ASSET_MANIFEST.every(
+        (asset) =>
+          ["Rumia-owned", "Unsplash License"].includes(asset.licence) &&
+          asset.files.every((file) => file.src.startsWith("/")) &&
+          (asset.licence === "Rumia-owned" || Boolean(asset.sourceUrl && asset.licenceUrl))
+      )
+    ).toBe(true);
   });
 
   it("keeps accessibility and refresh metadata with every asset", () => {

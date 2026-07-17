@@ -192,7 +192,7 @@ function scenario(
 }
 
 const checkoutScenarios: readonly RouteVisualScenario[] = [
-  scenario("checkout--anonymous", "unauthorized", "anonymous", staticRoute("/checkout"), "desktop-mobile", { access: "redirect", noPrivateDisclosure: true }),
+  scenario("checkout--anonymous", "unauthorized", "anonymous", { kind: "traveler-trip", variant: "foreign", suffix: "" }, "desktop-mobile", { access: "redirect", noPrivateDisclosure: true }, { query: { trip: "fixture:foreign" } }),
   scenario("checkout--no-trip", "empty", "traveler", staticRoute("/checkout"), "all-four", { access: "render", transition: "no trip is explained with one coherent planner action" }),
   scenario("checkout--foreign-trip", "not-found", "foreign-traveler", { kind: "traveler-trip", variant: "foreign", suffix: "" }, "desktop-mobile", { access: "not-found", noPrivateDisclosure: true }, { query: { trip: "fixture:foreign" } }),
   scenario("checkout--draft", "ready", "traveler", { kind: "traveler-trip", variant: "draft", suffix: "" }, "desktop-mobile", { access: "render" }, { query: { trip: "fixture:draft" } }),
@@ -203,7 +203,7 @@ const checkoutScenarios: readonly RouteVisualScenario[] = [
 ];
 
 const expertChatScenarios: readonly RouteVisualScenario[] = [
-  scenario("expert-chat--anonymous", "unauthorized", "anonymous", staticRoute("/expert-chat"), "desktop-mobile", { access: "redirect", noPrivateDisclosure: true }),
+  scenario("expert-chat--anonymous", "unauthorized", "anonymous", { kind: "traveler-trip", variant: "foreign", suffix: "" }, "desktop-mobile", { access: "redirect", noPrivateDisclosure: true }, { query: { trip: "fixture:foreign" } }),
   scenario("expert-chat--disabled", "disabled", "traveler", staticRoute("/expert-chat"), "desktop-mobile", { access: "render", transition: "messaging is truthfully unavailable while the feature flag is off" }, { flags: { ENABLE_TRIP_MESSAGING: false } }),
   scenario("expert-chat--no-trip", "empty", "traveler", staticRoute("/expert-chat"), "all-four", { access: "render", transition: "the trip context required for messaging is explained" }, { flags: { ENABLE_TRIP_MESSAGING: true } }),
   scenario("expert-chat--foreign-trip", "not-found", "foreign-traveler", { kind: "traveler-trip", variant: "foreign", suffix: "" }, "desktop-mobile", { access: "redirect", noPrivateDisclosure: true, transition: "foreign trip context is not disclosed and returns to a safe route" }, { query: { trip: "fixture:foreign" }, flags: { ENABLE_TRIP_MESSAGING: true } }),
@@ -238,9 +238,11 @@ function setupFor(path: HttpRoutePath, state: RouteVisualState): RouteVisualScen
   const flags = flagsForState(path, state);
   const interaction = interactionFor(state);
   const provider = state === "unavailable" ? "unreachable" : undefined;
-  const query = state === "not-found" && (path.includes("[tripId]") || ["/checkout", "/logistics", "/expert-chat"].includes(path))
-    ? { trip: "fixture:foreign" }
-    : undefined;
+  const query = path === "/logistics"
+    ? { trip: state === "not-found" ? "fixture:foreign" : "fixture:draft" }
+    : state === "not-found" && (path.includes("[tripId]") || ["/checkout", "/expert-chat"].includes(path))
+      ? { trip: "fixture:foreign" }
+      : undefined;
   if (!flags && !interaction && !provider && !query) return undefined;
   return { ...(flags ? { flags } : {}), ...(interaction ? { interaction } : {}), ...(provider ? { provider } : {}), ...(query ? { query } : {}) };
 }
@@ -259,7 +261,7 @@ function buildPublicScenarios(path: HttpRoutePath, contract: RouteSceneContract)
   return contract.states.map((state, index) => scenario(
     `${path.slice(1).replaceAll("/", "-") || "home"}--${state}`,
     state,
-    "public",
+    path === "/sign-in" && state === "redirect" ? "traveler" : "public",
     fixtureFor(path, state, contract.fixture),
     index === 0 ? "all-four" : "desktop-mobile",
     { access: state === "not-found" ? "not-found" : state === "redirect" ? "redirect" : "render" },
@@ -274,19 +276,30 @@ function buildOwnerScenarios(path: HttpRoutePath, contract: RouteSceneContract):
   const primaryState = primaryStateFor(path, states);
   for (const state of states) {
     if (state === "unauthorized") {
-      scenarios.push(scenario(`${key}--anonymous`, state, "anonymous", path === "/b2b/[orgSlug]" ? staticRoute(path) : contract.fixture, "desktop-mobile", { access: "redirect", noPrivateDisclosure: true }));
+      const anonymousRender = path === "/vault" || path === "/b2b/[orgSlug]";
+      const protectedTrip = ["/checkout", "/logistics", "/expert-chat"].includes(path);
+      scenarios.push(scenario(
+        `${key}--anonymous`,
+        state,
+        "anonymous",
+        path === "/b2b/[orgSlug]" ? staticRoute(path) : protectedTrip ? { kind: "traveler-trip", variant: "foreign", suffix: "" } : contract.fixture,
+        "desktop-mobile",
+        { access: anonymousRender ? "render" : "redirect", noPrivateDisclosure: true },
+        protectedTrip ? { query: { trip: "fixture:foreign" } } : undefined
+      ));
       continue;
     }
     const foreign = state === "not-found" && (path.includes("[tripId]") || ["/checkout", "/logistics", "/expert-chat"].includes(path));
     const persona: RoutePersona = foreign ? "foreign-traveler" : path === "/guide/onboarding" ? "specialist-candidate" : "traveler";
     const fixture = fixtureFor(path, state, contract.fixture);
+    const ownedTripPrivacyRedirect = foreign && (path === "/trip/[tripId]" || path === "/trip/[tripId]/map" || path === "/logistics");
     scenarios.push(scenario(
       `${key}--${state}${foreign ? "-foreign" : ""}`,
       state,
       persona,
       fixture,
       state === primaryState ? "all-four" : "desktop-mobile",
-      { access: state === "not-found" ? "not-found" : "render", ...(foreign ? { noPrivateDisclosure: true } : {}) },
+      { access: ownedTripPrivacyRedirect ? "redirect" : state === "not-found" ? "not-found" : "render", ...(foreign ? { noPrivateDisclosure: true } : {}) },
       setupFor(path, state)
     ));
   }

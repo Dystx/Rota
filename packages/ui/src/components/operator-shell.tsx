@@ -194,6 +194,7 @@ export function OperatorShell({
     <div
       data-surface="linen"
       data-surface-texture="none"
+      data-scene="utility"
       className="rumia-operator-shell min-h-screen rumia-surface rumia-surface-linen text-primary"
     >
       {/* Desktop layout: sidebar + content */}
@@ -232,6 +233,7 @@ export function OperatorShell({
               ) : (
                 <div
                   aria-hidden
+                  data-a11y-hidden="decorative"
                   className="h-9 w-9 shrink-0 rounded-full bg-olive-light/15 flex items-center justify-center font-label-ui text-label-ui text-olive-dark"
                 >
                   {initial}
@@ -284,6 +286,7 @@ export function OperatorShell({
               <div className="flex items-center gap-3 border-t border-olive-light/10 pt-4">
                 <div
                   aria-hidden
+                  data-a11y-hidden="decorative"
                   className="h-9 w-9 shrink-0 rounded-full bg-olive-light/15 flex items-center justify-center font-label-ui text-label-ui text-olive-dark"
                 >
                   {initial}

@@ -1,35 +1,40 @@
-# Task 10 report — synchronized trip detail, map, and stop selection
+# Task 10 report — planner and trip-creation decision hierarchy
 
-Implemented owner-scoped trip context, day selection, map/list synchronization, and truthful route states. The detail page now renders the shared `TripContextBar`, day tabs, a mobile snap filmstrip with agenda/list equivalents, and map filter chips with an accessible stop list. Stop selection updates `useMapStore` and uses `runViewTransition` to focus the map when supported.
+Status: DONE_WITH_CONCERNS
 
-Verification:
+## Implementation
 
-- `pnpm vitest run --config vitest.config.ts 'apps/web/app/(app)/trip/[tripId]/_components/trip-route-sync.test.tsx'` — PASS (3 tests)
-- `pnpm --filter web typecheck` — PASS
+- Kept the planner activity-first and form-first on mobile with a compact
+  Place / Time / Details rail; the desktop context rail remains sticky.
+- Preserved the shared `ChoiceCard` and `ChoiceChipGroup` selected contracts:
+  `aria-checked`/`aria-pressed`, `data-selected`, and visible selected styling.
+- Added a stable `planner-summary` hook and a planner regression proving that
+  selecting a place updates both semantic state and the compact summary.
+- Kept trip creation choice-only for dates and refinements, with activity-first
+  vocabulary and explicit saved-plan framing rather than accommodation search.
+- Preserved the controlled option-sheet focus containment and restoration work.
 
-Review follow-up:
+## Verification
 
-- Query-selected days now initialize the cinematic map chapter and stop list (including the 1-based day label).
-- Generation failures, empty day payloads, and ready itineraries render distinct truthful states; failures retain trip context and expose a retry action.
-- Context-bar edits route to a field-specific planner editor, and map filters/stop equivalents are keyboard-usable on mobile and desktop.
-- Re-ran the focused route-sync tests and web typecheck after these fixes — PASS.
-- Final review fixes: `?edit=` is parsed by the planner and opens the matching editor sheet; map filter chips now expose stateful menus; selected days without geocoded stops retain their day label/list and show an explicit no-map-stops message.
+- Focused Task 10 Vitest — PASS, 5 files / 31 tests.
+- `corepack pnpm --dir apps/web typecheck` — PASS.
+- `corepack pnpm lint:eslint` — PASS.
+- `git diff --check` — PASS.
 
-Final review follow-up:
+## TDD evidence
 
-- Map chapter/list stop IDs now consistently use `day-${day}-stop-${index}`, so selecting either surface highlights the same source stop.
-- Explicit unresolved day selections retain their day label and expose the no-map-stops state via a tested status component; transport and layer chips are explicit menu controls with observable expanded/selection state.
-- Verification: focused route-sync tests — PASS (6 tests); `pnpm --filter web typecheck` — PASS; `pnpm lint` — PASS.
+- The planner-level selected-state and summary regression was added before the
+  final gate; it passes alongside the existing choice, sheet, day-planner, and
+  trip-brief suites.
 
-Task 10 unresolved-day guard:
+## Dirty-boundary notes
 
-- Added an explicit-day guard so a `?day=2` selection remains on Day 2 when only Day 1 has geocoded chapters; the map retains the Day 2 stop list and no-map-stops state while chapter navigation falls back safely.
-- Added regression coverage for explicit unresolved-day preservation.
-- Verification: focused cinematic/route-sync tests — PASS (11 tests).
+Only the 15 Task 10 paths named in the active brief were staged. Existing
+planner, trip-creation, UI primitive, and browser-flow changes in those paths
+were preserved; unrelated routes, docs, database, map, deployment, and
+snapshot files remain outside this task commit.
 
-Task 10 final conditional fix:
+## Concerns
 
-- Distinguished an explicit `?day=N` selection from default map mode. Default visits and filmstrip now choose the first day with geocoded stops (Day 2 when Day 1 has none), while explicit unresolved days retain their label and no-map-stops state.
-- Added `selectedDayIsExplicit` to the map section and mark map-menu changes explicit, preserving unresolved local selections even when the chapter surface falls back.
-- Regression coverage includes default Day 1/Day 2 geocoding fallback and explicit `?day=1` preservation.
-- Verification: focused route-sync tests — PASS (8 tests); `pnpm --filter web typecheck` — PASS.
+- The four-viewport Playwright browser gate and human visual approval remain
+  open for Task 17; this task is not a release approval.

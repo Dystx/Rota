@@ -427,7 +427,7 @@ body {
 
 .rumia-top-nav a[data-active="true"] {
   position: relative;
-  color: var(--color-ochre-on-light) !important;
+  color: var(--color-ochre-ink) !important;
 }
 
 .rumia-top-nav a[data-active="true"]::after {
@@ -443,7 +443,7 @@ body {
 }
 
 .rumia-top-nav a:not([data-active="true"]):hover {
-  color: var(--color-ochre-on-light) !important;
+  color: var(--color-ochre-ink) !important;
 }
 
 .rumia-top-nav::after {
@@ -1221,6 +1221,12 @@ body {
   }
 }
 
+@media (min-width: 900px) and (max-width: 1199px) {
+  .rumia-legal-header h1 {
+    font-size: clamp(2.75rem, 6vw, 4rem);
+  }
+}
+
 /* Task 8 route-owned structures:
  * How it works is a chapter sequence with alternating media/text panes.
  * Pricing is a utility ledger with one recommended free starting point and a
@@ -1453,7 +1459,10 @@ body {
 }
 
 .rumia-pricing-tiers [data-tier-state="future"] {
-  opacity: 0.72;
+  /* Do not mute the whole subtree with opacity: it composites body copy
+     below WCAG AA contrast on the linen surface. Keep the future state
+     visually quiet through its surface treatment instead. */
+  background: rgba(22, 40, 31, 0.025);
 }
 
 .rumia-planner-summary > section {
@@ -1822,6 +1831,26 @@ a {
   display: grid;
   gap: 1.5rem;
   align-items: stretch;
+}
+
+/* The local-expertise route is a midnight reading field. Its shared
+ * editorial primitives normally use paper-surface ink, so make the
+ * route-level pairing explicit and keep the pale evidence cards readable. */
+.rumia-local-expertise-page .text-primary,
+.rumia-local-expertise-page .text-midnight {
+  color: var(--color-linen) !important;
+}
+
+.rumia-local-expertise-page .text-on-surface-variant {
+  color: rgba(239, 236, 230, 0.78) !important;
+}
+
+.rumia-local-expertise-page .text-ochre-dark {
+  color: var(--color-ochre-light) !important;
+}
+
+.rumia-local-expertise-page .rumia-local-expertise-list {
+  color: var(--color-primary) !important;
 }
 
 .rumia-local-expertise-still {
