@@ -59,6 +59,7 @@ export function ActivityMapFallback({
               ? "Approximate public area"
               : "Public point"
             : item.geometryLabel;
+          const avoidWhen = point?.avoidWhen;
           return (
             <li key={`${item.activityId}-${index}`} data-testid="activity-map-list-item" data-activity-id={item.activityId} data-duration-minutes={item.durationMinutes ?? undefined}>
               <button
@@ -74,8 +75,9 @@ export function ActivityMapFallback({
                   </span>
                   <span className="min-w-0">
                     <span className="block font-medium text-primary">{item.title}</span>
-                  <span className="mt-1 block text-base leading-7 text-on-surface-variant">{item.verdict}</span>
+                    <span className="mt-1 block text-base leading-7 text-on-surface-variant">{item.verdict}</span>
                     <span className="mt-2 block text-xs uppercase tracking-[0.12em] text-ochre-dark">{geometryLabel} · {item.bestTime}{item.durationMinutes ? ` · ${item.durationMinutes} min` : ""}</span>
+                    {avoidWhen ? <span className="mt-2 block text-base leading-7 text-on-surface-variant"><strong className="font-medium text-primary">Leave room for:</strong> {avoidWhen}</span> : null}
                     {item.evidenceAttribution ? <span className="mt-2 block text-xs text-on-surface-variant">Source: {item.evidenceAttribution}</span> : null}
                   </span>
                 </span>

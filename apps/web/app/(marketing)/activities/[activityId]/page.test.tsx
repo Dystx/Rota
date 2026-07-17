@@ -48,6 +48,24 @@ describe("ActivityDetailPage", () => {
     expect(within(hero).getByText("Rumia verdict")).toBeTruthy();
     expect(within(hero).getByText("Time to allow")).toBeTruthy();
     expect(within(hero).getByText("Leave room for")).toBeTruthy();
-    expect(within(hero).getByRole("button", { name: /save/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /save/i })).toBeTruthy();
+    expect(screen.getByTestId("activity-detail-save-bar").className).toContain("md:absolute");
+  });
+
+  it("keeps the mobile save bar page-level and leaves document room before evidence", async () => {
+    const page = await ActivityDetailPage({
+      params: Promise.resolve({ activityId: "porto-ribeira-slow-walk" })
+    });
+    render(page);
+
+    const article = screen.getByTestId("activity-detail-page");
+    const saveBar = screen.getByTestId("activity-detail-save-bar");
+
+    expect(saveBar.className).toContain("fixed");
+    expect(saveBar.className).toContain("bottom-0");
+    expect(saveBar.className).toContain("safe-area-inset-bottom");
+    expect(saveBar.className).toContain("md:absolute");
+    expect(article.className).toContain("sm:pb-[calc(8rem+env(safe-area-inset-bottom))]");
+    expect(saveBar.compareDocumentPosition(screen.getByRole("link", { name: /Read the editorial evidence/i })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });

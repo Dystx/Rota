@@ -454,7 +454,7 @@ export function ActivityWorkspace({
             </EditorialChapterClose>
           </>
         ) : (
-          <section key="empty" data-motion-key="empty" className={`rumia-workspace-empty relative mt-10 overflow-hidden rounded-[28px] p-6 md:p-8 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`} aria-label="No chosen activities">
+          <section key="empty" data-motion-key="empty" className={`rumia-workspace-empty relative mt-10 !min-h-0 overflow-hidden rounded-[28px] p-6 md:p-8 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`} aria-label="No chosen activities">
             <DecisionStatePanel
               data-testid="workspace-empty-anchor"
               kind="empty"
@@ -469,14 +469,6 @@ export function ActivityWorkspace({
                   className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-ochre-light px-5 py-3 text-sm font-medium text-primary shadow-sm transition-transform hover:-translate-y-0.5 hover:bg-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
                 >
                   Start with an activity <Icon name="arrow-right" />
-                </Link>
-              )}
-              secondaryAction={(
-                <Link
-                  className="inline-flex min-h-11 min-w-11 items-center px-1 py-2 text-sm font-medium text-ochre-light underline decoration-ochre-light underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-                  href="/explore"
-                >
-                  Keep exploring
                 </Link>
               )}
             />

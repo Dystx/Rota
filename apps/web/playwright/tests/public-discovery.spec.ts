@@ -113,7 +113,7 @@ test.describe("public discovery and trust routes", () => {
     const viewport = page.viewportSize();
     const hero = page.getByTestId("activity-detail-hero");
     const judgement = hero.getByTestId("activity-detail-judgement");
-    const save = hero.getByTestId("activity-detail-save-action");
+    const save = page.getByTestId("activity-detail-save-action");
     await expect(hero).toHaveAttribute("data-tone", "cover");
     await expect(judgement).toContainText("Rumia verdict");
     await expect(judgement).toContainText("Time to allow");
@@ -176,6 +176,7 @@ test.describe("public discovery and trust routes", () => {
     await expect(panel).toHaveAttribute("data-map-intent", "explicit");
     await expect(panel.locator('[data-map-mode="map"], [data-map-mode="fallback"]')).toHaveCount(1, { timeout: 15_000 });
     await expect(panel.getByText("Ribeira and Miragaia at walking pace", { exact: true })).toBeVisible();
+    await expect(panel.getByText(/quiet, step-free, or fast-moving morning/i)).toBeVisible();
     await expect(panel.getByTestId("activity-map-list-item")).toHaveCount(2);
     const mapIds = await panel.getByTestId("activity-map-list-item").evaluateAll((items) =>
       items.map((item) => item.getAttribute("data-activity-id"))

@@ -93,7 +93,7 @@ export default async function ActivityDetailPage({
     <PublicRouteLayout scene="cover" surfaceTone="midnight" surfaceTexture="none" footerMode="compact">
       <article
         data-testid="activity-detail-page"
-        className="rumia-activity-detail mx-auto max-w-6xl px-4 py-8 pb-20 sm:px-6 sm:py-12 md:py-16"
+        className="rumia-activity-detail mx-auto max-w-6xl px-4 py-8 pb-[calc(8rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-12 sm:pb-[calc(8rem+env(safe-area-inset-bottom))] md:py-16 md:pb-16"
       >
         <Link
           className="inline-flex min-h-11 items-center text-sm font-medium text-ochre-dark underline decoration-ochre-light underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
@@ -105,81 +105,84 @@ export default async function ActivityDetailPage({
         {(() => {
           const media = ACTIVITY_MEDIA[activity.region];
           return (
-            <RouteScene
-              tone="cover"
-              bleed="contained"
-              layout="overlay"
-              focalLayer="media"
-              data-testid="activity-detail-hero"
-              className="!mx-0 !max-w-none mt-6 min-h-[clamp(34rem,70vh,46rem)] overflow-hidden rounded-[28px] border border-white/15 shadow-[0_28px_80px_rgba(7,17,19,0.3)] md:mt-8"
-              media={(
-                <CinematicMedia
-                  src={CINEMATIC_MEDIA.portugalCover.videoSrc}
-                  poster={media.poster}
-                  fallbackSrc={media.fallbackSrc}
-                  alt={media.alt}
-                  caption={media.caption}
-                  credit={media.credit}
-                  width={media.width}
-                  height={media.height}
-                  sizes="(max-width: 768px) 100vw, 1200px"
-                  priority
-                  motionPolicy={media.motionPolicy}
-                  textSafeZone={{ x: 0.06, y: 0.12, width: 0.86, height: 0.78 }}
-                  mobileTextSafeZone={{ x: 0.06, y: 0.2, width: 0.88, height: 0.72 }}
-                  testId="activity-detail-media"
-                  className="relative h-full min-h-[clamp(34rem,70vh,46rem)] w-full bg-midnight/10"
-                  posterClassName="object-center brightness-[0.56] saturate-[0.9]"
-                  videoClassName="object-center brightness-[0.56] saturate-[0.9]"
-                  overlayClassName="bg-gradient-to-t from-midnight/90 via-midnight/25 to-midnight/10"
-                />
-              )}
-              foreground={(
-                <header className="flex min-h-[clamp(34rem,70vh,46rem)] items-end px-5 pb-28 pt-10 text-linen-dark sm:px-8 md:px-12 md:pb-32">
-                  <div className="max-w-4xl">
-                    <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-light">
-                      Portugal / {activity.region} / activity judgement
-                    </p>
-                    <h1 className="mt-4 max-w-4xl font-display text-4xl leading-[0.98] text-linen-dark sm:text-5xl md:text-7xl">
-                      {activity.title}
-                    </h1>
-                    <div
-                      data-testid="activity-detail-judgement"
-                      className="mt-7 max-w-3xl border-t border-ochre-light/50 pt-5"
-                    >
+            <div className="relative mt-6 md:mt-8">
+              <RouteScene
+                tone="cover"
+                bleed="contained"
+                layout="overlay"
+                focalLayer="media"
+                data-testid="activity-detail-hero"
+                className="!mx-0 !max-w-none min-h-[clamp(34rem,70vh,46rem)] overflow-hidden rounded-[28px] border border-white/15 shadow-[0_28px_80px_rgba(7,17,19,0.3)]"
+                media={(
+                  <CinematicMedia
+                    src={CINEMATIC_MEDIA.portugalCover.videoSrc}
+                    poster={media.poster}
+                    fallbackSrc={media.fallbackSrc}
+                    alt={media.alt}
+                    caption={media.caption}
+                    credit={media.credit}
+                    width={media.width}
+                    height={media.height}
+                    sizes="(max-width: 768px) 100vw, 1200px"
+                    priority
+                    motionPolicy={media.motionPolicy}
+                    textSafeZone={{ x: 0.06, y: 0.12, width: 0.86, height: 0.78 }}
+                    mobileTextSafeZone={{ x: 0.06, y: 0.2, width: 0.88, height: 0.72 }}
+                    testId="activity-detail-media"
+                    className="relative h-full min-h-[clamp(34rem,70vh,46rem)] w-full bg-midnight/10"
+                    posterClassName="object-center brightness-[0.56] saturate-[0.9]"
+                    videoClassName="object-center brightness-[0.56] saturate-[0.9]"
+                    overlayClassName="bg-gradient-to-t from-midnight/90 via-midnight/25 to-midnight/10"
+                  />
+                )}
+                foreground={(
+                  <header className="flex min-h-[clamp(34rem,70vh,46rem)] items-end px-5 pb-28 pt-10 text-linen-dark sm:px-8 md:px-12 md:pb-32">
+                    <div className="max-w-4xl">
                       <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-light">
-                        Rumia verdict
+                        Portugal / {activity.region} / activity judgement
                       </p>
-                      <p className="mt-3 max-w-3xl font-display text-xl leading-tight text-linen-dark sm:text-2xl md:text-3xl">
-                        {activity.verdict}
-                      </p>
-                      <dl className="mt-5 grid gap-4 border-t border-white/20 pt-4 text-base leading-7 text-linen-dark sm:grid-cols-2">
-                        <div>
-                          <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-ochre-light">Time to allow</dt>
-                          <dd className="mt-1">{timeLabel(activity.durationMinutes)}</dd>
-                        </div>
-                        <div>
-                          <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-ochre-light">Leave room for</dt>
-                          <dd className="mt-1">{activity.avoidWhen ?? "The unplanned parts of the day."}</dd>
-                        </div>
-                      </dl>
+                      <h1 className="mt-4 max-w-4xl font-display text-4xl leading-[0.98] text-linen-dark sm:text-5xl md:text-7xl">
+                        {activity.title}
+                      </h1>
+                      <div
+                        data-testid="activity-detail-judgement"
+                        className="mt-7 max-w-3xl border-t border-ochre-light/50 pt-5"
+                      >
+                        <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-light">
+                          Rumia verdict
+                        </p>
+                        <p className="mt-3 max-w-3xl font-display text-xl leading-tight text-linen-dark sm:text-2xl md:text-3xl">
+                          {activity.verdict}
+                        </p>
+                        <dl className="mt-5 grid gap-4 border-t border-white/20 pt-4 text-base leading-7 text-linen-dark sm:grid-cols-2">
+                          <div>
+                            <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-ochre-light">Time to allow</dt>
+                            <dd className="mt-1">{timeLabel(activity.durationMinutes)}</dd>
+                          </div>
+                          <div>
+                            <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-ochre-light">Leave room for</dt>
+                            <dd className="mt-1">{activity.avoidWhen ?? "The unplanned parts of the day."}</dd>
+                          </div>
+                        </dl>
+                      </div>
                     </div>
-                  </div>
-                </header>
-              )}
-              actions={(
-                <div className="rumia-activity-detail-save-bar sticky bottom-0 z-20 w-full bg-midnight/90 px-5 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-md sm:px-8 md:static md:bg-transparent md:px-12 md:pb-8 md:pt-3">
-                  <div data-testid="activity-detail-primary-action">
-                    <ActivityDetailSaveAction
-                      activityId={activity.id}
-                      activityTitle={activity.title}
-                      moods={activity.bestFor}
-                      region={activity.region}
-                    />
-                  </div>
+                  </header>
+                )}
+              />
+              <div
+                data-testid="activity-detail-save-bar"
+                className="rumia-activity-detail-save-bar fixed inset-x-0 bottom-0 z-30 w-full bg-midnight/95 px-5 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-md sm:px-8 md:absolute md:inset-x-0 md:bottom-0 md:bg-transparent md:px-12 md:pb-8 md:pt-3"
+              >
+                <div data-testid="activity-detail-primary-action">
+                  <ActivityDetailSaveAction
+                    activityId={activity.id}
+                    activityTitle={activity.title}
+                    moods={activity.bestFor}
+                    region={activity.region}
+                  />
                 </div>
-              )}
-            />
+              </div>
+            </div>
           );
         })()}
 

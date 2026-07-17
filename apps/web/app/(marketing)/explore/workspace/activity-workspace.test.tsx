@@ -37,10 +37,11 @@ describe("ActivityWorkspace", () => {
     render(<ActivityWorkspace initialActivities={[]} />);
 
     expect(screen.getByRole("heading", { name: /choose again/i })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Keep exploring" })).toBeTruthy();
     expect(screen.getByRole("group", { name: /empty day preview/i })).toBeTruthy();
     expect(screen.getByTestId("workspace-empty-anchor")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Start with an activity" })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Keep exploring" })).toBeNull();
+    expect(screen.getByTestId("activity-workspace").querySelector(".rumia-workspace-empty")?.className).toContain("!min-h-0");
     expect(screen.getByText("Time")).toBeTruthy();
     expect(screen.getByText("Judgement")).toBeTruthy();
     expect(screen.getByText("Practical space")).toBeTruthy();
