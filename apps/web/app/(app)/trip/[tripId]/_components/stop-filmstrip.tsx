@@ -64,7 +64,7 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
         className="flex gap-gutter overflow-x-auto scrollbar-hide px-container-padding-lg pb-4 snap-x snap-mandatory"
         data-testid="filmstrip-track"
       >
-        {stops.map((stop) => {
+        {stops.map((stop, index) => {
           const isActive = stop.id === activeStopId;
           const isNext = stop.id === nextStopId && stop.id !== activeStopId;
           const hasCoords = stop.coordinates !== undefined;
@@ -73,6 +73,8 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
               key={stop.id}
               type="button"
               data-testid={`stop-card-${stop.id}`}
+              data-trip-stop={String(index + 1)}
+              data-selected={isActive || undefined}
               onClick={() => {
                 // Defence in depth: the `disabled` attribute
                 // below already prevents the click when the
@@ -227,18 +229,24 @@ export function StopFilmstrip({ stops }: { stops: FilmstripStop[] }) {
         </a>
       </div>
       <ol aria-label="Stops list (text view)" className="mt-2 grid gap-2 px-container-padding-lg pb-4 md:hidden">
-        {stops.map((stop, index) => <li key={`list-${stop.id}`}>
+        {stops.map((stop, index) => {
+          const isActive = stop.id === activeStopId;
+          return <li key={`list-${stop.id}`}>
           <button
             type="button"
-            className="flex min-h-11 w-full items-center justify-between rounded-lg border border-olive-dark/15 bg-white/70 px-3 py-2 text-left text-sm text-primary"
+            data-trip-stop={String(index + 1)}
+            data-selected={isActive || undefined}
+            className="flex min-h-11 w-full items-center justify-between rounded-lg border border-olive-dark/15 bg-white/70 px-3 py-2 text-left text-base text-primary"
             onClick={() => stop.coordinates && selectStop(stop.id, stop.coordinates)}
             disabled={!stop.coordinates}
+            aria-pressed={stop.coordinates ? isActive : undefined}
             aria-label={`${stop.startTime} — ${stop.placeName}${stop.coordinates ? "" : " (no map coordinates yet)"} (Stop ${index + 1} of ${stops.length})`}
           >
             <span>{stop.startTime} — {stop.placeName}</span>
             <span className="font-mono-micro text-on-surface-variant" aria-hidden="true">{index + 1}/{stops.length}</span>
           </button>
-        </li>)}
+        </li>;
+        })}
       </ol>
     </section>
   );

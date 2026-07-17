@@ -37,7 +37,7 @@ export function RouteStoryControls({
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-atlantic)]">
             Explore your plan
           </p>
-          <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+          <p className="mt-1 text-base leading-7 text-[var(--color-muted-foreground)]">
             {started ? `${active?.label ?? "Stop"} · ${active?.dayPart ?? "day"}` : "Move through the day when you choose."}
           </p>
         </div>
@@ -64,7 +64,7 @@ export function RouteStoryControls({
           </>
         )}
       </div>
-      <p className="mt-3 text-xs leading-relaxed text-[var(--color-muted-foreground)]">
+      <p className="mt-3 text-base leading-7 text-[var(--color-muted-foreground)]">
         Camera movement is optional; the route list remains the source of truth.
       </p>
     </section>

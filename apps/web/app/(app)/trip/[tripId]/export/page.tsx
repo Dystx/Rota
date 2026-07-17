@@ -44,7 +44,7 @@ function renderPrintView(
       <div data-testid="print-view" className="hidden" />
       <PrintAutoTrigger auto={autoPrint} />
       <SectionHeading
-        eyebrow={`Trip ${tripId}`}
+        eyebrow="Saved plan export"
         title={`${title} print view`}
         description="A simplified saved-plan layout for browser print and PDF save flows."
         h1
@@ -69,19 +69,19 @@ function renderPrintView(
                 <div key={day.dayIndex} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
                   <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Day {day.dayIndex}</p>
                   <p className="mt-2 text-lg font-semibold text-[var(--color-foreground)]">{day.theme}</p>
-                  <p className="text-on-surface-variant leading-loose mt-2 text-sm">{day.summary}</p>
+                  <p className="text-on-surface-variant leading-loose mt-2 text-base">{day.summary}</p>
                   <div className="mt-4 grid gap-2">
                     {day.stops.map((stop) => (
                       <div key={`${stop.startTime}-${stop.placeName}`} className="rounded-[16px] border border-[var(--color-border)] bg-white p-3">
-                        <p className="text-sm font-semibold text-[var(--color-foreground)]">{stop.startTime} · {stop.placeName}</p>
-                        <p className="text-on-surface-variant leading-loose mt-1 text-sm">{stop.reason}</p>
+                        <p className="text-base font-semibold text-[var(--color-foreground)]">{stop.startTime} · {stop.placeName}</p>
+                        <p className="text-on-surface-variant leading-loose mt-1 text-base">{stop.reason}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               ))
             ) : (
-        <p className="text-on-surface-variant leading-loose text-sm">No day agenda is available yet for print export.</p>
+        <p className="text-on-surface-variant leading-loose text-base">No day agenda is available yet for print export.</p>
             )}
           </CardContent>
         </Card>
@@ -153,7 +153,7 @@ export default async function TripExportPage({
       <CinematicGuide>
         <GuideProgress chapters={chapters} />
 
-        <GuideChapter id="overview" className="py-12 md:py-24">
+        <GuideChapter id="overview" fullHeight={false} className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8" data-testid="trip-export-header">
             <RevealSection>
               <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium text-[var(--color-atlantic)]">Carry your plan · Saved work</p>
@@ -167,7 +167,7 @@ export default async function TripExportPage({
               <RevealSection delayMs={120}>
                 <Card data-testid="info-message">
                   <CardContent className="pt-6">
-                    <p className="text-on-surface-variant leading-loose text-sm">{infoMessage}</p>
+                    <p className="text-on-surface-variant leading-loose text-base">{infoMessage}</p>
                   </CardContent>
                 </Card>
               </RevealSection>
@@ -175,7 +175,7 @@ export default async function TripExportPage({
           </div>
         </GuideChapter>
 
-        <GuideChapter id="formats" className="py-12 md:py-24">
+        <GuideChapter id="formats" fullHeight={false} className="py-12 md:py-24">
           <div className="mx-auto max-w-[1100px] grid gap-8">
             <RevealSection>
               <h2 className="font-display text-4xl text-[var(--color-foreground)]">Choose how to carry it</h2>
@@ -213,7 +213,7 @@ export default async function TripExportPage({
           </div>
         </GuideChapter>
 
-        <GuideChapter id="delivery" className="py-12 md:py-24">
+        <GuideChapter id="delivery" fullHeight={false} className="py-12 md:py-24">
           <div className="mx-auto max-w-[860px] grid gap-8">
             <RevealSection>
               <h2 className="font-display text-4xl text-[var(--color-foreground)]">Share &amp; carry</h2>
@@ -229,13 +229,13 @@ export default async function TripExportPage({
                 <CardContent className="grid gap-3">
                   <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
                     <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Share path</p>
-                    <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{buildTripSharePath(tripId)}</p>
-                    <p className="text-on-surface-variant leading-loose mt-2 text-sm">Share links stay tied to the saved plan and its current choices.</p>
+                    <p className="mt-2 text-base font-semibold text-[var(--color-foreground)]">{buildTripSharePath(tripId)}</p>
+                    <p className="text-on-surface-variant leading-loose mt-2 text-base">Share links stay tied to the saved plan and its current choices.</p>
                   </div>
                   <div className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4">
                     <p className="text-xs uppercase tracking-widest text-ochre-dark font-medium">Delivery email</p>
-                    <p className="mt-2 text-sm font-semibold text-[var(--color-foreground)]">{emailPreview.subject}</p>
-                    <p className="text-on-surface-variant leading-loose mt-2 text-sm">{emailPreview.previewText}</p>
+                    <p className="mt-2 text-base font-semibold text-[var(--color-foreground)]">{emailPreview.subject}</p>
+                    <p className="text-on-surface-variant leading-loose mt-2 text-base">{emailPreview.previewText}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -252,7 +252,7 @@ export default async function TripExportPage({
                     "Day-by-day agenda with activity timing",
                     "Local tips and reviewer trust markers"
                   ].map((item) => (
-                    <div key={item} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4 text-sm text-[var(--color-foreground)]">
+                    <div key={item} className="rounded-[20px] border border-[var(--color-border)] bg-white/70 p-4 text-base leading-7 text-[var(--color-foreground)]">
                       {item}
                     </div>
                   ))}
@@ -262,7 +262,7 @@ export default async function TripExportPage({
           </div>
         </GuideChapter>
 
-        <GuideChapter id="access" className="py-12 md:py-24 bg-[var(--color-ink)] text-[var(--color-paper)]">
+        <GuideChapter id="access" fullHeight={false} className="py-12 md:py-24 bg-[var(--color-ink)] text-[var(--color-paper)]">
           <div className="mx-auto max-w-[860px] grid gap-8">
             <RevealSection>
               <h2 className="font-display text-4xl">Export access</h2>
@@ -298,7 +298,7 @@ export default async function TripExportPage({
           </div>
         </GuideChapter>
 
-        <GuideChapter id="next-step" className="p-0">
+        <GuideChapter id="next-step" fullHeight={false} className="p-0">
           <CTASection>
             <h2 className="font-display text-4xl md:text-5xl">Carry the plan onward</h2>
             <p className="text-xl text-[var(--color-cream)] max-w-2xl">

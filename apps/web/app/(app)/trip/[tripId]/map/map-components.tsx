@@ -51,7 +51,7 @@ export function RouteMapStatus({ className }: { className?: string }) {
       role="status"
       data-testid="trip-route-status"
       className={[
-        "rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.88)] px-4 py-3 text-sm leading-relaxed text-[var(--color-muted-foreground)]",
+        "rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.88)] px-4 py-3 text-base leading-7 text-[var(--color-muted-foreground)]",
         className
       ].filter(Boolean).join(" ")}
     >
@@ -151,18 +151,23 @@ export function RouteMap({
   if (routeStatus !== "ready") {
     return (
       <RouteMapStatusContext.Provider value={routeStatus}>
-        <SchematicMap
-          selectedDayId={selectedDayId}
-          days={days}
-          warnings={warnings}
-          {...rest}
-          showFallbackNotice={false}
+        <div
+          data-testid="trip-workspace-canvas-frame"
           data-map-capable="true"
           data-route-status={routeStatus}
           data-map-renderer="schematic"
+          className="relative"
         >
-          {children}
-        </SchematicMap>
+          <SchematicMap
+            selectedDayId={selectedDayId}
+            days={days}
+            warnings={warnings}
+            {...rest}
+            showFallbackNotice={false}
+          >
+            {children}
+          </SchematicMap>
+        </div>
       </RouteMapStatusContext.Provider>
     );
   }

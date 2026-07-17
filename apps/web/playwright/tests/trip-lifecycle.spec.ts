@@ -16,27 +16,28 @@ async function openOwnedRoute(page: Parameters<typeof test>[0] extends never ? n
 }
 
 test.describe("@task11 checkout package choice", () => {
-  test("package cards change the selected package without introducing payment inputs", async ({ page }) => {
+  test("unlinked checkout exposes one saved-day handoff", async ({ page }) => {
     await page.goto("/checkout");
-    const selector = page.getByTestId("checkout-package-selector");
-    await expect(selector).toBeVisible();
-
-    const core = page.getByTestId("checkout-package-core");
-    const specialist = page.getByTestId("checkout-package-specialist");
-    await expect(specialist).toHaveAttribute("aria-pressed", "true");
-    await core.click();
-    await expect(core).toHaveAttribute("aria-pressed", "true");
-    await expect(specialist).toHaveAttribute("aria-pressed", "false");
-    await expect(page.locator('input[type="number"], input[autocomplete="cc-number"], input[name*="card"]')).toHaveCount(0);
+    await expect(page).toHaveURL(/\/checkout$/);
+    await expect(page.getByTestId("checkout-no-trip")).toBeVisible();
+    await expect(page.getByTestId("checkout-no-trip")).toHaveAttribute("data-kind", "empty");
+    await expect(page.getByRole("link", { name: "Shape a day" })).toHaveAttribute("href", "/planner");
+    await expect(page.getByRole("link", { name: "Explore activities" })).toHaveAttribute("href", "/explore");
+    await expect(page.getByTestId("checkout-package-selector")).toHaveCount(0);
   });
 
-  test("selected package is persisted in the unlock form when an owned trip is available", async ({ page }) => {
+  test.describe("owned trip", () => {
     test.use({ storageState: createTravelerStorageState() });
-    await openOwnedRoute(page, `/checkout?trip=${tripId()}`, "owned checkout data unavailable");
-    const core = page.getByTestId("checkout-package-core");
-    await core.click();
-    await expect(page.locator('input[name="package"]')).toHaveValue("core");
-    await expect(page.getByTestId("checkout-package-submit")).toContainText("Core AI");
+
+    test("selected package is persisted in the unlock form when an owned trip is available", async ({ page }) => {
+      const ownedTripId = tripId();
+      await openOwnedRoute(page, `/checkout?trip=${ownedTripId}`, "owned checkout data unavailable");
+      await expect(page.locator("body")).not.toContainText(ownedTripId);
+      const core = page.getByTestId("checkout-package-core");
+      await core.click();
+      await expect(page.locator('input[name="package"]')).toHaveValue("core");
+      await expect(page.getByTestId("checkout-package-submit")).toContainText("Continue with the brief");
+    });
   });
 });
 

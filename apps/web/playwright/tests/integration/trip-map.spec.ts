@@ -76,4 +76,16 @@ test.describe("Trip Map (Spatial Engine)", () => {
     await story.getByRole("button", { name: "Stop exploring" }).click();
     await expect(story.getByRole("button", { name: "Start exploring" })).toBeVisible();
   });
+
+  test("route list remains the source of truth when the map is unavailable", async ({ page }) => {
+    await page.goto(travelerTripPath("/map?map=unavailable"));
+    if (!page.url().includes("/map")) {
+      test.skip(true, `saved trip unavailable; landed on ${page.url()}`);
+    }
+
+    const routeList = page.getByTestId("route-list-fallback");
+    await expect(routeList).toBeVisible();
+    const stopCount = Number(await page.getByTestId("route-stop-count").textContent());
+    await expect(routeList.getByRole("listitem")).toHaveCount(stopCount);
+  });
 });

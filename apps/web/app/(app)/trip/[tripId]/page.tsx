@@ -498,7 +498,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
         above 4.5:1.
       */}
       <span className="text-[12px] font-semibold uppercase tracking-[0.1em] opacity-75">{label}</span>
-      <span className="text-sm font-medium text-right">{value}</span>
+      <span className="text-base font-medium text-right">{value}</span>
     </div>
   );
 }

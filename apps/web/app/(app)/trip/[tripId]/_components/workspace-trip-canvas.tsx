@@ -214,7 +214,7 @@ export const WorkspaceTripCanvas = React.forwardRef<
         <div
           data-static-schematic=""
           role="img"
-          aria-label={`Route preview unavailable for ${tripId}`}
+          aria-label="Route preview unavailable for this saved plan"
           className="h-[600px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)]"
           style={{
             background:
@@ -224,7 +224,7 @@ export const WorkspaceTripCanvas = React.forwardRef<
         <p
           role="status"
           data-testid="trip-route-status"
-          className="absolute bottom-4 left-4 right-4 z-10 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.92)] px-4 py-3 text-sm text-[var(--color-muted-foreground)] shadow-sm"
+          className="absolute bottom-4 left-4 right-4 z-10 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.92)] px-4 py-3 text-base leading-7 text-[var(--color-muted-foreground)] shadow-sm"
         >
           {tripRouteStatusMessage(routeStatus)}
         </p>
@@ -249,7 +249,7 @@ export const WorkspaceTripCanvas = React.forwardRef<
             data-static-schematic=""
             data-static-placeholder=""
             role="img"
-            aria-label={`Loading route preview for ${tripId}`}
+            aria-label="Loading route preview for this saved plan"
             className="h-[600px] w-full overflow-hidden rounded-[32px] border border-[var(--color-border)]"
             style={{
               background:
@@ -274,7 +274,7 @@ export const WorkspaceTripCanvas = React.forwardRef<
         <p
           role="status"
           data-testid="trip-route-status"
-          className="pointer-events-none absolute bottom-4 left-4 right-4 z-10 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.92)] px-4 py-3 text-sm text-[var(--color-muted-foreground)] shadow-sm"
+          className="pointer-events-none absolute bottom-4 left-4 right-4 z-10 rounded-xl border border-[var(--color-border)] bg-[rgba(247,250,249,0.92)] px-4 py-3 text-base leading-7 text-[var(--color-muted-foreground)] shadow-sm"
         >
           {tripRouteStatusMessage(routeStatus)}
         </p>
