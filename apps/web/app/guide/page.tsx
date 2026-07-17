@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { isFeatureEnabled } from "@repo/config";
-import { BetaUnavailable } from "../_components/beta-unavailable";
+import { BetaUnavailablePanel } from "../_components/beta-unavailable";
 
 /**
  * /guide — the operator onboarding index.
@@ -12,7 +12,7 @@ import { BetaUnavailable } from "../_components/beta-unavailable";
 export default function GuideIndex() {
   if (!isFeatureEnabled("guideBeta")) {
     return (
-      <BetaUnavailable
+      <BetaUnavailablePanel
         title="Specialist onboarding is in private beta"
         description="Rumia is onboarding a limited group of Portugal specialists while verification and operations are finalized."
       />

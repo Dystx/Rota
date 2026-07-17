@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { PublicRouteLayout } from "../../_components/public-route-layout";
 
 type Message = {
   id: string;
@@ -87,9 +86,8 @@ export function ExpertChat({ tripId, tripLabel = "Your saved day" }: ExpertChatP
   };
 
   return (
-    <PublicRouteLayout scene="utility" footerMode="none" surfaceTone="linen" surfaceTexture="none" navigation="none">
-      <div className="min-h-[calc(100vh-12rem)] flex flex-col font-body-md text-body-md">
-        <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full px-container-padding-sm py-8">
+    <div className="min-h-[calc(100dvh-5rem)] flex flex-col font-body-md text-body-md">
+      <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full px-container-padding-sm py-8">
           <h1 className="font-headline-lg text-headline-lg text-primary mb-2">Expert messages</h1>
           <p className="text-on-surface-variant mb-6">{tripLabel}</p>
           <section aria-live="polite" className="flex-1 rounded-2xl border border-olive-light/15 bg-white/70 p-5">
@@ -120,14 +118,13 @@ export function ExpertChat({ tripId, tripLabel = "Your saved day" }: ExpertChatP
               </div>
             )}
           </section>
-          {state !== "denied" && state !== "error" && (
-            <div className="mt-4 flex gap-2">
+        {state !== "denied" && state !== "error" && (
+            <div data-testid="chat-composer" className="mt-4 flex gap-2 pb-[env(safe-area-inset-bottom)]">
               <textarea aria-label="Message your specialist" value={input} onChange={(event) => setInput(event.target.value)} className="min-h-12 flex-1 rounded-xl border border-olive-light/20 p-3" placeholder="Write a message…" />
               <button type="button" onClick={() => void send()} disabled={sending || !input.trim()} className="rounded-xl bg-primary px-5 text-white disabled:opacity-50">{sending ? "Sending…" : "Send"}</button>
             </div>
-          )}
-        </div>
+        )}
       </div>
-    </PublicRouteLayout>
+    </div>
   );
 }

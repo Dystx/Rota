@@ -1,3 +1,4 @@
+import "@testing-library/jest-dom/vitest";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as React from "react";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -16,6 +17,8 @@ describe("ExpertChat", () => {
     render(<ExpertChat tripId="trip-42" />);
     await waitFor(() => expect(screen.getByTestId("chat-empty-state")).toBeDefined());
     expect(screen.queryByText(/Ana|Kyoto|sample/i)).toBeNull();
+    expect(screen.queryByText("Trip trip-42")).toBeNull();
+    expect(screen.getByText("Your saved day")).toBeDefined();
   });
 
   it("shows denied and provider-error states from the API", async () => {
@@ -25,6 +28,21 @@ describe("ExpertChat", () => {
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 500 }));
     render(<ExpertChat tripId="trip-42" />);
     await waitFor(() => expect(screen.getByTestId("chat-provider-error")).toBeDefined());
+    expect(screen.getByRole("button", { name: "Try again" })).toBeDefined();
+  });
+
+  it("offers a retry action after a provider failure", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(null, { status: 500 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ messages: [
+        { id: "specialist-1", authorRole: "specialist", body: "I found a quieter route." }
+      ] }), { status: 200 }));
+
+    render(<ExpertChat tripId="trip-42" />);
+    await waitFor(() => expect(screen.getByTestId("chat-provider-error")).toBeDefined());
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(screen.getByText("I found a quieter route.")).toBeDefined());
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("treats missing trips as denied for both reads and sends", async () => {
@@ -61,5 +79,14 @@ describe("ExpertChat", () => {
     expect(screen.queryByText("Missing id")).toBeNull();
     expect(screen.queryByText("Unknown author")).toBeNull();
     expect(screen.queryByText("   ")).toBeNull();
+  });
+
+  it("keeps the mobile composer above the safe-area inset", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ messages: [] }), { status: 200 }));
+
+    render(<ExpertChat tripId="trip-42" />);
+    await waitFor(() => expect(screen.getByTestId("chat-empty-state")).toBeDefined());
+
+    expect(screen.getByTestId("chat-composer")).toHaveClass("pb-[env(safe-area-inset-bottom)]");
   });
 });

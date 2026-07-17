@@ -1,12 +1,12 @@
+import * as React from "react";
 import { redirect } from "next/navigation";
 import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
-import { loadSessionOutcome } from "@/lib/auth/session-outcome";
-import { getSpecialistProfileByUserId } from "@repo/db";
+import { isSessionProviderFailure, loadSessionOutcome } from "@/lib/auth/session-outcome";
+import { getSpecialistProfileByUserId, isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
 import { isFeatureEnabled } from "@repo/config";
 import { GuideOnboardingForm } from "./_components/guide-onboarding-form";
 import { loadSpecialistCapabilities } from "./actions";
-import { BetaUnavailable } from "../../_components/beta-unavailable";
-import { PublicRouteLayout } from "../../_components/public-route-layout";
+import { BetaUnavailablePanel } from "../../_components/beta-unavailable";
 import { RouteRecovery } from "../../_components/route-recovery";
 
 /**
@@ -33,7 +33,7 @@ import { RouteRecovery } from "../../_components/route-recovery";
 export default async function GuideOnboardingPage() {
   if (!isFeatureEnabled("guideBeta")) {
     return (
-      <BetaUnavailable
+      <BetaUnavailablePanel
         title="Specialist onboarding is in private beta"
         description="This onboarding flow opens to approved specialists as verification capacity becomes available."
       />
@@ -42,11 +42,7 @@ export default async function GuideOnboardingPage() {
 
   const sessionOutcome = await loadSessionOutcome();
   if (sessionOutcome.kind === "unavailable") {
-    return (
-      <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
-        <RouteRecovery kind="unavailable" />
-      </PublicRouteLayout>
-    );
+    return <RouteRecovery kind="unavailable" />;
   }
   if (sessionOutcome.kind !== "ready") {
     redirect("/sign-in?next=/guide/onboarding");
@@ -55,28 +51,29 @@ export default async function GuideOnboardingPage() {
   const userId = sessionOutcome.session.user.id;
   const actorOutcome = await loadCurrentAuthorizedActorOutcome(sessionOutcome);
   if (actorOutcome.kind === "unavailable") {
-    return (
-      <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
-        <RouteRecovery kind="unavailable" />
-      </PublicRouteLayout>
-    );
+    return <RouteRecovery kind="unavailable" />;
   }
   if (actorOutcome.kind !== "ready" || actorOutcome.actor.userId !== userId) {
     redirect("/sign-in?next=/guide/onboarding");
   }
   const actor = actorOutcome.actor;
 
-  const existing = await getSpecialistProfileByUserId(userId, { actor });
-  // Capabilities (skills + languages) live in a
-  // separate table. Only load them when the specialist
-  // row exists; for a new user the form starts empty.
-  const initialCapabilities = existing
-    ? await loadSpecialistCapabilities(sessionOutcome)
-    : { skills: [], languages: [] };
+  let existing;
+  let initialCapabilities: { skills: readonly string[]; languages: readonly string[] };
+  try {
+    existing = await getSpecialistProfileByUserId(userId, { actor });
+    // Capabilities (skills + languages) live in a separate table. Only load
+    // them when the specialist row exists; a new candidate starts empty.
+    initialCapabilities = existing
+      ? await loadSpecialistCapabilities(sessionOutcome)
+      : { skills: [], languages: [] };
+  } catch (error) {
+    const unavailable = isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
+    return <RouteRecovery kind={unavailable ? "unavailable" : "error"} />;
+  }
 
   return (
-    <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
-      <div className="mx-auto w-full max-w-5xl px-container-padding-sm py-16 md:px-container-padding-md">
+    <div className="mx-auto w-full max-w-5xl px-container-padding-sm py-16 md:px-container-padding-md">
       <header className="rota-stack-tight mb-6">
         <h1 className="font-headline text-headline-lg text-foreground">
           Specialist onboarding
@@ -94,7 +91,6 @@ export default async function GuideOnboardingPage() {
         initialCapabilities={initialCapabilities}
         userId={userId}
       />
-      </div>
-    </PublicRouteLayout>
+    </div>
   );
 }

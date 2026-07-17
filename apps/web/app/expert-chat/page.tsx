@@ -4,8 +4,7 @@ import { redirect } from "next/navigation";
 import { Button } from "@repo/ui";
 import { isFeatureEnabled } from "@repo/config";
 import { getOwnedTrip } from "@/app/lib/trip-access";
-import { BetaUnavailable } from "../_components/beta-unavailable";
-import { PublicRouteLayout } from "../_components/public-route-layout";
+import { BetaUnavailablePanel } from "../_components/beta-unavailable";
 import { ExpertChat } from "./_components/expert-chat";
 
 /**
@@ -32,7 +31,7 @@ export default async function ExpertChatPage({
 
   if (!isFeatureEnabled("tripMessaging")) {
     return (
-      <BetaUnavailable
+      <BetaUnavailablePanel
         title="Expert messaging is not available yet"
         description="Messaging will become available here when trip messaging is enabled. Your itinerary and review status remain available from the trip itself."
         returnHref={tripId ? `/trip/${encodeURIComponent(tripId)}` : "/itineraries"}
@@ -42,8 +41,7 @@ export default async function ExpertChatPage({
 
   if (!tripId) {
     return (
-      <PublicRouteLayout scene="utility" footerMode="none" surfaceTone="linen" surfaceTexture="none" navigation="none">
-        <div className="min-h-[calc(100vh-12rem)] flex items-center justify-center">
+      <div className="min-h-[calc(100dvh-5rem)] flex items-center justify-center">
           <div
             data-testid="expert-chat-empty"
             className="mx-auto max-w-2xl px-container-padding-sm text-center"
@@ -66,8 +64,7 @@ export default async function ExpertChatPage({
               </Button>
             </div>
           </div>
-        </div>
-      </PublicRouteLayout>
+      </div>
     );
   }
 
@@ -84,7 +81,7 @@ export default async function ExpertChatPage({
   const reviewed = tripAccess.trip.hasHumanReview || tripAccess.trip.status === "reviewed";
   if (!tripAccess.trip.isPaid || !reviewed) {
     return (
-      <BetaUnavailable
+      <BetaUnavailablePanel
         title="Expert messaging is reserved for reviewed trips"
         description="Unlock your trip and complete the local specialist review before messaging becomes available."
         returnHref={`/trip/${encodeURIComponent(tripId)}`}

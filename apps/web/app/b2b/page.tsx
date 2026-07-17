@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation";
+import * as React from "react";
 import { isFeatureEnabled } from "@repo/config";
-import { BetaUnavailable } from "../_components/beta-unavailable";
+import { BetaUnavailablePanel } from "../_components/beta-unavailable";
+import { PublicRouteLayout } from "../_components/public-route-layout";
 
 /**
  * /b2b — the B2B partner gateway index.
@@ -11,14 +12,15 @@ import { BetaUnavailable } from "../_components/beta-unavailable";
  * default partner for unauthenticated visitors.
  */
 export default function B2bIndex() {
-  if (!isFeatureEnabled("b2bBeta")) {
-    return (
-      <BetaUnavailable
-        title="Partner workspaces are in private beta"
-        description="Rumia is preparing organization-specific travel workspaces. This surface is available only to approved partners during the beta."
+  const enabled = isFeatureEnabled("b2bBeta");
+  return (
+    <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
+      <BetaUnavailablePanel
+        title={enabled ? "Partner workspace access is not available" : "Partner workspaces are in private beta"}
+        description={enabled
+          ? "Partner workspaces require an approved invitation. Rumia does not disclose organization details before membership is verified."
+          : "Rumia is preparing organization-specific travel workspaces. This surface is available only to approved partners during the beta."}
       />
-    );
-  }
-
-  redirect("/b2b/rumia");
+    </PublicRouteLayout>
+  );
 }
