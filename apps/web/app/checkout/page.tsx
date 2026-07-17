@@ -87,6 +87,7 @@ export default async function CheckoutPage({
 
   const trip = tripAccess.trip;
   const tripHref = `/trip/${tripId}`;
+  const isPaid = trip.isPaid;
 
   const coverImage = trip ? resolveCoverImage(trip.brief) : null;
   const tripTitle = trip?.title ?? "Your trip is taking shape";
@@ -180,20 +181,46 @@ export default async function CheckoutPage({
                   id="checkout-heading"
                   className="font-display-mobile md:font-display text-display-mobile md:text-display text-primary mb-3"
                 >
-                  Keep shaping this day
+                  {isPaid ? "Your day is ready" : "Keep shaping this day"}
                 </h1>
                 <p className="font-headline-sm text-headline-sm text-on-surface-variant">
-                  Start with the clear activity brief, then add an optional
-                  editorial refinement when the day needs a closer read. Rumia
-                  never books, chooses accommodation, or takes over the plan.
+                  {isPaid
+                    ? "This saved day is unlocked. Open the trip workspace to review the route, export the day, or decide what deserves another look."
+                    : "Start with the clear activity brief, then add an optional editorial refinement when the day needs a closer read. Rumia never books, chooses accommodation, or takes over the plan."}
                 </p>
                 <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant/70 mt-3">
                   for your saved day
                 </p>
               </header>
 
-              <PackageSelector tripId={tripId} />
-              <div className="hidden grid grid-cols-1 md:grid-cols-2 gap-4" aria-hidden="true">
+              {isPaid ? (
+                <div
+                  data-testid="checkout-paid-state"
+                  className="flex min-h-64 flex-col justify-between gap-8 rounded-xl border border-olive-light/30 bg-olive-dark px-6 py-8 text-linen-dark shadow-[0_24px_64px_rgba(29,42,35,0.2)] md:px-8"
+                >
+                  <div className="max-w-xl">
+                    <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light">
+                      Already unlocked
+                    </p>
+                    <h2 className="mt-3 font-headline-lg text-headline-lg text-linen-dark">
+                      This day is already unlocked.
+                    </h2>
+                    <p className="mt-3 font-body-md text-body-md text-linen-dark/80">
+                      Your saved route and practical context are ready in the trip workspace. There is nothing else to purchase here.
+                    </p>
+                  </div>
+                  <Link
+                    href={tripHref}
+                    className="inline-flex w-fit items-center gap-2 rounded-full bg-ochre-light px-5 py-3 font-label-ui text-label-ui text-primary transition-colors hover:bg-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-olive-dark"
+                  >
+                    Open your day
+                    <Icon name="arrow-right" className="text-[18px]" />
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <PackageSelector tripId={tripId} />
+                  <div className="hidden grid grid-cols-1 md:grid-cols-2 gap-4" aria-hidden="true">
                 {/* Tier 1: Core AI (Included) */}
                 <div
                   data-testid="checkout-tier-core"
@@ -303,15 +330,17 @@ export default async function CheckoutPage({
                     )}
                   </div>
                 </div>
-              </div>
+                  </div>
 
-              {!tripId ? (
-                <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
-                  <Icon name="info" className="text-[18px]" />
-                  These tiers apply to a specific trip. Plan one first and
-                  the checkout options will land here automatically.
-                </p>
-              ) : null}
+                  {!tripId ? (
+                    <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+                      <Icon name="info" className="text-[18px]" />
+                      These tiers apply to a specific trip. Plan one first and
+                      the checkout options will land here automatically.
+                    </p>
+                  ) : null}
+                </>
+              )}
             </section>
           </div>
         </div>

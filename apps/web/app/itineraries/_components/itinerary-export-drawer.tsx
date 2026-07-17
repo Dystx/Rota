@@ -8,8 +8,8 @@
  *   (PDF, Calendar, Share Link) as radio-style cards
  * - "Execute Export" runs the selected option
  * - Closes on backdrop click, X button, or Escape key
- * - Locks body scroll while open and traps focus on the close
- *   button for keyboard users
+ * - Uses the shared Base UI side-sheet behavior for scroll locking and focus
+ *   containment while keeping the export-specific editorial surface here
  *
  * PDF: opens the trip page in a new tab. The trip page renders
  *   well in print; the user prints from there. (A future pass
@@ -24,7 +24,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { TripDraftListItem } from "@repo/db";
-import { Icon } from "@repo/ui";
+import { Icon, SideSheet, SideSheetClose } from "@repo/ui";
 
 type ExportOption = "pdf" | "calendar" | "share";
 
@@ -63,31 +63,8 @@ export function ItineraryExportDrawer({
 }) {
   const [selected, setSelected] = React.useState<ExportOption>("pdf");
   const [toast, setToast] = React.useState<string | null>(null);
-  const closeButtonRef = React.useRef<HTMLButtonElement | null>(null);
 
   const isOpen = trip !== null;
-
-  // Lock body scroll while the drawer is open and focus the
-  // close button for keyboard users.
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
-
-  // Close on Escape.
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, onClose]);
 
   // Reset the selected option and toast whenever a new trip is
   // opened so the drawer starts fresh each time.
@@ -136,33 +113,16 @@ export function ItineraryExportDrawer({
   }, [selected, trip, showToast]);
 
   return (
-    <div
-      aria-hidden={!isOpen}
-      className={`fixed inset-0 z-50 ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+    <SideSheet
+      open={isOpen}
+      title="Export options"
+      description="Choose how to carry this itinerary beyond Rumia."
+      onClose={onClose}
+      panelTestId="export-drawer"
+      backdropTestId="export-drawer-backdrop"
     >
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className={`absolute inset-0 bg-olive-dark/40 backdrop-blur-sm transition-opacity duration-300 ${
-          isOpen ? "opacity-100" : "opacity-0"
-        }`}
-        data-testid="export-drawer-backdrop"
-      />
-
-      {/* Drawer */}
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="export-drawer-title"
-        data-testid="export-drawer"
-        data-state={isOpen ? "open" : "closed"}
-        className={`absolute top-0 right-0 h-full w-full sm:w-[420px] bg-linen shadow-2xl border-l border-olive-light/30 flex flex-col transform transition-transform duration-300 ease-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        {trip ? <DrawerBody trip={trip} selected={selected} setSelected={setSelected} onClose={onClose} onExecute={handleExecute} toast={toast} closeButtonRef={closeButtonRef} /> : null}
-      </aside>
-    </div>
+      {trip ? <DrawerBody trip={trip} selected={selected} setSelected={setSelected} onExecute={handleExecute} toast={toast} /> : null}
+    </SideSheet>
   );
 }
 
@@ -170,18 +130,14 @@ function DrawerBody({
   trip,
   selected,
   setSelected,
-  onClose,
   onExecute,
   toast,
-  closeButtonRef,
 }: {
   trip: TripDraftListItem;
   selected: ExportOption;
   setSelected: (id: ExportOption) => void;
-  onClose: () => void;
   onExecute: () => void;
   toast: string | null;
-  closeButtonRef: React.RefObject<HTMLButtonElement | null>;
 }) {
   const subtitle = [trip.brief?.destinationCountry, trip.brief?.regions?.[0]]
     .filter(Boolean)
@@ -197,19 +153,17 @@ function DrawerBody({
         >
           Export Options
         </h2>
-        <button
-          ref={closeButtonRef}
-          onClick={onClose}
+        <SideSheetClose
           aria-label="Close export panel"
           data-testid="export-drawer-close"
           className="p-2 -mr-2 rounded-full text-on-surface-variant hover:bg-olive-light/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           <Icon name="x" className="text-[20px]" />
-        </button>
+        </SideSheetClose>
       </header>
 
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 pb-32">
+      <div className="relative z-0 min-h-0 flex-1 overflow-y-auto px-6 py-6 pb-32">
         {/* Selected itinerary summary */}
         <div
           data-testid="export-drawer-summary"
@@ -284,7 +238,7 @@ function DrawerBody({
       </div>
 
       {/* Footer with execute button */}
-      <footer className="border-t border-olive-light/30 px-6 py-4 bg-linen">
+      <footer className="absolute inset-x-0 bottom-0 z-20 border-t border-olive-light/30 px-6 py-4 bg-linen">
         {toast ? (
           <div
             role="status"

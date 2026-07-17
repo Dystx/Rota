@@ -77,6 +77,25 @@ describe("AccountPage recovery", () => {
     expect(loadCurrentAuthorizedActorOutcome).toHaveBeenCalledWith(sessionOutcome);
   });
 
+  it("marks the route as account settings", async () => {
+    const sessionOutcome = {
+      kind: "ready",
+      session: { user: { id: "traveler-1", email: "traveler@example.test" }, session: { id: "session-1" } }
+    } as const;
+    getCurrentUser.mockResolvedValue({
+      outcome: "ready",
+      sessionOutcome,
+      user: sessionOutcome.session.user,
+      session: sessionOutcome.session.session
+    });
+    loadCurrentAuthorizedActorOutcome.mockResolvedValue({ kind: "anonymous" });
+    getTripsForUser.mockResolvedValue([]);
+
+    render(await AccountPage());
+
+    expect(screen.getByTestId("account-settings")).toBeInTheDocument();
+  });
+
   it("sanitizes hostile saved-trip failures into typed recovery", async () => {
     const sessionOutcome = {
       kind: "ready",

@@ -59,6 +59,19 @@ describe("ItinerariesPage recovery", () => {
     expect(loadCurrentAuthorizedActorOutcome).toHaveBeenCalledWith(sessionOutcome);
   });
 
+  it("marks the route as the traveler archive", async () => {
+    getCurrentUser.mockResolvedValue({
+      outcome: "ready",
+      sessionOutcome: { kind: "ready", session: { user: { id: "traveler-1" }, session: { id: "session-1" } } },
+      user: { id: "traveler-1", email: "traveler@example.test" },
+      session: { id: "session-1" }
+    });
+
+    render(await ItinerariesPage({ searchParams: Promise.resolve({}) }));
+
+    expect(screen.getByTestId("itineraries-archive")).toBeInTheDocument();
+  });
+
   it("keeps anonymous access as a redirect rather than an outage", async () => {
     getCurrentUser.mockResolvedValue({ outcome: "anonymous", user: null, session: null });
 

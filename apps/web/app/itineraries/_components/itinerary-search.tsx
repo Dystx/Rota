@@ -1,9 +1,11 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import type { TripDraftListItem } from "@repo/db";
-import { Icon } from "@repo/ui";
+import { DecisionStatePanel, Icon } from "@repo/ui";
 import { ItineraryExportDrawer } from "./itinerary-export-drawer";
+import { resolveCoverImage } from "@/lib/trip-cover";
 
 /**
  * ItinerarySearch — small client island for the /itineraries page.
@@ -65,49 +67,85 @@ export function ItinerarySearch({ trips }: { trips: TripDraftListItem[] }) {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by title, country, region, or interest…"
+              placeholder="Search itineraries…"
               data-testid="itinerary-search-input"
-              className="w-full font-body-md text-body-md pl-11 pr-4 py-2.5 rounded-lg bg-white/70 border border-olive-light/30 focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light"
+              className="min-h-11 w-full font-body-md text-body-md pl-11 pr-4 py-2.5 rounded-lg bg-white/70 border border-olive-light/30 focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light"
             />
           </div>
         </label>
       </div>
       <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Filter itineraries by status" data-testid="itinerary-status-filter">
         {([['all','All'],['draft','Drafts'],['paid','Unlocked'],['in_review','In review'],['reviewed','Reviewed']] as const).map(([value,label]) => (
-          <button key={value} type="button" onClick={() => setStatusFilter(value)} aria-pressed={statusFilter === value} data-testid={`itinerary-filter-${value}`} className={`rounded-full border px-4 py-2 text-sm transition-colors ${statusFilter === value ? "border-olive-dark bg-olive-dark text-white" : "border-olive-light/30 bg-white/70 text-primary hover:bg-olive-light/10"}`}>
+          <button key={value} type="button" onClick={() => setStatusFilter(value)} aria-pressed={statusFilter === value} data-testid={`itinerary-filter-${value}`} className={`min-h-11 rounded-full border px-4 py-2 text-sm transition-colors ${statusFilter === value ? "border-olive-dark bg-olive-dark text-white" : "border-olive-light/30 bg-white/70 text-primary hover:bg-olive-light/10"}`}>
             {label}
           </button>
         ))}
       </div>
 
-      <p
-        data-testid="itinerary-result-count"
-        className="font-mono-micro text-mono-micro text-on-surface-variant/70 mb-4"
-      >
-        {visible.length === trips.length
-          ? `${trips.length} ${trips.length === 1 ? "itinerary" : "itineraries"}`
-          : `${visible.length} of ${trips.length} ${trips.length === 1 ? "itinerary" : "itineraries"}`}
-      </p>
-
       {visible.length === 0 ? (
-        <div
+        <DecisionStatePanel
           data-testid="itinerary-filtered-empty"
-          className="bg-glass-light/40 border border-olive-light/20 rounded-xl p-card-padding text-center"
+          kind="empty"
+          tone="inverse"
+          className="rounded-xl border-white/20 px-6 py-12"
+          title="No matching itineraries"
+          description={`No itineraries match "${query || statusFilter}". Try clearing the filter or planning a new trip.`}
+          illustration={<Icon name="magnifying-glass" aria-hidden />}
+          primaryAction={(
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setStatusFilter("all");
+              }}
+              data-testid="itinerary-clear-filters"
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-ochre-light px-5 font-label-ui text-label-ui text-primary transition-colors hover:bg-ochre-light/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+            >
+              Clear filters
+            </button>
+          )}
+          secondaryAction={(
+            <Link
+              href="/planner"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-linen-dark/30 px-5 font-label-ui text-label-ui text-linen-dark transition-colors hover:border-ochre-light hover:text-ochre-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+            >
+              Plan a new trip
+            </Link>
+          )}
         >
-          <p className="font-body-md text-body-md text-on-surface-variant">
-            No itineraries match{" "}
-            <span className="font-medium text-primary">"{query || statusFilter}"</span>
-            . Try clearing the filter or planning a new trip.
-          </p>
-        </div>
+        </DecisionStatePanel>
       ) : (
-        <ul role="list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter list-none p-0 m-0">
-          {visible.map((trip) => (
-            <li key={trip.id}>
-              <ItineraryCard trip={trip} onSelect={setSelectedTrip} />
-            </li>
-          ))}
-        </ul>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.64fr)] lg:items-stretch">
+          <section className="min-w-0" aria-labelledby="itinerary-results-heading">
+            <div className="mb-4 flex items-baseline justify-between gap-4">
+              <h2
+                id="itinerary-results-heading"
+                className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark"
+              >
+                Your saved work
+              </h2>
+              <p
+                data-testid="itinerary-result-count"
+                className="font-mono-micro text-mono-micro text-on-surface-variant/70"
+              >
+                {visible.length === trips.length
+                  ? `${trips.length} ${trips.length === 1 ? "itinerary" : "itineraries"}`
+                  : `${visible.length} of ${trips.length} ${trips.length === 1 ? "itinerary" : "itineraries"}`}
+              </p>
+            </div>
+            <ul
+              role="list"
+              className={`grid grid-cols-1 ${visible.length > 1 ? "md:grid-cols-2" : "md:grid-cols-1"} gap-gutter list-none p-0 m-0`}
+            >
+              {visible.map((trip) => (
+                <li key={trip.id}>
+                  <ItineraryCard trip={trip} onSelect={setSelectedTrip} />
+                </li>
+              ))}
+            </ul>
+          </section>
+          <ArchiveNextAction trip={visible[0] ?? trips[0]} />
+        </div>
       )}
 
       <ItineraryExportDrawer
@@ -115,6 +153,60 @@ export function ItinerarySearch({ trips }: { trips: TripDraftListItem[] }) {
         onClose={() => setSelectedTrip(null)}
       />
     </>
+  );
+}
+
+function ArchiveNextAction({ trip }: { trip: TripDraftListItem | undefined }) {
+  if (!trip) return null;
+
+  return (
+    <aside
+      data-testid="itinerary-next-action"
+      className="flex h-full min-h-[20rem] flex-col justify-between gap-8 overflow-hidden rounded-[var(--radius-card)] bg-primary p-card-padding text-linen-dark shadow-raised lg:sticky lg:top-28"
+      aria-labelledby="itinerary-next-action-heading"
+    >
+      <div className="grid gap-5">
+        <div className="flex items-start justify-between gap-4">
+          <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light">
+            One useful next step
+          </p>
+          <Icon name="arrow-up" aria-hidden className="text-ochre-light text-[20px]" />
+        </div>
+        <div className="grid gap-2">
+          <h2 id="itinerary-next-action-heading" className="font-headline-lg text-headline-lg leading-tight">
+            Keep one day in hand.
+          </h2>
+          <p className="max-w-prose font-body-md text-body-md leading-relaxed text-linen-dark/75">
+            Your archive is a starting point. Reopen the saved plan when you
+            want to compare its stops, keep its context, or carry it into an
+            export.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-3">
+        <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-linen-dark/55">
+          Saved day in focus
+        </p>
+        <p className="font-headline-sm text-headline-sm text-linen-dark">
+          {trip.title || "Untitled trip"}
+        </p>
+        <div className="grid gap-2 pt-2">
+          <Link
+            href={`/trip/${encodeURIComponent(trip.id)}`}
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-ochre-light px-5 py-3 font-label-ui text-label-ui font-semibold text-primary transition-colors hover:bg-ochre-light/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+          >
+            Open saved plan
+          </Link>
+          <Link
+            href="/explore"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-linen-dark/30 px-5 py-3 font-label-ui text-label-ui text-linen-dark transition-colors hover:border-ochre-light hover:text-ochre-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+          >
+            Shape another day
+          </Link>
+        </div>
+      </div>
+    </aside>
   );
 }
 
@@ -126,10 +218,9 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 /**
- * Cover gradients — same palette as the account trip card so
- * the two archive surfaces read as siblings. Unknown regions
- * and id-collisions hash into a deterministic 8-colour
- * fallback so a 3-column grid always has visual variety.
+ * Per-region gradient fallback for the cover area. The manifest-backed local
+ * artwork is the visible focal layer; the gradient remains underneath it so a
+ * slow or unavailable image never leaves a blank archive card.
  */
 const COVER_GRADIENTS: Record<string, string> = {
   lisbon: "linear-gradient(135deg, #F2C5A0 0%, #E08860 40%, #5A2A2E 85%, #1D2A23 100%)",
@@ -143,31 +234,6 @@ const COVER_GRADIENTS: Record<string, string> = {
   alentejo: "linear-gradient(135deg, #C9A876 0%, #8B7048 35%, #5C4828 75%, #2E2412 100%)",
   aveiro: "linear-gradient(135deg, #8FB8C8 0%, #5A8FA8 35%, #2E6080 75%, #143850 100%)",
   iberia: "linear-gradient(135deg, #8B6F47 0%, #5C4530 35%, #3A2D1E 75%, #1A1410 100%)"
-};
-
-const COVER_PALETTE: readonly string[] = [
-  "linear-gradient(135deg, #B89878 0%, #7A5C3A 35%, #4A3622 75%, #1F1610 100%)",
-  "linear-gradient(135deg, #C49542 0%, #8A6428 35%, #5C4520 75%, #2E2410 100%)",
-  "linear-gradient(135deg, #6F8FA8 0%, #4A6F88 35%, #2E4A60 75%, #142838 100%)",
-  "linear-gradient(135deg, #A87060 0%, #7A4838 35%, #4A2A20 75%, #1F1410 100%)",
-  "linear-gradient(135deg, #7AB5C8 0%, #4A8FA8 35%, #2A6080 75%, #0F3D55 100%)",
-  "linear-gradient(135deg, #8FB89E 0%, #5C8870 35%, #2E5848 75%, #143028 100%)",
-  "linear-gradient(135deg, #C49542 0%, #8A6428 50%, #4A3618 100%)",
-  "linear-gradient(135deg, #B89878 0%, #7A5C3A 50%, #3A2818 100%)"
-] as const;
-
-const hashString = (value: string): number => {
-  let hash = 5381;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = ((hash << 5) + hash + value.charCodeAt(i)) | 0;
-  }
-  return Math.abs(hash);
-};
-
-const coverGradient = (trip: TripDraftListItem): string => {
-  const first = trip.brief?.regions?.[0]?.toLowerCase().replace(/\s+/g, "-");
-  if (first && COVER_GRADIENTS[first]) return COVER_GRADIENTS[first];
-  return COVER_PALETTE[hashString(trip.id) % COVER_PALETTE.length] ?? COVER_PALETTE[0] ?? "linear-gradient(135deg, #5A2A2E 0%, #3A2D1E 50%, #1A1410 100%)";
 };
 
 function ItineraryCard({
@@ -184,7 +250,11 @@ function ItineraryCard({
   ]
     .filter(Boolean)
     .join(" · ");
-  const gradient = coverGradient(trip);
+  const firstRegion = trip.brief?.regions?.[0]?.toLowerCase().replace(/\s+/g, "-");
+  const gradient = (firstRegion && COVER_GRADIENTS[firstRegion])
+    ?? COVER_GRADIENTS.iberia
+    ?? "linear-gradient(135deg, #5A2A2E 0%, #3A2D1E 50%, #1A1410 100%)";
+  const cover = resolveCoverImage(trip.brief);
   return (
     <button
       type="button"
@@ -193,16 +263,22 @@ function ItineraryCard({
       aria-label={`Open export options for ${trip.title || "trip"}`}
       className="group block w-full text-left bg-glass-light backdrop-blur-md rounded-xl border border-white/20 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
     >
-      {/* Cover area — region-keyed gradient. 16:9 ratio so the
-          card has a clear visual anchor and the grid doesn't
-          feel like a CMS list. A subtle top→bottom dark overlay
-          keeps the gradient's brighter zones from washing the
-          title out. */}
+      {/* Cover area — local manifest-backed regional artwork over a
+          deterministic gradient fallback. The 16:9 ratio keeps the card
+          anchored in the archive grid without becoming a CMS list. */}
       <div
         className="relative w-full aspect-[16/9]"
         style={{ background: gradient }}
         aria-hidden="true"
       >
+        <img
+          data-testid={`itinerary-card-cover-image-${trip.id}`}
+          src={cover}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/50 via-transparent to-transparent" />
         <span
           className={`absolute top-2.5 left-2.5 font-mono-micro text-mono-micro uppercase tracking-widest px-2 py-0.5 rounded ${statusTone}`}

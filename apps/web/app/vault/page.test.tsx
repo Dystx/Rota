@@ -43,6 +43,7 @@ describe("VaultPage recovery", () => {
 
     render(await VaultPage());
 
+    expect(screen.getByTestId("vault-assets")).toBeInTheDocument();
     expect(screen.getByTestId("vault-gallery")).toHaveTextContent("0");
     expect(loadCurrentAuthorizedActorOutcome).not.toHaveBeenCalled();
   });

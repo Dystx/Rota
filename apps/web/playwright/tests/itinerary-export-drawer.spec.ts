@@ -7,10 +7,9 @@ import { createTravelerStorageState } from "../fixtures/traveler-auth";
 // primary action surface for a saved trip (PDF / Calendar /
 // Share) — opening it from a card is the happy path.
 //
-// We test the drawer using the unauthenticated public list
-// (which renders the dev seed trips via `getTripsForUser(null)`).
-// The traveler persona may have no trips in CI, so the
-// persona-tagged suite only checks that the page renders.
+// The traveler persona is seeded by global setup and owns the list rendered by
+// `/itineraries`. The drawer is portal-mounted only while open, so the tests
+// assert the closed/open behavior at the observable dialog boundary.
 //
 // We don't assert the export actions themselves (window.open,
 // clipboard, blob download) — those are exercised manually.
@@ -23,14 +22,11 @@ test.describe("@smoke @itinerary-export-drawer itineraries export drawer (travel
     const firstCard = page.locator('[data-testid^="itinerary-card-"]').first();
     await expect(firstCard).toBeVisible();
 
-    // The drawer is mounted but closed by default.
-    const drawer = page.getByTestId("export-drawer");
-    await expect(drawer).toHaveAttribute("data-state", "closed");
-
     await firstCard.click();
 
     // After click, the drawer is open and the summary is visible.
-    await expect(drawer).toHaveAttribute("data-state", "open");
+    const drawer = page.getByTestId("export-drawer");
+    await expect(drawer).toBeVisible();
     await expect(page.getByTestId("export-drawer-summary")).toBeVisible();
     await expect(page.getByTestId("export-drawer-execute")).toBeVisible();
   });
@@ -47,10 +43,11 @@ test.describe("@smoke @itinerary-export-drawer itineraries export drawer (travel
   test("close button dismisses the drawer", async ({ page }) => {
     await page.goto("/itineraries");
     await page.locator('[data-testid^="itinerary-card-"]').first().click();
-    await expect(page.getByTestId("export-drawer")).toHaveAttribute("data-state", "open");
+    const drawer = page.getByTestId("export-drawer");
+    await expect(drawer).toBeVisible();
 
     await page.getByTestId("export-drawer-close").click();
-    await expect(page.getByTestId("export-drawer")).toHaveAttribute("data-state", "closed");
+    await expect(drawer).toBeHidden();
   });
 
   test("PDF action navigates to the auto-print view (?view=print&print=1)", async ({ page, context }) => {

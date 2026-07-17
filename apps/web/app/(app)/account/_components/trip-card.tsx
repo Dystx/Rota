@@ -1,3 +1,4 @@
+import * as React from "react";
 import type { HTMLAttributes } from "react";
 import Link from "next/link";
 import type { TripBrief } from "@repo/types";
@@ -11,23 +12,10 @@ import { getTripCommerceState } from "@/lib/trip-commerce";
 import { resolveCoverImage } from "@/lib/trip-cover";
 
 /**
- * Per-region CSS gradient for the cover area. The SVG
- * covers in `/public/trip-covers/` exist but `<img>` rendering
- * of them in this card has been unreliable (the SVGs load
- * with 200 + correct content-type but the browser doesn't
- * paint them on top of the fallback gradient — the SVGs have
- * complex gradients + filters that some renderers drop). A
- * CSS gradient is always available and always renders.
- *
- * Two strategies here, blended:
- * 1. When the first region of the brief matches a known
- *    REGION_GRADIENTS key, use that (so Lisbon trips look
- *    like Lisbon, Porto like Porto, etc.).
- * 2. When the first region is unknown OR collides with
- *    another trip (the seeded data has 5 drafts all keyed
- *    "lisbon"), fall back to a hash of the trip ID against
- *    a palette of distinct gradients so every trip still
- *    gets its own cover.
+ * Per-region CSS gradient fallback for the cover area. The
+ * manifest-backed SVG is now the visible focal layer; the
+ * gradient remains underneath it so a slow or unavailable
+ * image never leaves a blank card.
  */
 const REGION_GRADIENTS: Record<string, string> = {
   lisbon: "linear-gradient(135deg, #F2C5A0 0%, #E08860 40%, #5A2A2E 85%, #1D2A23 100%)",
@@ -138,11 +126,6 @@ const STATUS_TONE: Record<string, "default" | "soft" | "glass"> = {
 };
 
 export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
-  // resolveCoverImage is still called so the function signature
-  // stays consistent with the trip page (the trip detail page
-  // uses the same helper), but the card renders a region-keyed
-  // CSS gradient instead of the SVG. See `regionGradient` for
-  // why.
   const cover = resolveCoverImage(trip.brief as TripBrief);
   const commerce = getTripCommerceState({
     hasHumanReview: trip.hasHumanReview,
@@ -154,27 +137,26 @@ export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
   return (
     <Card
       data-testid={`trip-item-${trip.id}`}
-      className="flex flex-col overflow-hidden transition-shadow"
+      className="group flex flex-col overflow-hidden transition-shadow"
       {...rest}
     >
-      {/* Cover area — region-keyed CSS gradient (see regionGradient
-          for why we don't use the SVG img). The 16:9 area renders
-          a distinct color per first-region-of-brief so Lisbon
-          trips look different from Porto trips. A subtle top-to-
-          bottom dark overlay sits on top so the title text below
-          the cover stays readable when the gradient is bright. */}
+      {/* Cover area — local manifest-backed regional artwork with a
+          deterministic gradient underneath as the loading/error fallback. */}
       <div
+        data-testid="account-trip-cover"
         className="relative w-full aspect-[16/9] overflow-hidden"
         style={{ background: gradient }}
         aria-hidden="true"
       >
+        <img
+          data-testid="account-trip-cover-image"
+          src={cover}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/50 via-transparent to-transparent" />
-        {/* Suppress the unused `cover` reference so eslint doesn't
-            flag it. The trip page still reads it; this card just
-            prefers the CSS gradient. */}
-        <span data-cover={cover} className="sr-only">
-          {trip.title}
-        </span>
       </div>
 
       <CardContent className="flex flex-1 flex-col gap-4 p-card-padding">
@@ -194,12 +176,12 @@ export function AccountTripCard({ trip, ...rest }: AccountTripCardProps) {
             status stack. Access + review state collapse to one
             readable sentence; saves ~30% card height and lets the
             grid breathe. */}
-        <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
           {commerce.canUnlock ? "Free shape · exports available after unlock" : commerce.accessLabel}
           {commerce.reviewLabel ? ` · ${commerce.reviewLabel.replace("Human review", "Specialist review")}` : ""}
         </p>
 
-        <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
           {trip.brief.regions.map(prettify).join(", ")} ·{" "}
           {trip.brief.tripLengthDays} days ·{" "}
           {trip.brief.interests.map(prettify).join(", ")}

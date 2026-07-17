@@ -41,7 +41,7 @@ export default async function VaultPage() {
   const trips = user && actor ? await getTripsForUser(user.id, 24, { actor }) : [];
   return (
     <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
-      <div className="rumia-vault-page flex flex-col font-body-md text-body-md">
+      <div className="rumia-vault-page flex flex-col font-body-md text-body-md" data-testid="vault-assets">
         <div className="flex-grow pt-[88px] pb-section-gap px-container-padding-sm md:px-container-padding-lg max-w-[1440px] mx-auto w-full flex flex-col md:flex-row gap-section-gap relative">
           <VaultGallery trips={trips} />
         </div>

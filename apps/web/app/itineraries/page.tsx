@@ -52,7 +52,7 @@ export default async function ItinerariesPage({
 
   return (
     <PublicRouteLayout scene="utility" footerMode="utility" surfaceTone="linen" surfaceTexture="none">
-      <div className="flex flex-col font-body-md">
+      <div className="flex flex-col font-body-md" data-testid="itineraries-archive">
         <div className="flex-1 px-container-padding-sm md:px-container-padding-lg max-w-7xl mx-auto w-full pt-8 pb-24">
           <header className="mb-8">
             <h1 className="font-display-mobile text-display-mobile md:font-display md:text-display text-primary mb-2">
