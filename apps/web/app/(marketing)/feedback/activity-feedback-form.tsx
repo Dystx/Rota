@@ -3,18 +3,21 @@
 import * as React from "react";
 
 type FeedbackSource = "activity-day" | "activity-detail" | "feedback-page";
+type FeedbackStatus = { kind: "success" | "error"; message: string } | null;
 
 export function ActivityFeedbackForm({
   activityIds,
+  activityTitles = [],
   source = "feedback-page"
 }: {
   activityIds: readonly string[];
+  activityTitles?: readonly string[];
   source?: FeedbackSource;
 }) {
   const [rating, setRating] = React.useState<number | null>(null);
   const [note, setNote] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [status, setStatus] = React.useState<string | null>(null);
+  const [status, setStatus] = React.useState<FeedbackStatus>(null);
 
   async function submit(): Promise<void> {
     if (!rating || activityIds.length === 0 || isSubmitting) return;
@@ -37,26 +40,43 @@ export function ActivityFeedbackForm({
       const message = body && typeof body === "object" && "message" in body && typeof body.message === "string" ? body.message : null;
 
       if (!response.ok) {
-        setStatus(message ?? "Feedback is temporarily unavailable. Please try again later.");
+        setStatus({
+          kind: "error",
+          message: message ?? "Feedback is temporarily unavailable. Please try again."
+        });
         return;
       }
 
-      setStatus(message ?? "Thanks — your feedback was recorded.");
+      setStatus({ kind: "success", message: message ?? "Thanks — your feedback was recorded." });
     } catch {
-      setStatus("Feedback is temporarily unavailable. Please try again later.");
+      setStatus({ kind: "error", message: "Feedback is temporarily unavailable. Please try again." });
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <section className="mt-10 grid gap-8 rounded-[28px] border border-[var(--color-border)] bg-white/45 p-6 shadow-sm backdrop-blur-sm md:p-8" aria-labelledby="feedback-heading">
+    <section className="rumia-feedback-form mt-10 grid gap-8 rounded-[28px] border border-[var(--color-border)] bg-white/45 p-6 shadow-sm backdrop-blur-sm md:p-8" aria-labelledby="feedback-heading">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">Improve the next judgement</p>
       <h2 id="feedback-heading" className="mt-3 font-display text-3xl text-primary">How did this day feel?</h2>
       <p className="mt-3 max-w-xl leading-relaxed text-on-surface-variant">Your rating is anonymous and helps us test whether Rumia&apos;s activity judgements hold up in the real world.</p>
 
+      <div className="rumia-feedback-form__context grid gap-3 rounded-[22px] border border-[var(--color-border)] bg-white/65 p-4">
+        <p className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-dark">
+          {activityIds.length} selected activities
+        </p>
+        {activityTitles.length > 0 ? (
+          <p className="text-base leading-7 text-on-surface-variant">
+            {activityTitles.join(" · ")}
+          </p>
+        ) : null}
+        <p className="text-base leading-7 text-on-surface-variant">
+          No account, email address, or booking details are collected here.
+        </p>
+      </div>
+
       <div className="mt-7" aria-label="Rate this day">
-        <p className="text-sm font-medium text-primary">Your rating</p>
+        <p className="text-base font-medium text-primary">Your rating</p>
         <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Rate this day from one to five">
           {[1, 2, 3, 4, 5].map((value) => (
             <button
@@ -73,7 +93,7 @@ export function ActivityFeedbackForm({
         </div>
       </div>
 
-      <label className="mt-7 block text-sm font-medium text-primary" htmlFor="activity-feedback-note">
+      <label className="mt-7 block text-base font-medium text-primary" htmlFor="activity-feedback-note">
         What would make this day better? <span className="font-normal text-on-surface-variant">(optional)</span>
       </label>
       <textarea
@@ -93,7 +113,15 @@ export function ActivityFeedbackForm({
       >
         {isSubmitting ? "Sending feedback…" : "Send feedback"}
       </button>
-      {status ? <p className="mt-4 text-sm text-on-surface-variant" role="status">{status}</p> : null}
+      {status ? (
+        <p
+          className="mt-4 text-base leading-7 text-on-surface-variant"
+          data-testid="feedback-status"
+          role={status.kind === "error" ? "alert" : "status"}
+        >
+          {status.message}
+        </p>
+      ) : null}
     </section>
   );
 }

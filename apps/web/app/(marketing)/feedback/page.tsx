@@ -31,9 +31,11 @@ export default async function FeedbackPage({
   searchParams: Promise<{ activity?: string | readonly string[]; source?: string }>;
 }) {
   const { activity, source } = await searchParams;
-  const activityIds = [...new Set(values(activity).map((id) => id.trim()))]
-    .filter((id) => Boolean(getReviewedActivityById(REVIEWED_ACTIVITY_SEED, id)))
+  const selectedActivities = [...new Set(values(activity).map((id) => id.trim()))]
+    .map((id) => getReviewedActivityById(REVIEWED_ACTIVITY_SEED, id))
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
     .slice(0, 5);
+  const activityIds = selectedActivities.map((item) => item.id);
 
   return (
     <PublicRouteLayout scene="utility" surfaceTone="linen" surfaceTexture="none" footerMode="compact">
@@ -55,11 +57,34 @@ export default async function FeedbackPage({
       />
 
       {activityIds.length > 0 ? (
-        <ActivityFeedbackForm activityIds={activityIds} source={feedbackSource(source)} />
+        <>
+          <section className="rumia-feedback-context" aria-labelledby="feedback-context-title">
+            <div className="grid gap-3">
+              <p className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-dark">
+                Selected day context
+              </p>
+              <h2 id="feedback-context-title" className="font-display text-3xl leading-tight text-primary">
+                You are rating the activities you actually kept.
+              </h2>
+            </div>
+            <ul className="grid gap-3 text-base leading-8 text-on-surface-variant">
+              {selectedActivities.map((item) => (
+                <li key={item.id} className="rounded-[22px] border border-[var(--color-border)] bg-white/55 px-5 py-4">
+                  {item.title}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <ActivityFeedbackForm
+            activityIds={activityIds}
+            activityTitles={selectedActivities.map((item) => item.title)}
+            source={feedbackSource(source)}
+          />
+        </>
       ) : (
-        <section className="mt-10 border-t border-[var(--color-border)] pt-8" aria-label="Choose activities before sharing feedback">
+        <section className="rumia-feedback-empty mt-10 border-t border-[var(--color-border)] pt-8" aria-label="Choose activities before sharing feedback">
           <h2 className="font-display text-3xl text-primary">Choose a day to review.</h2>
-          <p className="mt-3 max-w-xl leading-relaxed text-on-surface-variant">Feedback is tied only to activities you selected, so the signal stays useful to the editorial team.</p>
+          <p className="mt-3 max-w-xl leading-relaxed text-on-surface-variant">Feedback is tied only to activities you selected, so the signal stays useful to the editorial team and does not drift into generic travel opinions.</p>
           <Button asChild variant="primary" tone="ochre" className="mt-6 w-fit">
             <Link href="/explore">Explore Portugal activities</Link>
           </Button>

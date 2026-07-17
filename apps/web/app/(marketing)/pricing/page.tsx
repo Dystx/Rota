@@ -2,8 +2,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import * as React from "react";
 import { listCommerceProducts } from "@repo/payments";
-import { Button, CinematicMedia, SectionHeading } from "@repo/ui";
-import { CINEMATIC_MEDIA } from "@/content/cinematic-media-manifest";
+import { Button, SectionHeading } from "@repo/ui";
 import { EditorialProofRail } from "../_components/editorial-proof-rail";
 import { PublicRouteLayout } from "../../_components/public-route-layout";
 
@@ -19,54 +18,65 @@ export default function PricingPage() {
   const products = listCommerceProducts();
 
   return (
-      <PublicRouteLayout scene="utility" surfaceTone="linen" surfaceTexture="none" footerMode="compact">
-        <div className="rumia-quiet-page rumia-pricing-page mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
+    <PublicRouteLayout scene="utility" surfaceTone="linen" surfaceTexture="none" footerMode="compact">
+      <div className="rumia-quiet-page rumia-pricing-route mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
         <SectionHeading
           eyebrow="Optional, after your chosen day"
           title="Keep the decisions yours."
           description="Rumia is useful before you pay: compare judged activities, shape a day, and keep the list. Optional upgrades only appear when a saved day is ready for a fuller export or a specialist review."
           h1={true}
         />
-        <section
-          aria-labelledby="pricing-field-note-title"
-          className="grid gap-5"
-          data-testid="pricing-field-note"
-        >
-          <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_minmax(14rem,0.5fr)] md:items-end md:gap-10">
-            <div>
+
+        <section className="rumia-pricing-ledger" aria-labelledby="pricing-ledger-title">
+          <div className="rumia-pricing-ledger__copy">
+            <div className="grid gap-2">
               <p className="font-mono-micro text-mono-micro uppercase tracking-[0.2em] text-ochre-dark">
-                Field note / optional access
+                Utility ledger / optional access
               </p>
-              <h2 id="pricing-field-note-title" className="mt-2 max-w-2xl font-display text-3xl leading-tight text-primary md:text-4xl">
-                Pay for a clearer day, not a bigger promise.
+              <h2 id="pricing-ledger-title" className="max-w-2xl font-display text-3xl leading-tight text-primary md:text-4xl">
+                Start free, then add only the part that sharpens the same day.
               </h2>
+              <p className="max-w-2xl text-base leading-8 text-on-surface-variant">
+                The still stays visible because the point is restraint: a chosen day should feel clearer before it costs anything.
+              </p>
             </div>
-            <p className="max-w-sm text-base leading-7 text-primary/70 md:justify-self-end md:text-right">
-              The Douro still sets the tone: leave room around the choices before adding anything paid.
-            </p>
+
+            <section
+              aria-label="Free activity-day preview — Included"
+              className="rumia-pricing-free-preview"
+              data-testid="pricing-free-preview"
+            >
+              <p className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-light">
+                Recommended
+              </p>
+              <div className="grid gap-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-3">
+                  <h3 className="font-display text-3xl text-linen">Free activity-day preview</h3>
+                  <strong className="text-xl text-linen">€0</strong>
+                </div>
+                <p className="text-base leading-8 text-linen/78">
+                  Review judged activities, compare trade-offs, and shape a day before you decide whether anything paid is useful.
+                </p>
+              </div>
+              <Button asChild variant="secondary" tone="ochre" className="w-full sm:w-fit">
+                <Link href="/explore">Start with the free preview</Link>
+              </Button>
+            </section>
           </div>
-          <CinematicMedia
-            src={CINEMATIC_MEDIA.douroField.videoSrc}
-            poster={CINEMATIC_MEDIA.douroField.posterSrc}
-            fallbackSrc={CINEMATIC_MEDIA.douroField.fallbackSrc}
-            alt={CINEMATIC_MEDIA.douroField.alt}
-            caption="A considered day starts with enough room around it."
-            credit={CINEMATIC_MEDIA.douroField.attribution}
-            width={CINEMATIC_MEDIA.douroField.width}
-            height={CINEMATIC_MEDIA.douroField.height}
-            sizes="(min-width: 1024px) 1152px, 100vw"
-            priority
-            motionPolicy="poster-only"
-            loadStrategy="eager"
-            pauseWhenHidden
-            textSafeZone={CINEMATIC_MEDIA.douroField.textSafeZone}
-            mobileTextSafeZone={CINEMATIC_MEDIA.douroField.mobileTextSafeZone}
-            className="relative aspect-[4/3] min-h-[18rem] w-full rounded-[28px] shadow-overlay md:aspect-[16/6] md:min-h-[22rem]"
-            posterClassName="object-center brightness-[0.82] saturate-[0.9]"
-            overlayClassName="bg-gradient-to-t from-midnight/65 via-midnight/10 to-transparent"
-            testId="pricing-field-note-media"
-          />
+
+          <figure className="rumia-pricing-place" data-testid="pricing-place-image">
+            <img
+              src="/media/unsplash/douro-terraces.jpg"
+              alt="Terraced vineyards descending toward the Douro River in northern Portugal."
+              width={1600}
+              height={996}
+            />
+            <figcaption>
+              The image stays present because the free starting point should remain in the same first glance as the Portugal landscape it helps you judge.
+            </figcaption>
+          </figure>
         </section>
+
         <EditorialProofRail
           items={[
             { label: "Free first", value: "Explore and shape a day before payment." },
@@ -74,8 +84,8 @@ export default function PricingPage() {
             { label: "Independent", value: "No bookings, accommodation search, or on-trip support." }
           ]}
         />
+
         <div className="rumia-pricing-tiers divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
-          <TierRow name="Free activity-day preview" status="included" price="€0" delivery="Reviewed activities, practical context, and a day you can keep changing." limitation="No booking, reservation, or specialist review is implied." href="/explore" action="Explore what to do" />
           {products.map((product) => (
             <TierRow
               key={product.sku}
@@ -85,13 +95,14 @@ export default function PricingPage() {
               delivery={product.sku === "full_itinerary_v1" ? "A fuller saved-day version and export access after payment." : "A Portugal specialist checks pace, pairings, and practical context after export unlock."}
               limitation={product.sku === "full_itinerary_v1" ? "No bookings or accommodation search." : "Only available after the chosen day is unlocked; no bookings or on-trip concierge."}
               href={product.sku === "local_polish_v1" ? "/local-expertise" : "/planner"}
-              action={product.sku === "local_polish_v1" ? "Review the boundaries" : "Shape a chosen day"}
+              action={product.sku === "local_polish_v1" ? "Review the boundaries" : "Unlock the export later"}
             />
           ))}
           <TierRow name="On-trip concierge" status="future" price="Waitlist" delivery="A future higher-touch program, not part of the current Rumia product." limitation="Not available to buy; no on-trip support is promised today." href="/support" action="Ask about future access" />
         </div>
-        </div>
-      </PublicRouteLayout>
+
+      </div>
+    </PublicRouteLayout>
   );
 }
 

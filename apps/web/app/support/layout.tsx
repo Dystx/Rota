@@ -7,7 +7,7 @@ import { TopNav } from "../_components/top-nav";
 
 export default function SupportLayout({ children }: { children: ReactNode }) {
   return (
-    <AppLayout variant="marketing" topNav={<TopNav />} surface="linen" surfaceTexture="none" siteFooter={<SiteFooter variant="compact" />}>
+    <AppLayout variant="marketing" topNav={<TopNav />} surface="linen" surfaceTexture="none" siteFooter={<SiteFooter variant="utility" />}>
       {children}
     </AppLayout>
   );

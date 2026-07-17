@@ -1,13 +1,11 @@
+import * as React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
   Button,
-  Card,
-  CardContent,
   EditorialHeading,
-  EditorialRule,
+  EditorialRule
 } from "@repo/ui";
-import { EditorialProofRail } from "../_components/editorial-proof-rail";
 import { PublicRouteLayout } from "../../_components/public-route-layout";
 
 export const metadata: Metadata = {
@@ -16,102 +14,104 @@ export const metadata: Metadata = {
   alternates: { canonical: "/local-expertise" }
 };
 
-const REVIEW_PILLARS = [
-  {
-    index: "01",
-    title: "Pacing checked",
-    description:
-      "We look for days that are technically possible but tiring in practice, with enough room for a real pause."
-  },
-  {
-    index: "02",
-    title: "Context added",
-    description:
-      "We flag seasonal constraints, transfer friction, queues, and pairings that need more time or a calmer order."
-  },
-  {
-    index: "03",
-    title: "Boundaries clear",
-    description:
-      "Review does not include bookings, accommodation search, guarantees, or on-trip support."
-  }
+const REVIEW_CHECKS = [
+  "Pacing that looks possible on paper but feels cramped in practice.",
+  "Transfer friction, queues, and timing gaps between the activities you already saved.",
+  "Seasonal or weather caveats that could make a good-looking day disappointing."
+] as const;
+
+const REVIEW_BOUNDARIES = [
+  "No bookings, reservations, or accommodation search.",
+  "No guarantee that a venue, queue, or weather window will behave perfectly.",
+  "No live concierge or on-trip rescue once you are already moving through the day."
 ] as const;
 
 export default function LocalExpertisePage() {
   return (
     <PublicRouteLayout scene="cover" surfaceTone="midnight" surfaceTexture="none" footerMode="full">
-      <div className="mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
-      <EditorialHeading
-        eyebrow="Local judgement"
-        title="A second look at the day you chose."
-        dek="You choose the activities first. When a saved day needs more context, a Portugal specialist can pressure-test its shape and explain the trade-offs."
-      />
+      <div className="rumia-local-expertise-page mx-auto grid max-w-6xl gap-20 px-6 py-16 lg:gap-32 lg:px-12 lg:py-24">
+        <section className="rumia-local-expertise-hero" data-testid="local-expertise-evidence">
+          <div className="grid gap-6">
+            <EditorialHeading
+              eyebrow="Local judgement"
+              title="A second look at the day you chose."
+              dek="You choose the activities first. When a saved day needs more context, a Portugal specialist can pressure-test its shape and explain the trade-offs."
+            />
+            <div className="grid gap-3 rounded-[24px] border border-white/10 bg-white/8 p-5 text-linen/78">
+              <p className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-light">
+                Field-note evidence
+              </p>
+              <p className="text-base leading-8">
+                Review starts from the exact activities you already selected, then checks whether the day still holds together once pace, transfers, and on-the-ground friction are taken seriously.
+              </p>
+            </div>
+          </div>
 
-      <EditorialProofRail
-        items={[
-          { label: "Review begins", value: "After your chosen day has a shape." },
-          { label: "Specialist lens", value: "Pace, transfers, seasonality, and pairings." },
-          { label: "Boundary", value: "No booking, accommodation search, or on-trip support." }
-        ]}
-      />
+          <figure className="rumia-local-expertise-still">
+            <img
+              src="/media/unsplash/portugal-coast-golden-hour.jpg"
+              alt="Golden light over the Portuguese coast, used as a still image for the local expertise chapter."
+              width={1600}
+              height={1174}
+            />
+            <figcaption>Review clarifies a chosen day; it does not turn into a new itinerary brief.</figcaption>
+          </figure>
+        </section>
 
-      <section aria-labelledby="review-pillars" className="grid gap-8">
-        <div className="grid gap-3 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:items-end">
-          <p className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-dark">
-            What gets checked
-          </p>
-          <h2 id="review-pillars" className="max-w-2xl font-display text-3xl leading-tight tracking-tight text-primary md:text-4xl">
-            Useful context, not a different trip.
-          </h2>
-        </div>
+        <section aria-labelledby="review-checks" className="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="grid gap-3">
+            <p className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-dark">
+              Review lens
+            </p>
+            <h2 id="review-checks" className="font-display text-3xl leading-tight tracking-tight text-primary md:text-4xl">
+              What reviewers check
+            </h2>
+          </div>
+          <ul className="grid gap-3 text-base leading-8 text-on-surface-variant">
+            {REVIEW_CHECKS.map((item) => (
+              <li key={item} className="rounded-[22px] border border-[var(--color-border)] bg-white/55 px-5 py-4">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          {REVIEW_PILLARS.map((pillar) => (
-            <Card key={pillar.index} as="article" variant="outline" className="bg-white/45">
-              <CardContent className="grid gap-6 p-6 md:min-h-[220px] md:p-7">
-                <p className="font-mono-micro text-mono-micro tracking-[0.18em] text-ochre-dark">
-                  {pillar.index}
-                </p>
-                <div className="grid gap-3">
-                  <h3 className="font-display text-2xl leading-tight text-primary">
-                    {pillar.title}
-                  </h3>
-                  <p className="text-base leading-relaxed text-on-surface-variant">
-                    {pillar.description}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+        <EditorialRule />
 
-      <EditorialRule />
+        <section className="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="grid gap-3">
+            <p className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-dark">
+              Boundary
+            </p>
+            <h2 className="font-display text-3xl leading-tight tracking-tight text-primary md:text-4xl">
+              What they do not promise
+            </h2>
+          </div>
+          <ul className="grid gap-3 text-base leading-8 text-on-surface-variant">
+            {REVIEW_BOUNDARIES.map((item) => (
+              <li key={item} className="rounded-[22px] border border-[var(--color-border)] bg-white/55 px-5 py-4">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-      <section aria-labelledby="review-access" className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-        <div className="grid max-w-2xl gap-3">
-          <p className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-dark">
-            When it appears
-          </p>
-          <h2 id="review-access" className="font-display text-3xl leading-tight tracking-tight text-primary">
-            Keep exploring before you decide.
-          </h2>
-          <p className="text-base leading-relaxed text-on-surface-variant">
-            A review request is available only after the relevant chosen-day access is unlocked. Delivery timing and limits are shown before purchase.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-4">
+        <section className="rumia-local-expertise-turnaround grid gap-4 rounded-[28px] border border-ochre-dark/20 bg-ochre-light/10 p-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-8">
+          <div className="grid max-w-2xl gap-3">
+            <p className="font-metadata text-metadata uppercase tracking-[0.16em] text-ochre-dark">
+              Turnaround
+            </p>
+            <h2 className="font-display text-3xl leading-tight tracking-tight text-primary">
+              Most review requests return within 24 hours.
+            </h2>
+            <p className="text-base leading-8 text-on-surface-variant">
+              Timing is shown before purchase because this is a bounded editorial pass, not a live support channel.
+            </p>
+          </div>
           <Button asChild variant="secondary">
-            <Link href="/pricing">See optional access</Link>
+            <Link href="/pricing">See review access</Link>
           </Button>
-          <Link
-            href="/explore"
-            className="inline-flex min-h-11 items-center rounded-full px-2 text-sm font-medium text-primary underline-offset-4 hover:text-ochre-dark hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-          >
-            Explore activities
-          </Link>
-        </div>
-      </section>
+        </section>
       </div>
     </PublicRouteLayout>
   );

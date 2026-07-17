@@ -1,9 +1,11 @@
 import "@testing-library/jest-dom/vitest";
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 
 import PricingPage from "./page";
+
+afterEach(cleanup);
 
 describe("PricingPage", () => {
   it("renders truthful one-time tiers and keeps concierge as a waitlist", () => {
@@ -14,5 +16,15 @@ describe("PricingPage", () => {
     expect(screen.getByText(/Ask about future access/i)).toBeTruthy();
     expect(screen.getByRole("region", { name: /Free activity-day preview — Included/i })).toBeTruthy();
     expect(screen.getByRole("region", { name: /On-trip concierge — Future access/i })).toBeTruthy();
+  });
+
+  it("makes the free preview the only recommended pricing choice", () => {
+    render(<PricingPage />);
+
+    expect(screen.getAllByText(/recommended/i)).toHaveLength(1);
+    expect(screen.getByTestId("pricing-place-image")).toBeVisible();
+    expect(screen.getByTestId("pricing-free-preview")).toContainElement(
+      screen.getByRole("link", { name: /start with the free preview/i })
+    );
   });
 });

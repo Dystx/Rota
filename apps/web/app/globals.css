@@ -1221,161 +1221,17 @@ body {
   }
 }
 
-/* The explanatory pages need editorial structure, not a long unbroken linen
- * field. These panels keep the calm tone while giving each decision chapter
- * a visible beginning, middle, and end. */
-.rumia-how-page,
-.rumia-pricing-page {
-  gap: clamp(2.25rem, 4vw, 3.75rem) !important;
-  background:
-    radial-gradient(circle at 88% 8%, rgba(206, 147, 63, 0.1), transparent 24rem),
-    radial-gradient(circle at 8% 64%, rgba(60, 84, 71, 0.08), transparent 30rem),
-    var(--rumia-reading-field);
+/* Task 8 route-owned structures:
+ * How it works is a chapter sequence with alternating media/text panes.
+ * Pricing is a utility ledger with one recommended free starting point and a
+ * clearly visible still image. These selectors are intentionally uncoupled. */
+.rumia-how-route,
+.rumia-pricing-route {
+  gap: clamp(2.5rem, 4vw, 4rem) !important;
 }
 
-.rumia-how-page > :first-child,
-.rumia-pricing-page > :first-child {
-  position: relative;
-  max-width: 68rem;
-  overflow: hidden;
-  padding: clamp(2.25rem, 5vw, 4.5rem) clamp(1.5rem, 5vw, 4.5rem);
-  border: 1px solid rgba(234, 184, 117, 0.28);
-  border-radius: 0 1.75rem 1.75rem 0;
-  background:
-    radial-gradient(circle at 88% 14%, rgba(206, 147, 63, 0.2), transparent 17rem),
-    linear-gradient(132deg, rgba(16, 39, 29, 0.94) 0%, rgba(25, 55, 42, 0.84) 58%, rgba(13, 33, 24, 0.96) 100%),
-    url('/media/unsplash/porto-cobblestone-street.webp');
-  background-position: center, center, center 46%;
-  background-size: cover;
-  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.09);
-  color: var(--color-linen);
-}
-
-.rumia-pricing-page > :first-child {
-  background-image:
-    radial-gradient(circle at 88% 14%, rgba(206, 147, 63, 0.22), transparent 17rem),
-    linear-gradient(132deg, rgba(16, 39, 29, 0.94) 0%, rgba(25, 55, 42, 0.84) 58%, rgba(13, 33, 24, 0.96) 100%),
-    url('/media/unsplash/douro-terraces.webp');
-  background-position: center, center, center 52%;
-}
-
-.rumia-how-page > :first-child::after,
-.rumia-pricing-page > :first-child::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.62;
-  background:
-    repeating-radial-gradient(ellipse at 96% 6%, transparent 0 78px, rgba(234, 184, 117, 0.08) 79px 80px, transparent 81px 158px),
-    linear-gradient(118deg, transparent 0 58%, rgba(234, 184, 117, 0.08) 58.2%, transparent 58.4%);
-  mask-image: linear-gradient(180deg, black, transparent 90%);
-}
-
-.rumia-how-page > :first-child > *,
-.rumia-pricing-page > :first-child > * {
-  position: relative;
-  z-index: 1;
-}
-
-.rumia-how-page > :first-child > :first-child p,
-.rumia-pricing-page > :first-child > :first-child p {
-  color: rgba(239, 236, 230, 0.76) !important;
-}
-
-.rumia-how-page > :first-child > :first-child p:first-child,
-.rumia-pricing-page > :first-child > :first-child p:first-child {
-  color: var(--color-ochre-light) !important;
-}
-
-.rumia-how-page > :first-child > :first-child h1,
-.rumia-pricing-page > :first-child > :first-child h1 {
-  color: var(--color-linen) !important;
-}
-
-/* PageShell wraps bare content in one layout grid. Keep the chapter treatment
- * on the actual heading block rather than accidentally painting the whole
- * explanatory page dark. */
-.rumia-how-page > :first-child,
-.rumia-pricing-page > :first-child {
-  width: 100%;
-  margin-inline: auto;
-  max-width: 72rem;
-  gap: clamp(2.5rem, 4vw, 3.5rem) !important;
-  overflow: visible;
-  padding: clamp(3.5rem, 8vw, 7rem) clamp(1.5rem, 4vw, 3rem);
-  border: 0;
-  border-radius: 0;
-  background: transparent !important;
-  box-shadow: none;
-  color: inherit;
-}
-
-.rumia-how-page > :first-child > :first-child,
-.rumia-pricing-page > :first-child > :first-child {
-  position: relative;
-  max-width: 68rem;
-  overflow: hidden;
-  padding: clamp(2.25rem, 5vw, 4.5rem) clamp(1.5rem, 5vw, 4.5rem);
-  border: 1px solid rgba(234, 184, 117, 0.28);
-  border-radius: 0 1.75rem 1.75rem 0;
-  background:
-    radial-gradient(circle at 88% 14%, rgba(206, 147, 63, 0.2), transparent 17rem),
-    linear-gradient(132deg, #10271d 0%, #19372a 58%, #0d2118 100%);
-  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.09);
-  color: var(--color-linen);
-}
-
-.rumia-how-page > :first-child > :first-child::after,
-.rumia-pricing-page > :first-child > :first-child::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.62;
-  background:
-    repeating-radial-gradient(ellipse at 96% 6%, transparent 0 78px, rgba(234, 184, 117, 0.08) 79px 80px, transparent 81px 158px),
-    linear-gradient(118deg, transparent 0 58%, rgba(234, 184, 117, 0.08) 58.2%, transparent 58.4%);
-  mask-image: linear-gradient(180deg, black, transparent 90%);
-}
-
-.rumia-how-page > :first-child > :first-child > *,
-.rumia-pricing-page > :first-child > :first-child > * {
-  position: relative;
-  z-index: 1;
-}
-
-.rumia-how-page > :first-child > :first-child p,
-.rumia-pricing-page > :first-child > :first-child p {
-  color: rgba(239, 236, 230, 0.76) !important;
-}
-
-.rumia-how-page > :first-child > :first-child p:first-child,
-.rumia-pricing-page > :first-child > :first-child p:first-child {
-  color: var(--color-ochre-light) !important;
-}
-
-.rumia-how-page > :first-child > :first-child h1,
-.rumia-pricing-page > :first-child > :first-child h1 {
-  color: var(--color-linen) !important;
-}
-
-.rumia-how-page > :first-child > [data-testid="editorial-proof-rail"],
-.rumia-pricing-page > :first-child > [data-testid="editorial-proof-rail"] {
-  position: relative;
-  z-index: 1;
-  padding-inline: 0;
-}
-
-.rumia-how-page > :first-child > [data-testid="editorial-proof-rail"] dd,
-.rumia-pricing-page > :first-child > [data-testid="editorial-proof-rail"] dd,
-.rumia-how-page > :first-child > .rumia-process-grid p:not(:first-child),
-.rumia-pricing-page > :first-child > .rumia-pricing-tiers p {
-  color: var(--color-on-surface-variant) !important;
-}
-
-.rumia-how-page > [data-testid="editorial-proof-rail"],
-.rumia-pricing-page > [data-testid="editorial-proof-rail"] {
+.rumia-how-route [data-testid="editorial-proof-rail"],
+.rumia-pricing-route [data-testid="editorial-proof-rail"] {
   padding: 1.25rem clamp(1rem, 2vw, 1.5rem);
   border: 1px solid rgba(60, 84, 71, 0.13);
   border-radius: 1.25rem;
@@ -1383,63 +1239,205 @@ body {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 18px 44px rgba(22, 40, 31, 0.05);
 }
 
-.rumia-process-grid {
-  position: relative;
+.rumia-how-cover {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(2rem, 5vw, 4rem);
+  border: 1px solid rgba(234, 184, 117, 0.28);
+  border-radius: 0 2rem 2rem 0;
+  background:
+    radial-gradient(circle at 86% 12%, rgba(234, 184, 117, 0.24), transparent 17rem),
+    linear-gradient(132deg, #10271d 0%, #19372a 58%, #0d2118 100%);
+  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  color: var(--color-linen);
 }
 
-.rumia-process-grid::before {
+.rumia-how-cover .text-primary,
+.rumia-how-cover h1 {
+  color: var(--color-linen) !important;
+}
+
+.rumia-how-cover p:not([class*="font-metadata"]),
+.rumia-how-cover .text-on-surface-variant {
+  color: rgba(239, 236, 230, 0.76) !important;
+}
+
+.rumia-how-cover .text-ochre-dark,
+.rumia-how-cover .text-ochre-on-light {
+  color: var(--color-ochre-light) !important;
+}
+
+.rumia-how-cover__index {
+  display: grid;
+  gap: 0.85rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rumia-how-cover__index li {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 44px;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(234, 184, 117, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  text-transform: uppercase;
+}
+
+.rumia-how-cover__index span,
+.rumia-how-cover__index strong {
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+}
+
+.rumia-how-cover__index span {
+  color: var(--color-ochre-light);
+}
+
+.rumia-how-sequence {
+  display: grid;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rumia-how-chapter {
+  display: grid;
+  gap: 1.25rem;
+  align-items: stretch;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(60, 84, 71, 0.14);
+  border-radius: 1.75rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(241, 237, 228, 0.42));
+  box-shadow: 0 18px 44px rgba(22, 40, 31, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.rumia-how-chapter__media {
+  display: grid;
+  align-content: space-between;
+  gap: 1rem;
+  min-height: 12rem;
+  padding: 1.25rem;
+  border-radius: 1.4rem;
+  background:
+    radial-gradient(circle at 84% 14%, rgba(234, 184, 117, 0.22), transparent 10rem),
+    linear-gradient(136deg, rgba(16, 39, 29, 0.92) 0%, rgba(25, 55, 42, 0.78) 100%);
+  color: var(--color-linen);
+}
+
+.rumia-how-chapter__accent,
+.rumia-how-chapter__number {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ochre-light);
+}
+
+.rumia-how-chapter__number {
+  font-size: 1rem;
+}
+
+.rumia-how-chapter__note {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(239, 236, 230, 0.8);
+}
+
+.rumia-how-chapter[data-step="judgement"] .rumia-how-chapter__media {
+  background:
+    radial-gradient(circle at 84% 14%, rgba(206, 147, 63, 0.26), transparent 10rem),
+    linear-gradient(145deg, rgba(248, 244, 235, 0.96), rgba(236, 228, 214, 0.92));
+  color: var(--color-primary);
+}
+
+.rumia-how-chapter[data-step="judgement"] .rumia-how-chapter__accent,
+.rumia-how-chapter[data-step="judgement"] .rumia-how-chapter__number,
+.rumia-how-chapter[data-step="judgement"] .rumia-how-chapter__note {
+  color: var(--color-primary);
+}
+
+.rumia-how-chapter[data-step="control"] .rumia-how-chapter__media {
+  background:
+    radial-gradient(circle at 84% 14%, rgba(234, 184, 117, 0.2), transparent 10rem),
+    linear-gradient(132deg, #10271d 0%, #19382b 58%, #0d2017 100%);
+}
+
+.rumia-how-chapter[data-step="review"] .rumia-how-chapter__media {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(234, 184, 117, 0.22), transparent 10rem),
+    linear-gradient(145deg, rgba(248, 244, 235, 0.9), rgba(255, 255, 255, 0.82));
+  color: var(--color-primary);
+}
+
+.rumia-how-chapter[data-step="review"] .rumia-how-chapter__accent,
+.rumia-how-chapter[data-step="review"] .rumia-how-chapter__number,
+.rumia-how-chapter[data-step="review"] .rumia-how-chapter__note {
+  color: var(--color-primary);
+}
+
+.rumia-pricing-ledger {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.rumia-pricing-ledger__copy {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.rumia-pricing-free-preview {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(234, 184, 117, 0.18), transparent 15rem),
+    linear-gradient(132deg, #10271d 0%, #19382b 58%, #0d2017 100%);
+  box-shadow: 0 22px 52px rgba(22, 40, 31, 0.16), inset 0 1px 0 rgba(232, 255, 240, 0.12);
+}
+
+.rumia-pricing-place {
+  position: relative;
+  overflow: hidden;
+  min-height: 12rem;
+  border: 1px solid rgba(60, 84, 71, 0.15);
+  border-radius: 1.75rem;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 18px 44px rgba(22, 40, 31, 0.08);
+}
+
+.rumia-pricing-place::after {
   content: "";
   position: absolute;
-  top: 0.75rem;
-  right: 0;
-  left: 0;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(206, 147, 63, 0.42), rgba(60, 84, 71, 0.14), transparent);
+  inset: 0;
   pointer-events: none;
+  background: linear-gradient(180deg, rgba(16, 39, 29, 0.18), rgba(16, 39, 29, 0.32));
 }
 
-.rumia-process-grid li {
+.rumia-pricing-place img {
+  display: block;
+  width: 100%;
+  height: clamp(10rem, 34vw, 22rem);
+  object-fit: cover;
+}
+
+.rumia-pricing-place figcaption {
   position: relative;
-  min-height: 12rem;
-  padding: 1.5rem;
-  border: 1px solid rgba(60, 84, 71, 0.16);
-  border-radius: 1.25rem;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.74), var(--rumia-reading-field-wash));
-  box-shadow: 0 16px 38px rgba(22, 40, 31, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.76);
-  transition: transform 220ms var(--ease-standard), box-shadow 220ms var(--ease-standard), border-color 220ms var(--ease-standard);
-}
-
-.rumia-process-grid li:hover {
-  transform: translateY(-4px);
-  border-color: rgba(206, 147, 63, 0.42);
-  box-shadow: var(--rumia-shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.76);
-}
-
-.rumia-how-it-works li,
-.rumia-process-grid li {
-  animation: rumia-card-rise 620ms var(--ease-cinematic, cubic-bezier(0.2, 0, 0, 1)) both;
-}
-
-.rumia-how-it-works li:nth-child(2),
-.rumia-process-grid li:nth-child(2) { animation-delay: 70ms; }
-
-.rumia-how-it-works li:nth-child(3),
-.rumia-process-grid li:nth-child(3) { animation-delay: 140ms; }
-
-.rumia-how-it-works li:nth-child(4),
-.rumia-process-grid li:nth-child(4) { animation-delay: 210ms; }
-
-.rumia-process-grid li > p:first-child {
-  display: inline-flex;
-  min-width: 2.25rem;
-  min-height: 2.25rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  background: rgba(206, 147, 63, 0.14);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
+  z-index: 1;
+  margin: 0;
+  padding: 1rem 1.25rem 1.1rem;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--color-on-surface-variant);
+  background: rgba(247, 245, 239, 0.92);
 }
 
 .rumia-pricing-tiers {
@@ -1452,10 +1450,6 @@ body {
 .rumia-pricing-tiers [data-tier-state] {
   position: relative;
   padding-block: clamp(1.25rem, 2.5vw, 2rem);
-}
-
-.rumia-pricing-tiers [data-tier-state="included"] {
-  background: linear-gradient(110deg, rgba(60, 84, 71, 0.1), rgba(255, 255, 255, 0.12));
 }
 
 .rumia-pricing-tiers [data-tier-state="future"] {
@@ -1546,34 +1540,18 @@ body {
     font-size: 0.56rem;
   }
 
-  .rumia-process-grid::before {
-    top: 0;
-    right: auto;
-    bottom: 0;
-    left: 0.75rem;
-    width: 1px;
-    height: auto;
-    background: linear-gradient(180deg, rgba(206, 147, 63, 0.42), transparent);
-  }
-
-  .rumia-process-grid li {
-    min-height: auto;
-    padding: 1.25rem;
-  }
-
   .rumia-pricing-tiers [data-tier-state] {
     padding-inline: 1rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rumia-how-it-works li,
   .rumia-result-list > article,
   .rumia-workspace-list > li > article,
   .rumia-bento-card,
   .rumia-bento-card__media,
   .rumia-intent-submit,
-  .rumia-process-grid li,
+  .rumia-how-chapter,
   .rumia-operator-content > *,
   .rumia-chapter-close__primary {
     transition: none !important;
@@ -1581,8 +1559,7 @@ body {
   }
 
   .rumia-hero-intent,
-  .rumia-how-it-works li,
-  .rumia-process-grid li {
+  .rumia-how-chapter {
     animation: none !important;
   }
 }
@@ -1794,36 +1771,6 @@ a {
   box-shadow: var(--rumia-shadow-card);
 }
 
-.rumia-how-step:nth-child(2) {
-  background: linear-gradient(145deg, rgba(234, 184, 117, 0.14), rgba(255, 255, 255, 0.58));
-}
-
-.rumia-how-step:nth-child(3) {
-  border-color: rgba(234, 184, 117, 0.34);
-  background:
-    radial-gradient(circle at 86% 12%, rgba(234, 184, 117, 0.18), transparent 12rem),
-    linear-gradient(132deg, #10271d 0%, #19382b 58%, #0d2017 100%);
-  box-shadow: 0 22px 52px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(232, 255, 240, 0.12);
-}
-
-.rumia-how-step:nth-child(3) .text-primary,
-.rumia-how-step:nth-child(3) .text-on-surface-variant,
-.rumia-how-step:nth-child(3) .text-ochre-dark {
-  color: var(--color-linen) !important;
-}
-
-.rumia-how-page > :first-child > .rumia-process-grid li:nth-child(3) p.text-on-surface-variant {
-  color: rgba(239, 236, 230, 0.76) !important;
-}
-
-.rumia-how-step:nth-child(3) .text-ochre-dark {
-  color: var(--color-ochre-light) !important;
-}
-
-.rumia-how-step:nth-child(3)::after {
-  background: rgba(234, 184, 117, 0.55) !important;
-}
-
 .rumia-tier-row {
   position: relative;
   padding-inline: clamp(1.25rem, 3vw, 2rem);
@@ -1867,28 +1814,47 @@ a {
   color: var(--color-ochre-light) !important;
 }
 
-.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] p.text-on-surface-variant {
-  color: rgba(239, 236, 230, 0.76) !important;
-}
-
-.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] p.text-ochre-dark,
-.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] h2.text-primary,
-.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] strong.text-primary {
-  color: var(--color-ochre-light) !important;
-}
-
-.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] h2.text-primary,
-.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] strong.text-primary {
-  color: var(--color-linen) !important;
-}
-
-.rumia-pricing-page > :first-child > .rumia-pricing-tiers [data-tier-state="included"] a {
-  color: var(--color-linen) !important;
-  border-color: rgba(234, 184, 117, 0.58) !important;
-}
-
 .rumia-tier-row[data-tier-state="future"] {
   filter: saturate(0.7);
+}
+
+.rumia-local-expertise-hero {
+  display: grid;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.rumia-local-expertise-still {
+  overflow: hidden;
+  border-radius: 1.75rem;
+  border: 1px solid rgba(234, 184, 117, 0.26);
+  background:
+    radial-gradient(circle at 88% 12%, rgba(234, 184, 117, 0.2), transparent 14rem),
+    linear-gradient(132deg, rgba(16, 39, 29, 0.95) 0%, rgba(25, 56, 43, 0.84) 58%, rgba(13, 32, 23, 0.96) 100%);
+  box-shadow: 0 24px 64px rgba(22, 40, 31, 0.18), inset 0 1px 0 rgba(232, 255, 240, 0.12);
+}
+
+.rumia-local-expertise-still img {
+  display: block;
+  width: 100%;
+  height: clamp(16rem, 34vw, 26rem);
+  object-fit: cover;
+}
+
+.rumia-local-expertise-still figcaption {
+  padding: 1rem 1.25rem 1.1rem;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: rgba(239, 236, 230, 0.78);
+}
+
+.rumia-feedback-context {
+  display: grid;
+  gap: 1rem;
+}
+
+.rumia-feedback-form__context {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .rumia-legal-rail {
@@ -1926,5 +1892,9 @@ a {
 
   .rumia-tier-row:hover {
     transform: none;
+  }
+
+  .rumia-pricing-place img {
+    height: 10rem;
   }
 }
