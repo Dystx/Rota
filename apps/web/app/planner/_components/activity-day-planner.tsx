@@ -148,7 +148,7 @@ export function ActivityDayPlanner({
         <section className="mt-8 grid gap-7" aria-label="Day feasibility choices">
           <ChoiceChipGroup
             label="Available time"
-            labelClassName="text-linen-dark"
+            labelClassName="!text-linen-dark"
             multiple={false}
             options={Object.entries(dayTimes).map(([value, option]) => ({ value, label: option.label }))}
             selected={[dayTime]}
@@ -156,13 +156,13 @@ export function ActivityDayPlanner({
           />
           <ChoiceChipGroup
             label="Transport preference"
-            labelClassName="text-linen-dark"
+            labelClassName="!text-linen-dark"
             multiple={false}
             options={[{ value: "transit", label: "Transit & walking" }, { value: "car", label: "Rental car" }]}
             selected={[transport]}
             onChange={chooseTransport}
           />
-          <p className="text-sm leading-relaxed text-linen-dark/70">{transport === "transit" ? "Transit & walking is noted, but Rumia will not claim exact transfer times without your starting base." : "A rental car is noted, but Rumia will not claim exact driving time without your starting base."}</p>
+          <p className="text-base leading-7 text-linen-dark/70">{transport === "transit" ? "Transit & walking is noted, but Rumia will not claim exact transfer times without your starting base." : "A rental car is noted, but Rumia will not claim exact driving time without your starting base."}</p>
           <button className="inline-flex min-h-11 w-fit items-center bg-ochre-light px-5 py-3 text-sm font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-primary" type="button" onClick={() => setIsPreviewed(true)}>
             Preview this day
           </button>
@@ -198,7 +198,7 @@ function FeasibilityResult({
       {feasibility.kind === "comfortable" ? (
         <p className="mt-4 max-w-2xl leading-relaxed text-linen-dark/85">{feasibility.selectedMinutes} minutes of selected activity time fits {dayTime.toLowerCase()} on timing alone and leaves about {formatMinutes(feasibility.remainingMinutes)} unallocated. Use that time for a meal, a pause, or an actual transfer once you know your base.</p>
       ) : null}
-      <p className="mt-6 max-w-2xl text-sm leading-relaxed text-linen-dark/70">This is still an editable browser day. <Link className="font-medium text-ochre-light underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href={signInHref}>Sign in to keep this day</Link> and return to the same selections.</p>
+      <p className="mt-6 max-w-2xl text-base leading-7 text-linen-dark/70">This is still an editable browser day. <Link className="font-medium text-ochre-light underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light" href={signInHref}>Sign in to keep this day</Link> and return to the same selections.</p>
     </section>
   );
 }

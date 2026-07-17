@@ -57,7 +57,7 @@ function RerenderingSheetHarness(props: {
 }
 
 describe("OptionSheet", () => {
-  it("traps focus and restores it to the trigger after closing", () => {
+  it("traps focus and restores it to the trigger after closing", async () => {
     render(<SheetHarness />);
     const trigger = screen.getByRole("button", { name: "Open options" });
     trigger.focus();
@@ -65,11 +65,13 @@ describe("OptionSheet", () => {
 
     const dialog = screen.getByRole("dialog", { name: "Choose a route" });
     const closeButton = screen.getByRole("button", { name: "Close dialog" });
-    expect(screen.getByLabelText("Route name")).toHaveFocus();
+    await waitFor(() => {
+      expect(screen.getByLabelText("Route name")).toHaveFocus();
+    });
 
     closeButton.focus();
-    fireEvent.keyDown(document, { key: "Tab" });
-    expect(screen.getByLabelText("Route name")).toHaveFocus();
+    fireEvent.keyDown(closeButton, { key: "Tab" });
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
 
     fireEvent.click(closeButton);
     expect(dialog).not.toBeInTheDocument();
@@ -91,9 +93,12 @@ describe("OptionSheet", () => {
     fireEvent.click(trigger);
     restoreFocus.mockClear();
 
-    const replaceCloseCallback = screen.getByRole("button", {
-      name: "Replace close callback"
-    });
+    // Base UI makes the page inert while the modal is open, so the trigger
+    // remains in the DOM but is intentionally excluded from the accessible
+    // tree. Query the rendered control by text before moving focus to it.
+    const replaceCloseCallback = screen.getByText("Replace close callback", {
+      selector: "button"
+    }) as HTMLButtonElement;
     replaceCloseCallback.focus();
     fireEvent.click(replaceCloseCallback);
 

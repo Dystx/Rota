@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, StatPill } from "@repo/ui";
 import { TripBriefFormBoundary } from "./trip-brief-form";
 
 export const metadata: Metadata = {
-  title: "Shape a saved plan | Rumia",
+  title: "Shape a saved plan",
   description: "Set the time, pace, and practical context that should shape the activities you keep in Portugal.",
   alternates: {
     canonical: "/trip/new"
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function NewTripPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <section className="relative isolate w-full overflow-hidden border-b border-olive-light/20">
         <div className="absolute inset-0 w-full h-full -z-10">
           <div
@@ -23,8 +23,8 @@ export default function NewTripPage() {
                 "url('/hero/portugal-coast-golden-hour.svg')",
             }}
             />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-linen via-linen/80 to-linen/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-linen via-transparent to-transparent opacity-90" />
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[1200px] px-6 py-16 md:px-10 md:py-24">
@@ -46,7 +46,7 @@ export default function NewTripPage() {
               >
                 Find activities in Explore
               </Link>
-              <span className="text-sm text-on-surface-variant">
+              <span className="text-base text-on-surface-variant">
                 Or continue with a saved selection below.
               </span>
             </div>
@@ -75,21 +75,21 @@ export default function NewTripPage() {
             <CardContent className="grid gap-6">
               <div className="border-t border-olive-light/20 pt-5">
                 <p className="font-medium text-[var(--color-foreground)]">A believable pace</p>
-                <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                <p className="mt-2 text-base leading-7 text-on-surface-variant">
                   Fewer, better stops with time for the walk, meal, view, or pause that makes them worthwhile.
                 </p>
               </div>
 
               <div className="border-t border-olive-light/20 pt-5">
                 <p className="font-medium text-[var(--color-foreground)]">Useful local context</p>
-                <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                <p className="mt-2 text-base leading-7 text-on-surface-variant">
                   Season, transfers, effort, and nearby combinations stay visible when you shape what to do.
                 </p>
               </div>
 
               <div className="border-t border-olive-light/20 pt-5">
                 <p className="font-medium text-[var(--color-foreground)]">Your control</p>
-                <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                <p className="mt-2 text-base leading-7 text-on-surface-variant">
                   Save, remove, or reorder later. Rumia does not book, choose accommodation, or take over the day.
                 </p>
               </div>
@@ -98,7 +98,7 @@ export default function NewTripPage() {
 
           <div className="rounded-2xl border border-olive-light/20 bg-olive-light/10 p-5">
             <p className="font-label-ui text-label-ui uppercase tracking-[0.18em] text-primary/65">Need recommendations first?</p>
-            <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">Explore Portugal by situation, then return here when you have a shortlist worth shaping.</p>
+            <p className="mt-2 text-base leading-7 text-on-surface-variant">Explore Portugal by situation, then return here when you have a shortlist worth shaping.</p>
             <Link href="/explore" className="mt-4 inline-flex items-center font-label-ui text-label-ui text-primary underline decoration-olive-light/60 underline-offset-4 hover:decoration-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2">
               Browse worthwhile activities
             </Link>

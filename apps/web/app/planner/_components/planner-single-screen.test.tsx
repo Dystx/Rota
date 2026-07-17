@@ -1,7 +1,7 @@
 /// <reference types="@testing-library/jest-dom" />
 import "@testing-library/jest-dom/vitest";
 import * as React from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { REVIEWED_ACTIVITY_SEED } from "@/lib/content/activities";
 import { PlannerSingleScreen } from "./planner-single-screen";
@@ -19,9 +19,22 @@ describe("PlannerSingleScreen", () => {
     fireEvent.click(screen.getByRole("radio", { name: /Lisbon Tile-lined/i }));
     fireEvent.click(screen.getByRole("radio", { name: /5 days A different/i }));
     fireEvent.click(screen.getByRole("radio", { name: "Rental car" }));
-    expect(screen.getByRole("region", { name: "Trip summary" }).textContent).toContain("Lisbon");
-    fireEvent.click(screen.getByRole("button", { name: "Build my itinerary" }));
+    expect(screen.getByRole("region", { name: "Activity context" }).textContent).toContain("Lisbon");
+    fireEvent.click(screen.getByRole("button", { name: "Continue with this context" }));
     expect(push).toHaveBeenCalledWith(expect.stringContaining("destination=Lisbon"));
+  });
+
+  it("marks the selected place semantically and in the compact summary", () => {
+    render(<PlannerSingleScreen />);
+
+    const lisbon = screen.getByRole("radio", { name: /Lisbon Tile-lined/i });
+    expect(lisbon).toHaveAttribute("aria-checked", "false");
+
+    fireEvent.click(lisbon);
+
+    expect(lisbon).toHaveAttribute("aria-checked", "true");
+    expect(lisbon).toHaveAttribute("data-selected", "true");
+    expect(screen.getByTestId("planner-summary")).toHaveTextContent("Lisbon");
   });
 
   it("opens the travel window sheet and closes it with Escape", () => {
@@ -35,25 +48,45 @@ describe("PlannerSingleScreen", () => {
   it("routes every context edit button to a live option sheet", () => {
     render(<PlannerSingleScreen />);
     fireEvent.click(screen.getByRole("button", { name: "Edit destination" }));
-    expect(screen.getByRole("dialog", { name: /choose a destination/i })).toBeTruthy();
+    expect(screen.getByRole("dialog", { name: /where will you spend time/i })).toBeTruthy();
     fireEvent.keyDown(document, { key: "Escape" });
     fireEvent.click(screen.getByRole("button", { name: "Edit length" }));
-    expect(screen.getByRole("dialog", { name: /how long/i })).toBeTruthy();
+    expect(screen.getByRole("dialog", { name: /how much time/i })).toBeTruthy();
   });
 
   it("marks the primary action disabled while pending", () => {
     render(<PlannerSingleScreen />);
-    const action = screen.getByRole("button", { name: "Build my itinerary" });
+    const action = screen.getByRole("button", { name: "Continue with this context" });
     expect((action as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(action);
-    expect((screen.getByRole("button", { name: "Updating your route" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Saving this context" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("returns the continuation to an actionable state after navigation is accepted", async () => {
+    render(<PlannerSingleScreen />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue with this context" }));
+
+    await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect((screen.getByRole("button", { name: "Open this context again" }) as HTMLButtonElement).disabled).toBe(false));
+    expect(screen.getByRole("status").textContent).toContain("Context ready in the activity view.");
+  });
+
+  it("offers a retry when the navigation cannot be accepted", () => {
+    push.mockImplementationOnce(() => { throw new Error("navigation unavailable"); });
+    render(<PlannerSingleScreen />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue with this context" }));
+
+    expect((screen.getByRole("button", { name: "Retry context" }) as HTMLButtonElement).disabled).toBe(false);
+    expect(screen.getByRole("status").textContent).toContain("We could not open the activity view.");
   });
 
   it("keeps one focused option group on the mobile rail", () => {
     render(<PlannerSingleScreen />);
-    expect(screen.getByRole("button", { name: "Where" }).getAttribute("aria-pressed")).toBe("true");
-    fireEvent.click(screen.getByRole("button", { name: "How long" }));
-    expect(screen.getByRole("button", { name: "How long" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("button", { name: "Place" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Time" }));
+    expect(screen.getByRole("button", { name: "Time" }).getAttribute("aria-pressed")).toBe("true");
   });
 
   it("explains that direct entry starts with an activity decision", () => {
@@ -63,7 +96,14 @@ describe("PlannerSingleScreen", () => {
     expect(screen.getByTestId("planner-brief")).toBeTruthy();
     expect(screen.getByText("Start with an activity decision")).toBeTruthy();
     expect(screen.queryByText("Advanced day planning")).toBeNull();
-    expect(screen.getByRole("button", { name: "Build my itinerary" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Continue with this context" })).toBeTruthy();
+  });
+
+  it("labels the direct context as activity guidance rather than a saved trip", () => {
+    render(<PlannerSingleScreen />);
+
+    expect(screen.getByRole("region", { name: "Activity context" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Your trip" })).toBeNull();
   });
 
   it("shapes explicitly chosen activities without replacing them with a generic route brief", () => {
@@ -95,7 +135,7 @@ describe("PlannerSingleScreen", () => {
     expect(screen.getByRole("heading", { name: "Does this day fit?" })).toBeTruthy();
     expect(screen.getByText(/210 minutes of selected activity time/i)).toBeTruthy();
     expect(screen.getByText((_, element) => element?.tagName === "P" && element.textContent?.includes("leaves only about 1 hour unallocated") === true)).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Build my itinerary" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Continue with this context" })).toBeNull();
   });
 
   it("refuses to invent a single-day route from activities in different regions", () => {
