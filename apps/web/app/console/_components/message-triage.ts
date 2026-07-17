@@ -31,9 +31,18 @@ import {
   type TriageResult,
   TriageInputSchema
 } from "@repo/ai";
-import { consumePostgresTriageToken } from "@repo/db";
+import { consumePostgresTriageToken, isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
+import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
 
 const MAX_PER_MINUTE = 30;
+
+export type TriageActionResult =
+  | { kind: "ok"; result: TriageResult }
+  | { kind: "unauthenticated"; message: "Authentication required." }
+  | { kind: "forbidden"; message: "Forbidden." }
+  | { kind: "error"; message: "Invalid triage input." }
+  | { kind: "unavailable"; message: "This service is temporarily unavailable."; retryable: true };
 
 async function consumeToken(): Promise<"granted" | "limited" | "unavailable"> {
   try {
@@ -45,8 +54,30 @@ async function consumeToken(): Promise<"granted" | "limited" | "unavailable"> {
 
 export async function triageInboundMessage(
   input: unknown
-): Promise<TriageResult> {
-  const parsed = TriageInputSchema.parse(input);
+): Promise<TriageActionResult> {
+  let auth: Awaited<ReturnType<typeof getAdminPageAuthContext>>;
+  try {
+    auth = await getAdminPageAuthContext({ allCapabilities: ["operations:manage"] });
+  } catch (error) {
+    if (isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error)) {
+      return { kind: "unavailable", message: "This service is temporarily unavailable.", retryable: true };
+    }
+    return { kind: "unavailable", message: "This service is temporarily unavailable.", retryable: true };
+  }
+
+  if (!isAdminPageAuthContext(auth)) {
+    if (auth.reason === "unavailable") {
+      return { kind: "unavailable", message: "This service is temporarily unavailable.", retryable: true };
+    }
+    if (auth.reason === "unauthenticated") {
+      return { kind: "unauthenticated", message: "Authentication required." };
+    }
+    return { kind: "forbidden", message: "Forbidden." };
+  }
+
+  const parsedResult = TriageInputSchema.safeParse(input);
+  if (!parsedResult.success) return { kind: "error", message: "Invalid triage input." };
+  const parsed = parsedResult.data;
 
   // Always run the cheap keyword triage as a baseline so a rate-
   // limited caller still gets a useful result.
@@ -54,24 +85,24 @@ export async function triageInboundMessage(
 
   const token = await consumeToken();
   if (token === "limited") {
-    return {
+    return { kind: "ok", result: {
       ...keywordResult,
       rationale: `${keywordResult.rationale} (LLM path rate-limited; keyword fallback in use)`
-    };
+    } };
   }
   if (token === "unavailable") {
-    return {
+    return { kind: "ok", result: {
       ...keywordResult,
       rationale: `${keywordResult.rationale} (rate-limit store unavailable; keyword fallback in use)`
-    };
+    } };
   }
 
   try {
-    return await triageWithFallback(parsed);
+    return { kind: "ok", result: await triageWithFallback(parsed) };
   } catch (err) {
     // Triage is best-effort; never break the caller.
     // eslint-disable-next-line no-console
     console.warn("[@repo/ai] triage failed:", err instanceof Error ? err.message : err);
-    return keywordResult;
+    return { kind: "ok", result: keywordResult };
   }
 }

@@ -1,3 +1,11 @@
+import * as React from "react";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { DecisionStatePanel, OperatorShell } from "@repo/ui";
+import { requirePageAccess, requirementForHttpRoute } from "@/lib/auth/page-access";
+import { loadSessionOutcome } from "@/lib/auth/session-outcome";
+import { RouteRecovery } from "@/app/_components/route-recovery";
+
 /**
  * B2B developer portal docs (PR-15).
  *
@@ -13,28 +21,71 @@
  */
 
 export const metadata = {
-  title: "Developer API — Rumia"
+  title: "Developer API"
 };
 
-export default function DeveloperDocsPage() {
+export default async function DeveloperDocsPage() {
+  const headerList = await headers();
+  const currentPath = headerList.get("x-pathname") ?? headerList.get("next-url") ?? "/api/v1/docs";
+  const access = await requirePageAccess(requirementForHttpRoute(currentPath) ?? { anyRole: ["admin"], allCapabilities: ["developer_docs:read"] });
+
+  if (access.kind === "unavailable") {
+    return <RouteRecovery kind="unavailable" landmark="document" />;
+  }
+  if (access.kind === "unauthenticated") {
+    redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
+  }
+  if (access.kind === "forbidden") {
+    return (
+      <main id="main-content" className="min-h-screen bg-linen px-6 py-16">
+        <DecisionStatePanel
+          kind="error"
+          tone="light"
+          headingLevel={1}
+          title="Developer documentation is restricted"
+          description="This reference is only available to approved developer sessions."
+        />
+      </main>
+    );
+  }
+
+  const sessionOutcome = await loadSessionOutcome();
+  if (sessionOutcome.kind !== "ready") {
+    return <RouteRecovery kind="unavailable" landmark="document" />;
+  }
+
   return (
-    <main className="rota-page rota-page-pad">
-      <header className="rota-stack-tight mb-6">
-        <h1 className="font-headline text-headline-lg text-foreground">
+    <OperatorShell
+      section="developer"
+      currentPath={currentPath}
+      capabilities={access.actor.capabilities}
+      user={{
+        name: sessionOutcome.session.user.name || sessionOutcome.session.user.email || "Developer",
+        email: sessionOutcome.session.user.email ?? null,
+        avatarUrl: sessionOutcome.session.user.image ?? null
+      }}
+      signOutAction="/api/auth/sign-out"
+    >
+      <div id="developer-api-docs" data-testid="developer-api-docs" className="rumia-api-docs-page grid gap-8 text-on-surface">
+      <header className="grid gap-4 border-l-2 border-ochre-dark/60 pl-5 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:items-end md:gap-12">
+        <div>
+        <p className="rumia-type-label text-ochre-on-light">Developer surface · v1</p>
+        <h1 className="mt-3 rumia-type-display text-4xl text-primary md:text-6xl">
           Rumia API v1
         </h1>
-        <p className="text-on-surface-variant leading-loose max-w-2xl text-sm leading-relaxed">
+        </div>
+        <p className="max-w-2xl text-base leading-relaxed text-on-surface-variant md:text-lg">
           B2B partner API for the destination knowledge
           graph. The gateway is temporarily paused while
           its API-key ledger moves to private PostgreSQL.
         </p>
       </header>
 
-      <section className="rota-stack-tight mb-6">
-        <h2 className="font-headline text-headline-sm text-foreground">
+      <section className="grid gap-5 rounded-[var(--rumia-radius-dossier)] border border-[var(--rumia-border-subtle)] bg-white/65 p-5 shadow-[var(--rumia-shadow-dossier)] backdrop-blur-sm md:p-8" aria-labelledby="authentication-heading">
+        <h2 id="authentication-heading" className="rumia-type-section text-2xl text-primary">
           Authentication
         </h2>
-        <pre className="overflow-x-auto rounded-[14px] border border-[var(--color-border)] bg-surface-container p-4 text-xs leading-relaxed">
+        <pre className="whitespace-pre-wrap break-words rounded-[14px] border border-[var(--color-border)] bg-surface-container p-4 text-xs leading-relaxed">
 {`Authorization: Bearer rumia_live_<64 hex chars>`}
         </pre>
         <p className="text-on-surface-variant leading-loose text-sm">
@@ -45,8 +96,8 @@ export default function DeveloperDocsPage() {
         </p>
       </section>
 
-      <section className="rota-stack-tight mb-6">
-        <h2 className="font-headline text-headline-sm text-foreground">
+      <section className="grid gap-5 rounded-[var(--rumia-radius-dossier)] border border-[var(--rumia-border-subtle)] bg-white/65 p-5 shadow-[var(--rumia-shadow-dossier)] backdrop-blur-sm md:p-8" aria-labelledby="destinations-heading">
+        <h2 id="destinations-heading" className="rumia-type-section text-2xl text-primary">
           GET /api/v1/destinations
         </h2>
         <p className="text-sm text-foreground">
@@ -112,8 +163,8 @@ export default function DeveloperDocsPage() {
         </ul>
       </section>
 
-      <section className="rota-stack-tight">
-        <h2 className="font-headline text-headline-sm text-foreground">
+      <section className="grid gap-5 rounded-[var(--rumia-radius-dossier)] border border-ochre-dark/25 bg-ochre-light/10 p-5 md:p-8" aria-labelledby="roadmap-heading">
+        <h2 id="roadmap-heading" className="rumia-type-section text-2xl text-primary">
           Roadmap
         </h2>
         <p className="text-on-surface-variant leading-loose text-sm">
@@ -127,6 +178,7 @@ export default function DeveloperDocsPage() {
           <li>Webhook subscriptions for trip-status changes</li>
         </ul>
       </section>
-    </main>
+      </div>
+    </OperatorShell>
   );
 }

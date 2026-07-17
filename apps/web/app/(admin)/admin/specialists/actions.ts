@@ -16,7 +16,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { isPersistenceConfigError, setSpecialistVerified } from "@repo/db";
+import { isPersistenceConfigError, isSchemaDriftError, setSpecialistVerified } from "@repo/db";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
 
@@ -29,6 +29,8 @@ export type FlipInput = z.infer<typeof FlipInputSchema>;
 
 export type FlipResult =
   | { kind: "ok"; id: string }
+  | { kind: "unauthenticated"; message: "Authentication required." }
+  | { kind: "forbidden"; message: "Forbidden." }
   | { kind: "error"; message: string }
   | { kind: "unavailable"; message: string; retryable: true; status: 503 };
 
@@ -42,12 +44,14 @@ const unavailableResult: FlipResult = {
 export async function flipVerification(
   input: FlipInput
 ): Promise<FlipResult> {
-  const auth = await getAdminPageAuthContext();
+  const auth = await getAdminPageAuthContext({ allCapabilities: ["specialists:verify"] });
   if ("reason" in auth && auth.reason === "unavailable") {
     return unavailableResult;
   }
   if (!isAdminPageAuthContext(auth)) {
-    return { kind: "error", message: "Admin only" };
+    return auth.reason === "unauthenticated"
+      ? { kind: "unauthenticated", message: "Authentication required." }
+      : { kind: "forbidden", message: "Forbidden." };
   }
 
   const parsed = FlipInputSchema.safeParse(input);
@@ -67,9 +71,9 @@ export async function flipVerification(
     revalidatePath("/guide/onboarding");
     return { kind: "ok", id: updated.id };
   } catch (error) {
-    if (isPersistenceConfigError(error) || isSessionProviderFailure(error)) {
+    if (isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error)) {
       return unavailableResult;
     }
-    throw error;
+    return { kind: "error", message: "Could not update specialist verification." };
   }
 }

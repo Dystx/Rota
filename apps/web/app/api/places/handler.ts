@@ -10,7 +10,7 @@ export type PlacesRouteDependencies = {
 };
 
 export async function handlePlacesGetRequest(dependencies: PlacesRouteDependencies = {}) {
-  const requireAdmin = dependencies.requireAdmin ?? (() => requireApiRole(["admin"]));
+  const requireAdmin = dependencies.requireAdmin ?? (() => requireApiRole(["admin"], ["content:manage"]));
   const listPlaceRecords = dependencies.listPlaceRecords ?? listPlaces;
   const auth = await requireAdmin();
   if (isApiResponse(auth)) return auth;
@@ -26,7 +26,7 @@ export async function handlePlacesGetRequest(dependencies: PlacesRouteDependenci
 }
 
 export async function handlePlacesPostRequest(request: Request, dependencies: PlacesRouteDependencies = {}) {
-  const requireAdmin = dependencies.requireAdmin ?? (() => requireApiRole(["admin"]));
+  const requireAdmin = dependencies.requireAdmin ?? (() => requireApiRole(["admin"], ["content:manage"]));
   const createPlaceRecord = dependencies.createPlaceRecord ?? createPlace;
   const writeAuditTrailRecord = dependencies.writeAuditTrailRecord ?? writeAuditTrail;
   const auth = await requireAdmin();

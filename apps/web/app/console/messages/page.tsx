@@ -60,11 +60,12 @@ export default function ConsoleMessagesPage() {
         const data = (await response.json()) as {
           ok?: boolean;
           messages?: ChatMessage[];
+          message?: string;
           error?: string;
         };
         if (cancelled) return;
         if (!response.ok || !data.ok) {
-          setMessagesError(data.error ?? `HTTP ${response.status}`);
+          setMessagesError(data.message ?? data.error ?? `HTTP ${response.status}`);
           setMessages([]);
           return;
         }
@@ -98,6 +99,7 @@ export default function ConsoleMessagesPage() {
         const data = (await response.json()) as {
           ok?: boolean;
           events?: ItineraryEvent[];
+          message?: string;
           error?: string;
         };
         if (!response.ok || !data.ok) {
@@ -135,10 +137,11 @@ export default function ConsoleMessagesPage() {
         const data = (await response.json()) as {
           ok?: boolean;
           id?: string;
+          message?: string;
           error?: string;
         };
         if (!response.ok || !data.ok || !data.id) {
-          return { ok: false, error: data.error ?? `HTTP ${response.status}` };
+          return { ok: false, error: data.message ?? data.error ?? `HTTP ${response.status}` };
         }
         return { ok: true, id: data.id };
       } catch (error) {
@@ -170,10 +173,11 @@ export default function ConsoleMessagesPage() {
           ok?: boolean;
           id?: string;
           createdAt?: string;
+          message?: string;
           error?: string;
         };
         if (!response.ok || !data.ok || !data.id || !data.createdAt) {
-          return { ok: false, error: data.error ?? `HTTP ${response.status}` };
+          return { ok: false, error: data.message ?? data.error ?? `HTTP ${response.status}` };
         }
         return { ok: true, id: data.id, createdAt: data.createdAt };
       } catch (error) {
@@ -189,7 +193,7 @@ export default function ConsoleMessagesPage() {
 
   return (
     <>
-      <div className="md:ml-64 min-w-0 min-h-screen flex flex-col bg-background relative overflow-x-hidden">
+      <div className="min-w-0 min-h-screen flex flex-col bg-background relative overflow-x-hidden">
         <div
           aria-hidden
           className="fixed inset-0 z-0 bg-cover bg-center opacity-40 blur-sm pointer-events-none"
@@ -203,7 +207,7 @@ export default function ConsoleMessagesPage() {
           className="fixed inset-0 z-0 bg-glass-light/30 pointer-events-none"
         />
 
-        <main id="main-content" className="relative z-10 flex-1 min-h-screen lg:h-screen flex flex-col lg:flex-row gap-4 p-container-padding-sm overflow-y-auto lg:overflow-hidden">
+        <div className="relative z-10 flex-1 min-h-screen lg:h-screen flex flex-col lg:flex-row gap-4 p-container-padding-sm overflow-y-auto lg:overflow-hidden">
           <h1 className="sr-only">Messaging Hub</h1>
           <p className="absolute top-2 left-1/2 -translate-x-1/2 z-20 rounded-full border border-ochre-light/40 bg-primary/90 px-3 py-1 font-mono-micro text-mono-micro uppercase tracking-wider text-ochre-light shadow-sm">
             Demo data · Portugal sample itinerary
@@ -243,11 +247,11 @@ export default function ConsoleMessagesPage() {
             onRefreshRecent={loadRecentEvents}
             onPush={pushItineraryEvent}
           />
-        </main>
+        </div>
       </div>
       <style>{`
-        main ::-webkit-scrollbar { width: 6px; }
-        main ::-webkit-scrollbar-thumb {
+        .rumia-operator-main ::-webkit-scrollbar { width: 6px; }
+        .rumia-operator-main ::-webkit-scrollbar-thumb {
           background-color: rgba(60, 84, 71, 0.2); border-radius: 9999px;
         }
       `}</style>

@@ -4,7 +4,7 @@ import type { AuthorizedApiContext } from "@/lib/auth/api";
 import { handlePlacesGetRequest, handlePlacesPostRequest } from "./handler";
 
 const adminAuth = {
-  actor: { capabilities: [], reviewerId: null, roles: ["admin"], userId: "admin-user-123" },
+  actor: { capabilities: ["content:manage"], reviewerId: null, roles: ["admin"], userId: "admin-user-123" },
   reviewerId: null,
   role: "admin",
   userId: "admin-user-123"
@@ -40,10 +40,8 @@ describe("places admin API authorization", () => {
       requireAdmin: async () =>
         Response.json(
           {
-            error: {
-              code: "unauthenticated",
-              message: "Authentication required."
-            }
+            code: "unauthenticated",
+            message: "Authentication required."
           },
           { status: 401 }
         )
@@ -52,10 +50,8 @@ describe("places admin API authorization", () => {
     expect(response.status).toBe(401);
     expect(listCalled).toBe(false);
     await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "unauthenticated",
-        message: "Authentication required."
-      }
+      code: "unauthenticated",
+      message: "Authentication required."
     });
   });
 
@@ -69,10 +65,8 @@ describe("places admin API authorization", () => {
       requireAdmin: async () =>
         Response.json(
           {
-            error: {
-              code: "forbidden",
-              message: "Forbidden."
-            }
+            code: "forbidden",
+            message: "Forbidden."
           },
           { status: 403 }
         )
@@ -81,10 +75,8 @@ describe("places admin API authorization", () => {
     expect(response.status).toBe(403);
     expect(createCalled).toBe(false);
     await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "forbidden",
-        message: "Forbidden."
-      }
+      code: "forbidden",
+      message: "Forbidden."
     });
   });
 

@@ -53,7 +53,7 @@ export async function insertItineraryEvent(
   authorizedAdmin?: AdminPageAuthContext
 ): Promise<InsertItineraryEventResult> {
   const input = InsertPayloadSchema.parse(rawInput);
-  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext({ allCapabilities: ["operations:manage"] });
   if (!isAdminPageAuthContext(admin)) {
     throw new Error(
       `insertItineraryEvent requires an admin actor (got: ${admin.reason})`
@@ -75,7 +75,7 @@ export async function listItineraryEvents(
   authorizedAdmin?: AdminPageAuthContext
 ): Promise<ItineraryEventRow[]> {
   const input = ListPayloadSchema.parse(rawInput);
-  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext({ allCapabilities: ["operations:manage"] });
   if (!isAdminPageAuthContext(admin)) throw new Error(`listItineraryEvents requires an admin actor (got: ${admin.reason})`);
   const rows = await listPostgresItineraryEvents({ conversationId: input.conversationId, limit: input.limit }, admin.actor);
   return rows.map((row) => ({

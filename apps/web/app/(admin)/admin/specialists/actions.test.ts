@@ -50,10 +50,17 @@ describe("flipVerification", () => {
     expect(mocks.setSpecialistVerified).not.toHaveBeenCalled();
   });
 
-  test("preserves the admin-only result for an authenticated non-admin", async () => {
+  test("returns a sanitized forbidden result for a limited or non-admin session", async () => {
     mocks.getAdminPageAuthContext.mockResolvedValue({ reason: "forbidden", status: 403 });
 
-    await expect(flipVerification(input)).resolves.toEqual({ kind: "error", message: "Admin only" });
+    await expect(flipVerification(input)).resolves.toEqual({ kind: "forbidden", message: "Forbidden." });
+    expect(mocks.setSpecialistVerified).not.toHaveBeenCalled();
+  });
+
+  test("returns a sanitized unauthenticated result", async () => {
+    mocks.getAdminPageAuthContext.mockResolvedValue({ reason: "unauthenticated", status: 401 });
+
+    await expect(flipVerification(input)).resolves.toEqual({ kind: "unauthenticated", message: "Authentication required." });
     expect(mocks.setSpecialistVerified).not.toHaveBeenCalled();
   });
 

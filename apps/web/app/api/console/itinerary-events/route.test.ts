@@ -71,8 +71,8 @@ describe("console itinerary event route recovery", () => {
     expect(response.status).toBe(503);
     const payload = await response.json();
     expect(payload).toEqual({
-      ok: false,
-      error: "This service is temporarily unavailable. Please try again shortly."
+      code: "unavailable",
+      message: "This service is temporarily unavailable. Please try again shortly."
     });
     expect(JSON.stringify(payload)).not.toMatch(/DATABASE_URL|ECONNREFUSED|SQL|stack/i);
   });
@@ -84,7 +84,7 @@ describe("console itinerary event route recovery", () => {
 
     expect(response.status).toBe(500);
     const payload = await response.json();
-    expect(payload).toEqual({ ok: false, error: "Could not load timeline events." });
+    expect(payload).toEqual({ code: "internal_error", message: "Could not load timeline events." });
     expect(JSON.stringify(payload)).not.toMatch(/DATABASE_URL|ECONNREFUSED|SQL|stack/i);
   });
 
@@ -96,7 +96,28 @@ describe("console itinerary event route recovery", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(503);
-    expect(payload).toEqual({ ok: false, error: "This service is temporarily unavailable. Please try again shortly." });
+    expect(payload).toEqual({ code: "unavailable", message: "This service is temporarily unavailable. Please try again shortly." });
     expect(JSON.stringify(payload)).not.toMatch(/DATABASE_URL|SQLSTATE|schema details/i);
+  });
+
+  test("denies limited capability before parsing or calling the store", async () => {
+    mocks.getAdminPageAuthContext.mockResolvedValue({ reason: "forbidden", status: 403 });
+    mocks.isAdminPageAuthContext.mockReturnValue(false);
+
+    const response = await POST(request("POST", "/api/console/itinerary-events", {}));
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({ code: "forbidden", message: "Forbidden." });
+    expect(mocks.insertItineraryEvent).not.toHaveBeenCalled();
+  });
+
+  test("returns the shared sanitized validation envelope", async () => {
+    const response = await POST(request("POST", "/api/console/itinerary-events", {}));
+
+    expect(response.status).toBe(400);
+    const payload = await response.json();
+    expect(payload).toMatchObject({ code: "validation_error", message: "Invalid payload." });
+    expect(payload).not.toHaveProperty("error");
+    expect(payload).not.toHaveProperty("details");
   });
 });

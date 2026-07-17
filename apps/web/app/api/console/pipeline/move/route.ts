@@ -3,16 +3,14 @@ import { z } from "zod";
 import { isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 import { isSessionProviderFailure } from "@/lib/auth/session-outcome";
+import { authFailureError, internalError, unavailableError, validationError } from "@/lib/auth/api";
 import { moveTripStage } from "./store";
 
 const unavailableMessage = "This service is temporarily unavailable. Please try again shortly.";
 
 function failureResponse(error: unknown) {
   const unavailable = isPersistenceConfigError(error) || isSchemaDriftError(error) || isSessionProviderFailure(error);
-  return NextResponse.json(
-    { ok: false, error: unavailable ? unavailableMessage : "Could not move trip." },
-    { status: unavailable ? 503 : 500 }
-  );
+  return unavailable ? unavailableError(unavailableMessage) : internalError("Could not move trip.");
 }
 
 const BodySchema = z.object({
@@ -23,37 +21,22 @@ const BodySchema = z.object({
 export async function POST(request: NextRequest) {
   let admin: Awaited<ReturnType<typeof getAdminPageAuthContext>>;
   try {
-    admin = await getAdminPageAuthContext();
+    admin = await getAdminPageAuthContext({ allCapabilities: ["operations:manage"] });
   } catch (error) {
     return failureResponse(error);
   }
-  if (!isAdminPageAuthContext(admin)) {
-    return NextResponse.json(
-      { ok: false, error: `Forbidden: ${admin.reason}` },
-      { status: admin.status }
-    );
-  }
+  if (!isAdminPageAuthContext(admin)) return authFailureError(admin);
 
   let payload: unknown;
   try {
     payload = await request.json();
   } catch {
-    return NextResponse.json(
-      { ok: false, error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return validationError("Invalid JSON body.");
   }
 
   const parsed = BodySchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: "Invalid payload",
-        details: parsed.error.flatten(),
-      },
-      { status: 400 }
-    );
+    return validationError("Invalid payload.", parsed.error.flatten().fieldErrors);
   }
 
   try {

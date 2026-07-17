@@ -1,9 +1,10 @@
 import { expect, test, type APIRequestContext, type BrowserContextOptions } from "@playwright/test";
 import { createAdminStorageState } from "../fixtures/admin-auth";
+import { createAdminLimitedStorageState } from "../fixtures/admin-limited-auth";
 import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
 
-type Persona = "anonymous" | "traveler" | "reviewer" | "admin";
+type Persona = "anonymous" | "traveler" | "reviewer" | "admin" | "limited-admin";
 
 const reviewerPages = [
   "/reviewer/queue",
@@ -22,6 +23,16 @@ const adminPages = [
   "/admin/analytics"
 ] as const;
 
+const consolePages = [
+  "/console/pipeline",
+  "/console/workspace",
+  "/console/messages",
+  "/console/graph",
+  "/console/metrics",
+  "/console/config",
+  "/api/v1/docs"
+] as const;
+
 const reviewerApis = ["/api/reviewer-assignments"] as const;
 
 const adminApis = [
@@ -31,8 +42,14 @@ const adminApis = [
   "/api/reviewers"
 ] as const;
 
+const consoleApis = [
+  "/api/console/chat-messages?conversationId=conversation-1",
+  "/api/console/itinerary-events?conversationId=conversation-1"
+] as const;
+
 function storageStateFor(persona: Persona): BrowserContextOptions["storageState"] | undefined {
   if (persona === "admin") return createAdminStorageState();
+  if (persona === "limited-admin") return createAdminLimitedStorageState();
   if (persona === "reviewer") return createReviewerStorageState();
   if (persona === "traveler") return createTravelerStorageState();
   return undefined;
@@ -57,7 +74,7 @@ async function expectPageBlocked(request: APIRequestContext, path: string) {
   if (status === 200) {
     const body = await response.text();
     const isRedirect = body.includes("NEXT_REDIRECT");
-    const isForbiddenPage = body.includes('data-testid=\"admin-forbidden\"') || body.includes(">Forbidden<");
+    const isForbiddenPage = body.includes('data-testid=\"admin-forbidden\"') || body.includes(">Forbidden<") || body.toLowerCase().includes("access is restricted");
     expect(isRedirect || isForbiddenPage).toBe(true);
 
     if (isRedirect) {
@@ -78,13 +95,13 @@ async function expectApiBlocked(request: APIRequestContext, path: string) {
 test.describe("@smoke @protected-routes anonymous access", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  for (const path of [...reviewerPages, ...adminPages]) {
+  for (const path of [...reviewerPages, ...adminPages, ...consolePages]) {
     test(`anonymous user is redirected away from ${path}`, async ({ request }) => {
       await expectPageBlocked(request, path);
     });
   }
 
-  for (const path of [...reviewerApis, ...adminApis]) {
+  for (const path of [...reviewerApis, ...adminApis, ...consoleApis]) {
     test(`anonymous user receives 401 from ${path}`, async ({ request }) => {
       const response = await request.get(path);
       expect(response.status()).toBe(401);
@@ -98,13 +115,13 @@ test.describe("@smoke @protected-routes anonymous access", () => {
 test.describe("@smoke @protected-routes traveler persona is denied reviewer & admin surfaces", () => {
   test.use({ storageState: storageStateFor("traveler")! });
 
-  for (const path of [...reviewerPages, ...adminPages]) {
+  for (const path of [...reviewerPages, ...adminPages, ...consolePages]) {
     test(`traveler is blocked from ${path}`, async ({ request }) => {
       await expectPageBlocked(request, path);
     });
   }
 
-  for (const path of [...reviewerApis, ...adminApis]) {
+  for (const path of [...reviewerApis, ...adminApis, ...consoleApis]) {
     test(`traveler is blocked from ${path}`, async ({ request }) => {
       await expectApiBlocked(request, path);
     });
@@ -114,13 +131,13 @@ test.describe("@smoke @protected-routes traveler persona is denied reviewer & ad
 test.describe("@smoke @protected-routes reviewer persona cannot access admin surfaces", () => {
   test.use({ storageState: storageStateFor("reviewer")! });
 
-  for (const path of adminPages) {
+  for (const path of [...adminPages, ...consolePages]) {
     test(`reviewer is blocked from ${path}`, async ({ request }) => {
       await expectPageBlocked(request, path);
     });
   }
 
-  for (const path of adminApis) {
+  for (const path of [...adminApis, ...consoleApis]) {
     test(`reviewer is blocked from ${path}`, async ({ request }) => {
       await expectApiBlocked(request, path);
     });
@@ -136,6 +153,33 @@ test.describe("@smoke @protected-routes admin persona can read reviewer operatio
       expect(response.status()).toBe(200);
       const body = (await response.json()) as { assignments?: unknown };
       expect(body.assignments).toBeDefined();
+    });
+  }
+});
+
+test.describe("@smoke @protected-routes limited admin capabilities are enforced", () => {
+  test.use({ storageState: storageStateFor("limited-admin")! });
+
+  for (const path of [...adminPages, ...consolePages]) {
+    test(`limited admin is blocked from ${path}`, async ({ request }) => {
+      await expectPageBlocked(request, path);
+    });
+  }
+
+  for (const path of [...adminApis, ...consoleApis]) {
+    test(`limited admin is blocked from ${path}`, async ({ request }) => {
+      await expectApiBlocked(request, path);
+    });
+  }
+});
+
+test.describe("@smoke @protected-routes admin persona can reach console and developer boundaries", () => {
+  test.use({ storageState: storageStateFor("admin")! });
+
+  for (const path of consolePages) {
+    test(`admin can reach ${path}`, async ({ request }) => {
+      const response = await request.get(path, { maxRedirects: 0 });
+      expect(response.status()).toBe(200);
     });
   }
 });

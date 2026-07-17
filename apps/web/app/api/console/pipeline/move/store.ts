@@ -46,7 +46,7 @@ export async function moveTripStage(
   authorizedAdmin?: AdminPageAuthContext
 ): Promise<MoveTripStageResult> {
   const input = MovePayloadSchema.parse(rawInput);
-  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext({ allCapabilities: ["operations:manage"] });
   if (!isAdminPageAuthContext(admin)) {
     throw new Error(
       `moveTripStage requires an admin actor (got: ${admin.reason})`

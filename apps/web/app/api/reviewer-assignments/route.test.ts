@@ -5,7 +5,7 @@ import type { AuthorizedApiContext } from "@/lib/auth/api";
 import { handleReviewerAssignmentsPostRequest } from "./handler";
 
 const adminAuth = {
-  actor: { capabilities: [], reviewerId: null, roles: ["admin"], userId: "admin-user-123" },
+  actor: { capabilities: ["operations:manage"], reviewerId: null, roles: ["admin"], userId: "admin-user-123" },
   reviewerId: null,
   role: "admin",
   userId: "admin-user-123"
@@ -33,6 +33,31 @@ function assignmentRequest(body: unknown): Request {
 }
 
 describe("reviewer assignments admin API", () => {
+  test("blocks invalid assignment payloads before parsing for a traveler", async () => {
+    let createCalled = false;
+    const response = await handleReviewerAssignmentsPostRequest(
+      assignmentRequest({ invalid: true }),
+      {
+        createAssignment: async () => {
+          createCalled = true;
+          throw new Error("create should not run for a traveler");
+        },
+        requireAdmin: async () =>
+          Response.json(
+            { code: "forbidden", message: "Forbidden." },
+            { status: 403 }
+          )
+      }
+    );
+
+    expect(response.status).toBe(403);
+    expect(createCalled).toBe(false);
+    await expect(response.json()).resolves.toEqual({
+      code: "forbidden",
+      message: "Forbidden."
+    });
+  });
+
   test("returns 409 for duplicate active assignment attempts", async () => {
     const response = await handleReviewerAssignmentsPostRequest(
       assignmentRequest({

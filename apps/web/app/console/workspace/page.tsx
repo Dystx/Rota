@@ -10,7 +10,7 @@ export default function ConsoleWorkspacePage() {
   return (
     <>
       <div
-        className="md:ml-64 min-w-0 min-h-screen flex flex-col bg-background relative overflow-x-hidden"
+        className="min-w-0 min-h-screen flex flex-col bg-background relative overflow-x-hidden"
         style={{ backgroundImage: AMBIENT_PATTERN }}
       >
         <header className="h-header-height px-container-padding-lg flex items-center justify-between border-b border-olive-light/10 bg-surface/50 backdrop-blur-md shrink-0 z-10">
@@ -39,7 +39,7 @@ export default function ConsoleWorkspacePage() {
           </div>
         </header>
 
-        <main id="main-content" className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden">
           <aside className="w-full md:w-1/3 md:min-w-[320px] md:max-w-[400px] border-r border-olive-light/10 bg-glass-light backdrop-blur-md overflow-y-auto p-container-padding-sm flex flex-col gap-section-gap shrink-0">
             <div className="flex items-center justify-between">
               <h3 className="font-headline-sm text-headline-sm text-primary">
@@ -187,7 +187,7 @@ export default function ConsoleWorkspacePage() {
               ]}
             />
           </section>
-        </main>
+        </div>
       </div>
       <style>{`
         aside::-webkit-scrollbar, section::-webkit-scrollbar { width: 6px; }

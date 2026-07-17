@@ -11,8 +11,8 @@ export default function ConsoleConfigPage() {
 
   return (
     <>
-      <div className="md:ml-64 min-h-screen flex flex-col bg-background relative">
-        <main id="main-content" className="flex-1 p-container-padding-lg relative z-10">
+      <div className="min-h-screen flex flex-col bg-background relative">
+        <div className="flex-1 p-container-padding-lg relative z-10">
           <div className="max-w-[1440px] mx-auto min-h-screen relative z-10 flex flex-col">
             <header className="mb-section-gap flex flex-col gap-4 md:flex-row md:items-end md:justify-between border-b border-olive-light/10 pb-6">
               <div>
@@ -226,7 +226,7 @@ export default function ConsoleConfigPage() {
               </aside>
             </section>
           </div>
-        </main>
+        </div>
       </div>
     </>
   );

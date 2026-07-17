@@ -38,8 +38,8 @@ const REGIONS = [
 export default function ConsoleMetricsPage() {
   return (
     <>
-      <div className="md:ml-64 min-h-screen flex flex-col bg-background relative">
-        <main id="main-content" className="flex-1 p-container-padding-lg w-full flex flex-col gap-section-gap relative z-10 overflow-x-hidden">
+      <div className="min-h-screen flex flex-col bg-background relative">
+        <div className="flex-1 p-container-padding-lg w-full flex flex-col gap-section-gap relative z-10 overflow-x-hidden">
           <header className="mb-4">
             <h1 className="font-headline-lg text-headline-lg text-primary">
               Global Metrics Dashboard
@@ -117,7 +117,7 @@ export default function ConsoleMetricsPage() {
               </ul>
             </section>
           </section>
-        </main>
+        </div>
       </div>
     </>
   );

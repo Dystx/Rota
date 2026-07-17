@@ -3,7 +3,7 @@ import { UpdatePlaceSchema } from "@repo/types";
 import { internalError, isApiResponse, notFoundError, requireApiRole, validationError } from "@/lib/auth/api";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ placeId: string }> }) {
-  const auth = await requireApiRole(["admin"]);
+  const auth = await requireApiRole(["admin"], ["content:manage"]);
 
   if (isApiResponse(auth)) {
     return auth;
@@ -27,7 +27,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ pla
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ placeId: string }> }) {
-  const auth = await requireApiRole(["admin"]);
+  const auth = await requireApiRole(["admin"], ["content:manage"]);
 
   if (isApiResponse(auth)) {
     return auth;

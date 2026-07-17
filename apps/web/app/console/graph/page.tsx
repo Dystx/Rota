@@ -99,7 +99,7 @@ export default function ConsoleGraphPage() {
 
   return (
     <>
-      <div className="min-h-screen min-w-0 overflow-x-hidden flex flex-col bg-[#050806] text-linen-dark relative z-10 md:ml-64">
+      <div className="min-h-screen min-w-0 overflow-x-hidden flex flex-col bg-[#050806] text-linen-dark relative z-10">
         <header className="min-h-16 border-b border-white/5 flex flex-wrap items-center gap-2 justify-between px-container-padding-lg py-2 shrink-0 bg-black/40 backdrop-blur-md">
           <nav
             aria-label="Graph hierarchy path"
@@ -134,7 +134,7 @@ export default function ConsoleGraphPage() {
           </div>
         </header>
 
-        <main id="main-content" className="flex-1 min-w-0 flex flex-col md:flex-row overflow-hidden">
+        <div className="flex-1 min-w-0 flex flex-col md:flex-row overflow-hidden">
           <aside className="w-full md:w-1/3 md:min-w-[300px] border-r border-white/5 bg-black/20 flex flex-col">
             <header className="p-gutter border-b border-white/5 flex items-center justify-between shrink-0">
               <h1 className="font-headline-sm text-headline-sm text-linen-dark uppercase tracking-wide">
@@ -244,11 +244,11 @@ export default function ConsoleGraphPage() {
               </div>
             </div>
           </section>
-        </main>
+        </div>
       </div>
       <style>{`
-        main ::-webkit-scrollbar { width: 6px; }
-        main ::-webkit-scrollbar-thumb {
+        .rumia-operator-main ::-webkit-scrollbar { width: 6px; }
+        .rumia-operator-main ::-webkit-scrollbar-thumb {
           background-color: rgba(255, 255, 255, 0.1); border-radius: 9999px;
         }
       `}</style>

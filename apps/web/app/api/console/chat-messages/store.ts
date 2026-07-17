@@ -45,7 +45,7 @@ export async function insertChatMessage(
   authorizedAdmin?: AdminPageAuthContext
 ): Promise<InsertChatMessageResult> {
   const input = InsertPayloadSchema.parse(rawInput);
-  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext({ allCapabilities: ["operations:manage"] });
   if (!isAdminPageAuthContext(admin)) {
     throw new Error(
       `insertChatMessage requires an admin actor (got: ${admin.reason})`
@@ -75,7 +75,7 @@ export async function listChatMessages(
   authorizedAdmin?: AdminPageAuthContext
 ): Promise<ChatMessageRow[]> {
   const input = ListPayloadSchema.parse(rawInput);
-  const admin = authorizedAdmin ?? await getAdminPageAuthContext();
+  const admin = authorizedAdmin ?? await getAdminPageAuthContext({ allCapabilities: ["operations:manage"] });
   if (!isAdminPageAuthContext(admin)) throw new Error(`listChatMessages requires an admin actor (got: ${admin.reason})`);
   const rows = await listPostgresChatMessages({ conversationId: input.conversationId, limit: input.limit }, admin.actor);
   return rows.map((row) => ({

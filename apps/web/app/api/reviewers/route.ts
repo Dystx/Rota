@@ -3,7 +3,7 @@ import { CreateReviewerSchema } from "@repo/types";
 import { internalError, isApiResponse, requireApiRole, validationError } from "@/lib/auth/api";
 
 export async function GET() {
-  const auth = await requireApiRole(["admin"]);
+  const auth = await requireApiRole(["admin"], ["operations:manage"]);
 
   if (isApiResponse(auth)) {
     return auth;
@@ -20,7 +20,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const auth = await requireApiRole(["admin"]);
+  const auth = await requireApiRole(["admin"], ["operations:manage"]);
 
   if (isApiResponse(auth)) {
     return auth;

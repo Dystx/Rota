@@ -1,24 +1,55 @@
 import type { ReactNode } from "react";
-import { ConsoleNav } from "./_components/console-nav";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { DecisionStatePanel, OperatorShell } from "@repo/ui";
+import { requirePageAccess, requirementForHttpRoute } from "@/lib/auth/page-access";
+import { loadSessionOutcome } from "@/lib/auth/session-outcome";
+import { RouteRecovery } from "@/app/_components/route-recovery";
 
-/**
- * ConsoleLayout — shared shell for /console/* routes.
- *
- * Source: docs/reference/rumia-console/ (2.1 Operations Pipeline Board, 3.3 System
- * Variable Config, etc.) + docs/roadmap.md §3.10 PR-14a. The SideNavBar (olive-dark
- * + backdrop-blur-xl) is the single piece of chrome every console page needs;
- * the per-page `bg-background` / dark-mode `bg-[#050806]` override stays in the
- * page so the design system doesn't lose its per-route accent.
- *
- * Each child page still owns its own outer `<div>` + `<main>` so it can apply
- * per-page layout decisions (workspace needs `relative` for the validation
- * bar; graph needs dark-mode bg). This layout owns only the nav.
- */
-export default function ConsoleLayout({ children }: { children: ReactNode }) {
+export default async function ConsoleLayout({ children }: { children: ReactNode }) {
+  const headerList = await headers();
+  const currentPath = headerList.get("x-pathname") ?? headerList.get("next-url") ?? "/console";
+  const access = await requirePageAccess(requirementForHttpRoute(currentPath) ?? { anyRole: ["admin"] });
+
+  if (access.kind === "unavailable") {
+    return <RouteRecovery kind="unavailable" landmark="document" />;
+  }
+  if (access.kind === "unauthenticated") {
+    redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
+  }
+  if (access.kind === "forbidden") {
+    return (
+      <main id="main-content" className="min-h-screen bg-linen px-6 py-16">
+        <DecisionStatePanel
+          kind="error"
+          tone="light"
+          headingLevel={1}
+          title="Console access is restricted"
+          description="This operator workspace is not available to the current account."
+        />
+      </main>
+    );
+  }
+
+  const sessionOutcome = await loadSessionOutcome();
+  if (sessionOutcome.kind !== "ready") {
+    return <RouteRecovery kind="unavailable" landmark="document" />;
+  }
+
   return (
-    <>
-      <ConsoleNav />
+    <OperatorShell
+      section="console"
+      currentPath={currentPath}
+      capabilities={access.actor.capabilities}
+      contentWidth="wide"
+      user={{
+        name: sessionOutcome.session.user.name || sessionOutcome.session.user.email || "Operator",
+        email: sessionOutcome.session.user.email ?? null,
+        avatarUrl: sessionOutcome.session.user.image ?? null
+      }}
+      signOutAction="/api/auth/sign-out"
+    >
       {children}
-    </>
+    </OperatorShell>
   );
 }

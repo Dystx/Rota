@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { OperatorShell } from "@repo/ui";
+import { DecisionStatePanel, OperatorShell } from "@repo/ui";
 import { getReviewerById } from "@repo/db";
-import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { requirePageAccess } from "@/lib/auth/page-access";
 import { loadSessionOutcome } from "@/lib/auth/session-outcome";
 import { RouteRecovery } from "@/app/_components/route-recovery";
 
@@ -33,26 +33,34 @@ export default async function ReviewerLayout({
 }) {
   const headerList = await headers();
   const currentPath = headerList.get("x-pathname") ?? headerList.get("next-url") ?? "/reviewer/queue";
-  const sessionOutcome = await loadSessionOutcome();
-  if (sessionOutcome.kind === "unavailable") {
+  const access = await requirePageAccess({ anyRole: ["reviewer"] });
+  if (access.kind === "unavailable") {
     return <RouteRecovery kind="unavailable" landmark="document" />;
   }
-  if (sessionOutcome.kind !== "ready") {
+  if (access.kind === "unauthenticated") {
     redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
+  }
+  if (access.kind === "forbidden" || !access.actor.reviewerId) {
+    return (
+      <main id="main-content" className="min-h-screen bg-linen px-6 py-16">
+        <DecisionStatePanel
+          kind="error"
+          tone="light"
+          headingLevel={1}
+          title="Reviewer access is restricted"
+          description="This workspace is only available to assigned reviewers. Return to sign in or ask an administrator for access."
+        />
+      </main>
+    );
   }
 
-  // Use the request-scoped no-argument actor loader so child reviewer
-  // contexts reuse this same authorization probe.
-  const actorOutcome = await loadCurrentAuthorizedActorOutcome();
-  if (actorOutcome.kind === "unavailable") {
+  const sessionOutcome = await loadSessionOutcome();
+  if (sessionOutcome.kind !== "ready") {
     return <RouteRecovery kind="unavailable" landmark="document" />;
-  }
-  if (actorOutcome.kind !== "ready" || !actorOutcome.actor.roles.includes("reviewer") || !actorOutcome.actor.reviewerId) {
-    redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
   }
 
   const user = sessionOutcome.session.user;
-  const reviewer = await getReviewerById(actorOutcome.actor.reviewerId, { actor: actorOutcome.actor });
+  const reviewer = await getReviewerById(access.actor.reviewerId, { actor: access.actor });
   const displayName = reviewer?.name || user?.email || "Reviewer";
 
   // Read the current pathname for active-link highlighting.
@@ -63,6 +71,7 @@ export default async function ReviewerLayout({
     <OperatorShell
       section="reviewer"
       currentPath={currentPath}
+      capabilities={access.actor.capabilities}
       user={{
         name: displayName,
         email: user?.email ?? null,

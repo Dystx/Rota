@@ -16,7 +16,7 @@ export type ReviewerAssignmentRouteDependencies = {
 };
 
 export async function handleReviewerAssignmentsGetRequest(request: Request, dependencies: ReviewerAssignmentRouteDependencies = {}) {
-  const requireReader = dependencies.requireReader ?? (() => requireApiRole(["reviewer", "admin"]));
+  const requireReader = dependencies.requireReader ?? (() => requireApiRole(["reviewer", "admin"], ["operations:manage"]));
   const listAssignments = dependencies.listAssignments ?? listReviewerAssignments;
   const auth = await requireReader();
 
@@ -41,7 +41,7 @@ export async function handleReviewerAssignmentsGetRequest(request: Request, depe
 }
 
 export async function handleReviewerAssignmentsPostRequest(request: Request, dependencies: ReviewerAssignmentRouteDependencies = {}) {
-  const requireAdmin = dependencies.requireAdmin ?? (() => requireApiRole(["admin"]));
+  const requireAdmin = dependencies.requireAdmin ?? (() => requireApiRole(["admin"], ["operations:manage"]));
   const createAssignment = dependencies.createAssignment ?? createReviewerAssignment;
   const auth = await requireAdmin();
 

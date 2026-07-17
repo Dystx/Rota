@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { OperatorShell, SectionHeading } from "@repo/ui";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { loadCurrentAuthorizedActorOutcome } from "@/lib/auth/authorization";
+import { requirePageAccess, requirementForHttpRoute } from "@/lib/auth/page-access";
 import { loadSessionOutcome } from "@/lib/auth/session-outcome";
 import { RouteRecovery } from "@/app/_components/route-recovery";
 
@@ -15,23 +15,23 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const sessionOutcome = await loadSessionOutcome();
-  if (sessionOutcome.kind === "unavailable") {
-    return <RouteRecovery kind="unavailable" landmark="document" />;
-  }
+  const headerList = await headers();
+  const currentPath = headerList.get("x-pathname") ?? headerList.get("next-url") ?? "/admin/places";
+  const catalogueRequirement = requirementForHttpRoute(currentPath);
+  const auth = await requirePageAccess(catalogueRequirement ?? { anyRole: ["admin"] });
 
-  // Use the request-scoped no-argument actor loader so child admin contexts
-  // reuse this same authorization probe.
-  const auth = await loadCurrentAuthorizedActorOutcome();
-
-  if (auth.kind === "ready" && auth.actor.roles.includes("admin")) {
-    const currentPath = (await headers()).get("x-pathname") ?? "/admin/places";
+  if (auth.kind === "ready") {
+    const sessionOutcome = await loadSessionOutcome();
+    if (sessionOutcome.kind !== "ready") {
+      return <RouteRecovery kind="unavailable" landmark="document" />;
+    }
 
     return (
       <OperatorShell
         section="admin"
         currentPath={currentPath}
-        user={{ name: sessionOutcome.kind === "ready" ? sessionOutcome.session.user.name || sessionOutcome.session.user.email || "Administrator" : "Administrator", email: sessionOutcome.kind === "ready" ? sessionOutcome.session.user.email ?? null : null, avatarUrl: sessionOutcome.kind === "ready" ? sessionOutcome.session.user.image ?? null : null }}
+        capabilities={auth.actor.capabilities}
+        user={{ name: sessionOutcome.session.user.name || sessionOutcome.session.user.email || "Administrator", email: sessionOutcome.session.user.email ?? null, avatarUrl: sessionOutcome.session.user.image ?? null }}
         signOutAction="/api/auth/sign-out"
       >
         {children}
@@ -43,8 +43,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return <RouteRecovery kind="unavailable" landmark="document" />;
   }
 
-  if (auth.kind === "anonymous") {
-    redirect("/sign-in?next=/admin");
+  if (auth.kind === "unauthenticated") {
+    redirect(`/sign-in?next=${encodeURIComponent(currentPath)}`);
   }
 
   return (

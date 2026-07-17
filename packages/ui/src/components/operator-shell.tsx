@@ -4,8 +4,8 @@ import { cn } from "../lib/cn";
 import { Icon } from "./icon";
 
 /**
- * OperatorShell — shared layout for the /reviewer and /admin
- * console surfaces (12 pages total).
+ * OperatorShell — shared layout for reviewer, admin, console, and developer
+ * utility surfaces.
  *
  * The previous surface had two problems:
  * 1. The reviewer pages had no nav at all — a manual
@@ -31,7 +31,15 @@ import { Icon } from "./icon";
  * sees admin links and vice versa — the role-gating lives
  * in the layout that wraps the shell, not in the shell.
  */
-export type OperatorSection = "reviewer" | "admin";
+export type OperatorSection = "reviewer" | "admin" | "console" | "developer";
+export type OperatorCapability =
+  | "access:manage"
+  | "content:manage"
+  | "operations:manage"
+  | "analytics:read"
+  | "configuration:deploy"
+  | "developer_docs:read"
+  | "specialists:verify";
 
 interface NavItem {
   href: string;
@@ -41,6 +49,7 @@ interface NavItem {
   icon?: string;
   /** Optional short description under the label. */
   hint?: string;
+  requiredCapability?: OperatorCapability;
 }
 
 const REVIEWER_NAV: NavItem[] = [
@@ -51,19 +60,34 @@ const REVIEWER_NAV: NavItem[] = [
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { href: "/admin/regions", label: "Regions", icon: "map", hint: "Curation" },
-  { href: "/admin/countries", label: "Countries", icon: "public", hint: "Rollout" },
-  { href: "/admin/places", label: "Places", icon: "place", hint: "Place database" },
-  { href: "/admin/specialists", label: "Specialists", icon: "support_agent", hint: "Reviewer roster" },
-  { href: "/admin/partners", label: "Partners", icon: "handshake", hint: "Booking sources" },
-  { href: "/admin/reviewers", label: "Reviewers", icon: "verified", hint: "Reviewer pool" },
-  { href: "/admin/quality", label: "Quality", icon: "fact_check", hint: "Trust markers" },
-  { href: "/admin/analytics", label: "Analytics", icon: "monitoring", hint: "Pipeline health" }
+  { href: "/admin/regions", label: "Regions", icon: "map", hint: "Curation", requiredCapability: "content:manage" },
+  { href: "/admin/countries", label: "Countries", icon: "public", hint: "Rollout", requiredCapability: "content:manage" },
+  { href: "/admin/places", label: "Places", icon: "place", hint: "Place database", requiredCapability: "content:manage" },
+  { href: "/admin/specialists", label: "Specialists", icon: "support_agent", hint: "Reviewer roster", requiredCapability: "specialists:verify" },
+  { href: "/admin/partners", label: "Partners", icon: "handshake", hint: "Booking sources", requiredCapability: "operations:manage" },
+  { href: "/admin/reviewers", label: "Reviewers", icon: "verified", hint: "Reviewer pool", requiredCapability: "operations:manage" },
+  { href: "/admin/quality", label: "Quality", icon: "fact_check", hint: "Trust markers", requiredCapability: "operations:manage" },
+  { href: "/admin/analytics", label: "Analytics", icon: "monitoring", hint: "Pipeline health", requiredCapability: "analytics:read" }
+];
+
+const CONSOLE_NAV: NavItem[] = [
+  { href: "/console/pipeline", label: "Pipeline", icon: "check-circle", hint: "Operations board", requiredCapability: "operations:manage" },
+  { href: "/console/workspace", label: "Workspace", icon: "note-pencil", hint: "Revision workspace", requiredCapability: "operations:manage" },
+  { href: "/console/messages", label: "Messages", icon: "chat-circle", hint: "Messaging hub", requiredCapability: "operations:manage" },
+  { href: "/console/graph", label: "Knowledge graph", icon: "tree-structure", hint: "Graph evidence", requiredCapability: "content:manage" },
+  { href: "/console/metrics", label: "Metrics", icon: "chart-line-up", hint: "Pipeline health", requiredCapability: "analytics:read" },
+  { href: "/console/config", label: "System config", icon: "gear", hint: "Deployment controls", requiredCapability: "configuration:deploy" }
+];
+
+const DEVELOPER_NAV: NavItem[] = [
+  { href: "/api/v1/docs", label: "API Docs", icon: "books", hint: "Developer reference", requiredCapability: "developer_docs:read" }
 ];
 
 const SECTION_META: Record<OperatorSection, { label: string; kicker: string }> = {
   reviewer: { label: "Reviewer workspace", kicker: "Reviewer" },
-  admin: { label: "Admin CMS", kicker: "Admin" }
+  admin: { label: "Admin CMS", kicker: "Admin" },
+  console: { label: "Operations console", kicker: "Console" },
+  developer: { label: "Developer utilities", kicker: "Developer" }
 };
 
 export interface OperatorShellUser {
@@ -83,6 +107,8 @@ export interface OperatorShellProps {
    *  it stays a pure server component. */
   currentPath: string;
   user: OperatorShellUser;
+  capabilities?: readonly OperatorCapability[];
+  contentWidth?: "standard" | "wide";
   /** Optional sign-out form action. If omitted, no sign-out
    *  link is rendered. */
   signOutAction?: string;
@@ -134,7 +160,7 @@ const NavLink = ({
   </Link>
 );
 
-const NavList = ({ items, currentPath }: { items: NavItem[]; currentPath: string }) => (
+const NavList = ({ items, currentPath }: { items: readonly NavItem[]; currentPath: string }) => (
   <ul role="list" className="grid gap-0.5 list-none p-0 m-0">
     {items.map((item) => (
       <li key={item.href}>
@@ -148,18 +174,27 @@ export function OperatorShell({
   section,
   currentPath,
   user,
+  capabilities,
+  contentWidth = "standard",
   signOutAction,
   children
 }: OperatorShellProps) {
   const meta = SECTION_META[section];
-  const navItems = section === "reviewer" ? REVIEWER_NAV : ADMIN_NAV;
+  const navItems = section === "reviewer"
+    ? REVIEWER_NAV
+    : section === "admin"
+      ? ADMIN_NAV
+      : section === "console"
+        ? CONSOLE_NAV
+        : DEVELOPER_NAV;
+  const visibleNavItems = navItems.filter((item) => !item.requiredCapability || capabilities === undefined || capabilities.includes(item.requiredCapability));
   const initial = user.name.trim().charAt(0).toUpperCase() || "?";
 
   return (
     <div
       data-surface="linen"
       data-surface-texture="none"
-      className="min-h-screen rumia-surface rumia-surface-linen text-primary"
+      className="rumia-operator-shell min-h-screen rumia-surface rumia-surface-linen text-primary"
     >
       {/* Desktop layout: sidebar + content */}
       <div className="lg:flex lg:min-h-screen">
@@ -169,7 +204,7 @@ export function OperatorShell({
         <aside
           aria-label={`${meta.kicker} navigation`}
           data-testid="operator-sidebar"
-          className="hidden lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-olive-light/15 lg:bg-white/45"
+          className="rumia-operator-sidebar hidden lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-olive-light/15 lg:bg-white/45"
         >
           <div className="flex flex-1 flex-col gap-6 p-6 sticky top-0 h-screen">
             <Link
@@ -184,7 +219,7 @@ export function OperatorShell({
               <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark font-medium mb-3">
                 {meta.kicker}
               </p>
-              <NavList items={navItems} currentPath={currentPath} />
+              <NavList items={visibleNavItems} currentPath={currentPath} />
             </div>
 
             <div className="mt-auto flex items-center gap-3 rounded-lg border border-olive-light/15 bg-white/60 p-3">
@@ -227,7 +262,7 @@ export function OperatorShell({
         <main
           id="main-content"
           data-testid="operator-main"
-          className="flex-1 min-w-0"
+          className="rumia-operator-main flex-1 min-w-0"
         >
           {/* Mobile top-bar — visible below `lg`. Uses a
               native <details> for zero-JS disclosure. */}
@@ -245,7 +280,7 @@ export function OperatorShell({
               </span>
             </summary>
             <div className="p-4 grid gap-4 border-t border-olive-light/10">
-              <NavList items={navItems} currentPath={currentPath} />
+              <NavList items={visibleNavItems} currentPath={currentPath} />
               <div className="flex items-center gap-3 border-t border-olive-light/10 pt-4">
                 <div
                   aria-hidden
@@ -273,7 +308,10 @@ export function OperatorShell({
             </div>
           </details>
 
-          <div className="mx-auto min-w-0 w-full max-w-6xl overflow-x-hidden px-4 py-8 md:px-8 md:py-12 lg:px-12 lg:py-16">
+          <div className={cn(
+            "rumia-operator-content mx-auto min-w-0 w-full overflow-x-hidden px-4 py-8 md:px-8 md:py-12 lg:px-12 lg:py-16",
+            contentWidth === "wide" ? "max-w-[1440px]" : "max-w-6xl"
+          )}>
             {children}
           </div>
         </main>

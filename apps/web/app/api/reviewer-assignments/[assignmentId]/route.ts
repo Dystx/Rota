@@ -3,7 +3,7 @@ import { UpdateReviewerAssignmentSchema } from "@repo/types";
 import { forbiddenError, internalError, isApiResponse, notFoundError, requireApiRole, validationError } from "@/lib/auth/api";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ assignmentId: string }> }) {
-  const auth = await requireApiRole(["reviewer", "admin"]);
+  const auth = await requireApiRole(["reviewer", "admin"], ["operations:manage"]);
 
   if (isApiResponse(auth)) {
     return auth;
