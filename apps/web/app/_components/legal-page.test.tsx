@@ -57,6 +57,33 @@ describe("LegalPage route surface", () => {
 
     expect(screen.getByTestId("public-route-layout")).toHaveAttribute("data-scene", "cover");
   });
+
+  it("links every document section from the contents navigation", () => {
+    const sections = [
+      { id: "collection", heading: "Collection", content: <p>Collection content.</p> },
+      { id: "retention", heading: "Retention", content: <p>Retention content.</p> }
+    ];
+
+    render(
+      <LegalPage
+        kicker="Legal"
+        title="Privacy Policy"
+        intro="A plain-language policy."
+        asideTitle="In brief"
+        asideText="A short summary."
+        sections={sections}
+      >
+        <p>Fallback content.</p>
+      </LegalPage>
+    );
+
+    const contents = screen.getByRole("navigation", { name: /contents/i });
+    for (const section of sections) {
+      expect(contents).toHaveTextContent(section.heading);
+      expect(screen.getByRole("link", { name: section.heading })).toHaveAttribute("href", `#${section.id}`);
+      expect(screen.getByRole("heading", { name: section.heading })).toHaveAttribute("id", section.id);
+    }
+  });
 });
 
 function documentElement(): HTMLElement {

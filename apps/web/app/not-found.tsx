@@ -1,3 +1,4 @@
+import * as React from "react";
 import Link from "next/link";
 import { Icon } from "@repo/ui";
 import { BrandMark } from "@repo/ui";
@@ -23,7 +24,12 @@ import { SiteFooter } from "./_components/site-footer";
  */
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col rumia-surface rumia-surface-linen" data-surface="linen" data-surface-texture="editorial">
+    <div
+      className="min-h-screen flex flex-col rumia-surface rumia-surface-linen"
+      data-surface="linen"
+      data-surface-texture="none"
+      data-testid="not-found-recovery"
+    >
       <main
         id="main-content"
         className="flex-1 flex items-center justify-center px-6 py-16"
@@ -59,7 +65,7 @@ export default function NotFound() {
           </div>
         </div>
       </main>
-      <SiteFooter />
+      <SiteFooter variant="compact" />
     </div>
   );
 }

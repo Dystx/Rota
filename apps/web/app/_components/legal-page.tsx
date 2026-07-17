@@ -4,6 +4,12 @@ import type { ReactNode } from "react";
 import { PublicRouteLayout } from "./public-route-layout";
 import type { RouteSceneTone } from "./route-scene";
 
+export interface LegalSection {
+  id: string;
+  heading: string;
+  content: ReactNode;
+}
+
 interface LegalPageProps {
   scene?: RouteSceneTone;
   kicker: string;
@@ -14,7 +20,8 @@ interface LegalPageProps {
   asideText: string;
   asideHref?: string;
   asideLinkLabel?: string;
-  children: ReactNode;
+  sections?: readonly LegalSection[];
+  children?: ReactNode;
 }
 
 /**
@@ -32,6 +39,7 @@ export function LegalPage({
   asideText,
   asideHref,
   asideLinkLabel,
+  sections,
   children
 }: LegalPageProps) {
   return (
@@ -80,8 +88,41 @@ export function LegalPage({
               ) : null}
             </aside>
 
-            <div className="rumia-legal-body font-body-md text-body-md text-on-surface">
-              {children}
+            <div className="grid min-w-0 gap-4">
+              {sections?.length ? (
+                <details open className="grid gap-2 rounded-2xl border border-olive-light/15 bg-linen/90 p-4 shadow-sm backdrop-blur-xl lg:sticky lg:top-24">
+                  <summary className="min-h-11 cursor-pointer list-none py-2 font-mono-micro text-mono-micro uppercase tracking-[0.18em] text-ochre-dark">
+                    Contents
+                  </summary>
+                  <nav aria-label="Contents">
+                    <ol className="m-0 flex list-none flex-wrap gap-x-5 gap-y-1 p-0">
+                      {sections.map((section) => (
+                        <li key={section.id}>
+                          <Link
+                            href={`#${section.id}`}
+                            className="inline-flex min-h-11 items-center text-sm font-semibold text-primary underline decoration-ochre-dark/55 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+                          >
+                            {section.heading}
+                          </Link>
+                        </li>
+                      ))}
+                    </ol>
+                  </nav>
+                </details>
+              ) : null}
+
+              <div className="rumia-legal-body font-body-md text-body-md text-on-surface">
+                {sections?.length
+                  ? sections.map((section) => (
+                      <section key={section.id} id={`${section.id}-section`} aria-labelledby={section.id} className="[&+section]:mt-10 [&+section]:border-t [&+section]:border-olive-light/15 [&+section]:pt-10">
+                        <h2 id={section.id} className="font-display text-3xl leading-tight text-primary">
+                          {section.heading}
+                        </h2>
+                        <div className="mt-4 grid gap-5">{section.content}</div>
+                      </section>
+                    ))
+                  : children}
+              </div>
             </div>
           </div>
         </article>

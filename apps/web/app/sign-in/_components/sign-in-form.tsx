@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@repo/ui";
+import { signInAction } from "../_actions/sign-in";
 
 interface SignInFormProps {
   next: string;
@@ -21,8 +22,8 @@ interface SignInFormProps {
  *      recommended pattern for non-blocking server actions)
  *   3. Show a toast on success
  *
- * The server action performs the Better Auth password sign-in and
- * redirects after the session cookie is set.
+ * The server action performs the Better Auth password sign-in and returns a
+ * safe result; this form routes after the session cookie is set.
  *
  * PR-3: Migrated to <Field> + <Input> primitives for consistent
  * label / error / focus-ring treatment across the app.
@@ -31,41 +32,42 @@ export function SignInForm({ next, initialSent, initialError }: SignInFormProps)
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   function handleSubmit(formData: FormData) {
     const submittedEmail = String(formData.get("email") ?? "").trim();
+    setSubmitError(null);
     startTransition(async () => {
       try {
-        // The server action is imported dynamically because it carries
-        // the "use server" boundary — Next.js will not bundle a static
-        // import of a server action into the client. This is the
-        // documented Next 16 pattern; the action module is not
-        // runtime-selected.
-        const { signInAction } = await import("../_actions/sign-in");
-        await signInAction(formData);
+        const result = await signInAction(formData);
+        if (!result.ok) {
+          setSubmitError(result.message);
+          return;
+        }
+
         toast.success(
           "Signed in",
           `Signed in as ${submittedEmail}.`
         );
-        router.push(next);
+        router.push(result.next || next);
       } catch (err) {
-        // Server action throws redirect() on success and
-        // error; Next.js handles the redirect internally. Only
-        // a true error reaches here.
-        toast.error(
-          "Couldn\u2019t sign in",
-          err instanceof Error ? err.message : "Try again in a moment."
-        );
+        // Keep unexpected transport/runtime failures generic as well. The
+        // server action already maps auth/provider failures to a safe message;
+        // this branch protects the UI from server internals.
+        void err;
+        const message = "We couldn’t sign you in right now. Try again in a moment.";
+        setSubmitError(message);
       }
     });
   }
 
   return (
-    <form action={handleSubmit} className="max-w-xl text-xl leading-relaxed text-primary">
+    <form action={handleSubmit} className="rumia-signin-form max-w-xl text-xl leading-relaxed text-primary">
       <input type="hidden" name="next" value={next} />
 
       <label htmlFor="email" className="sr-only">Email address</label>
-      <span>Sign in with </span>
+      <div className="rumia-signin-sentence">
+      <span className="rumia-signin-copy">Sign in with </span>
       <input
         id="email"
         name="email"
@@ -75,25 +77,34 @@ export function SignInForm({ next, initialSent, initialError }: SignInFormProps)
         placeholder="you@example.com"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
-        className="inline min-w-48 border-b border-ochre-dark bg-transparent px-1 py-1 text-inherit outline-none placeholder:text-on-surface-variant focus-visible:ring-2 focus-visible:ring-ochre-light"
+        className="rumia-signin-input inline min-w-48 border-b border-ochre-dark bg-transparent px-1 py-1 text-inherit outline-none placeholder:text-on-surface-variant focus-visible:ring-2 focus-visible:ring-ochre-light"
       />
-      <span> and password </span>
-      <input
-        id="password"
-        name="password"
-        aria-label="Password"
-        type="password"
-        required
-        minLength={8}
-        autoComplete="current-password"
-        placeholder="your password"
-        className="inline min-w-48 border-b border-ochre-dark bg-transparent px-1 py-1 text-inherit outline-none placeholder:text-on-surface-variant focus-visible:ring-2 focus-visible:ring-ochre-light"
-      />
-      <span>, then </span>
+      <span className="rumia-signin-copy"> and password </span>
+      <span className="rumia-signin-password-field">
+        <input
+          id="password"
+          name="password"
+          aria-label="Password"
+          type="password"
+          required
+          minLength={8}
+          autoComplete="current-password"
+          placeholder="your password"
+          className="rumia-signin-input inline min-w-48 border-b border-ochre-dark bg-transparent px-1 py-1 text-inherit outline-none placeholder:text-on-surface-variant focus-visible:ring-2 focus-visible:ring-ochre-light"
+        />
+      </span>
+      <span className="rumia-signin-copy"> and then </span>
       <button type="submit" disabled={pending} className="inline border-b border-ochre-dark bg-transparent px-1 py-1 font-medium text-ochre-dark hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light disabled:opacity-60">
         {pending ? "signing in…" : "sign in"}
       </button>
       <span>.</span>
+      </div>
+
+      {submitError ? (
+        <div role="alert" aria-live="assertive" className="mt-6 rounded-xl border border-red-900/20 bg-red-50/70 px-4 py-3 text-sm leading-6 text-red-900">
+          <strong className="font-medium">Sign-in failed.</strong> {submitError}
+        </div>
+      ) : null}
 
       {initialSent && !pending ? (
         <div
@@ -110,7 +121,7 @@ export function SignInForm({ next, initialSent, initialError }: SignInFormProps)
           role="alert"
           className="mt-6 text-sm text-red-800"
         >
-          <strong className="font-medium">Sign-in failed.</strong> {decodeURIComponent(initialError)}
+          <strong className="font-medium">Sign-in failed.</strong> We couldn’t sign you in. Check your email and password and try again.
         </div>
       ) : null}
     </form>

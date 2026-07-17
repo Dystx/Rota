@@ -1,3 +1,4 @@
+import * as React from "react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AppLayout, BrandMark } from "@repo/ui";
@@ -7,6 +8,12 @@ import { resolveRoleCompatibleNext } from "@/lib/auth/role-compatible-next";
 import { SignInForm } from "./_components/sign-in-form";
 import { safeNext } from "../auth/safe-next";
 import { RouteRecovery } from "../_components/route-recovery";
+
+export const SIGN_IN_PLACE_MEDIA = {
+  src: "/media/unsplash/portugal-coast-golden-hour.jpg",
+  alt: "Golden light over the coast of Portugal in a static sign-in place crop.",
+  motionPolicy: "poster-only" as const
+};
 
 export const SIGN_IN_HELP_LINK_CLASS =
   "text-ochre-dark underline underline-offset-2 hover:text-[var(--color-ochre-on-light)] transition-colors duration-fast ease-standard";
@@ -61,6 +68,22 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
       <div className="rumia-auth-page min-h-full bg-transparent">
         <div className="mx-auto grid w-full max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(24rem,28rem)] lg:items-center lg:gap-20 lg:px-12 lg:py-24">
           <aside className="order-2 overflow-hidden rounded-[32px] bg-midnight px-7 py-8 text-linen shadow-raised lg:order-1 lg:px-10 lg:py-11">
+            <figure
+              className="mb-8 overflow-hidden rounded-[22px] border border-linen/15 bg-linen/10"
+              data-testid="sign-in-place-media"
+              data-motion-policy={SIGN_IN_PLACE_MEDIA.motionPolicy}
+            >
+              <img
+                src={SIGN_IN_PLACE_MEDIA.src}
+                alt={SIGN_IN_PLACE_MEDIA.alt}
+                width={1600}
+                height={1174}
+                className="h-40 w-full object-cover object-center opacity-90 lg:h-48"
+              />
+              <figcaption className="px-4 py-3 font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-ochre-light">
+                A quiet place to return to
+              </figcaption>
+            </figure>
             <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-light">
               Rumia / private daybook
             </p>
