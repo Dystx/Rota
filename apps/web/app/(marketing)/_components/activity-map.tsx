@@ -103,6 +103,7 @@ function MapControls({
 
 function ActivityMapSurface({
   model,
+  avoidWhenByActivityId,
   selectedActivityId,
   onSelectActivity,
   onClose,
@@ -112,6 +113,7 @@ function ActivityMapSurface({
   attribution
 }: {
   model: ActivityMapModel;
+  avoidWhenByActivityId: ReadonlyMap<string, string>;
   selectedActivityId: string | null;
   onSelectActivity: (activityId: string) => void;
   onClose: () => void;
@@ -253,6 +255,7 @@ function ActivityMapSurface({
         </div>
         <ActivityMapFallback
           model={model}
+          avoidWhenByActivityId={avoidWhenByActivityId}
           selectedActivityId={selectedActivityId}
           onSelectActivity={handleActivitySelect}
           error={mapError}
@@ -279,6 +282,21 @@ export function ActivityMap({
 }: ActivityMapProps) {
   const attribution = provider?.attribution ?? DEFAULT_ACTIVITY_MAP_ATTRIBUTION;
   const model = React.useMemo(() => buildActivityMapModel(activities), [activities]);
+  const avoidWhenByActivityId = React.useMemo(() => {
+    const warnings = new Map<string, string>();
+    for (const activity of activities) {
+      const activityId = typeof activity.activityId === "string" && activity.activityId.trim()
+        ? activity.activityId.trim()
+        : typeof activity.id === "string" && activity.id.trim()
+          ? activity.id.trim()
+          : null;
+      const avoidWhen = typeof activity.avoidWhen === "string" && activity.avoidWhen.trim()
+        ? activity.avoidWhen.trim()
+        : null;
+      if (activityId && avoidWhen) warnings.set(activityId, avoidWhen);
+    }
+    return warnings;
+  }, [activities]);
   const selected = model.list.some((item) => item.activityId === selectedActivityId)
     ? selectedActivityId
     : model.points[0]?.activityId ?? selectedActivityId;
@@ -296,7 +314,13 @@ export function ActivityMap({
     return (
       <section aria-label="Activity map" data-map-mode="fallback" className="space-y-4">
         <button type="button" onClick={onClose} className="min-h-11 rounded-full border border-[var(--color-border)] bg-linen px-4 py-2 text-sm font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light">View list</button>
-        <ActivityMapFallback model={model} selectedActivityId={selected} onSelectActivity={onSelectActivity} attribution={attribution} />
+        <ActivityMapFallback
+          model={model}
+          avoidWhenByActivityId={avoidWhenByActivityId}
+          selectedActivityId={selected}
+          onSelectActivity={onSelectActivity}
+          attribution={attribution}
+        />
       </section>
     );
   }
@@ -306,6 +330,7 @@ export function ActivityMap({
       <p className="sr-only">{model.points.length} selected activities in {model.points[0]?.locality ?? "Portugal"}; the list beside this map contains the same stops.</p>
       <ActivityMapSurface
         model={model}
+        avoidWhenByActivityId={avoidWhenByActivityId}
         selectedActivityId={selected}
         onSelectActivity={onSelectActivity}
         onClose={onClose}

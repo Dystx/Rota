@@ -8,6 +8,7 @@ import {
 
 export interface ActivityMapFallbackProps {
   model: ActivityMapModel;
+  avoidWhenByActivityId?: ReadonlyMap<string, string>;
   selectedActivityId?: string | null;
   onSelectActivity?: (activityId: string) => void;
   error?: string | null;
@@ -22,6 +23,7 @@ export interface ActivityMapFallbackProps {
  */
 export function ActivityMapFallback({
   model,
+  avoidWhenByActivityId,
   selectedActivityId = null,
   onSelectActivity,
   error,
@@ -59,7 +61,7 @@ export function ActivityMapFallback({
               ? "Approximate public area"
               : "Public point"
             : item.geometryLabel;
-          const avoidWhen = point?.avoidWhen;
+          const avoidWhen = avoidWhenByActivityId?.get(item.activityId) ?? point?.avoidWhen;
           return (
             <li key={`${item.activityId}-${index}`} data-testid="activity-map-list-item" data-activity-id={item.activityId} data-duration-minutes={item.durationMinutes ?? undefined}>
               <button
