@@ -67,6 +67,8 @@ test.describe("public discovery and trust routes", () => {
   test("reviewed activities activate by keyboard and preserve the chosen-day URL", async ({ page }) => {
     await page.goto("/explore?region=porto&mood=a%20walk");
     const explorer = page.getByTestId("activity-explorer");
+    await expect(page.getByTestId("explore-results-column")).toBeVisible();
+    await expect(page.getByTestId("explore-day-rail")).toHaveAttribute("aria-label", "Your chosen day");
     const activityTitle = "Ribeira and Miragaia at walking pace";
     const save = explorer.getByRole("button", { name: `Save ${activityTitle} to this day` });
     await save.scrollIntoViewIfNeeded();
@@ -77,8 +79,11 @@ test.describe("public discovery and trust routes", () => {
       .locator('section[aria-label="Judged activities"]')
       .getByRole("button", { name: `Remove ${activityTitle} from this day` });
     await expect(saved).toHaveAttribute("aria-pressed", "true");
+    await expect(explorer.getByTestId("activity-result-card").first()).toHaveAttribute("data-saved", "true");
+    await expect(page.getByTestId("activity-day-tray")).toBeVisible();
+    await expect(page.getByTestId("activity-day-tray")).toContainText("1 activity");
     await expect(page).toHaveURL(/\/explore\?.*saved=porto-ribeira-slow-walk/);
-    await expect(page.getByTestId("activity-status")).toContainText(/added to your day/i);
+    await expect(page.getByRole("status")).toContainText(/added to your day/i);
 
     await saved.focus();
     await page.keyboard.press("Enter");

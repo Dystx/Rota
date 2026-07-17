@@ -25,6 +25,10 @@ describe("ActivityDayTray", () => {
     expect(tray.className).toContain("md:block");
     expect(screen.getByText("Your day is open.")).toBeDefined();
     expect(screen.getByText(/Save an activity/)).toBeDefined();
+    expect(screen.getByRole("link", { name: "Browse the judged activities" })).toHaveAttribute(
+      "href",
+      "#judged-activities"
+    );
   });
 
   it("uses a compact sticky mobile tray while retaining the full desktop day list", () => {
@@ -37,6 +41,7 @@ describe("ActivityDayTray", () => {
     );
 
     const tray = screen.getByRole("region", { name: /Your day/i });
+    expect(tray).toHaveAttribute("data-testid", "activity-day-tray");
     expect(tray.className).toContain("fixed");
     expect(tray.className).toContain("safe-area-inset-bottom");
     expect(tray.className).toContain("md:static");

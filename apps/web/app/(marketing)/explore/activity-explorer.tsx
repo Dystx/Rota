@@ -67,7 +67,7 @@ export function ActivityExplorer({
     []
   );
   const savedActivities = savedIds.flatMap((savedId) => {
-    const activity = activities.find((candidate) => candidate.id === savedId);
+    const activity = activitiesById.get(savedId);
     return activity ? [activity] : [];
   });
   const intentMotionKey = [
@@ -123,8 +123,9 @@ export function ActivityExplorer({
     <div
       data-testid="activity-explorer"
       data-reduced-motion={reducedMotion ? "true" : "false"}
-      className="mx-auto grid max-w-6xl gap-10 px-6 pb-[calc(12rem+env(safe-area-inset-bottom))] pt-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:pb-28 lg:py-16"
+      className="rumia-explore-page mx-auto grid min-w-0 max-w-6xl gap-10 px-6 pb-[calc(12rem+env(safe-area-inset-bottom))] pt-12 lg:grid-cols-12 lg:items-start lg:pb-28 lg:py-16"
     >
+      <div data-testid="explore-results-column" className="min-w-0 lg:col-span-8">
       <div
         key={`${statusRevision}:${status}`}
         data-motion-key={statusRevision}
@@ -145,7 +146,7 @@ export function ActivityExplorer({
           <ActivityIntentComposer initial={{ region: intent.region === "porto" ? "Porto" : intent.region === "lisbon" ? "Lisbon" : intent.region === "douro" ? "Douro" : intent.region === "algarve" ? "The Algarve" : "The Azores", timeWindow: intent.timeWindow, moods: intent.moods, group: intent.group, constraints: intent.constraints }} onSubmit={updateIntent} />
         </div>
 
-        <section aria-label="Judged activities" className="mt-12">
+        <section id="judged-activities" aria-label="Judged activities" className="mt-12">
           {activities.length > 0 ? activities.map((activity, index) => <ActivityResultCard activity={activity} index={index} alternativeTitle={activity.alternativeId ? activitiesById.get(activity.alternativeId)?.title : undefined} key={activity.id} saved={savedIds.includes(activity.id)} onToggle={toggle} />) : (
             <div className="border-t border-[var(--color-border)] py-8">
               <h2 className="font-display text-3xl text-primary">That combination is still under review.</h2>
@@ -154,13 +155,14 @@ export function ActivityExplorer({
           )}
         </section>
       </div>
-      <div
+      </div>
+      <aside data-testid="explore-day-rail" aria-label="Your chosen day"
         key={savedMotionKey}
         data-motion-key={savedMotionKey}
-        className={`lg:sticky lg:top-24 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`}
+        className={`min-w-0 lg:col-span-4 lg:sticky lg:top-24 ${reducedMotion ? "transition-none" : "rumia-save-transition"}`}
       >
         <ActivityDayTray key={savedMotionKey} activities={savedActivities} onRemove={toggle} onContinue={continueToWorkspace} />
-      </div>
+      </aside>
     </div>
   );
 }

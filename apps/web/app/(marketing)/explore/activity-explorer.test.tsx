@@ -21,6 +21,19 @@ afterEach(() => {
 });
 
 describe("ActivityExplorer", () => {
+  it("makes a saved activity visible in every decision surface", () => {
+    render(<ActivityExplorer initialIntent={parseActivityIntent({ region: "porto", mood: "a walk" })} />);
+
+    const save = screen.getAllByRole("button", { name: /save .* to this day/i })[0]!;
+    fireEvent.click(save);
+
+    expect(save).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getAllByTestId("activity-result-card")[0]).toHaveAttribute("data-saved", "true");
+    expect(screen.getByRole("status")).toHaveTextContent(/added to your day/i);
+    expect(screen.getByTestId("activity-day-tray")).toHaveTextContent("1 activity");
+    expect(replace).toHaveBeenCalledWith(expect.stringContaining("saved="));
+  });
+
   it("reserves mobile space for the fixed day tray and restores desktop spacing", () => {
     render(<ActivityExplorer initialIntent={parseActivityIntent({ region: "porto" })} />);
 
@@ -113,6 +126,19 @@ describe("ActivityExplorer", () => {
     fireEvent.click(screen.getByRole("button", { name: /See this day/i }));
     expect(push).toHaveBeenCalledWith(
       "/explore/workspace?activity=porto-bombarda-art-walk&activity=porto-ribeira-slow-walk"
+    );
+  });
+
+  it("keeps a saved activity visible when a new lens filters it out of the results", () => {
+    render(
+      <ActivityExplorer
+        initialIntent={parseActivityIntent({ region: "porto", mood: "culture" })}
+        initialSavedIds={["porto-ribeira-slow-walk"]}
+      />
+    );
+
+    expect(screen.getByRole("region", { name: /Your day/i })).toHaveTextContent(
+      "Ribeira and Miragaia at walking pace"
     );
   });
 

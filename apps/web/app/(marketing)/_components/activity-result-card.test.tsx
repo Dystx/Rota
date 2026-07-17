@@ -1,4 +1,5 @@
 import * as React from "react";
+import "@testing-library/jest-dom/vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -40,5 +41,21 @@ describe("ActivityResultCard", () => {
     );
     expect(screen.getByText("Choose instead")).toBeTruthy();
     expect(screen.getByText("Miguel Bombarda for contemporary art and design")).toBeTruthy();
+  });
+
+  it("exposes the saved marker and reversible pressed state", () => {
+    render(
+      <ActivityResultCard
+        activity={REVIEWED_ACTIVITY_SEED[0]!}
+        saved
+        onToggle={vi.fn()}
+      />
+    );
+
+    expect(screen.getByTestId("activity-result-card")).toHaveAttribute("data-saved", "true");
+    expect(screen.getByRole("button", { name: /Remove Ribeira and Miragaia.*from this day/i })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
   });
 });

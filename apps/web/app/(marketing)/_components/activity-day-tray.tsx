@@ -42,6 +42,12 @@ export function ActivityDayTray({
             <span>Leave enough room for the day to stay yours.</span>
           </li>
         </ol>
+        <a
+          className="mt-8 inline-flex min-h-11 items-center border-b border-ochre-dark px-0.5 py-2 text-sm font-medium text-ochre-dark transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+          href="#judged-activities"
+        >
+          Browse the judged activities
+        </a>
       </aside>
     );
   }
@@ -51,7 +57,7 @@ export function ActivityDayTray({
   const motionKey = activities.map((activity) => activity.id).join("|");
 
   return (
-    <aside aria-label="Your day" data-reduced-motion={reducedMotion ? "true" : "false"} data-motion-key={motionKey} className={`fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex min-h-16 items-center gap-3 border border-[var(--color-border)] bg-surface p-3 shadow-[0_12px_28px_rgba(43,62,52,0.16)] md:static md:inset-auto md:z-auto md:block md:p-5 md:shadow-[0_12px_28px_rgba(43,62,52,0.08)] ${transitionClass}`} role="region">
+    <aside data-testid="activity-day-tray" aria-label="Your day" data-reduced-motion={reducedMotion ? "true" : "false"} data-motion-key={motionKey} className={`fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex min-h-16 items-center gap-3 border border-[var(--color-border)] bg-surface p-3 shadow-[0_12px_28px_rgba(43,62,52,0.16)] md:static md:inset-auto md:z-auto md:block md:p-5 md:shadow-[0_12px_28px_rgba(43,62,52,0.08)] ${transitionClass}`} role="region">
       <p className="min-w-0 text-sm text-primary md:hidden">
         <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">Your day</span>
         {activities.length} {activities.length === 1 ? "activity" : "activities"} · {Math.round(totalMinutes / 30) / 2} hr
