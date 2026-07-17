@@ -55,15 +55,6 @@ export async function moveTripStage(
 
   const newStatus = localToTripsStatus(input.toStatus);
 
-  // Cheap pre-check: refuse to touch fallback items (their ids
-  // start with "fallback-") so the board's offline placeholder
-  // cards never get a write attempted against the real table.
-  if (input.tripId.startsWith("fallback-")) {
-    throw new Error(
-      "Cannot persist a move for a fallback item (no such row in the database)."
-    );
-  }
-
   const updated = await updatePostgresTripStatus(input.tripId, newStatus as "draft" | "in_review" | "active", admin.actor);
   if (!updated) throw new Error("moveTripStage failed: trip not found or not authorized.");
 

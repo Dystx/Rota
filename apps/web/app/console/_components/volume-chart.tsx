@@ -1,33 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 
-interface BarDatum {
+export interface BarDatum {
   label: string;
   height: string;
   fill: string;
   peak?: boolean;
 }
 
-const WEEKLY_BARS: BarDatum[] = [
-  { label: "Mon", height: "60%", fill: "bg-olive-light/20" },
-  { label: "Tue", height: "80%", fill: "bg-olive-light/35" },
-  { label: "Wed", height: "40%", fill: "bg-olive-light/15" },
-  { label: "Thu", height: "90%", fill: "bg-olive-light/60", peak: true },
-  { label: "Fri", height: "70%", fill: "bg-olive-light/45" },
-  { label: "Sat", height: "50%", fill: "bg-olive-light/25" },
-  { label: "Sun", height: "85%", fill: "bg-olive-light/55" },
-];
-
 export interface VolumeChartProps {
-  weekly: BarDatum[];
+  weekly: readonly BarDatum[];
+  monthly?: readonly BarDatum[];
 }
 
-export function VolumeChart({ weekly }: VolumeChartProps) {
-  const [range, setRange] = useState<"weekly" | "monthly">("weekly");
-  const [hovered, setHovered] = useState<number | null>(null);
+export function VolumeChart({ weekly, monthly = weekly }: VolumeChartProps) {
+  const [range, setRange] = React.useState<"weekly" | "monthly">("weekly");
+  const [hovered, setHovered] = React.useState<number | null>(null);
 
-  const data = range === "weekly" ? weekly : weekly;
+  const data = range === "weekly" ? weekly : monthly;
 
   return (
     <section className="glass-card rounded-xl p-card-padding flex flex-col">

@@ -1,257 +1,27 @@
-"use client";
-
-import { useState } from "react";
-import { Icon } from "@repo/ui";
-
-interface TreeNode {
-  id: string;
-  label: string;
-  icon: string;
-  count?: string;
-  children?: TreeNode[];
-}
-
-const HIERARCHY: TreeNode[] = [
-  {
-    id: "portugal",
-    label: "Portugal",
-    icon: "public",
-    count: "1,248",
-    children: [
-      {
-        id: "north",
-        label: "North",
-        icon: "map",
-        count: "402",
-        children: [
-          { id: "porto", label: "Porto", icon: "location_city" },
-          { id: "douro", label: "Douro Valley", icon: "terrain" },
-          { id: "minho", label: "Minho", icon: "terrain" },
-        ],
-      },
-      {
-        id: "lisbon-region",
-        label: "Lisbon Region",
-        icon: "map",
-        count: "528",
-        children: [
-          { id: "lisbon", label: "Lisbon", icon: "location_city" },
-          { id: "sintra", label: "Sintra", icon: "terrain" },
-        ],
-      },
-    ],
-  },
-];
-
-const VECTOR_PREVIEW = Array.from({ length: 36 }, (_, index) => {
-  const seed = Math.sin(index * 1.7) * 0.5;
-  return (seed + Math.cos(index * 0.9) * 0.3).toFixed(4);
-}).join(", ");
+import * as React from "react";
+import { DecisionStatePanel } from "@repo/ui";
 
 export default function ConsoleGraphPage() {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    portugal: true,
-    north: true,
-    "lisbon-region": true,
-  });
-  const [focusedNode, setFocusedNode] = useState("portugal");
-
-  const toggle = (id: string) =>
-    setExpanded((current) => ({ ...current, [id]: !current[id] }));
-
-  const renderNode = (node: TreeNode, depth: number) => {
-    const isExpanded = !!expanded[node.id];
-    const hasChildren = !!node.children?.length;
-    const indent = depth > 0 ? `pl-${Math.min(depth, 12)}` : "";
-
-    return (
-      <li key={node.id} className={indent}>
-        <button
-          type="button"
-          onClick={() => hasChildren && toggle(node.id)}
-          aria-expanded={hasChildren ? isExpanded : undefined}
-          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left font-mono-technical text-mono-technical hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light ${
-            node.id === focusedNode
-              ? "bg-primary-container/30 border border-ochre-light/20 text-ochre-light font-medium"
-              : "text-linen-dark"
-          }`}
-        >
-          <Icon
-            name={hasChildren ? (isExpanded ? "expand_more" : "chevron_right") : node.icon}
-            className="text-[18px]"
-          />
-          <Icon name={hasChildren ? node.icon : ""} className="text-[18px] text-ochre-light" />
-          <span className="flex-1 truncate">{node.label}</span>
-          {node.count ? (
-            <span className="font-mono-technical text-mono-technical opacity-70">
-              {node.count}
-            </span>
-          ) : null}
-        </button>
-        {hasChildren && isExpanded ? (
-          <ul className={`mt-1 space-y-1 ${depth >= 1 ? "pl-6" : "pl-6"}`}>
-            {node.children!.map((child) => renderNode(child, depth + 1))}
-          </ul>
-        ) : null}
-      </li>
-    );
-  };
-
   return (
-    <>
-      <div className="min-h-screen min-w-0 overflow-x-hidden flex flex-col bg-[#050806] text-linen-dark relative z-10">
-        <header className="min-h-16 border-b border-white/5 flex flex-wrap items-center gap-2 justify-between px-container-padding-lg py-2 shrink-0 bg-black/40 backdrop-blur-md">
-          <nav
-            aria-label="Graph hierarchy path"
-            className="flex items-center gap-2 font-mono-technical text-mono-technical text-linen-dark/70"
-          >
-            <span>Nodes</span>
-            <span aria-hidden>/</span>
-            <span>Geography</span>
-            <span aria-hidden>/</span>
-            <span className="text-ochre-light font-medium">Portugal</span>
-          </nav>
-          <span className="mr-auto ml-6 rounded-full border border-ochre-light/30 bg-ochre-light/10 px-3 py-1 font-mono-micro text-mono-micro uppercase tracking-wider text-ochre-light">
-            Demo data · Portugal atlas
-          </span>
-          <div className="flex items-center gap-1" aria-label="Focus graph region">
-            <span className="sr-only">Focus graph region</span>
-            {["portugal", "lisbon", "porto", "douro"].map((id) => (
-              <button
-                key={id}
-                type="button"
-                aria-pressed={focusedNode === id}
-                onClick={() => setFocusedNode(id)}
-                className={`rounded-full px-3 py-1.5 font-mono-micro text-mono-micro uppercase tracking-wider border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light ${
-                  focusedNode === id
-                    ? "border-ochre-light bg-ochre-light/15 text-ochre-light"
-                    : "border-white/10 text-linen-dark/60 hover:border-ochre-light/50 hover:text-linen-dark"
-                }`}
-              >
-                {id === "portugal" ? "All Portugal" : id}
-              </button>
-            ))}
-          </div>
-        </header>
-
-        <div className="flex-1 min-w-0 flex flex-col md:flex-row overflow-hidden">
-          <aside className="w-full md:w-1/3 md:min-w-[300px] border-r border-white/5 bg-black/20 flex flex-col">
-            <header className="p-gutter border-b border-white/5 flex items-center justify-between shrink-0">
-              <h1 className="font-headline-sm text-headline-sm text-linen-dark uppercase tracking-wide">
-                Graph Hierarchy
-              </h1>
-              <button
-                type="button"
-                aria-label="Filter tree"
-                className="p-2 rounded-lg text-linen-dark/70 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-olive-dark"
-              >
-                <Icon name="funnel" />
-              </button>
-            </header>
-            <div className="flex-1 overflow-y-auto p-4 font-mono-technical text-mono-technical">
-              <ul className="space-y-1">{HIERARCHY.map((node) => renderNode(node, 0))}</ul>
-            </div>
-          </aside>
-
-          <section className="min-w-0 flex-1 overflow-y-auto p-container-padding-lg">
-            <div className="max-w-4xl mx-auto space-y-section-gap">
-              <article className="relative overflow-hidden bg-glass-dark border border-white/5 rounded-xl p-card-padding shadow-2xl backdrop-blur-xl">
-                <span
-                  aria-hidden
-                  className="absolute top-0 right-0 w-64 h-64 bg-ochre-dark/10 blur-[80px] rounded-full pointer-events-none"
-                />
-                <div className="relative z-10 flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="font-mono-micro text-mono-micro uppercase tracking-widest bg-olive-light/30 border border-olive-light text-linen-dark px-2 py-1 rounded">
-                        Node: Country
-                      </span>
-                      <span className="font-mono-micro text-mono-micro uppercase tracking-widest bg-olive-light/40 border border-olive-light/60 text-linen-dark px-2 py-1 rounded shadow-sm flex items-center gap-1">
-                        <span
-                          aria-hidden
-                          className="w-1.5 h-1.5 rounded-full bg-olive-light"
-                        />
-                        Active
-                      </span>
-                    </div>
-                    <h2 className="font-headline-lg text-headline-lg text-linen-dark mb-2">
-                      Portugal
-                    </h2>
-                    <p className="font-mono-technical text-mono-technical text-linen-dark/60">
-                      ID: node_geog_pt_0001a
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      aria-label="Edit node"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark"
-                    >
-                      <Icon name="edit" />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="View revision history"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-linen-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2 focus-visible:ring-offset-glass-dark"
-                    >
-                      <Icon name="history" />
-                    </button>
-                  </div>
-                </div>
-              </article>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-                <article className="bg-black/40 border border-white/5 rounded-lg p-card-padding">
-                  <h3 className="font-headline-sm text-headline-sm text-linen-dark mb-3 flex items-center gap-2">
-                    <Icon name="data_array" className="text-ochre-light" />
-                    Semantic Vector Map
-                  </h3>
-                  <div className="relative bg-black/60 rounded border border-white/5 p-3 mb-3 h-32 overflow-hidden">
-                    <p className="font-mono-technical text-mono-technical text-ochre-light break-words">
-                      [{VECTOR_PREVIEW}, …]
-                    </p>
-                    <span
-                      aria-hidden
-                      className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"
-                    />
-                  </div>
-                  <footer className="flex items-center justify-between border-t border-white/5 pt-3 font-mono-technical text-mono-technical text-linen-dark/70">
-                    <span>Dim: 1536</span>
-                    <span>Model: text-embedding-3-large</span>
-                  </footer>
-                </article>
-
-                <article className="bg-black/40 border border-white/5 rounded-lg p-card-padding flex flex-col">
-                  <h3 className="font-headline-sm text-headline-sm text-linen-dark mb-3 flex items-center gap-2">
-                    <Icon name="satellite_alt" className="text-ochre-light" />
-                    Spatial Data (PostGIS)
-                  </h3>
-                  <div className="flex-1 relative bg-black/60 rounded border border-white/5 overflow-hidden min-h-[120px]">
-                    <img
-                      src="/hero/portugal-coast-golden-hour.svg"
-                      alt="Satellite reference map for Portugal"
-                      className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen"
-                    />
-                    <span
-                      aria-hidden
-                      className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/60 to-transparent"
-                    />
-                    <span className="absolute bottom-3 left-3 font-mono-technical text-mono-technical text-ochre-light bg-black/50 border border-white/10 px-2 py-1 rounded">
-                      POINT(-8.496 39.500)
-                    </span>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </section>
-        </div>
+    <main className="min-h-screen min-w-0 overflow-x-hidden bg-olive-dark p-container-padding-sm text-linen-dark lg:p-container-padding-lg">
+      <header className="mb-6 border-b border-white/10 pb-5">
+        <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light">
+          Knowledge graph
+        </p>
+        <h1 className="mt-2 font-headline-lg text-headline-lg text-linen-dark">Graph evidence</h1>
+        <p className="mt-2 max-w-2xl font-body-md text-body-md text-linen-dark/70">
+          Places, regions, and relationships appear here only when the persisted graph source is connected.
+        </p>
+      </header>
+      <div data-testid="console-graph">
+        <DecisionStatePanel
+          kind="unavailable"
+          tone="inverse"
+          headingLevel={2}
+          title="Knowledge graph is unavailable"
+          description="No persisted graph evidence is available, so vectors, counts, and map coordinates are not presented as operational data."
+        />
       </div>
-      <style>{`
-        .rumia-operator-main ::-webkit-scrollbar { width: 6px; }
-        .rumia-operator-main ::-webkit-scrollbar-thumb {
-          background-color: rgba(255, 255, 255, 0.1); border-radius: 9999px;
-        }
-      `}</style>
-    </>
+    </main>
   );
 }

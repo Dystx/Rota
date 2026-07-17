@@ -31,7 +31,10 @@ vi.mock("@/app/_components/route-recovery", () => ({
 
 import DeveloperDocsPage from "./page";
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  delete process.env.ENABLE_API_DOCS;
+});
 
 const actor = {
   capabilities: ["developer_docs:read"],
@@ -43,6 +46,7 @@ const actor = {
 describe("developer docs access boundary", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    process.env.ENABLE_API_DOCS = "true";
     mocks.headers.mockResolvedValue({ get: () => "/api/v1/docs" });
     mocks.requirementForHttpRoute.mockReturnValue({ anyRole: ["admin"], allCapabilities: ["developer_docs:read"] });
     mocks.requirePageAccess.mockResolvedValue({ kind: "ready", actor });
@@ -66,6 +70,15 @@ describe("developer docs access boundary", () => {
     render(await DeveloperDocsPage());
 
     expect(screen.getByRole("heading", { name: /developer documentation is restricted/i })).toBeInTheDocument();
+    expect(screen.queryByTestId("developer-api-docs")).not.toBeInTheDocument();
+  });
+
+  it("renders a paused state when the API docs flag is disabled", async () => {
+    delete process.env.ENABLE_API_DOCS;
+
+    render(await DeveloperDocsPage());
+
+    expect(screen.getByRole("heading", { name: /api docs are paused/i })).toBeInTheDocument();
     expect(screen.queryByTestId("developer-api-docs")).not.toBeInTheDocument();
   });
 });

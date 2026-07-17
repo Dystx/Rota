@@ -1,8 +1,8 @@
 "use client";
 
+import * as React from "react";
 import { useState, useTransition, type FormEvent } from "react";
-import { Icon } from "@repo/ui";
-import { SnippetCard } from "../../_components/snippet-card";
+import { DecisionStatePanel, Icon } from "@repo/ui";
 import type { Day } from "../_lib/conversations";
 
 /**
@@ -47,7 +47,7 @@ interface TriagePanelProps {
 }
 
 /**
- * Column 3: snippet library (static) + Update Timeline form +
+ * Column 3: persisted snippet availability + Update Timeline form +
  * recent-pushes list. Form state lives inside the component; the
  * page only sees the push result and the read-only recent-events
  * list.
@@ -102,55 +102,14 @@ export function TriagePanel({
 
   return (
     <aside className="w-full shrink-0 flex flex-col gap-4 lg:w-[clamp(18rem,27vw,21rem)]">
-      <section className="flex-1 min-h-0 flex flex-col bg-glass-light backdrop-blur-md border border-white/40 shadow-sm rounded-xl overflow-hidden">
-        <header className="px-4 py-3 border-b border-olive-light/10 bg-white/30 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            <Icon name="library_books" className="text-ochre-dark" />
-            <h3 className="font-headline-sm text-headline-sm text-primary">
-              Snippet Library
-            </h3>
-          </div>
-          <button
-            type="button"
-            aria-label="Add new snippet"
-            className="p-2 rounded-lg text-on-surface-variant hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
-          >
-            <Icon name="plus-circle" />
-          </button>
-        </header>
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-gutter">
-          <div>
-            <h4 className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant mb-2">
-              Portugal Recommendations
-            </h4>
-            <div className="flex flex-col gap-2">
-              <SnippetCard
-                title="Lisbon tile studio"
-                body="A quiet, host-led azulejo session in a working studio near Alfama, with time for questions and a short walk."
-              />
-              <SnippetCard
-                title="Douro quinta morning"
-                body="An early departure to a family-run quinta, with a slow vineyard walk and a reserved table overlooking the river."
-              />
-            </div>
-          </div>
-          <div>
-            <h4 className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant mb-2">
-              General Admin
-            </h4>
-            <div className="flex flex-col gap-2">
-              <SnippetCard
-                title="Deposit Reminder"
-                body="Friendly nudge that the second 50% deposit is due 60 days before departure, with a direct payment link."
-              />
-            </div>
-          </div>
-        </div>
-        <footer className="p-3 bg-surface-container-lowest/50 border-t border-olive-light/10 shrink-0">
-          <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant text-center">
-            Drag snippets to chat
-          </p>
-        </footer>
+      <section data-testid="snippet-library-unavailable" className="flex-1 min-h-0 overflow-hidden rounded-xl border border-white/40 bg-glass-light shadow-sm">
+        <DecisionStatePanel
+          kind="unavailable"
+          headingLevel={3}
+          title="Snippet library unavailable"
+          description="Only persisted editorial snippets can be inserted into a conversation."
+          className="min-h-0 rounded-none border-0 px-4 py-10"
+        />
       </section>
 
       <section className="flex-1 min-h-0 flex flex-col bg-glass-dark text-on-primary backdrop-blur-xl shadow-xl rounded-xl overflow-hidden border border-white/10">
@@ -202,8 +161,7 @@ export function TriagePanel({
               <input
                 name="title"
                 type="text"
-                  defaultValue="Lisbon tile studio"
-                data-testid="push-event-title"
+                  data-testid="push-event-title"
                 className="w-full font-body-md text-body-md bg-white/10 border border-white/20 text-on-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ochre-light"
               />
             </label>
@@ -215,7 +173,6 @@ export function TriagePanel({
                 <input
                   name="eventDate"
                   type="date"
-                  defaultValue="2024-10-14"
                   data-testid="push-event-date"
                   className="w-full font-body-md text-body-md bg-white/10 border border-white/20 text-on-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ochre-light"
                 />
@@ -227,7 +184,6 @@ export function TriagePanel({
                 <input
                   name="eventTime"
                   type="time"
-                  defaultValue="14:00"
                   data-testid="push-event-time"
                   className="w-full font-body-md text-body-md bg-white/10 border border-white/20 text-on-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ochre-light"
                 />
@@ -266,7 +222,7 @@ export function TriagePanel({
               >
                 {timelineStatus.kind === "error"
                   ? `Error: ${timelineStatus.message}`
-                  : `Recorded — id ${timelineStatus.id.slice(0, 8)}`}
+                  : "Event recorded."}
               </p>
             ) : null}
           </form>

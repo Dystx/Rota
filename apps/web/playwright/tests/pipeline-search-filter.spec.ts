@@ -53,7 +53,7 @@ test.describe("@smoke @pipeline-search-filter pipeline header search + filter", 
     await page.getByTestId("pipeline-filter-draft").click();
 
     // Filter button now shows the selected label.
-    await expect(page.getByTestId("pipeline-filter-button")).toContainText("New Drafts");
+    await expect(page.getByTestId("pipeline-filter-button")).toContainText("New activity evidence");
 
     // The Clear button appears because the filter is non-default.
     await expect(page.getByTestId("pipeline-filter-clear")).toBeVisible();

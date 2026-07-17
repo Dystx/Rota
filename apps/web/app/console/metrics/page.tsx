@@ -1,124 +1,71 @@
-import { KpiCard } from "../_components/kpi-card";
-import { VolumeChart } from "../_components/volume-chart";
+import * as React from "react";
+import { getPostgresAdminAnalyticsMetricCounts } from "@repo/db";
+import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
+import { DecisionStatePanel } from "@repo/ui";
 
-const WEEKLY_BARS = [
-  { label: "Mon", height: "60%", fill: "bg-olive-light/20" },
-  { label: "Tue", height: "80%", fill: "bg-olive-light/35" },
-  { label: "Wed", height: "40%", fill: "bg-olive-light/15" },
-  { label: "Thu", height: "90%", fill: "bg-olive-light/60", peak: true },
-  { label: "Fri", height: "70%", fill: "bg-olive-light/45" },
-  { label: "Sat", height: "50%", fill: "bg-olive-light/25" },
-  { label: "Sun", height: "85%", fill: "bg-olive-light/55" },
-] as const;
+type MetricsState =
+  | { kind: "ready"; counts: Awaited<ReturnType<typeof getPostgresAdminAnalyticsMetricCounts>> }
+  | { kind: "unavailable" };
 
-const REGIONS = [
-  {
-    name: "North America",
-    active: "412 active trips",
-    share: "54%",
-    delta: "+2.1%",
-    deltaTone: "text-olive-light",
-  },
-  {
-    name: "Europe",
-    active: "289 active trips",
-    share: "32%",
-    delta: "-0.8%",
-    deltaTone: "text-on-error-container",
-  },
-  {
-    name: "Asia Pacific",
-    active: "104 active trips",
-    share: "14%",
-    delta: "+5.4%",
-    deltaTone: "text-olive-light",
-  },
-] as const;
+async function loadMetricsState(): Promise<MetricsState> {
+  try {
+    const admin = await getAdminPageAuthContext({ allCapabilities: ["analytics:read"] });
+    if (!isAdminPageAuthContext(admin)) return { kind: "unavailable" };
+    return { kind: "ready", counts: await getPostgresAdminAnalyticsMetricCounts(admin.actor) };
+  } catch {
+    return { kind: "unavailable" };
+  }
+}
 
-export default function ConsoleMetricsPage() {
+function formatCount(value: number) {
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
+export default async function ConsoleMetricsPage() {
+  const state = await loadMetricsState();
+
   return (
-    <>
-      <div className="min-h-screen flex flex-col bg-background relative">
-        <div className="flex-1 p-container-padding-lg w-full flex flex-col gap-section-gap relative z-10 overflow-x-hidden">
-          <header className="mb-4">
-            <h1 className="font-headline-lg text-headline-lg text-primary">
-              Global Metrics Dashboard
-            </h1>
-            <p className="font-body-md text-body-md text-on-surface-variant">
-              Admin health overview and real-time performance indicators.
-            </p>
-          </header>
+    <main data-testid="console-metrics" className="min-h-screen min-w-0 overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
+      <header className="mb-6 border-b border-olive-light/15 pb-5">
+        <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
+          Operator metrics
+        </p>
+        <h1 className="mt-2 font-headline-lg text-headline-lg text-primary">Pipeline health</h1>
+        <p className="mt-2 max-w-2xl font-body-md text-body-md text-on-surface-variant">
+          Counts are read from the admin reporting tables and are never replaced with illustrative totals.
+        </p>
+      </header>
 
-          <section
-            aria-label="Key metrics"
-            className="grid grid-cols-1 md:grid-cols-3 gap-gutter"
-          >
-            <KpiCard
-              eyebrow="Gross Merchandise Value"
-              icon="payments"
-              value="$2.4M"
-              trend={{ direction: "up", label: "+12.5% MTD", tone: "olive-light" }}
-            />
-            <KpiCard
-              eyebrow="Conversion T1 → T2"
-              icon="swap_calls"
-              value="42.8%"
-              trend={{
-                direction: "down",
-                label: "-2.1% MTD",
-                tone: "on-error-container",
-              }}
-            />
-            <KpiCard
-              eyebrow="Specialist SLA Time"
-              icon="timer"
-              value="1h 14m"
-              trend={{
-                direction: "down",
-                label: "-15m MTD (Improved)",
-                tone: "olive-light",
-              }}
-            />
-          </section>
-
-          <section className="grid grid-cols-1 lg:grid-cols-5 gap-gutter min-w-0">
-            <div className="lg:col-span-3 min-w-0">
-              <VolumeChart weekly={[...WEEKLY_BARS]} />
-            </div>
-
-            <section className="glass-card rounded-xl p-card-padding flex flex-col gap-2 min-w-0 overflow-hidden">
-              <h3 className="font-label-ui text-label-ui uppercase tracking-widest text-primary mb-2">
-                Regional Performance
-              </h3>
-              <ul className="flex flex-col gap-2">
-                {REGIONS.map((region) => (
-                  <li
-                    key={region.name}
-                    className="flex items-center justify-between gap-2 p-3 rounded-lg border border-transparent hover:border-outline/10 hover:bg-surface-variant/50 cursor-pointer focus-within:ring-2 focus-within:ring-ochre-light min-w-0"
-                  >
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <span className="font-label-ui text-label-ui text-primary truncate">
-                        {region.name}
-                      </span>
-                      <span className="font-mono-technical text-mono-technical text-on-surface-variant truncate">
-                        {region.active}
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-end shrink-0 gap-0.5">
-                      <span className="font-label-ui text-label-ui text-primary">
-                        {region.share}
-                      </span>
-                      <span className={`font-mono-technical text-mono-technical ${region.deltaTone}`}>
-                        {region.delta}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </section>
+      {state.kind === "unavailable" ? (
+        <div data-testid="console-metrics-unavailable">
+          <DecisionStatePanel
+            kind="unavailable"
+            headingLevel={2}
+            title="Metrics are unavailable"
+            description="The admin reporting source could not be loaded, so no derived or placeholder totals are shown."
+          />
         </div>
-      </div>
-    </>
+      ) : (
+        <section className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Persisted operator metrics">
+          <MetricCard label="Trips total" value={formatCount(state.counts.tripsTotal)} />
+          <MetricCard label="Trips · last 7 days" value={formatCount(state.counts.tripsLast7Days)} />
+          <MetricCard label="Review queue" value={formatCount(state.counts.reviewQueueSize)} />
+          <MetricCard label="Review completions" value={formatCount(state.counts.reviewCompletions)} />
+          <MetricCard label="Checkout completions" value={formatCount(state.counts.checkoutCompletions)} />
+          <MetricCard label="Partner clicks total" value={formatCount(state.counts.partnerClicksTotal)} />
+          <MetricCard label="Partner clicks · last 7 days" value={formatCount(state.counts.partnerClicksLast7Days)} />
+        </section>
+      )}
+    </main>
+  );
+}
+
+function MetricCard({ label, value }: { label: string; value: string }) {
+  return (
+    <article className="min-w-0 rounded-xl border border-olive-light/15 bg-white/65 p-card-padding shadow-sm">
+      <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-on-surface-variant">{label}</p>
+      <p className="mt-5 break-words font-headline-lg text-headline-lg text-primary">{value}</p>
+      <p className="mt-2 font-label-ui text-label-ui text-on-surface-variant">Persisted admin count</p>
+    </article>
   );
 }

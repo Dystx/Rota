@@ -23,9 +23,9 @@ type StatusFilter = "all" | PipelineItem["status"];
 
 const STATUS_OPTIONS: Array<{ value: StatusFilter; label: string }> = [
   { value: "all", label: "All statuses" },
-  { value: "draft", label: "New Drafts" },
-  { value: "in_revision", label: "In Revision" },
-  { value: "active_chat", label: "Active Chats" }
+  { value: "draft", label: "New activity evidence" },
+  { value: "in_revision", label: "Needs editorial revision" },
+  { value: "active_chat", label: "Reviewer follow-up" }
 ];
 
 export function PipelineHeader({
@@ -70,13 +70,13 @@ export function PipelineHeader({
   return (
     <div className="flex w-full min-w-0 flex-wrap items-center gap-3 md:w-auto md:flex-nowrap">
       <label className="relative min-w-0 flex-1 sm:flex-none">
-        <span className="sr-only">Search pipeline</span>
+        <span className="sr-only">Search activity evidence</span>
         <Icon aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" name="search" />
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search threads…"
+          placeholder="Search evidence…"
           data-testid="pipeline-search-input"
           className="w-full max-w-full font-body-md text-body-md pl-10 pr-4 py-2 rounded-full bg-white/60 border border-white/40 backdrop-blur-md text-primary placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-ochre-light focus:border-ochre-light sm:w-64"
         />
@@ -88,7 +88,7 @@ export function PipelineHeader({
           onClick={() => setFilterOpen((v) => !v)}
           aria-haspopup="listbox"
           aria-expanded={filterOpen}
-          aria-label="Filter pipeline by status"
+          aria-label="Filter activity review by status"
           data-testid="pipeline-filter-button"
           className="min-h-11 shrink-0 font-label-ui text-label-ui flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-white/40 backdrop-blur-md text-primary hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >

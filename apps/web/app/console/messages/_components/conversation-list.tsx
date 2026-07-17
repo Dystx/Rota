@@ -1,10 +1,11 @@
 "use client";
 
+import * as React from "react";
 import type { Day } from "../_lib/conversations";
-import { Icon } from "@repo/ui";
+import { DecisionStatePanel, Icon } from "@repo/ui";
 
 interface DayListProps {
-  days: Day[];
+  days: ReadonlyArray<Day>;
   activeId: string;
   onSelect: (id: string) => void;
   search: string;
@@ -20,8 +21,8 @@ interface DayListProps {
  * DayList — the leftmost column of the /console/messages
  * 3-column kanban. Renders the "Itinerary Days" header, a
  * finite choice filter, and a scrollable list of day
- * cards. Each card mirrors the reference's "Day 2 • Oct 13
- * — Lisbon Neighbourhoods" pattern: date pill on the left,
+ * cards. Each card mirrors the reference's day/date pattern:
+ * date pill on the left,
  * title + one-line summary on the right.
  *
  * Extracted from the page so the parent can stay focused on
@@ -89,6 +90,17 @@ export function ConversationList({
         ) : null}
       </div>
       <ul className="flex-1 overflow-y-auto">
+        {days.length === 0 ? (
+          <li>
+            <DecisionStatePanel
+              kind="unavailable"
+              headingLevel={3}
+              title="No conversations available"
+              description="Persisted conversations will appear here when connected."
+              className="min-h-0 rounded-none border-0 px-4 py-10"
+            />
+          </li>
+        ) : null}
         {days
           .filter((day) => {
             const q = search.trim().toLowerCase();

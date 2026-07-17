@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import * as React from "react";
 import { Icon } from "@repo/ui";
 
 export interface KpiCardProps {

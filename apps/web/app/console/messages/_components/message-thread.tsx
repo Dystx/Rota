@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import {
   useMemo,
   useState,
@@ -171,7 +172,7 @@ export function MessageThread({
                 Status: Planning
               </span>
               <span
-                data-realtime={isLive ? "live" : "fallback"}
+                data-realtime={isLive ? "live" : "unavailable"}
                 className={`font-mono-technical text-mono-technical px-2 py-0.5 rounded ${
                   isLive
                     ? "bg-olive-light/20 text-olive-dark"
@@ -325,7 +326,7 @@ export function MessageThread({
         )}
       </div>
 
-      <div className="p-4 bg-white/60 backdrop-blur-md border-t border-olive-light/10 shrink-0">
+      <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-white/60 backdrop-blur-md border-t border-olive-light/10 shrink-0">
         <div
           onDragOver={(event) => {
             event.preventDefault();
