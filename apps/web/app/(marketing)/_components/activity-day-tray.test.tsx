@@ -47,6 +47,9 @@ describe("ActivityDayTray", () => {
     expect(tray.className).toContain("md:static");
     expect(tray.className).toContain("rumia-save-transition");
     expect(tray.getAttribute("data-motion-key")).toBe("porto-ribeira-slow-walk");
+    expect(screen.getByRole("button", { name: /Remove Ribeira and Miragaia.*from this day/i }).className).toContain(
+      "scroll-mb-[calc(8rem+env(safe-area-inset-bottom))]"
+    );
     expect(screen.getByRole("button", { name: /See this day/i }).className).toContain("min-h-11");
   });
 });

@@ -53,9 +53,13 @@ describe("ActivityResultCard", () => {
     );
 
     expect(screen.getByTestId("activity-result-card")).toHaveAttribute("data-saved", "true");
-    expect(screen.getByRole("button", { name: /Remove Ribeira and Miragaia.*from this day/i })).toHaveAttribute(
+    const saveToggle = screen.getByRole("button", { name: /Remove Ribeira and Miragaia.*from this day/i });
+    expect(saveToggle).toHaveAttribute(
       "aria-pressed",
       "true"
     );
+    expect(saveToggle.className).toContain("min-h-11");
+    expect(saveToggle.className).toContain("min-w-11");
+    expect(saveToggle.className).toContain("scroll-mb-[calc(8rem+env(safe-area-inset-bottom))]");
   });
 });

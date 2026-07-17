@@ -72,7 +72,7 @@ export function ActivityDayTray({
               <span className="text-sm text-primary">{activity.title}</span>
               <button
                 aria-label={`Remove ${activity.title} from this day`}
-                className="min-h-11 min-w-11 text-sm text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+                className="min-h-11 min-w-11 scroll-mb-[calc(8rem+env(safe-area-inset-bottom))] text-sm text-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
                 type="button"
                 onClick={() => onRemove(activity.id)}
               >

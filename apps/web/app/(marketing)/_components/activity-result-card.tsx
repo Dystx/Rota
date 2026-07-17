@@ -65,7 +65,7 @@ export function ActivityResultCard({
             {activity.avoidWhen ?? "Worth choosing when it matches the pace you have available."}
           </p>
           <button
-            className="mt-5 min-h-11 border-b border-ochre-dark px-0.5 py-2 text-left text-sm font-medium text-ochre-dark transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+            className="mt-5 min-h-11 min-w-11 scroll-mb-[calc(8rem+env(safe-area-inset-bottom))] border-b border-ochre-dark px-0.5 py-2 text-left text-sm font-medium text-ochre-dark transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
             type="button"
             aria-pressed={saved}
             onClick={() => onToggle(activity.id)}
