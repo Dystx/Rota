@@ -2,6 +2,11 @@ import { expect, test } from "@playwright/test";
 import fs from "fs";
 import path from "path";
 import { travelerTripPath } from "../fixtures/traveler-trip";
+import { assertExactArtifactReceipt } from "../visual-state-matrix";
+
+test.beforeEach(() => {
+  assertExactArtifactReceipt();
+});
 
 const routes = {
   marketing: ["/", "/portugal", "/explore", "/explore/workspace", "/how-it-works", "/pricing", "/human-review", "/privacy", "/terms", "/sustainability", "/support", "/offline", "/sign-in", "/expert-chat", "/guide", "/b2b", "/guide/onboarding", "/b2b/unknown-workspace"],

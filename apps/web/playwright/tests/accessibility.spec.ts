@@ -6,6 +6,11 @@ import { createAdminStorageState } from "../fixtures/admin-auth";
 import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
 import { getTravelerTripId, travelerTripPath } from "../fixtures/traveler-trip";
+import { assertExactArtifactReceipt } from "../visual-state-matrix";
+
+test.beforeEach(() => {
+  assertExactArtifactReceipt();
+});
 
 const axeResults: { path: string; violations: any[] }[] = [];
 

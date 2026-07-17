@@ -3,8 +3,13 @@ import { createAdminStorageState } from "../fixtures/admin-auth";
 import { createAdminLimitedStorageState } from "../fixtures/admin-limited-auth";
 import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
+import { assertExactArtifactReceipt } from "../visual-state-matrix";
 
 type Persona = "anonymous" | "traveler" | "reviewer" | "admin" | "limited-admin";
+
+test.beforeEach(() => {
+  assertExactArtifactReceipt();
+});
 
 const reviewerPages = [
   "/reviewer/queue",

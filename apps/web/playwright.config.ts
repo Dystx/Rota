@@ -20,7 +20,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "retain-on-failure"
   },
-  webServer: {
+  webServer: process.env.PLAYWRIGHT_EXTERNAL_SERVER === "1" ? undefined : {
     // Always build and start the standalone release artifact for route-level
     // checks. Reusing a process from another checkout can silently exercise
     // stale planner/UI code and make visual and accessibility evidence invalid.

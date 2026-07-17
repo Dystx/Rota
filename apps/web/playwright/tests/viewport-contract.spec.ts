@@ -3,6 +3,11 @@ import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { createReviewerStorageState } from "../fixtures/reviewer-auth";
 import { createTravelerStorageState } from "../fixtures/traveler-auth";
 import { travelerTripPath } from "../fixtures/traveler-trip";
+import { assertExactArtifactReceipt } from "../visual-state-matrix";
+
+test.beforeEach(() => {
+  assertExactArtifactReceipt();
+});
 
 /**
  * UI-5 evidence for the tablet widths called out in the redesign plan.
@@ -10,7 +15,8 @@ import { travelerTripPath } from "../fixtures/traveler-trip";
  * This is deliberately not tagged `@smoke`, `@visual`, or `@a11y`: the
  * canonical release suites remain the 1440/Desktop Chrome and 390x844 mobile
  * projects. The contract is run explicitly with `--grep @viewport-qa` and
- * writes reviewable first-viewport captures for the two intermediate widths.
+ * writes reviewable first-viewport captures for the two intermediate widths;
+ * the catalogue visual suite owns the exact 1440×1000 and 390×844 captures.
  */
 const publicRoutes = [
   "/",
@@ -48,7 +54,7 @@ const travelerRoutes = [
 const reviewerRoutes = ["/reviewer/queue", "/reviewer/profile", "/reviewer/history"] as const;
 const viewportRows = [
   { name: "1024", width: 1024, height: 768 },
-  { name: "768", width: 768, height: 768 }
+  { name: "768", width: 768, height: 1024 }
 ] as const;
 
 const evidenceRoot = "../../.sisyphus/evidence/future-roadmap/viewport-contract";
@@ -65,8 +71,11 @@ function evidencePath(testInfo: TestInfo, viewportName: string, scope: string, r
 }
 
 async function waitForRouteReady(page: Page): Promise<void> {
-  await page.locator("main").waitFor({ state: "visible", timeout: 15_000 });
   await page.locator("h1:visible").first().waitFor({ state: "visible", timeout: 15_000 });
+  // Wait for the resolved route heading before checking landmarks. Streaming
+  // operator loading boundaries briefly coexist with the settled shell; a
+  // main-first wait races that handoff and produces a false strict-mode error.
+  await page.locator("main").first().waitFor({ state: "visible", timeout: 15_000 });
   // Let hydration and route-level effects emit their diagnostics before the
   // browser-error assertion; this remains short and deterministic.
   await page.waitForTimeout(150);
