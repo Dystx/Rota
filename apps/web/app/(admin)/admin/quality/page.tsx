@@ -1,5 +1,5 @@
 import { isPersistenceConfigError, listPlaces } from "@repo/db";
-import { Badge, Card, CardContent, CardHeader, CardTitle, PageShell, SectionHeading, StatPill } from "@repo/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState, ErrorState, PageShell, SectionHeading, StatPill } from "@repo/ui";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 export default async function AdminQualityPage() {
@@ -10,6 +10,10 @@ export default async function AdminQualityPage() {
   try {
     if (isAdminPageAuthContext(auth)) {
       places = await listPlaces(100, { actor: auth.actor });
+    } else {
+      infoMessage = auth.reason === "unavailable"
+        ? "Quality signals are temporarily unavailable."
+        : "You do not have access to quality signals.";
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
@@ -29,8 +33,7 @@ export default async function AdminQualityPage() {
         .sort((left, right) => (left.quality ?? -1) - (right.quality ?? -1))
         .slice(0, 6)
     : [];
-  const checks = reviewQueue.length
-    ? reviewQueue.map((place) => {
+  const checks = reviewQueue.map((place) => {
         const quality = place.quality;
         const reasons = [
           quality == null ? "Quality score missing" : quality < 8 ? `Quality ${quality.toFixed(1)}` : null,
@@ -41,13 +44,7 @@ export default async function AdminQualityPage() {
           details: reasons.join(" · ") || "Needs manual review",
           title: `${place.name} · ${place.region}`
         };
-      })
-    : [
-        {
-          details: "No persisted quality flags yet.",
-          title: "Waiting for place-review signals"
-        }
-      ];
+      });
 
   return (
     <PageShell variant="admin">
@@ -97,23 +94,14 @@ export default async function AdminQualityPage() {
               <p className="text-[var(--color-secondary)] text-sm leading-relaxed font-medium">
                 {flaggedPlaces.length
                   ? "Prioritize lower-confidence or lower-scored places before they influence more generated routes."
-                  : "Quality signals look clear so far. Keep expanding the curated place base without lowering confidence standards."}
+                  : places.length
+                    ? "No place records currently meet the review-queue criteria."
+                    : "No persisted place records are available to evaluate."}
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {infoMessage ? (
-        <Card className="mb-8 border-[rgba(180,35,24,0.15)] bg-[rgba(180,35,24,0.03)] shadow-none">
-          <CardContent className="pt-6">
-            <p className="text-[#b42318] text-sm font-medium flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#b42318] inline-block"></span>
-              {infoMessage}
-            </p>
-          </CardContent>
-        </Card>
-      ) : null}
 
       <div data-testid="quality-queue" className="w-full max-w-full min-w-0">
         <Card className="rota-glass-panel border-none shadow-sm overflow-hidden">
@@ -122,15 +110,21 @@ export default async function AdminQualityPage() {
               <span className="rota-dot"></span> Place review queue
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6 overflow-x-auto">
-            <div className="grid gap-4 md:grid-cols-2">
-              {checks.map((item) => (
-                <div key={item.title} className="rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface)] p-5 shadow-sm transition-colors hover:border-[var(--color-primary)]/30 hover:bg-white">
-                  <p className="text-sm font-medium text-[var(--color-foreground)] tracking-tight">{item.title}</p>
-                  <p className="text-[var(--color-muted-foreground)] mt-1.5 text-sm leading-relaxed">{item.details}</p>
-                </div>
-              ))}
-            </div>
+          <CardContent className="min-w-0 p-6">
+            {infoMessage ? (
+              <ErrorState variant="table" title="Quality signals unavailable" message={infoMessage} retryHref="/admin/quality" />
+            ) : checks.length === 0 ? (
+              <EmptyState variant="table" title="No quality flags" description="No persisted place records currently require manual quality review." />
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {checks.map((item) => (
+                  <div key={item.title} className="rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface)] p-5 shadow-sm transition-colors hover:border-[var(--color-primary)]/30 hover:bg-white">
+                    <p className="text-sm font-medium text-[var(--color-foreground)] tracking-tight">{item.title}</p>
+                    <p className="text-[var(--color-muted-foreground)] mt-1.5 text-sm leading-relaxed">{item.details}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

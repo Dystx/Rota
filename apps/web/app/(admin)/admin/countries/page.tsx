@@ -1,5 +1,5 @@
 import { isPersistenceConfigError, listRegions } from "@repo/db";
-import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading } from "@repo/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading } from "@repo/ui";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 function titleCase(value: string) {
@@ -18,6 +18,10 @@ export default async function AdminCountriesPage() {
   try {
     if (isAdminPageAuthContext(auth)) {
       regions = await listRegions(100, { actor: auth.actor });
+    } else {
+      infoMessage = auth.reason === "unavailable"
+        ? "Country rollout data is temporarily unavailable."
+        : "You do not have access to country rollout data.";
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
@@ -35,7 +39,7 @@ export default async function AdminCountriesPage() {
 
       map.set(key, {
         active,
-        languages: key === "portugal" ? "EN / PT" : "Pending",
+        languages: "Not tracked",
         name: titleCase(key),
         status
       });
@@ -44,14 +48,7 @@ export default async function AdminCountriesPage() {
     }, new Map()).values()
   );
 
-  const rawRows =
-    countries.length > 0
-      ? countries.map((country) => [country.name, country.status, country.name === "Portugal" ? "EUR" : "Pending", country.languages])
-      : [
-          ["Portugal", "Active", "EUR", "EN / PT"],
-          ["Spain", "Pilot later", "EUR", "EN / ES"],
-          ["Italy", "Planned", "EUR", "EN / IT"]
-        ];
+  const rawRows = countries.map((country) => [country.name, country.status, "Not tracked", country.languages]);
 
   const rows = rawRows.map((row, idx) => [
     <div key={`col0-${idx}`} className="flex items-center gap-3">
@@ -115,11 +112,21 @@ export default async function AdminCountriesPage() {
                   <Badge tone="default" className="self-start sm:self-auto">{rawRows.length} Markets</Badge>
                 </div>
               </CardHeader>
-              <div className="overflow-x-auto p-0 sm:p-2 sm:pb-0">
-                <div className="min-w-[600px] sm:min-w-0">
-                  <DataTable columns={["Territory", "Deployment Status", "Currency", "Locales"]} rows={rows} />
+              {infoMessage ? (
+                <ErrorState variant="table" title="Country rollout unavailable" message={infoMessage} retryHref="/admin/countries" />
+              ) : rawRows.length === 0 ? (
+                <EmptyState
+                  variant="table"
+                  title="No country rollout records"
+                  description="No persisted region records are available to derive country rollout status yet."
+                />
+              ) : (
+                <div className="overflow-x-auto p-0 sm:p-2 sm:pb-0">
+                  <div className="min-w-[600px] sm:min-w-0">
+                    <DataTable columns={["Territory", "Deployment Status", "Currency", "Locales"]} rows={rows} />
+                  </div>
                 </div>
-              </div>
+              )}
             </Card>
           </div>
         </div>

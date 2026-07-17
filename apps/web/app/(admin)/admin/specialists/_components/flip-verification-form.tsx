@@ -37,7 +37,7 @@ export function FlipVerificationForm({
     setError(null);
     startTransition(async () => {
       const result = await flipVerification({ specialistId, verified: nextVerified });
-      if (result.kind === "error") {
+      if (result.kind !== "ok") {
         setError(result.message);
       }
     });

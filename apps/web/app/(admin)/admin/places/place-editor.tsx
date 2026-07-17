@@ -1,37 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, DataTable } from "@repo/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState } from "@repo/ui";
 import type { Place } from "@repo/types";
 
 type PlaceRow = Place & { quality: number | null };
-
-const initialPlaces: PlaceRow[] = [
-  {
-    id: "miradouro-da-vitoria",
-    category: "Viewpoint",
-    name: "Miradouro da Vitória",
-    quality: 8.8,
-    region: "Porto",
-    sourceConfidence: "High"
-  },
-  {
-    id: "quinta-pinhao",
-    category: "Wine experience",
-    name: "Quinta in Pinhão",
-    quality: 9.1,
-    region: "Douro",
-    sourceConfidence: "Medium"
-  },
-  {
-    id: "rainy-day-museum",
-    category: "Museum",
-    name: "Rainy-day museum",
-    quality: 7.9,
-    region: "Lisbon",
-    sourceConfidence: "High"
-  }
-];
 
 type DraftState = {
   category: string;
@@ -54,16 +27,28 @@ function toId(name: string) {
 }
 
 export function PlaceEditor() {
-  const [places, setPlaces] = useState<PlaceRow[]>(initialPlaces);
+  const [places, setPlaces] = useState<PlaceRow[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftState>(emptyDraft);
   const [message, setMessage] = useState("Loading persisted places…");
+  const [loadError, setLoadError] = useState("");
+  const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
+  const filteredPlaces = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return places;
+
+    return places.filter((place) =>
+      [place.name, place.region, place.category, place.sourceConfidence]
+        .some((value) => value.toLowerCase().includes(normalizedQuery))
+    );
+  }, [places, query]);
+
   const rows = useMemo(
     () =>
-      places.map((place) => [
+      filteredPlaces.map((place) => [
         <div key={`${place.id}-name`} className="font-medium text-[var(--color-foreground)]">{place.name}</div>,
         <Badge key={`${place.id}-region`} tone="soft">{place.region}</Badge>,
         <span key={`${place.id}-cat`} className="text-[var(--color-muted-foreground)]">{place.category}</span>,
@@ -73,7 +58,7 @@ export function PlaceEditor() {
           Edit
         </Button>
       ]),
-    [places]
+    [filteredPlaces]
   );
 
   useEffect(() => {
@@ -92,20 +77,23 @@ export function PlaceEditor() {
         }
 
         if (response.ok && payload.places) {
+          setLoadError("");
           setPlaces(payload.places);
           setMessage(payload.places.length ? "Loaded persisted places." : "No persisted places yet.");
           return;
         }
 
-        setPlaces(initialPlaces);
-        setMessage(payload.message ?? "Falling back to local admin rehearsal data.");
+        setPlaces([]);
+        setLoadError(payload.message ?? "Could not load persisted places.");
+        setMessage("Places are unavailable until the admin data source responds.");
       } catch {
         if (!isMounted) {
           return;
         }
 
-        setPlaces(initialPlaces);
-        setMessage("Could not load persisted places. Using local admin rehearsal data.");
+        setPlaces([]);
+        setLoadError("Could not load persisted places. Please try again.");
+        setMessage("Places are unavailable until the admin data source responds.");
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -213,6 +201,25 @@ export function PlaceEditor() {
   return (
     <div className="grid items-start gap-8 xl:grid-cols-[1.15fr_0.85fr]">
       <div className="grid gap-6 min-w-0">
+        <div
+          data-testid="admin-filter-bar"
+          className="flex min-w-0 flex-col gap-3 rounded-[24px] border border-[var(--color-border)] bg-white/60 p-4 shadow-sm sm:flex-row sm:items-end sm:justify-between"
+          role="search"
+          aria-label="Filter places"
+        >
+          <label className="grid min-w-0 flex-1 gap-2">
+            <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--color-muted-foreground)]">Filter places</span>
+            <input
+              className="min-h-[44px] w-full rounded-[18px] border border-[var(--color-border)] bg-white/84 px-4 py-3 text-[var(--color-foreground)] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Name, region, category"
+            />
+          </label>
+          <Button type="button" variant="secondary" onClick={() => { setEditingId(null); setDraft(emptyDraft); }}>
+            Add place
+          </Button>
+        </div>
         <Card className="overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardHeader>
             <CardTitle>Places index</CardTitle>
@@ -220,7 +227,17 @@ export function PlaceEditor() {
           <CardContent className="grid gap-6 min-w-0">
             <div data-testid="places-table" className="min-w-0">
               {isLoading ? <p className="text-sm text-[var(--color-muted-foreground)]">Loading places…</p> : null}
-              <DataTable columns={["Place", "Region", "Category", "Quality", "Source confidence", "Action"]} rows={rows} />
+              {loadError ? (
+                <ErrorState variant="table" title="Places unavailable" message={loadError} retryHref="/admin/places" />
+              ) : !isLoading && filteredPlaces.length === 0 ? (
+                <EmptyState
+                  variant="table"
+                  title={places.length === 0 ? "No places yet" : "No matching places"}
+                  description={places.length === 0 ? "No persisted place records are available yet." : "Try a different place, region, or category filter."}
+                />
+              ) : (
+                <DataTable columns={["Place", "Region", "Category", "Quality", "Source confidence", "Action"]} rows={rows} />
+              )}
             </div>
             <p className="text-sm text-[var(--color-muted-foreground)]">{message}</p>
           </CardContent>
@@ -277,7 +294,7 @@ export function PlaceEditor() {
             </div>
             <div className="mt-4 flex flex-wrap gap-3">
               <Button data-testid="place-save-button" type="button" onClick={savePlace} disabled={isSaving}>
-                {isSaving ? "Saving…" : editingId ? "Save place" : "Add place"}
+                {isSaving ? "Saving…" : editingId ? "Save place" : "Save new place"}
               </Button>
               <Button type="button" variant="ghost" onClick={resetForm}>
                 Clear

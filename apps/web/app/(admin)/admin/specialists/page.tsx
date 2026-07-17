@@ -5,6 +5,8 @@ import {
   CardHeader,
   CardTitle,
   DataTable,
+  EmptyState,
+  ErrorState,
   type DataTableColumn,
   PageShell,
   SectionHeading,
@@ -19,60 +21,6 @@ import {
 } from "@repo/db";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 import { FlipVerificationForm } from "./_components/flip-verification-form";
-
-const DEMO_SPECIALISTS: ReadonlyArray<{
-  fullName: string;
-  tier3OnCall: boolean;
-  tier4LicensedGuide: boolean;
-  license: string | null;
-  isVerified: boolean;
-  hourlyRate: number;
-  bio: string | null;
-  photoUrl: string | null;
-  caps: SpecialistCapabilities;
-}> = [
-  {
-    fullName: "Inês Almeida",
-    tier3OnCall: true,
-    tier4LicensedGuide: false,
-    license: null,
-    isVerified: true,
-    hourlyRate: 60,
-    bio: "Porto-based local food guide with a soft spot for slow Saturdays.",
-    photoUrl: null,
-    caps: {
-      skills: ["Local food", "Old streets", "Family-friendly pacing"],
-      languages: ["pt", "en"]
-    }
-  },
-  {
-    fullName: "Tomás Costa",
-    tier3OnCall: false,
-    tier4LicensedGuide: true,
-    license: "RNAAT-1029",
-    isVerified: true,
-    hourlyRate: 95,
-    bio: "Licensed for Sintra, Cascais, and the Lisbon coast.",
-    // Demo mode never points at an external portrait host. Real portraits
-    // are private Storage paths returned by specialist onboarding uploads.
-    photoUrl: null,
-    caps: {
-      skills: ["Sintra Expert", "Coastal itineraries"],
-      languages: ["pt", "en", "es"]
-    }
-  },
-  {
-    fullName: "Beatriz Silva",
-    tier3OnCall: true,
-    tier4LicensedGuide: false,
-    license: null,
-    isVerified: false,
-    hourlyRate: 50,
-    bio: null,
-    photoUrl: null,
-    caps: { skills: [], languages: ["pt"] }
-  }
-];
 
 function truncate(text: string | null, max: number): string {
   if (!text) return "—";
@@ -117,6 +65,10 @@ export default async function AdminSpecialistsPage() {
         })
       );
       capsById = new Map(caps);
+    } else {
+      infoMessage = auth.reason === "unavailable"
+        ? "Specialist records are temporarily unavailable."
+        : "You do not have access to specialist records.";
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
@@ -240,54 +192,26 @@ export default async function AdminSpecialistsPage() {
     }
   ];
 
-  const data = profiles.length > 0
-    ? profiles
-    : DEMO_SPECIALISTS.map((d, i) => ({
-        id: `demo-${i}`,
-        userId: `demo-${i}`,
-        fullName: d.fullName,
-        regionsCovered: [] as string[],
-        tier3OnCall: d.tier3OnCall,
-        tier4LicensedGuide: d.tier4LicensedGuide,
-        rnaatLicenseNumber: d.license,
-        isVerified: d.isVerified,
-        hourlyRate: d.hourlyRate,
-        bio: d.bio,
-        photoUrl: d.photoUrl,
-        createdAt: "2026-07-01T00:00:00Z"
-      } satisfies SpecialistProfile));
-
-  // Seed the capabilities map for the demo data so the
-  // "Capabilities" column reflects realistic counts when
-  // the PostgreSQL environment isn't configured.
-  if (profiles.length === 0) {
-    DEMO_SPECIALISTS.forEach((d, i) => {
-      capsById.set(`demo-${i}`, d.caps);
-    });
-  }
-
   return (
     <PageShell variant="admin">
       <div data-testid="admin-specialists-header">
         <SectionHeading
           eyebrow="Admin CMS"
           title="Specialist roster"
-          description="Verification queue and tier participation. PR-11 unblocks the admin-side review of onboarding submissions."
+          description="Verification queue and tier participation for the specialist review team."
           h1
         />
       </div>
 
       {infoMessage ? (
-        <p
-          className="mb-6 rounded-lg border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] px-4 py-3 text-sm text-[var(--color-status-warning-fg)]"
-          role="status"
-          data-testid="admin-specialists-info"
-        >
-          {infoMessage}
-        </p>
+        <Card className="mb-6 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm" data-testid="admin-specialists-info">
+          <CardContent className="p-0">
+            <ErrorState variant="table" title="Specialist roster unavailable" message={infoMessage} retryHref="/admin/specialists" />
+          </CardContent>
+        </Card>
       ) : null}
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+      {profiles.length > 0 ? <div className="mb-6 grid gap-4 sm:grid-cols-3">
         <Card className="rota-glass-panel border-0">
           <CardHeader>
             <CardTitle className="text-base">Total specialists</CardTitle>
@@ -314,22 +238,24 @@ export default async function AdminSpecialistsPage() {
             <StatPill label="Tier 4" value={String(tier4Count)} />
           </CardContent>
         </Card>
-      </div>
+      </div> : null}
 
-      <Card className="rota-glass-panel border-0">
+      <Card data-testid="admin-specialists-table" className="rota-glass-panel border-0">
         <CardHeader>
           <CardTitle>Specialist profiles</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto" aria-label="Specialist profiles table region">
+          <div className="min-w-0" aria-label="Specialist profiles table region">
             <DataTable
               columns={columns}
-              data={data as SpecialistProfile[]}
+              data={profiles}
               getRowId={(row) => row.id}
               emptyState={
-                <p className="py-8 text-center text-sm text-[var(--color-muted-foreground)]">
-                  No specialists have onboarded yet.
-                </p>
+                <EmptyState
+                  variant="table"
+                  title="No specialist profiles"
+                  description="No persisted specialist onboarding records are available yet."
+                />
               }
               ariaLabel="Specialist profiles"
             />

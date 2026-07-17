@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import { filterActiveReviewerAssignments, isPersistenceConfigError, listReviewerAssignments, getTripDraftById } from "@repo/db";
-import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatusPill } from "@repo/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatusPill } from "@repo/ui";
 import { getTripCommerceState } from "@/lib/trip-commerce";
 import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
 import { RequireReviewerAuth } from "../../_components/require-reviewer-auth";
@@ -85,31 +85,57 @@ export default async function ReviewerQueuePage() {
           description="Manage your assigned trips, priorities, and pending quality reviews."
         />
       </div>
-      <div className="flex flex-wrap gap-4 mt-6">
-        <a
+      <div className="mt-6 hidden flex-wrap gap-4 md:flex">
+        <Link
           href="/reviewer/operations"
           className="inline-flex min-h-[44px] items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
-          Open worker plan
-        </a>
-        <a
+          Open operations
+        </Link>
+        <Link
           href="/reviewer/profile"
           className="inline-flex min-h-[44px] items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           Reviewer profile
-        </a>
-        <a
+        </Link>
+        <Link
           href="/reviewer/history"
           className="inline-flex min-h-[44px] items-center rounded-full border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
         >
           Review history
-        </a>
+        </Link>
+      </div>
+      <div
+        data-testid="reviewer-queue-mobile"
+        className="mt-6 flex max-w-full flex-wrap gap-3 overflow-x-auto md:hidden"
+        role="group"
+        aria-label="Reviewer queue actions"
+      >
+        <Link
+          href="/reviewer/operations"
+          role="button"
+          className="inline-flex min-h-[44px] shrink-0 items-center rounded-full border border-[var(--color-border)] bg-white/70 px-4 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+        >
+          Open operations
+        </Link>
+        <Link
+          href="/reviewer/history"
+          role="button"
+          className="inline-flex min-h-[44px] shrink-0 items-center rounded-full border border-[var(--color-border)] bg-white/70 px-4 py-2.5 text-sm font-medium text-[var(--color-foreground)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light focus-visible:ring-offset-2"
+        >
+          Review history
+        </Link>
       </div>
 
       {errorMessage ? (
         <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="p-0">
-            <ErrorState variant="table" title="Cannot load queue" message={errorMessage} />
+            <ErrorState
+              variant="table"
+              title="Cannot load queue"
+              message={errorMessage}
+              retryHref="/reviewer/queue"
+            />
           </CardContent>
         </Card>
       ) : notSignedIn ? (
@@ -121,6 +147,11 @@ export default async function ReviewerQueuePage() {
               variant="table" 
               title="Your queue is empty" 
               description="There are no active trips assigned to you at the moment. Check back later or review your history." 
+              action={
+                <Button asChild size="md" variant="secondary">
+                  <Link href="/reviewer/history">Review history</Link>
+                </Button>
+              }
               icon={
                 <div className="h-12 w-12 rounded-full bg-[var(--color-surface-muted)] flex items-center justify-center">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-muted-foreground)]">

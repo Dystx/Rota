@@ -1,5 +1,5 @@
 import { isPersistenceConfigError, listRegions } from "@repo/db";
-import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading, StatPill } from "@repo/ui";
+import { Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatPill } from "@repo/ui";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 export default async function AdminRegionsPage() {
@@ -10,6 +10,10 @@ export default async function AdminRegionsPage() {
   try {
     if (isAdminPageAuthContext(auth)) {
       regions = await listRegions(100, { actor: auth.actor });
+    } else {
+      infoMessage = auth.reason === "unavailable"
+        ? "Region data is temporarily unavailable."
+        : "You do not have access to region data.";
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
@@ -17,21 +21,14 @@ export default async function AdminRegionsPage() {
       : "Could not load admin regions.";
   }
 
-  const rows =
-    regions.length > 0
-      ? regions.map((region) => [
-          region.name,
-          region.countrySlug,
-          region.bestFor.join(", ") || "Pending",
-          region.seasonality || "Pending",
-          region.launchStatus
-        ])
-      : [
-          ["Porto", "Portugal", "Old streets + food", "Year-round", "Active"],
-          ["Douro Valley", "Portugal", "Scenic wine days", "Spring / autumn", "Active"],
-          ["Algarve", "Portugal", "Coastal stays", "Summer-heavy", "Planned"],
-          ["North coast", "Portugal", "Calmer road trips", "Spring", "Research"]
-        ];
+  const rows = regions.map((region) => [
+    region.name,
+    region.countrySlug,
+    region.bestFor.join(", ") || "Not tracked",
+    region.seasonality || "Not tracked",
+    region.launchStatus
+  ]);
+  const countryCount = new Set(regions.map((region) => region.countrySlug)).size;
 
   return (
     <PageShell variant="admin">
@@ -49,9 +46,9 @@ export default async function AdminRegionsPage() {
             <CardTitle>Active launch shape</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
-            <StatPill label="Country" value="Portugal" />
+            <StatPill label="Countries" value={String(countryCount)} />
             <StatPill label="Active regions" value={String(rows.filter((row) => row[4] === "Active").length)} />
-            <StatPill label="Pilot next" value="Spain" />
+            <StatPill label="Next rollout" value="Not tracked" />
           </CardContent>
         </Card>
         <Card>
@@ -59,14 +56,9 @@ export default async function AdminRegionsPage() {
             <CardTitle>Current rules</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            {[
-              "Meal-time defaults",
-              "Rain-safe notes",
-              "Transport assumptions",
-              "Local quality rules"
-            ].map((item) => (
-              <Badge key={item} tone="soft">{item}</Badge>
-            ))}
+            <p className="text-sm leading-relaxed text-[var(--color-muted-foreground)]">
+              Region-specific rules appear here when persisted curation records provide them.
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -78,23 +70,24 @@ export default async function AdminRegionsPage() {
           </CardContent>
         </Card>
       </div>
-      {infoMessage ? (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-on-surface-variant leading-loose text-sm">{infoMessage}</p>
-          </CardContent>
-        </Card>
-      ) : null}
       <div id="regions-table" className="regions-table min-w-0 max-w-full" data-testid="regions-table">
         <Card className="min-w-0 max-w-full">
           <CardHeader>
             <CardTitle>Region controls</CardTitle>
           </CardHeader>
-          <CardContent className="overflow-x-auto overflow-y-hidden">
-            <DataTable
-              columns={["Region", "Country", "Best for", "Seasonality", "Launch status"]}
-              rows={rows}
-            />
+          <CardContent className="min-w-0">
+            {infoMessage ? (
+              <ErrorState variant="table" title="Regions unavailable" message={infoMessage} retryHref="/admin/regions" />
+            ) : rows.length === 0 ? (
+              <EmptyState variant="table" title="No region records" description="No persisted regions are available for curation yet." />
+            ) : (
+              <div className="overflow-x-auto overflow-y-hidden">
+                <DataTable
+                  columns={["Region", "Country", "Best for", "Seasonality", "Launch status"]}
+                  rows={rows}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

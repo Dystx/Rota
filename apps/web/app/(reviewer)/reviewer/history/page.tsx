@@ -1,13 +1,12 @@
 import Link from "next/link";
-import { getReviewerById, isPersistenceConfigError, listReviewerAssignments } from "@repo/db";
-import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatPill, StatusPill } from "@repo/ui";
+import { isPersistenceConfigError, listReviewerAssignments } from "@repo/db";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatPill, StatusPill } from "@repo/ui";
 import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
 import { RequireReviewerAuth } from "../../_components/require-reviewer-auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function ReviewerHistoryPage() {
-  let reviewer = null as Awaited<ReturnType<typeof getReviewerById>>;
   let assignments = [] as Awaited<ReturnType<typeof listReviewerAssignments>>;
   let errorMessage = "";
   let notSignedIn = false;
@@ -20,7 +19,6 @@ export default async function ReviewerHistoryPage() {
     } else if ("reason" in auth) {
       errorMessage = "Reviewer history is temporarily unavailable. Please try again shortly.";
     } else {
-      reviewer = await getReviewerById(auth.reviewerId, { actor: auth.actor });
       assignments = await listReviewerAssignments(20, auth.reviewerId, { actor: auth.actor });
     }
   } catch (error) {
@@ -32,11 +30,25 @@ export default async function ReviewerHistoryPage() {
   const rawData = assignments.map((assignment) => ({
     id: assignment.id,
     tripId: assignment.tripId,
-    tripName: `Trip ${assignment.tripId}`,
+    tripName: "Review assignment",
     status: assignment.status,
     notes: assignment.notes || "Review assignment recorded",
     updated: assignment.completedAt ?? assignment.createdAt,
   }));
+  const completedCount = assignments.filter((assignment) => assignment.status === "completed").length;
+  const activeCount = assignments.filter((assignment) => assignment.status === "assigned" || assignment.status === "submitted").length;
+  const latestUpdate = assignments
+    .map((assignment) => assignment.completedAt ?? assignment.createdAt)
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+  const reviewNotes = Array.from(
+    new Set(
+      assignments
+        .map((assignment) => assignment.notes.trim())
+        .filter(Boolean)
+    )
+  ).slice(0, 4);
 
   return (
     <PageShell variant="reviewer">
@@ -48,15 +60,15 @@ export default async function ReviewerHistoryPage() {
           h1
         />
       </div>
-      <div data-testid="history-metrics" className="grid gap-4 lg:grid-cols-3">
+      {!errorMessage && !notSignedIn ? <div data-testid="history-metrics" className="grid gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle>Throughput</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
-            <StatPill label="This week" value={reviewer ? `${reviewer.regions.length + 5} reviews` : "—"} />
-            <StatPill label="Avg time" value={reviewer ? "5.4h" : "—"} />
-            <StatPill label="Quality" value={reviewer ? "High" : "—"} />
+            <StatPill label="Completed" value={String(completedCount)} />
+            <StatPill label="Active queue" value={String(activeCount)} />
+            <StatPill label="Latest update" value={latestUpdate ? String(latestUpdate) : "Not tracked"} />
           </CardContent>
         </Card>
         <Card>
@@ -64,17 +76,12 @@ export default async function ReviewerHistoryPage() {
             <CardTitle>Recent themes</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            {reviewer ? [
-              "Better food stop",
-              "Rain-safe route",
-              "Calmer day pacing",
-              "Local tip added"
-            ].map((item) => (
+            {reviewNotes.length ? reviewNotes.map((item) => (
               <Badge key={item} tone="soft">
                 {item}
               </Badge>
             )) : (
-              <p className="text-sm text-[var(--color-muted-foreground)]">Sign in to see themes.</p>
+              <p className="text-sm text-[var(--color-muted-foreground)]">No review notes recorded.</p>
             )}
           </CardContent>
         </Card>
@@ -86,12 +93,17 @@ export default async function ReviewerHistoryPage() {
             <p className="text-[15px] leading-relaxed text-[var(--color-foreground)]">Keep paid human-review trips moving from queue to polished itinerary within one day.</p>
           </CardContent>
         </Card>
-      </div>
+      </div> : null}
 
       {errorMessage ? (
         <Card className="mt-8 border-[var(--color-border)] shadow-sm bg-white/60">
           <CardContent className="p-0">
-            <ErrorState variant="table" title="Cannot load history" message={errorMessage} />
+            <ErrorState
+              variant="table"
+              title="Cannot load history"
+              message={errorMessage}
+              retryHref="/reviewer/history"
+            />
           </CardContent>
         </Card>
       ) : notSignedIn ? (
@@ -119,6 +131,11 @@ export default async function ReviewerHistoryPage() {
                     variant="table" 
                     title="No review history" 
                     description="You haven't completed any reviews yet." 
+                    action={
+                      <Button asChild size="md" variant="secondary">
+                        <Link href="/reviewer/queue">Back to review queue</Link>
+                      </Button>
+                    }
                   />
                 )}
               </CardContent>
@@ -130,7 +147,16 @@ export default async function ReviewerHistoryPage() {
             {rawData.length === 0 ? (
               <Card className="border-[var(--color-border)] bg-white/60 shadow-sm">
                 <CardContent className="p-0">
-                  <EmptyState variant="table" title="No review history" description="You haven't completed any reviews yet." />
+                  <EmptyState
+                    variant="table"
+                    title="No review history"
+                    description="You haven't completed any reviews yet."
+                    action={
+                      <Button asChild size="md" variant="secondary">
+                        <Link href="/reviewer/queue">Back to review queue</Link>
+                      </Button>
+                    }
+                  />
                 </CardContent>
               </Card>
             ) : rawData.map((item) => (

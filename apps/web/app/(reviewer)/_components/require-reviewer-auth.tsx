@@ -1,4 +1,6 @@
-import { Card, CardContent, EmptyState } from "@repo/ui";
+import * as React from "react";
+import Link from "next/link";
+import { Button, Card, CardContent, EmptyState } from "@repo/ui";
 
 /**
  * RequireReviewerAuth — the empty state shown on every reviewer
@@ -37,6 +39,11 @@ export function RequireReviewerAuth({
           variant="table"
           title="Sign in required"
           description={`Sign in with a linked reviewer account to ${descriptions[noun]}.`}
+          action={
+            <Button asChild size="md" variant="secondary">
+              <Link href="/sign-in">Sign in</Link>
+            </Button>
+          }
         />
       </CardContent>
     </Card>

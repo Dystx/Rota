@@ -1,5 +1,5 @@
 import { isPersistenceConfigError, listReviewers } from "@repo/db";
-import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading, StatPill } from "@repo/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading, StatPill } from "@repo/ui";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 export default async function AdminReviewersPage() {
@@ -10,6 +10,10 @@ export default async function AdminReviewersPage() {
   try {
     if (isAdminPageAuthContext(auth)) {
       reviewers = await listReviewers(100, { actor: auth.actor });
+    } else {
+      infoMessage = auth.reason === "unavailable"
+        ? "Reviewer records are temporarily unavailable."
+        : "You do not have access to reviewer records.";
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
@@ -17,20 +21,14 @@ export default async function AdminReviewersPage() {
       : "Could not load admin reviewers.";
   }
 
-  const rows =
-    reviewers.length > 0
-      ? reviewers.map((reviewer) => [
-          reviewer.name,
-          reviewer.regions.join(" / ") || "Pending",
-          reviewer.languages.join(" / ") || "Pending",
-          reviewer.specialties.join(", ") || "Pending",
-          reviewer.status
-        ])
-      : [
-          ["Inês Almeida", "Porto / Douro", "PT / EN / ES", "Food + pacing", "Active"],
-          ["Tomás Costa", "Lisbon coast", "PT / EN", "Family-friendly", "Active"],
-          ["Beatriz Silva", "Algarve", "PT / EN", "Coastal itineraries", "Onboarding"]
-        ];
+  const rows = reviewers.map((reviewer) => [
+    reviewer.name,
+    reviewer.regions.join(" / ") || "Not tracked",
+    reviewer.languages.join(" / ") || "Not tracked",
+    reviewer.specialties.join(", ") || "Not tracked",
+    reviewer.status
+  ]);
+  const languageCount = new Set(reviewers.flatMap((reviewer) => reviewer.languages)).size;
 
   return (
     <PageShell variant="admin">
@@ -50,8 +48,8 @@ export default async function AdminReviewersPage() {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-4">
             <StatPill label="Active" value={`${rows.filter((row) => row[4] === "Active").length} reviewers`} />
-            <StatPill label="Languages" value="PT / EN / ES" />
-            <StatPill label="Gap" value="South coast" />
+            <StatPill label="Languages" value={`${languageCount} tracked`} />
+            <StatPill label="Coverage gap" value="Not tracked" />
           </CardContent>
         </Card>
         
@@ -83,24 +81,24 @@ export default async function AdminReviewersPage() {
         </Card>
       </div>
 
-      {infoMessage ? (
-        <Card className="mb-8 border-amber-200 bg-amber-50">
-          <CardContent className="pt-6">
-            <p className="text-sm text-amber-800">{infoMessage}</p>
-          </CardContent>
-        </Card>
-      ) : null}
-
       <div data-testid="reviewers-table" className="min-w-0 max-w-full">
         <Card className="rota-glass-panel border-0 overflow-hidden">
           <CardHeader>
             <CardTitle>Reviewer roster</CardTitle>
           </CardHeader>
-          <CardContent className="overflow-x-auto">
-            <DataTable
-              columns={["Reviewer", "Regions", "Languages", "Specialty", "Status"]}
-              rows={rows}
-            />
+          <CardContent className="min-w-0">
+            {infoMessage ? (
+              <ErrorState variant="table" title="Reviewers unavailable" message={infoMessage} retryHref="/admin/reviewers" />
+            ) : rows.length === 0 ? (
+              <EmptyState variant="table" title="No reviewer records" description="No persisted reviewer profiles are available yet." />
+            ) : (
+              <div className="overflow-x-auto">
+                <DataTable
+                  columns={["Reviewer", "Regions", "Languages", "Specialty", "Status"]}
+                  rows={rows}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

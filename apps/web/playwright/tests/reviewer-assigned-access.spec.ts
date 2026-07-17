@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { createReviewerStorageState } from "../fixtures/reviewer-auth";
+import { reviewerTripPath } from "../fixtures/reviewer-trip";
 
 test.describe("@smoke @reviewer-assigned-access", () => {
   test("anonymous reviewer trip route redirects before private trip data renders", async ({ page }) => {
@@ -30,5 +32,17 @@ test.describe("@smoke @reviewer-assigned-access", () => {
       }
     }
     if (screenshotError) throw screenshotError;
+  });
+});
+
+test.describe("@reviewer-assigned-access authenticated", () => {
+  test.use({ storageState: createReviewerStorageState() });
+
+  test("unassigned reviewer trip stays in the unavailable state", async ({ page }) => {
+    await page.goto(reviewerTripPath("unassigned"));
+
+    await expect(page.getByTestId("reviewer-trip-header")).toBeVisible();
+    await expect(page.getByText("This reviewer trip is unavailable.", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("Client brief context", { exact: true })).toHaveCount(0);
   });
 });

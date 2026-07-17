@@ -1,5 +1,5 @@
 import { isPersistenceConfigError, listPartners } from "@repo/db";
-import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, PageShell, SectionHeading } from "@repo/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle, DataTable, EmptyState, ErrorState, PageShell, SectionHeading } from "@repo/ui";
 import { getAdminPageAuthContext, isAdminPageAuthContext } from "@/lib/auth/admin";
 
 export default async function AdminPartnersPage() {
@@ -10,6 +10,10 @@ export default async function AdminPartnersPage() {
   try {
     if (isAdminPageAuthContext(auth)) {
       partners = await listPartners(100, { actor: auth.actor });
+    } else {
+      infoMessage = auth.reason === "unavailable"
+        ? "Partner records are temporarily unavailable."
+        : "You do not have access to partner records.";
     }
   } catch (error) {
     infoMessage = isPersistenceConfigError(error)
@@ -17,20 +21,13 @@ export default async function AdminPartnersPage() {
       : "Could not load partner records.";
   }
 
-  const rows =
-    partners.length > 0
-      ? partners.map((partner) => [
-          partner.name,
-          partner.type || "Pending",
-          partner.coverageRegions.join(", ") || "Pending",
-          partner.status,
-          partner.notes || "Pending"
-        ])
-      : [
-          ["Quinta stays", "Lodging", "Douro", "Draft", "Useful for wine-country overnights"],
-          ["Rail booking source", "Transport", "Portugal", "Research", "Could improve no-car planning"],
-          ["Food tour affiliate", "Experience", "Porto", "Candidate", "Needs local quality review"]
-        ];
+  const rows = partners.map((partner) => [
+    partner.name,
+    partner.type || "Not tracked",
+    partner.coverageRegions.join(", ") || "Not tracked",
+    partner.status,
+    partner.notes || "Not tracked"
+  ]);
 
   return (
     <PageShell variant="admin">
@@ -79,17 +76,6 @@ export default async function AdminPartnersPage() {
         </Card>
       </div>
 
-      {infoMessage ? (
-        <Card className="mb-8 border-[rgba(180,35,24,0.15)] bg-[rgba(180,35,24,0.03)] shadow-none">
-          <CardContent className="pt-6">
-            <p className="text-[#b42318] text-sm font-medium flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#b42318] inline-block"></span>
-              {infoMessage}
-            </p>
-          </CardContent>
-        </Card>
-      ) : null}
-
       <div data-testid="partners-table" className="w-full max-w-full min-w-0">
         <Card className="rota-glass-panel border-none shadow-sm overflow-hidden">
           <CardHeader className="border-b border-border/40 bg-[var(--color-surface-muted)]/30">
@@ -97,11 +83,19 @@ export default async function AdminPartnersPage() {
               <span className="rota-dot"></span> Active Roster
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <DataTable
-              columns={["Partner", "Type", "Coverage", "Status", "Notes"]}
-              rows={rows}
-            />
+          <CardContent className="min-w-0 p-0">
+            {infoMessage ? (
+              <ErrorState variant="table" title="Partners unavailable" message={infoMessage} retryHref="/admin/partners" />
+            ) : rows.length === 0 ? (
+              <EmptyState variant="table" title="No partner records" description="No persisted partner records are available yet." />
+            ) : (
+              <div className="overflow-x-auto">
+                <DataTable
+                  columns={["Partner", "Type", "Coverage", "Status", "Notes"]}
+                  rows={rows}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

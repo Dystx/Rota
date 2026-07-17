@@ -50,10 +50,14 @@ export default async function ReviewerTripPage({
       errorMessage = "Reviewer trip workspace is temporarily unavailable. Please try again shortly.";
     } else {
       if (!(await reviewerHasTripAssignment(tripId, auth.reviewerId, { actor: auth.actor }))) {
-        infoMessage = "This trip is not assigned to your reviewer account.";
+        infoMessage = "This reviewer trip is unavailable.";
       } else {
-        isAuthorizedReviewer = true;
-      trip = await getTripDraftById(tripId, { actor: auth.actor });
+        trip = await getTripDraftById(tripId, { actor: auth.actor });
+        if (!trip) {
+          infoMessage = "This reviewer trip is unavailable.";
+        } else {
+          isAuthorizedReviewer = true;
+        }
       }
     }
 
@@ -101,27 +105,27 @@ export default async function ReviewerTripPage({
     <PageShell variant="reviewer">
       <div data-testid="reviewer-trip-header">
         <SectionHeading
-          eyebrow={`Review trip ${tripId}`}
+          eyebrow={trip ? "Reviewer workspace" : "Reviewer trip"}
           title={trip ? `${trip.title} reviewer route` : "Reviewer trip workspace"}
           description="Review the route, leave local notes, apply substitutions, monitor pacing alerts, and complete the reviewer summary."
           h1
         />
       </div>
-      {review === "queued" ? (
+      {isAuthorizedReviewer && review === "queued" ? (
         <Card className="mt-6 border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="pt-6">
             <p className="text-on-surface-variant leading-loose text-sm">This trip is now marked as in review.</p>
           </CardContent>
         </Card>
       ) : null}
-      {review === "completed" ? (
+      {isAuthorizedReviewer && review === "completed" ? (
         <Card className="mt-6 border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="pt-6">
             <p className="text-on-surface-variant leading-loose text-sm">Reviewer completion saved. The trip now carries reviewed trust markers.</p>
           </CardContent>
         </Card>
       ) : null}
-      {review === "locked" ? (
+      {isAuthorizedReviewer && review === "locked" ? (
         <Card className="mt-6 border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="pt-6">
             <p className="text-on-surface-variant leading-loose text-sm">This trip must be unlocked before it can move through human review.</p>
@@ -131,13 +135,28 @@ export default async function ReviewerTripPage({
       {errorMessage ? (
         <Card className="mt-6 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="p-0">
-            <ErrorState variant="table" title="Cannot load trip workspace" message={errorMessage} />
+            <ErrorState
+              variant="table"
+              title="Cannot load trip workspace"
+              message={errorMessage}
+              retryHref="/reviewer/queue"
+              retryText="Back to review queue"
+            />
           </CardContent>
         </Card>
       ) : infoMessage ? (
         <Card className="mt-6 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
           <CardContent className="p-0">
-            <EmptyState variant="table" title="Reviewer access required" description={infoMessage} />
+            <EmptyState
+              variant="table"
+              title="Reviewer access required"
+              description={infoMessage}
+              action={
+                <Button asChild size="md" variant="secondary">
+                  <Link href="/reviewer/queue">Back to review queue</Link>
+                </Button>
+              }
+            />
           </CardContent>
         </Card>
       ) : null}
@@ -238,7 +257,7 @@ export default async function ReviewerTripPage({
         </div>
         <div className="grid gap-6 min-w-0">
           <div data-testid="day-tabs" className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
-            {(routeValidation?.days ?? Array.from({ length: 3 }, (_, index) => ({ dayIndex: index + 1, label: `Day ${index + 1}` }))).map(
+            {(routeValidation?.days ?? []).map(
               (routeDay) => {
                 const isActive = routeDay.dayIndex === activeDay?.dayIndex || (!activeDay && routeDay.dayIndex === 1);
 

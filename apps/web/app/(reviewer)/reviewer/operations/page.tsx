@@ -1,36 +1,38 @@
-import { buildWorkerPlan } from "@repo/workers/plan";
-import { buildEmailPreview } from "@repo/emails";
-import { listCheckoutPlans } from "@repo/payments";
-import { isPersistenceConfigError, isSchemaDriftError } from "@repo/db";
+import Link from "next/link";
+import {
+  filterActiveReviewerAssignments,
+  isPersistenceConfigError,
+  isSchemaDriftError,
+  listReviewerAssignments
+} from "@repo/db";
 import {
   Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  DataTable,
   EmptyState,
+  ErrorState,
   PageShell,
   SectionHeading,
   StatPill,
   StatusPill
 } from "@repo/ui";
 import { getReviewerPageAuthContext } from "@/lib/auth/reviewer";
+import { RequireReviewerAuth } from "../../_components/require-reviewer-auth";
 
 type JobStatusTone = "success" | "warning" | "neutral" | "danger";
 
 function statusTone(status: string): JobStatusTone {
   switch (status) {
-    case "ready":
-    case "succeeded":
     case "completed":
       return "success";
-    case "blocked":
-    case "dead_lettered":
-      return "danger";
-    case "queued":
-    case "running":
-    case "retry_scheduled":
+    case "assigned":
       return "warning";
+    case "submitted":
+      return "neutral";
     default:
       return "neutral";
   }
@@ -41,36 +43,38 @@ function prettify(value: string) {
 }
 
 export default async function ReviewerOperationsPage() {
+  let assignments = [] as Awaited<ReturnType<typeof listReviewerAssignments>>;
   let infoMessage = "";
+  let errorMessage = "";
+  let notSignedIn = false;
 
   try {
     const authContext = await getReviewerPageAuthContext();
     if (!authContext) {
-      infoMessage = "Sign in with a linked reviewer account to interact with the live operations console.";
+      notSignedIn = true;
     } else if ("reason" in authContext) {
-      infoMessage = "Reviewer operations are temporarily unavailable. Please try again shortly.";
+      errorMessage = "Reviewer operations are temporarily unavailable. Please try again shortly.";
+    } else {
+      assignments = await listReviewerAssignments(100, authContext.reviewerId, { actor: authContext.actor });
     }
   } catch (error) {
-    if (isPersistenceConfigError(error)) {
-      infoMessage = "Configure PostgreSQL and Better Auth to load the reviewer operations console.";
-    } else if (isSchemaDriftError(error)) {
-      infoMessage = "Reviewer operations are temporarily unavailable while persistence is being reconciled. Background queues, checkout, and delivery previews remain visible below.";
-    } else {
-      infoMessage = "Could not load reviewer operations context. The reference queues below are still available.";
-    }
+    infoMessage = isPersistenceConfigError(error)
+      ? "Configure PostgreSQL and Better Auth to load persisted reviewer assignments here."
+      : isSchemaDriftError(error)
+        ? "Reviewer assignments are temporarily unavailable while persistence is being reconciled."
+        : "Could not load reviewer assignments. Please try again later.";
   }
 
-  const workerPlan = buildWorkerPlan({ tripId: "1", isPaid: true, hasHumanReview: false });
-  const checkoutPlans = listCheckoutPlans();
-  const emailPreviews = [
-    buildEmailPreview("payment-receipt", "Porto & Douro / 5 days"),
-    buildEmailPreview("export-ready", "Porto & Douro / 5 days"),
-    buildEmailPreview("review-complete", "Porto & Douro / 5 days")
-  ];
-
-  const totalJobs = workerPlan.jobs.length;
-  const blockedJobs = workerPlan.jobs.filter((job) => Boolean(job.blockingReason)).length;
-  const readyJobs = totalJobs - blockedJobs;
+  const activeAssignments = filterActiveReviewerAssignments(assignments);
+  const completedAssignments = assignments.filter((assignment) => assignment.status === "completed");
+  const submittedAssignments = assignments.filter((assignment) => assignment.status === "submitted");
+  const assignmentRows = assignments.map((assignment) => ({
+    id: assignment.id,
+    notes: assignment.notes || "No notes recorded",
+    status: assignment.status,
+    trip: "Assigned trip",
+    updated: assignment.completedAt ?? assignment.createdAt
+  }));
 
   return (
     <PageShell variant="reviewer">
@@ -78,100 +82,89 @@ export default async function ReviewerOperationsPage() {
         <SectionHeading
           eyebrow="Reviewer dashboard"
           title="Operations console"
-          description="Monitor background queues, checkout pricing, and reviewer delivery messages used across the assignment lifecycle."
+          description="Review the persisted assignment state for your reviewer account. Background workers, checkout, and delivery previews are not shown without live records."
           h1
         />
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        <StatPill label="Background jobs" value={String(totalJobs)} />
-        <StatPill label="Ready" value={String(readyJobs)} />
-        <StatPill label="Blocked" value={String(blockedJobs)} />
-        <StatPill label="Checkout tiers" value={String(checkoutPlans.length)} />
-        <StatPill label="Delivery messages" value={String(emailPreviews.length)} />
-      </div>
-
-      {infoMessage ? (
+      {errorMessage ? (
+        <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm">
+          <CardContent className="p-0">
+            <ErrorState variant="table" title="Operations unavailable" message={errorMessage} retryHref="/reviewer/operations" />
+          </CardContent>
+        </Card>
+      ) : infoMessage ? (
         <Card className="mt-8 overflow-hidden border-[var(--color-border)] bg-white/60 shadow-sm" data-testid="reviewer-operations-info">
-          <CardContent className="pt-6">
-            <p className="text-on-surface-variant leading-loose text-sm">{infoMessage}</p>
+          <CardContent className="p-0">
+            <ErrorState variant="table" title="Cannot load operations" message={infoMessage} retryHref="/reviewer/operations" />
           </CardContent>
         </Card>
-      ) : null}
-
-      <div className="mt-8 flex flex-col gap-8 md:gap-12">
-        <Card data-testid="worker-plan-card" className="border-[var(--color-border)] bg-white/60 shadow-sm">
-          <CardHeader className="px-4 md:px-8 pt-6 md:pt-8 pb-4">
-            <CardTitle className="font-display text-2xl">Background queue</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-6 px-4 md:px-8 pb-6 md:pb-8">
-            <p className="text-on-surface-variant leading-loose text-base leading-relaxed">{workerPlan.summary}</p>
-            {workerPlan.jobs.length === 0 ? (
-              <EmptyState variant="table" title="No background jobs" description="Background queues are idle. Newly assigned trips will appear here once they enter the operations pipeline." />
-            ) : (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {workerPlan.jobs.map((job) => (
-                  <div key={job.id} className="flex flex-col gap-4 rounded-[24px] border border-[var(--color-border)] bg-white/70 p-6 shadow-sm">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge tone="soft">{prettify(job.type)}</Badge>
-                      <StatusPill tone={statusTone(job.status)} label={prettify(job.status)} />
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold text-[var(--color-foreground)]">{job.title}</p>
-                      <p className="text-on-surface-variant leading-loose mt-1 text-sm leading-relaxed">{job.summary}</p>
-                    </div>
-                    <div className="mt-auto grid gap-2 pt-2 text-sm">
-                      <p className="text-[var(--color-foreground)]"><span className="text-xs uppercase tracking-widest text-ochre-dark font-medium mr-2">Owner</span>{job.owner}</p>
-                      <p className="text-[var(--color-foreground)]"><span className="text-xs uppercase tracking-widest text-ochre-dark font-medium mr-2">Next step</span>{job.nextStep}</p>
-                      {job.blockingReason ? (
-                        <p className="text-[var(--color-muted-foreground)]"><span className="text-xs uppercase tracking-widest text-ochre-dark font-medium mr-2">Blocked</span>{job.blockingReason}</p>
-                      ) : null}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <Card data-testid="checkout-plan-card" className="border-[var(--color-border)] bg-white/60 shadow-sm">
-            <CardHeader className="px-4 md:px-8 pt-6 md:pt-8 pb-4">
-              <CardTitle className="font-display text-2xl">Checkout tiers</CardTitle>
+      ) : notSignedIn ? (
+        <RequireReviewerAuth signedIn={false} noun="operations" />
+      ) : (
+        <>
+          <Card data-testid="reviewer-operations-summary" className="mt-8 border-[var(--color-border)] bg-white/60 shadow-sm">
+            <CardHeader className="px-4 pt-6 md:px-8 md:pt-8">
+              <CardTitle className="font-display text-2xl">Assignment summary</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 gap-4 px-4 md:px-8 pb-6 md:pb-8">
-              {checkoutPlans.map((plan) => (
-                <div key={plan.tier} className="flex flex-col gap-3 rounded-[24px] border border-[var(--color-border)] bg-white/70 p-6 shadow-sm">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge tone="soft">{prettify(plan.tier)}</Badge>
-                    <Badge tone="soft">{plan.priceLabel}</Badge>
-                  </div>
-                  <p className="text-on-surface-variant leading-loose text-base leading-relaxed">{plan.fulfillment}</p>
-                </div>
-              ))}
+            <CardContent className="flex flex-wrap gap-3 px-4 pb-6 md:px-8 md:pb-8">
+              <StatPill label="Active" value={String(activeAssignments.length)} />
+              <StatPill label="Submitted" value={String(submittedAssignments.length)} />
+              <StatPill label="Completed" value={String(completedAssignments.length)} />
+              <Badge tone="soft">Source: reviewer assignments</Badge>
             </CardContent>
           </Card>
 
-          <Card data-testid="email-preview-card" className="border-[var(--color-border)] bg-white/60 shadow-sm">
-            <CardHeader className="px-4 md:px-8 pt-6 md:pt-8 pb-4">
-              <CardTitle className="font-display text-2xl">Delivery messages</CardTitle>
+          <Card data-testid="reviewer-operations-table" className="mt-8 border-[var(--color-border)] bg-white/60 shadow-sm">
+            <CardHeader className="px-4 pt-6 md:px-8 md:pt-8">
+              <CardTitle className="font-display text-2xl">Assignment records</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 gap-4 px-4 md:px-8 pb-6 md:pb-8">
-              {emailPreviews.map((preview) => (
-                <div key={preview.kind} className="flex flex-col gap-3 rounded-[24px] border border-[var(--color-border)] bg-white/70 p-6 shadow-sm">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge tone="soft">{prettify(preview.kind)}</Badge>
+            <CardContent className="px-4 pb-6 md:px-8 md:pb-8">
+              {assignmentRows.length === 0 ? (
+                <EmptyState
+                  variant="table"
+                  title="No assignment records"
+                  description="No persisted reviewer assignments are available for this account yet."
+                  action={
+                    <Button asChild size="md" variant="secondary">
+                      <Link href="/reviewer/queue">Open review queue</Link>
+                    </Button>
+                  }
+                />
+              ) : (
+                <>
+                  <div className="hidden md:block">
+                    <DataTable
+                      columns={[
+                        { key: "trip", header: "Trip", cell: (row) => row.trip },
+                        { key: "status", header: "Status", cell: (row) => <StatusPill tone={statusTone(row.status)} label={prettify(row.status)} /> },
+                        { key: "notes", header: "Notes", cell: (row) => row.notes },
+                        { key: "updated", header: "Updated", cell: (row) => row.updated }
+                      ]}
+                      data={assignmentRows}
+                      getRowId={(row) => row.id}
+                      density="compact"
+                      ariaLabel="Reviewer assignment records"
+                    />
                   </div>
-                  <div>
-                    <p className="text-base font-semibold text-[var(--color-foreground)]">{preview.subject}</p>
-                    <p className="text-on-surface-variant leading-loose mt-1 text-sm leading-relaxed">{preview.previewText}</p>
+                  <div className="grid gap-3 md:hidden" data-testid="reviewer-operations-mobile">
+                    {assignmentRows.map((row) => (
+                      <article key={row.id} className="grid gap-3 rounded-2xl border border-[var(--color-border)] bg-white/70 p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <p className="font-medium text-[var(--color-foreground)]">{row.trip}</p>
+                          <StatusPill tone={statusTone(row.status)} label={prettify(row.status)} />
+                        </div>
+                        <p className="text-sm leading-relaxed text-[var(--color-muted-foreground)]">{row.notes}</p>
+                        <p className="text-xs text-[var(--color-muted-foreground)]">Updated {row.updated}</p>
+                      </article>
+                    ))}
                   </div>
-                </div>
-              ))}
+                </>
+              )}
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </>
+      )}
     </PageShell>
   );
 }
