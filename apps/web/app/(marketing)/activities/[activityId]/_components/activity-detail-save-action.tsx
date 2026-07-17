@@ -15,6 +15,7 @@ export interface ActivityDetailSaveActionProps {
   activityTitle: string;
   region: ActivityRegion;
   moods: readonly string[];
+  className?: string;
 }
 
 function explorerHref(
@@ -37,7 +38,8 @@ export function ActivityDetailSaveAction({
   activityId,
   activityTitle,
   region,
-  moods
+  moods,
+  className
 }: ActivityDetailSaveActionProps) {
   const [saved, setSaved] = React.useState(false);
   const [status, setStatus] = React.useState("");
@@ -54,7 +56,7 @@ export function ActivityDetailSaveAction({
   }
 
   return (
-    <div data-testid="activity-detail-save-action" className="space-y-3">
+    <div data-testid="activity-detail-save-action" className={className ? `space-y-3 ${className}` : "space-y-3"}>
       <div className="flex flex-wrap items-center gap-3">
         <Button
           aria-pressed={saved}

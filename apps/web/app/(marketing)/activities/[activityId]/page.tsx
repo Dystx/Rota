@@ -93,93 +93,113 @@ export default async function ActivityDetailPage({
     <PublicRouteLayout scene="cover" surfaceTone="midnight" surfaceTexture="none" footerMode="compact">
       <article
         data-testid="activity-detail-page"
-        className="rumia-activity-detail mx-auto max-w-6xl px-6 py-12 md:py-16"
+        className="rumia-activity-detail mx-auto max-w-6xl px-4 py-8 pb-20 sm:px-6 sm:py-12 md:py-16"
       >
-      <Link
-        className="inline-flex min-h-11 items-center text-sm font-medium text-ochre-dark underline decoration-ochre-light underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-        href={`/explore?region=${activity.region}`}
-      >
-        Back to judged activities
-      </Link>
+        <Link
+          className="inline-flex min-h-11 items-center text-sm font-medium text-ochre-dark underline decoration-ochre-light underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+          href={`/explore?region=${activity.region}`}
+        >
+          Back to judged activities
+        </Link>
 
-      {(() => {
-        const media = ACTIVITY_MEDIA[activity.region];
-        return (
-          <RouteScene
-            tone="cover"
-            bleed="contained"
-            focalLayer="media"
-            data-testid="activity-detail-hero"
-            className="!mx-0 !max-w-none mt-10 md:mt-12"
-            media={(
-              <CinematicMedia
-                src={CINEMATIC_MEDIA.portugalCover.videoSrc}
-                poster={media.poster}
-                fallbackSrc={media.fallbackSrc}
-                alt={media.alt}
-                caption={media.caption}
-                credit={media.credit}
-                width={media.width}
-                height={media.height}
-                sizes="(max-width: 768px) 100vw, 1200px"
-                priority
-                motionPolicy={media.motionPolicy}
-                testId="activity-detail-media"
-                className="relative h-[58vh] min-h-[18rem] max-h-[42rem] w-full border border-midnight/10 bg-midnight/10"
-                posterClassName="object-center brightness-[0.82] saturate-[0.9]"
-                videoClassName="object-center brightness-[0.82] saturate-[0.9]"
-                overlayClassName="bg-gradient-to-t from-midnight/35 via-transparent to-white/5"
-              />
-            )}
-          />
-        );
-      })()}
-
-      <div className="mt-8 grid gap-10 md:grid-cols-[minmax(0,1fr)_18rem] md:gap-16">
-        <header className="rumia-detail-judgement-zone">
-          <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-dark">
-            Portugal / {activity.region} / activity judgement
-          </p>
-          <h1 className="mt-4 max-w-4xl font-display text-5xl leading-[0.98] text-primary md:text-7xl">
-            {activity.title}
-          </h1>
-          <div data-testid="activity-detail-primary-action" className="mt-5">
-            <ActivityDetailSaveAction
-              activityId={activity.id}
-              activityTitle={activity.title}
-              moods={activity.bestFor}
-              region={activity.region}
+        {(() => {
+          const media = ACTIVITY_MEDIA[activity.region];
+          return (
+            <RouteScene
+              tone="cover"
+              bleed="contained"
+              layout="overlay"
+              focalLayer="media"
+              data-testid="activity-detail-hero"
+              className="!mx-0 !max-w-none mt-6 min-h-[clamp(34rem,70vh,46rem)] overflow-hidden rounded-[28px] border border-white/15 shadow-[0_28px_80px_rgba(7,17,19,0.3)] md:mt-8"
+              media={(
+                <CinematicMedia
+                  src={CINEMATIC_MEDIA.portugalCover.videoSrc}
+                  poster={media.poster}
+                  fallbackSrc={media.fallbackSrc}
+                  alt={media.alt}
+                  caption={media.caption}
+                  credit={media.credit}
+                  width={media.width}
+                  height={media.height}
+                  sizes="(max-width: 768px) 100vw, 1200px"
+                  priority
+                  motionPolicy={media.motionPolicy}
+                  textSafeZone={{ x: 0.06, y: 0.12, width: 0.86, height: 0.78 }}
+                  mobileTextSafeZone={{ x: 0.06, y: 0.2, width: 0.88, height: 0.72 }}
+                  testId="activity-detail-media"
+                  className="relative h-full min-h-[clamp(34rem,70vh,46rem)] w-full bg-midnight/10"
+                  posterClassName="object-center brightness-[0.56] saturate-[0.9]"
+                  videoClassName="object-center brightness-[0.56] saturate-[0.9]"
+                  overlayClassName="bg-gradient-to-t from-midnight/90 via-midnight/25 to-midnight/10"
+                />
+              )}
+              foreground={(
+                <header className="flex min-h-[clamp(34rem,70vh,46rem)] items-end px-5 pb-28 pt-10 text-linen-dark sm:px-8 md:px-12 md:pb-32">
+                  <div className="max-w-4xl">
+                    <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-light">
+                      Portugal / {activity.region} / activity judgement
+                    </p>
+                    <h1 className="mt-4 max-w-4xl font-display text-4xl leading-[0.98] text-linen-dark sm:text-5xl md:text-7xl">
+                      {activity.title}
+                    </h1>
+                    <div
+                      data-testid="activity-detail-judgement"
+                      className="mt-7 max-w-3xl border-t border-ochre-light/50 pt-5"
+                    >
+                      <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-light">
+                        Rumia verdict
+                      </p>
+                      <p className="mt-3 max-w-3xl font-display text-xl leading-tight text-linen-dark sm:text-2xl md:text-3xl">
+                        {activity.verdict}
+                      </p>
+                      <dl className="mt-5 grid gap-4 border-t border-white/20 pt-4 text-base leading-7 text-linen-dark sm:grid-cols-2">
+                        <div>
+                          <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-ochre-light">Time to allow</dt>
+                          <dd className="mt-1">{timeLabel(activity.durationMinutes)}</dd>
+                        </div>
+                        <div>
+                          <dt className="font-mono-micro text-mono-micro uppercase tracking-[0.16em] text-ochre-light">Leave room for</dt>
+                          <dd className="mt-1">{activity.avoidWhen ?? "The unplanned parts of the day."}</dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </div>
+                </header>
+              )}
+              actions={(
+                <div className="rumia-activity-detail-save-bar sticky bottom-0 z-20 w-full bg-midnight/90 px-5 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-md sm:px-8 md:static md:bg-transparent md:px-12 md:pb-8 md:pt-3">
+                  <div data-testid="activity-detail-primary-action">
+                    <ActivityDetailSaveAction
+                      activityId={activity.id}
+                      activityTitle={activity.title}
+                      moods={activity.bestFor}
+                      region={activity.region}
+                    />
+                  </div>
+                </div>
+              )}
             />
-          </div>
-          <div
-            data-testid="activity-detail-judgement"
-            className="mt-8 max-w-3xl border-t border-ochre-dark/40 pt-5"
-          >
-            <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-dark">
-              Rumia verdict
-            </p>
-            <p className="mt-4 font-display text-2xl leading-tight text-primary md:text-3xl">
-              {activity.verdict}
-            </p>
-          </div>
-        </header>
+          );
+        })()}
 
-        <div className="rumia-detail-decision border-t border-[var(--color-border)] pt-5 md:mt-2">
-          <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-dark">
-            The decision
-          </p>
-          <p className="mt-3 text-base leading-7 text-on-surface-variant">
-            Choose this when the time, pace, and trade-off match the day you
-            actually have.
-          </p>
-          <Link
-            className="mt-6 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark transition-colors duration-base hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
-            href={`/explore?region=${activity.region}`}
-          >
-            Compare with other activities
-          </Link>
+        <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,1fr)_18rem] md:gap-16">
+          <div className="rumia-detail-decision border-t border-[var(--color-border)] pt-5">
+            <p className="font-mono-micro text-mono-micro uppercase tracking-[0.22em] text-ochre-dark">
+              The decision
+            </p>
+            <p className="mt-3 text-base leading-7 text-on-surface-variant">
+              Choose this when the time, pace, and trade-off match the day you
+              actually have.
+            </p>
+            <Link
+              className="mt-6 inline-flex min-h-11 items-center border-b border-ochre-dark px-1 py-2 text-sm font-medium text-ochre-dark transition-colors duration-base hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-light"
+              href={`/explore?region=${activity.region}`}
+            >
+              Compare with other activities
+            </Link>
+          </div>
         </div>
-      </div>
 
       <dl
         data-testid="activity-detail-fact-rail"

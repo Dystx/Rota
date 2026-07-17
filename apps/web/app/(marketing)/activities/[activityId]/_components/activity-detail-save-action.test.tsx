@@ -50,4 +50,25 @@ describe("ActivityDetailSaveAction", () => {
     );
     expect(screen.queryByRole("link", { name: /See this day/i })).toBeNull();
   });
+
+  it("keeps save as the primary action and announces the chosen-day transition", () => {
+    render(
+      <ActivityDetailSaveAction
+        activityId="porto-ribeira-slow-walk"
+        activityTitle="Ribeira and Miragaia at walking pace"
+        region="porto"
+        moods={["a walk"]}
+      />
+    );
+
+    const save = screen.getByRole("button", { name: /save to my day/i });
+    expect(save.getAttribute("aria-pressed")).toBe("false");
+    fireEvent.click(save);
+
+    expect(screen.getByRole("button", { name: /remove from my day/i }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("status").textContent).toMatch(/added to your day/i);
+    expect(screen.getByRole("link", { name: /see this day/i }).getAttribute("href")).toContain(
+      "saved=porto-ribeira-slow-walk"
+    );
+  });
 });

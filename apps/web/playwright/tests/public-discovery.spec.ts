@@ -107,6 +107,42 @@ test.describe("public discovery and trust routes", () => {
     await expect(page.getByText("Ribeira and Miragaia at walking pace", { exact: true })).toBeVisible();
   });
 
+  test("activity detail keeps judgement, caveat, and save inside the first viewport", async ({ page }) => {
+    await page.goto("/activities/porto-ribeira-slow-walk");
+
+    const viewport = page.viewportSize();
+    const hero = page.getByTestId("activity-detail-hero");
+    const judgement = hero.getByTestId("activity-detail-judgement");
+    const save = hero.getByTestId("activity-detail-save-action");
+    await expect(hero).toHaveAttribute("data-tone", "cover");
+    await expect(judgement).toContainText("Rumia verdict");
+    await expect(judgement).toContainText("Time to allow");
+    await expect(judgement).toContainText("Leave room for");
+    await expect(save.getByRole("button", { name: /save to my day/i })).toBeVisible();
+
+    const judgementBox = await judgement.boundingBox();
+    const evidenceBox = await page.getByRole("link", { name: /Read the editorial evidence/i }).boundingBox();
+    const saveBox = await save.boundingBox();
+    expect(judgementBox).not.toBeNull();
+    expect(evidenceBox).not.toBeNull();
+    expect(saveBox).not.toBeNull();
+    expect((judgementBox?.y ?? Number.POSITIVE_INFINITY) + (judgementBox?.height ?? 0)).toBeLessThanOrEqual(
+      viewport?.height ?? Number.POSITIVE_INFINITY
+    );
+    expect((saveBox?.y ?? 0) + (saveBox?.height ?? 0)).toBeLessThanOrEqual(evidenceBox?.y ?? Number.POSITIVE_INFINITY);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+
+  test("empty Workspace stays a bounded decision canvas", async ({ page }) => {
+    await page.goto("/explore/workspace");
+
+    await expect(page.getByTestId("activity-workspace")).toHaveAttribute("data-state", "empty");
+    await expect(page.getByTestId("workspace-empty-anchor")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Start with an activity", exact: true })).toBeVisible();
+    expect(await page.getByTestId("workspace-empty-anchor").boundingBox()).not.toBeNull();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+
   test("pricing exposes the three ascension choices", async ({ page }) => {
     await page.goto("/pricing");
     await expect(page.getByRole("heading", { name: "Free activity-day preview", exact: true })).toBeVisible();
@@ -127,8 +163,10 @@ test.describe("public discovery and trust routes", () => {
   test("activity map is explicit and keeps the complete list equivalent", async ({ page }) => {
     test.skip(process.env.ENABLE_ACTIVITY_MAP?.trim().toLowerCase() !== "true", "Requires ENABLE_ACTIVITY_MAP=true");
 
-    await page.goto("/explore/workspace?activity=porto-ribeira-slow-walk");
+    await page.goto("/explore/workspace?activity=porto-ribeira-slow-walk&activity=porto-bombarda-art-walk");
     await expect(page.getByRole("heading", { name: "Your tentative day", exact: true })).toBeVisible();
+    await expect(page.getByTestId("activity-workspace")).toHaveAttribute("data-state", "multiple");
+    await expect(page.getByTestId("workspace-day-summary")).toContainText(/travel|pauses/i);
 
     const openMap = page.getByRole("button", { name: "View on map", exact: true });
     await expect(openMap).toHaveAttribute("aria-expanded", "false");
@@ -138,6 +176,18 @@ test.describe("public discovery and trust routes", () => {
     await expect(panel).toHaveAttribute("data-map-intent", "explicit");
     await expect(panel.locator('[data-map-mode="map"], [data-map-mode="fallback"]')).toHaveCount(1, { timeout: 15_000 });
     await expect(panel.getByText("Ribeira and Miragaia at walking pace", { exact: true })).toBeVisible();
+    await expect(panel.getByTestId("activity-map-list-item")).toHaveCount(2);
+    const mapIds = await panel.getByTestId("activity-map-list-item").evaluateAll((items) =>
+      items.map((item) => item.getAttribute("data-activity-id"))
+    );
+    const listIds = await page.getByTestId("workspace-activity-card").evaluateAll((cards) =>
+      cards.map((card) => card.querySelector("h2")?.textContent)
+    );
+    expect(mapIds).toEqual(["porto-ribeira-slow-walk", "porto-bombarda-art-walk"]);
+    expect(listIds).toEqual([
+      "Ribeira and Miragaia at walking pace",
+      "Miguel Bombarda for contemporary art and design"
+    ]);
 
     await expect(openMap).toHaveAttribute("aria-expanded", "true");
     await panel.getByRole("button", { name: "View list", exact: true }).click();

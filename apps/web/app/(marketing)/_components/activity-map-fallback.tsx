@@ -40,17 +40,17 @@ export function ActivityMapFallback({
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ochre-dark">The complete list</p>
           <h2 className="mt-2 font-display text-2xl text-primary">Every selected activity stays here</h2>
         </div>
-        {error ? <span role="alert" className="text-sm text-on-surface-variant">{error}</span> : null}
+        {error ? <span role="alert" className="text-base leading-7 text-on-surface-variant">{error}</span> : null}
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+      <p className="mt-3 text-base leading-7 text-on-surface-variant">
         The map is a spatial explanation, not the source of your day. Use these cards to compare the same editorial judgement without WebGL.
       </p>
       {model.fallback.required && model.fallback.message ? (
-        <p className="mt-3 rounded-xl border border-ochre-light/60 bg-ochre-light/10 px-3 py-3 text-sm leading-relaxed text-on-surface-variant">
+        <p className="mt-3 rounded-xl border border-ochre-light/60 bg-ochre-light/10 px-3 py-3 text-base leading-7 text-on-surface-variant">
           {model.fallback.message}
         </p>
       ) : null}
-      <ol aria-label="Selected activities" className="mt-5 space-y-3">
+      <ol data-testid="activity-map-list" aria-label="Selected activities" className="mt-5 space-y-3">
         {model.list.map((item, index) => {
           const point = model.byActivityId.get(item.activityId);
           const selected = item.activityId === selectedActivityId;
@@ -60,7 +60,7 @@ export function ActivityMapFallback({
               : "Public point"
             : item.geometryLabel;
           return (
-            <li key={`${item.activityId}-${index}`}>
+            <li key={`${item.activityId}-${index}`} data-testid="activity-map-list-item" data-activity-id={item.activityId} data-duration-minutes={item.durationMinutes ?? undefined}>
               <button
                 type="button"
                 id={`activity-map-item-${item.activityId}`}
@@ -74,7 +74,7 @@ export function ActivityMapFallback({
                   </span>
                   <span className="min-w-0">
                     <span className="block font-medium text-primary">{item.title}</span>
-                    <span className="mt-1 block text-sm leading-relaxed text-on-surface-variant">{item.verdict}</span>
+                  <span className="mt-1 block text-base leading-7 text-on-surface-variant">{item.verdict}</span>
                     <span className="mt-2 block text-xs uppercase tracking-[0.12em] text-ochre-dark">{geometryLabel} · {item.bestTime}{item.durationMinutes ? ` · ${item.durationMinutes} min` : ""}</span>
                     {item.evidenceAttribution ? <span className="mt-2 block text-xs text-on-surface-variant">Source: {item.evidenceAttribution}</span> : null}
                   </span>

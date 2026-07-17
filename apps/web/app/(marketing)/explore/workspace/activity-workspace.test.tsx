@@ -23,12 +23,24 @@ afterEach(() => {
 });
 
 describe("ActivityWorkspace", () => {
+  it.each([
+    [0, "empty"],
+    [1, "one"],
+    [2, "multiple"]
+  ] as const)("renders the %s-selection workspace state", (count, state) => {
+    render(<ActivityWorkspace initialActivities={REVIEWED_ACTIVITY_SEED.slice(0, count)} />);
+
+    expect(screen.getByTestId("activity-workspace").getAttribute("data-state")).toBe(state);
+  });
+
   it("makes an empty day recoverable with a useful shape preview", () => {
     render(<ActivityWorkspace initialActivities={[]} />);
 
     expect(screen.getByRole("heading", { name: /choose again/i })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Keep exploring" })).toBeTruthy();
     expect(screen.getByRole("group", { name: /empty day preview/i })).toBeTruthy();
+    expect(screen.getByTestId("workspace-empty-anchor")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Start with an activity" })).toBeTruthy();
     expect(screen.getByText("Time")).toBeTruthy();
     expect(screen.getByText("Judgement")).toBeTruthy();
     expect(screen.getByText("Practical space")).toBeTruthy();
@@ -55,7 +67,39 @@ describe("ActivityWorkspace", () => {
     expect(screen.getByText("Ribeira and Miragaia at walking pace")).toBeTruthy();
     expect(screen.getByTestId("workspace-status").textContent).toMatch(/restored to your day/i);
     expect(screen.getByText(/Keep exploring/i)).toBeTruthy();
+    const shapeLink = screen.getByRole("link", { name: "Shape this day" });
+    expect(shapeLink.getAttribute("href")).toContain("activity=porto-bombarda-art-walk");
     expect(screen.getByRole("link", { name: /Give feedback on this day/i }).getAttribute("href")).toContain("activity=porto-bombarda-art-walk");
+  });
+
+  it("keeps the ordered sequence editable and makes travel and pause room explicit", () => {
+    const [first, second] = REVIEWED_ACTIVITY_SEED.slice(0, 2);
+    render(<ActivityWorkspace initialActivities={[first!, second!]} />);
+
+    expect(screen.getByTestId("workspace-day-summary").contains(screen.getByTestId("workspace-total-time"))).toBe(true);
+    expect(screen.getByTestId("workspace-travel-caveat").textContent).toMatch(/travel|pause/i);
+    expect(screen.getByTestId("workspace-activity-sequence").textContent).toContain(first!.title);
+
+    fireEvent.click(screen.getByRole("button", { name: `Move ${second!.title} earlier` }));
+
+    const indexes = screen.getAllByTestId("workspace-activity-index");
+    expect(indexes[0]?.textContent).toBe("01");
+    expect(screen.getAllByTestId("workspace-activity-card")[0]?.textContent).toContain(second!.title);
+    expect(replace).toHaveBeenCalledWith(
+      `/explore/workspace?activity=${second!.id}&activity=${first!.id}`
+    );
+  });
+
+  it("announces ignored URL ids without changing the chosen sequence", () => {
+    render(
+      <ActivityWorkspace
+        initialActivities={REVIEWED_ACTIVITY_SEED.slice(0, 1)}
+        invalidActivityIds={["not-a-reviewed-activity"]}
+      />
+    );
+
+    expect(screen.getByRole("alert").textContent).toMatch(/not-a-reviewed-activity/i);
+    expect(screen.getAllByTestId("workspace-activity-card")).toHaveLength(1);
   });
 
   it("closes the optional map with Escape and restores focus to its trigger", async () => {

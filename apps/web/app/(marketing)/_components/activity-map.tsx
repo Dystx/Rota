@@ -244,7 +244,7 @@ function ActivityMapSurface({
               onMapError={setMapError}
             />
             {mapError ? (
-              <div role="alert" className="absolute inset-x-4 top-4 rounded-xl border border-ochre-light bg-linen/95 px-4 py-3 text-sm text-on-surface shadow-sm">
+              <div role="alert" className="absolute inset-x-4 top-4 rounded-xl border border-ochre-light bg-linen/95 px-4 py-3 text-base leading-7 text-on-surface shadow-sm">
                 The interactive map could not load. The complete activity list remains below.
               </div>
             ) : null}
