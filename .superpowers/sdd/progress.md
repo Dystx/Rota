@@ -1,13 +1,36 @@
 # Rumia frontend polish execution ledger
 
-Plan: `docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`
+Completed baseline plan: `docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`
+
+Active follow-up plan: `docs/superpowers/plans/2026-07-18-rumia-visual-hardening-release-readiness.md`
 
 Audit: `docs/reviews/2026-07-14-rumia-frontend-visual-audit.md`
 
-Status: finish plan active; foundation contracts and route authority verified;
-exact-artifact convergence is in progress
+Status: July 15 finish plan complete and pushed at `dfbc31c`; bounded July 18
+visual-hardening pass in progress on `codex/rumia-visual-hardening`
 
 ## Current checkpoint
+
+- The July 15 corrective plan is complete. Its 2026-07-17 exact artifact and
+  102-row desktop/mobile family passed the final gate and received explicit
+  owner approval; the earlier authenticated RLS blocker is closed.
+- A post-acceptance visual review found three bounded defects: Planner field/ink
+  contrast, Home mobile stacked-scene/card geometry, and Console Workspace's
+  nested mobile blank tail. The July 18 hardening plan owns only those defects,
+  their regression assertions, a six-row snapshot delta, and release readiness.
+- The latest pushed source is `main @ dfbc31c`. It is not the private VPS
+  release recorded in the July 13 cutover evidence, and no deployment or public
+  ingress change is authorized by the follow-up plan.
+- The follow-up is isolated in `/Users/cheng/rota/.worktrees/rumia-visual-hardening`.
+  Its focused pre-change baseline is green (37/37 unit assertions and web
+  Playwright typecheck); the existing jsdom media-play notices remain baseline
+  noise and are not introduced by this pass.
+
+### Completed July 15 execution chronology
+
+The entries below retain the dated route-by-route implementation and gate
+history. Where an earlier entry says a gate was open or blocked, the final July
+17 closeout later in this section supersedes it.
 
 - The current exact standalone artifact was rebuilt from this worktree and
   exercised at `http://127.0.0.1:3105/` with process-only local build values.
@@ -341,6 +364,7 @@ exact-artifact convergence is in progress
 - [x] Phase 5 — traveler product and saved-work states
 - [x] Phase 6 — beta, organization, developer, and operator surfaces
 - [x] Phase 7 — exact-artifact visual and release acceptance (Task 17 exact gate, approved visual family, and release checks complete)
+- [ ] Phase 8 — bounded visual hardening and release readiness (Planner, Home, Console, six-row delta, exact final gate)
 
 Task checkpoint: route authority contracts are red-green verified. `/explore`
 and `/explore/workspace` are live catalogue entries, `/human-review` now
@@ -378,3 +402,12 @@ aesthetic approval on the exact served artifact on 2026-07-17.
 - Task 15: complete with concerns (commit 9cb75c3, reviewer/admin density and truthful triage surfaces, mobile action/card contracts, and unassigned-trip safety are implemented; focused tests 53/53, web/UI typechecks, ESLint, production build, and diff checks pass; anonymous in-app browser protected-route redirects verified; authenticated Playwright remains blocked by local user_profiles RLS in global setup)
 - Task 16: complete with concerns (commit d228fca, console truth states, persisted pipeline data, explicit mobile workspace/lane switching, safe non-drag moves, truthful metrics/config boundaries, and capability/flag-gated API docs; console/API focused tests 22/22, typechecks, ESLint, production build 64/64, and diff checks pass; authenticated Playwright remains blocked by local user_profiles RLS in global setup)
 - Task 17: complete (exact standalone runner, external-server Playwright mode, manifest-driven route scenes, deterministic recovery/preferences checks, 102-row approval ledger, migrated visual assertions, contrast corrections, and prefetch/media performance corrections; final receipt `F5CzHygTrY-JgoMIi9Sxt` / `e839dcd3790d560ffbd2fb8c694d1c02277c5353a628440b9e70358aed6277e0`; exact gate 1,640 non-visual passed with 2,424 intentional skips and 102/102 visual passed with 306 intentional skips; owner approved the exact served family on 2026-07-17)
+
+## 2026-07-18 visual-hardening ledger
+
+- Hardening Task 1: in progress — restore Planner midnight field and add computed-style/Axe contrast guards.
+- Hardening Task 2: pending — repair Home stacked scene flow and one-up mobile activity-card geometry; prove activity-detail overlay unchanged.
+- Hardening Task 3: pending — remove Console Workspace nested viewport height and enforce one-viewport mobile empty composition.
+- Hardening Task 4: pending — build one candidate, run pre-approval, inspect exact Home/Planner/Console evidence, and obtain six owner decisions.
+- Hardening Task 5: pending — update only the approved six PNGs and run the complete exact-artifact final gate.
+- Hardening Task 6: pending — reconcile authority/evidence and record release-ready but not-deployed status.

@@ -1,6 +1,6 @@
 # Rumia plan index
 
-**Reconciled:** 2026-07-16 after the full in-app-browser design review and adversarial corrective-plan audit
+**Reconciled:** 2026-07-18 after the Task 17 closeout and bounded post-acceptance visual review
 
 This is the authority map for Rumia planning. Only documents marked **ACTIVE**
 may supply implementation tasks. Supporting contracts constrain those tasks;
@@ -8,66 +8,54 @@ deferred packets require a new approval gate; archived plans are evidence only.
 
 ## Current truth
 
-- Product scope is Portugal-wide and activity-first.
-- The completed 2026-07-14 convergence queue is preserved as historical
-  evidence; it does not supply new implementation tasks.
-- Frontend implementation remains owned by one canonical document:
-  `plans/2026-07-15-rumia-frontend-finish.md`. It has been reopened and expanded
-  into the corrective route/state implementation plan; no parallel redesign
-  queue was created.
-- The active product plan now points to that July 15 frontend authority; its
-  stale July 14 frontend link was removed. `specs/PLAN-AUDIT_LATEST.md` records
-  a READY-for-implementation verdict, not frontend completion.
-- The July 16 live browser review found that the promised four scene grammars
-  are not yet implemented as route-wide compositions. Most customer routes
-  still inherit the same linen/contour field, dark rounded chapter, white cards,
-  ochre labels, and repeated footer.
-- Home and Planner are the strongest distinct surfaces. Portugal's desktop
-  atlas, Pricing's free-first hierarchy, and Checkout's no-trip state are useful
-  foundations, but they do not close their route-family acceptance gates.
-- Primary open defects include weak Explore save feedback, a missing or
-  unreliable mobile chosen-day tray, below-fold activity judgement, an
-  oversized Workspace empty state, repetitive trust/legal/beta routes, cloned
-  traveler archive layouts, sparse reviewer/admin pages, and a separate Console
-  shell.
-- The accepted mobile Console Workspace baseline contains a large blank white
-  tail. Snapshot success is therefore not human visual approval.
-- The source HTTP catalogue has 53 entries: 51 rendered routes and 2 redirects.
-  `docs/audit/route-matrix.md` currently has only 51 rows, omits activity detail
-  and feedback, and does not yet express the required state matrix.
-- In a development runtime without database/auth configuration, Sign-in,
-  Itineraries, and Vault can remain in streamed skeleton/error responses and
-  Account can render a blank 500 shell. Typed unavailable recovery is an open P0
-  task; provider failure must not masquerade as anonymous or forbidden access.
-- `/console/*` and `/api/v1/docs` must enforce the role/capability contract
-  declared by the catalogue before operator visual work is accepted.
-- `/b2b/[orgSlug]` cannot have a truthful organization-ready state under the
-  active frontend authority because no membership contract exists and schema
-  changes are out of scope. It remains unavailable without organization-data
-  disclosure.
-- Earlier unit, typecheck, build, accessibility, performance, and browser
-  results remain technical evidence only. They do not override the July 16
-  design review or authorize snapshot refresh.
-- No snapshot baseline is approved for replacement and no deployment is
-  authorized. Acceptance must use one exact standalone artifact with one
-  Playwright worker; a long-lived development server is not release evidence.
-- Task 17 now provides that exact-artifact harness and manifest-driven route,
-  recovery, preference, and visual contracts. Its pre-approval run materialized
-  one build and closed port 3105, but authenticated global setup still stops at
-  `apps/web/playwright/global-setup.ts:113` because local PostgreSQL rejects the
-  `app.user_profiles` insert under RLS. The 102-row snapshot approval ledger is
-  therefore open and no snapshot update has been authorized.
-- Public ingress and optional map/provider/legal decisions remain separate.
-- Map Phase 2/3 and richer 3D remain deferred and must not enter this finish.
+- Product scope is Portugal-wide and activity-first. The product helps a
+  traveler decide what is genuinely worth doing; the saved-day workspace is a
+  secondary shaping tool.
+- The 17-task July 15 frontend finish plan is complete. Its exact Task 17
+  artifact (`F5CzHygTrY-JgoMIi9Sxt`, digest
+  `e839dcd3790d560ffbd2fb8c694d1c02277c5353a628440b9e70358aed6277e0`)
+  passed the final non-visual and 102-row visual gates and received owner
+  approval on 2026-07-17.
+- The 53-entry route catalogue, persona/state fixtures, typed recovery,
+  capability enforcement, shared operator shell, and truthful gated surfaces
+  are accepted baseline behavior. The earlier local `user_profiles` RLS block
+  is closed and must not be reported as current.
+- A fresh post-acceptance inspection found three bounded presentation defects:
+  Planner's texture-free midnight surface becomes a light field with linen ink;
+  Home's stacked scene slots compress the mobile activity atlas and leave weak
+  chapter pacing; Console Workspace nests `min-h-screen` inside `OperatorShell`
+  and creates a scrollable blank mobile tail.
+- Those defects are owned only by
+  `plans/2026-07-18-rumia-visual-hardening-release-readiness.md`. This is a
+  hardening pass, not a route-wide redesign or a reopening of the completed
+  July 15 queue.
+- The July 17 102-row snapshot approval remains valid historical evidence.
+  Changed Home, Planner, and Console Workspace desktop/mobile rows require a
+  separate six-row delta review and explicit approval before replacement.
+- Acceptance continues to require one exact standalone artifact, one worker,
+  a recorded build ID/digest, and verified port closure. A development server
+  is not release evidence.
+- The latest pushed source is `main @ dfbc31c`; it was not deployed by the
+  frontend closeout. The private VPS evidence still describes the older July 13
+  release, and public DNS/Caddy ingress remains deferred.
+- Public ingress, deployment, Map Phase 2/3, richer 3D, saved-account launch,
+  payments, workers, email, uploads, reviewer operations, and B2B enablement
+  remain separate gates.
 - Existing dirty worktree material must be preserved; no reset or broad cleanup
-  is part of the visual plan.
+  is part of the hardening pass.
 
 ## Active authority
 
 | Status | Document | Owns |
 | --- | --- | --- |
 | **ACTIVE — PRODUCT** | [`plans/2026-07-10-rumia-activity-first-master.md`](plans/2026-07-10-rumia-activity-first-master.md) | Portugal-wide activity promise, non-goals, release order, validation |
-| **ACTIVE — FRONTEND IMPLEMENTATION** | [`plans/2026-07-15-rumia-frontend-finish.md`](plans/2026-07-15-rumia-frontend-finish.md) | Corrective 53-route presentation contract, concrete persona/fixture/state scenarios, 17 implementation tasks, operator access convergence, and human visual acceptance |
+| **ACTIVE — FRONTEND HARDENING** | [`plans/2026-07-18-rumia-visual-hardening-release-readiness.md`](plans/2026-07-18-rumia-visual-hardening-release-readiness.md) | Planner contrast, Home mobile scene/card geometry, Console mobile empty composition, focused regression contracts, six-row approval delta, and exact-artifact release readiness |
+
+## Completed frontend baseline
+
+| Status | Document | Evidence |
+| --- | --- | --- |
+| **COMPLETED — 2026-07-17** | [`plans/2026-07-15-rumia-frontend-finish.md`](plans/2026-07-15-rumia-frontend-finish.md) | 17-task 53-route implementation, exact-artifact receipt, 102 approved desktop/mobile rows, and final non-visual/visual gate |
 
 ## Supporting contracts
 
@@ -76,7 +64,7 @@ deferred packets require a new approval gate; archived plans are evidence only.
 | **SUPPORTING** | [`specs/2026-07-10-rumia-activity-curation-design.md`](specs/2026-07-10-rumia-activity-curation-design.md) | Editorial judgement, evidence, practical activity fields |
 | **SUPPORTING** | [`specs/2026-07-11-rumia-vps-platform-design.md`](specs/2026-07-11-rumia-vps-platform-design.md) | Better Auth, PostgreSQL/PostGIS, VPS isolation, backups |
 | **SUPPORTING** | [`specs/2026-07-11-rumia-activity-map-capability.md`](specs/2026-07-11-rumia-activity-map-capability.md) | List-first map behavior, fallback, attribution, licensing |
-| **SUPPORTING** | [`specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md`](specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md) | Durable visual principles; the 2026-07-15 plan owns current execution |
+| **SUPPORTING** | [`specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md`](specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md) | Durable visual principles; the 2026-07-18 plan owns the bounded current follow-up |
 
 ## Deferred packet
 
@@ -92,9 +80,9 @@ and the frontend polish plan are visually stable.
 | Evidence | Purpose |
 | --- | --- |
 | [`../reviews/2026-07-14-rumia-frontend-visual-audit.md`](../reviews/2026-07-14-rumia-frontend-visual-audit.md) | Fresh 13-route desktop/mobile audit and current visual findings |
-| [`../reviews/2026-07-15-rumia-frontend-finish-verification.md`](../reviews/2026-07-15-rumia-frontend-finish-verification.md) | Prior exact-artifact technical evidence; superseded as aesthetic acceptance by the July 16 corrective plan |
+| [`../reviews/2026-07-15-rumia-frontend-finish-verification.md`](../reviews/2026-07-15-rumia-frontend-finish-verification.md) | Completed frontend technical and exact-artifact evidence |
 | [`../reviews/2026-07-16-rumia-cleanup-allowlist.md`](../reviews/2026-07-16-rumia-cleanup-allowlist.md) | Task 17 exact-file cleanup decision and migrated acceptance-file deletion |
-| [`../reviews/2026-07-16-rumia-snapshot-approval.md`](../reviews/2026-07-16-rumia-snapshot-approval.md) | Open 102-row primary baseline review; no owner approval or snapshot refresh |
+| [`../reviews/2026-07-16-rumia-snapshot-approval.md`](../reviews/2026-07-16-rumia-snapshot-approval.md) | Approved 102-row baseline; the July 18 plan will append a separate six-row hardening delta |
 | [`../reviews/2026-07-14-rumia-frontend-convergence-baseline.md`](../reviews/2026-07-14-rumia-frontend-convergence-baseline.md) | Exact implementation checkpoint and route ownership |
 | [`../reviews/2026-07-13-rumia-ui-ux-visual-review.md`](../reviews/2026-07-13-rumia-ui-ux-visual-review.md) | Earlier functional and cinematic closeout; superseded for aesthetic acceptance |
 | [`../reviews/2026-07-13-rumia-full-bleed-media-research.md`](../reviews/2026-07-13-rumia-full-bleed-media-research.md) | Media/licensing direction and bounded cinematic rationale |
@@ -132,20 +120,19 @@ active plan, reconcile this index, and gather fresh evidence.
 
 ## Next checkpoint
 
-Execute the active plan in this order:
+Execute the active hardening plan serially:
 
-1. Freeze the exact current 53-route desktop/mobile/provenance baseline, then
-   build the route-presentation plus concrete scenario catalogues, four
-   viewport projects, explicit surface/chrome contracts, bounded web/auth
-   recovery, and deterministic persona/state fixtures.
-2. Primary public journey, trust/reading routes, traveler product, and gated
-   surfaces in independently reviewed route-family commits.
-3. Catalogue-derived capability enforcement and one shared operator shell.
-4. Reviewer/admin density, Console truth/mobile repair, and API docs.
-5. Complete the blocked authenticated route/state/Axe/performance run, then
-   human review of all 102 primary desktop/mobile baselines before any scoped
-   snapshot refresh. The current blocker is local `user_profiles` RLS, not a
-   visual pass or release approval.
+1. Restore Planner's semantic midnight field and add computed-style plus Axe
+   contrast guards.
+2. Repair Home stacked-scene flow and one-up 390px activity-card geometry while
+   proving the activity-detail overlay is unchanged.
+3. Remove Console Workspace's nested viewport height and prove all mobile panes
+   fit one truthful first-viewport composition.
+4. Build once, run pre-approval, inspect Home/Planner in the in-app browser and
+   Console with the authenticated exact capture, then obtain explicit decisions
+   for exactly six changed rows.
+5. Update only approved PNGs, rerun the complete exact-artifact gate, and record
+   the local release-ready/not-deployed receipt.
 
-Do not begin route cleanup, baseline regeneration, deployment, Map Phase 2/3,
-or 3D work before its preceding gate is explicitly closed.
+Do not begin snapshot replacement, push, deployment, public ingress, Map Phase
+2/3, 3D work, or gated-feature enablement before its explicit gate closes.
