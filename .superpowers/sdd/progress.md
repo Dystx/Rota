@@ -7,7 +7,7 @@ Active follow-up plan: `docs/superpowers/plans/2026-07-18-rumia-visual-hardening
 Audit: `docs/reviews/2026-07-14-rumia-frontend-visual-audit.md`
 
 Status: July 15 finish plan complete and pushed at `dfbc31c`; bounded July 18
-visual-hardening pass is paused at explicit owner approval on
+visual-hardening pass is in final evidence reconciliation on
 `codex/rumia-visual-hardening`
 
 ## Current checkpoint
@@ -434,7 +434,7 @@ aesthetic approval on the exact served artifact on 2026-07-17.
   approved the local `min-h-[24rem] lg:min-h-0` pane minimum as a contained
   implementation of the 78%-viewport contract, with no Critical or Important
   issue. Its Minor warning-noise note remains open for raw final-gate evidence.
-- Hardening Task 4: awaiting owner approval — the single exact candidate is
+- Hardening Task 4: complete — the single exact candidate is
   build `yOnVK7qbn55IFxrzqRCkV` with digest
   `001ad401de23721cde98ef35643bd9abc38c16f63fd8de34ad13c70a30248867`.
   Static gates passed; the clean same-build retry passed 1,643 non-visual checks
@@ -442,8 +442,15 @@ aesthetic approval on the exact served artifact on 2026-07-17.
   leaving exactly the six planned Home/Planner/Console deltas and no seventh.
   In-app browser review covered Home and Planner at 390×844, 768×1024, and
   1440×1000; the authenticated Console actuals were inspected at desktop and
-  mobile. Commit `c198895` records six `PENDING OWNER APPROVAL` ledger rows.
-  Independent Task 4 review is approved with no remaining findings; snapshots
-  remain unchanged and port 3105 is closed.
-- Hardening Task 5: pending — update only the approved six PNGs and run the complete exact-artifact final gate.
+  mobile. Commit `c198895` recorded six `PENDING OWNER APPROVAL` ledger rows;
+  the owner explicitly approved all six on 2026-07-18. Independent Task 4
+  review is approved with no remaining findings.
+- Hardening Task 5: complete — `41c1265` updates exactly the six owner-approved
+  PNG baselines and `179abb8` records the six APPROVED decisions plus final-gate
+  evidence. The unchanged exact artifact passed 1,643 non-visual and 102 visual
+  checks with 2,433 and 306 intentional skips, respectively; build
+  `yOnVK7qbn55IFxrzqRCkV` retained digest
+  `001ad401de23721cde98ef35643bd9abc38c16f63fd8de34ad13c70a30248867`,
+  phase `final`, and 743 receipt files. Port 3105 is closed, `output/` remains
+  untracked, and independent Task 5 spec/quality review found no issue.
 - Hardening Task 6: pending — reconcile authority/evidence and record release-ready but not-deployed status.
