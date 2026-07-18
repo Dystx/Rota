@@ -2,30 +2,32 @@
 
 Completed baseline plan: `docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`
 
-Active follow-up plan: `docs/superpowers/plans/2026-07-18-rumia-visual-hardening-release-readiness.md`
+Completed follow-up plan: `docs/superpowers/plans/2026-07-18-rumia-visual-hardening-release-readiness.md`
 
 Audit: `docs/reviews/2026-07-14-rumia-frontend-visual-audit.md`
 
-Status: July 15 finish plan complete and pushed at `dfbc31c`; bounded July 18
-visual-hardening pass is in final evidence reconciliation on
-`codex/rumia-visual-hardening`
+Status: July 15 finish plan remains the accepted 53-route baseline; the bounded
+July 18 visual-hardening pass is complete on `codex/rumia-visual-hardening` and
+its local candidate is release-ready but **not deployed**.
 
 ## Current checkpoint
 
 - The July 15 corrective plan is complete. Its 2026-07-17 exact artifact and
   102-row desktop/mobile family passed the final gate and received explicit
   owner approval; the earlier authenticated RLS blocker is closed.
-- A post-acceptance visual review found three bounded defects: Planner field/ink
-  contrast, Home mobile stacked-scene/card geometry, and Console Workspace's
-  nested mobile blank tail. The July 18 hardening plan owns only those defects,
-  their regression assertions, a six-row snapshot delta, and release readiness.
-- The latest pushed source is `main @ dfbc31c`. It is not the private VPS
-  release recorded in the July 13 cutover evidence, and no deployment or public
-  ingress change is authorized by the follow-up plan.
-- The follow-up is isolated in `/Users/cheng/rota/.worktrees/rumia-visual-hardening`.
-  Its focused pre-change baseline is green (37/37 unit assertions and web
-  Playwright typecheck); the existing jsdom media-play notices remain baseline
-  noise and are not introduced by this pass.
+- The completed July 18 follow-up closed only Planner field/ink contrast, Home
+  mobile stacked-scene/card geometry, and Console Workspace's nested mobile
+  blank tail. Its six-row snapshot delta has explicit owner approval and its
+  scoped baseline update passed the final exact-artifact gate.
+- The candidate production source change is `7c01a23`; its Task 3 ledger commit
+  is `af2dd19`. The exact artifact was built after both identities, then reused
+  unchanged through approval and the final gate. The approved-baseline/evidence
+  checkpoint before Task 6 is `7cf4a19`; none of these local records changes
+  the private July 13 VPS release or authorizes deployment/public ingress.
+- The completed follow-up remains isolated in
+  `/Users/cheng/rota/.worktrees/rumia-visual-hardening`. Existing jsdom
+  media-play notices and the dated first-attempt listener/timeout evidence are
+  preserved below as historical runner evidence, not current blockers.
 
 ### Completed July 15 execution chronology
 
@@ -365,24 +367,21 @@ history. Where an earlier entry says a gate was open or blocked, the final July
 - [x] Phase 5 — traveler product and saved-work states
 - [x] Phase 6 — beta, organization, developer, and operator surfaces
 - [x] Phase 7 — exact-artifact visual and release acceptance (Task 17 exact gate, approved visual family, and release checks complete)
-- [ ] Phase 8 — bounded visual hardening and release readiness (Planner, Home, Console, six-row delta, exact final gate)
+- [x] Phase 8 — bounded visual hardening and release readiness (Planner, Home, Console, six-row approved delta, exact final gate, and local not-deployed receipt)
 
-Task checkpoint: route authority contracts are red-green verified. `/explore`
-and `/explore/workspace` are live catalogue entries, `/human-review` now
-redirects to `/local-expertise`, and activity-detail/feedback routes are in the
-catalogue. Shared-contract review is approved; media/font verification,
-pricing/account/beta focused slices, and the Task 17 exact-artifact harness are
-green. The final exact artifact was served from the recorded standalone build;
-the authenticated route/state matrix completed, the approved 102-row visual
-family was materialized, and the final non-visual and visual suites passed.
-Remaining skips are intentional contract exclusions documented by the runner,
-not unresolved acceptance failures.
+Task checkpoint: both frontend plans are complete. The July 18 hardening gate
+reused the recorded standalone build, materialized only the six owner-approved
+PNG deltas, and passed the final 1,643 non-visual / 102 visual family. The
+2,433 non-visual and 306 visual skips are intentional runner exclusions, not
+unresolved acceptance failures. The local candidate is not deployed.
 
 ## Completion rule
 
-Tests and visual snapshots are necessary but do not close the plan. This rule
-is satisfied: the final desktop/mobile candidate received explicit owner
-aesthetic approval on the exact served artifact on 2026-07-17.
+Tests and visual snapshots are necessary but do not close a plan. This rule is
+satisfied for the accepted July 15 baseline by its 2026-07-17 owner approval,
+and for the completed July 18 hardening delta by all six explicit owner
+approvals plus the final exact-artifact gate. Neither approval authorizes
+deployment or public ingress.
 
 ## Corrective-plan SDD ledger
 
@@ -453,4 +452,9 @@ aesthetic approval on the exact served artifact on 2026-07-17.
   `001ad401de23721cde98ef35643bd9abc38c16f63fd8de34ad13c70a30248867`,
   phase `final`, and 743 receipt files. Port 3105 is closed, `output/` remains
   untracked, and independent Task 5 spec/quality review found no issue.
-- Hardening Task 6: pending — reconcile authority/evidence and record release-ready but not-deployed status.
+- Hardening Task 6: complete — this documentation-only reconciliation closes
+  the authority records, retains the 102 approved baseline plus six approved
+  delta rows, and records the local candidate as release-ready but not
+  deployed. The Task 6 documentation commit is deliberately outside the
+  already-built artifact; its resulting SHA is recorded after commit in
+  `.superpowers/sdd/task-6-report.md` rather than self-referenced here.

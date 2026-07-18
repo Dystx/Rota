@@ -48,6 +48,25 @@ must not be read as evidence that Rumia is publicly deployed.
   owner/legal map-provider decision packet and, separately, public ingress;
   public `rumia.pt` remains deferred.
 
+### Local visual-hardening candidate — 2026-07-18
+
+- Local candidate checkpoint: `7cf4a19` on
+  `codex/rumia-visual-hardening`. Its production source change is `7c01a23`;
+  the Task 3 ledger checkpoint is `af2dd19`. The exact artifact was built after
+  both and reused unchanged through the approval and final-gate sequence.
+- Exact local receipt: build `yOnVK7qbn55IFxrzqRCkV`, digest
+  `001ad401de23721cde98ef35643bd9abc38c16f63fd8de34ad13c70a30248867`,
+  phase `final`, created `2026-07-18T04:35:41.299Z`, with 743 receipt files.
+  Final gate: 1,643 non-visual passed with 2,433 intentional skips; 102 visual
+  passed with 306 intentional skips; port 3105 was closed.
+- This is a local release-ready candidate and is **not deployed**. The Task 6
+  documentation commit is not inside this already-built artifact and is
+  recorded separately in its task report after commit.
+- The active private VPS release remains
+  `20260713T204125Z-cinematic-fix` on `127.0.0.1:3002`; public DNS/Caddy
+  ingress remains deferred. No VPS service, Caddy, DNS, or ingress mutation was
+  made for this local candidate.
+
 ### Cinematic frontend refresh — 2026-07-13
 
 - Local full unit suite passed at **177 files / 897 tests**; web typecheck and
