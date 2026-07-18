@@ -414,7 +414,16 @@ aesthetic approval on the exact served artifact on 2026-07-17.
   note was to retain full `NO_COLOR`/`FORCE_COLOR` warning output in later gate
   evidence. Fixture setup used the documented process-only owner connection;
   production RLS roles and policies were unchanged.
-- Hardening Task 2: pending — repair Home stacked scene flow and one-up mobile activity-card geometry; prove activity-detail overlay unchanged.
+- Hardening Task 2: complete — `13c354c` repairs Home's stacked chapter flow
+  and one-up 390px activity cards; `4caddf2` records its durable evidence.
+  Controller-observed TDD ordering showed only test files changed before the
+  expected Decision-tone and missing-grid-marker RED results. GREEN evidence is
+  15/15 focused unit assertions, web Playwright typecheck, 1/1 Home mobile
+  geometry guard, and 1/1 unchanged activity-detail desktop baseline. The
+  brief's stale `activities--activityId---ready` grep was resolved against the
+  generated `activities-[activityId]--ready` scenario ID. Independent review
+  found no Critical, Important, or Minor issue and confirmed the stacked-only
+  selector cannot affect overlay scenes.
 - Hardening Task 3: pending — remove Console Workspace nested viewport height and enforce one-viewport mobile empty composition.
 - Hardening Task 4: pending — build one candidate, run pre-approval, inspect exact Home/Planner/Console evidence, and obtain six owner decisions.
 - Hardening Task 5: pending — update only the approved six PNGs and run the complete exact-artifact final gate.
