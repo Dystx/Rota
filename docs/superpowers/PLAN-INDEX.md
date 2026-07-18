@@ -25,7 +25,8 @@ deferred packets require a new approval gate; archived plans are evidence only.
   and is complete: Planner contrast, Home mobile chapter/card geometry, and
   Console Workspace mobile blank-tail composition are its bounded defects.
   This was a hardening pass, not a route-wide redesign or a reopening of the
-  completed July 15 queue.
+  completed July 15 queue. No frontend follow-up is currently active; the
+  activity-first master remains the active product authority.
 - The July 17 102-row snapshot approval remains valid historical evidence. All
   six changed Home, Planner, and Console Workspace desktop/mobile delta rows
   received explicit owner approval; their scoped PNG update and final
@@ -63,7 +64,7 @@ deferred packets require a new approval gate; archived plans are evidence only.
 | **SUPPORTING** | [`specs/2026-07-10-rumia-activity-curation-design.md`](specs/2026-07-10-rumia-activity-curation-design.md) | Editorial judgement, evidence, practical activity fields |
 | **SUPPORTING** | [`specs/2026-07-11-rumia-vps-platform-design.md`](specs/2026-07-11-rumia-vps-platform-design.md) | Better Auth, PostgreSQL/PostGIS, VPS isolation, backups |
 | **SUPPORTING** | [`specs/2026-07-11-rumia-activity-map-capability.md`](specs/2026-07-11-rumia-activity-map-capability.md) | List-first map behavior, fallback, attribution, licensing |
-| **SUPPORTING** | [`specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md`](specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md) | Durable visual principles; the 2026-07-18 plan owns the bounded current follow-up |
+| **SUPPORTING** | [`specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md`](specs/2026-07-12-rumia-frontend-aesthetic-rework-design.md) | Durable visual principles; the completed 2026-07-18 plan is evidence, not an active follow-up |
 
 ## Deferred packet
 

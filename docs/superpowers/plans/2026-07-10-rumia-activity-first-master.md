@@ -10,7 +10,7 @@
 >
 > **UI redesign decision — completed 17 July 2026.** The cross-cutting clarity and quality program, including screen hierarchy, component states, responsive rules, accessibility gates, browser-finding mapping, and release sequence, is preserved in the completed `docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md` baseline.
 >
-> **Frontend hardening decision — reconciled 18 July 2026.** The only active frontend follow-up is `docs/superpowers/plans/2026-07-18-rumia-visual-hardening-release-readiness.md`: a bounded Planner contrast, Home mobile composition, Console mobile empty-state, regression, and release-readiness pass. It is not a new product roadmap or permission to make the homepage map-first.
+> **Frontend hardening decision — completed 18 July 2026.** The bounded Planner contrast, Home mobile composition, Console mobile empty-state, regression, and release-readiness pass in `docs/superpowers/plans/2026-07-18-rumia-visual-hardening-release-readiness.md` is completed evidence. No frontend follow-up is currently active; this activity-first master remains the active product authority. The completed pass is not a new product roadmap or permission to make the homepage map-first.
 
 **Goal:** Build Rumia into Portugal’s trusted activity-decision layer: travellers state the time and kind of day they have, receive a small set of independently judged activities, save a transparent day, and only then use planning, purchase, review, and export tools when needed.
 
@@ -207,9 +207,10 @@ Retain the existing foundations: shared shells, route catalogue, API envelopes, 
 **Gate:** at 1440px and 390px, a visitor can enter a situation, save/remove an activity, reach workspace, and encounter a truthful empty/error state with one main/h1 and no overflow.
 
 The completed cross-cutting UI redesign sequence is the 17-task corrective
-baseline in [`docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`](2026-07-15-rumia-frontend-finish.md). The only active follow-up is the bounded
+baseline in [`docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`](2026-07-15-rumia-frontend-finish.md). The bounded
 [`docs/superpowers/plans/2026-07-18-rumia-visual-hardening-release-readiness.md`](2026-07-18-rumia-visual-hardening-release-readiness.md)
-pass. Neither document changes the release order or authorizes gated commerce.
+pass is also complete; no frontend follow-up is currently active. Neither
+completed document changes the release order or authorizes gated commerce.
 
 ### Release 2 — Chosen-day composition and preview
 
@@ -386,7 +387,7 @@ and 3D-building terms.
 - MapLibre GL JS licence: <https://github.com/maplibre/maplibre-gl-js/blob/main/LICENSE.txt>
 - Interactive 3D inspiration reviewed for concepts only: <https://github.com/siddsachar/gpt5.6-sol-test/tree/main/london-3d>
 - Completed frontend corrective convergence and visual baseline: [`docs/superpowers/plans/2026-07-15-rumia-frontend-finish.md`](2026-07-15-rumia-frontend-finish.md)
-- Active bounded visual hardening and release-readiness plan: [`docs/superpowers/plans/2026-07-18-rumia-visual-hardening-release-readiness.md`](2026-07-18-rumia-visual-hardening-release-readiness.md)
+- Completed bounded visual hardening and release-readiness evidence: [`docs/superpowers/plans/2026-07-18-rumia-visual-hardening-release-readiness.md`](2026-07-18-rumia-visual-hardening-release-readiness.md)
 - Editorial travel interaction inspiration (not a product model): <https://www.awwwards.com/sites/when-to-travel%20>
 
 ## 10. Master completion condition
