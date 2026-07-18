@@ -338,6 +338,7 @@ test("@smoke @a11y planner is choice-led and input-free", async ({ page }) => {
   await expect(placeChoices).toBeVisible();
   await expect(placeChoices.locator('[role="radio"], button').first()).toBeVisible();
   await verifyCustomerBodyMinimum(page, "/planner");
+  await runAxe(page, "/planner");
 });
 
 test("@smoke @a11y cinematic media keeps a poster path for reduced motion", async ({ browser }) => {

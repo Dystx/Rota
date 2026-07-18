@@ -908,7 +908,8 @@ body {
 }
 
 .rumia-planner-page {
-  background:
+  background-color: var(--color-midnight);
+  background-image:
     radial-gradient(circle at 84% 12%, rgba(234, 184, 117, 0.13), transparent 22rem),
     radial-gradient(circle at 4% 86%, rgba(60, 84, 71, 0.28), transparent 28rem),
     linear-gradient(145deg, #10271d 0%, #162f24 52%, #0d1f16 100%);
