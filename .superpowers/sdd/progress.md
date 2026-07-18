@@ -455,6 +455,6 @@ deployment or public ingress.
 - Hardening Task 6: complete — this documentation-only reconciliation closes
   the authority records, retains the 102 approved baseline plus six approved
   delta rows, and records the local candidate as release-ready but not
-  deployed. The Task 6 documentation commit is deliberately outside the
-  already-built artifact; its resulting SHA is recorded after commit in
-  `.superpowers/sdd/task-6-report.md` rather than self-referenced here.
+  deployed. Documentation commit `bf50728af48c9d1ea412baac6f8ea9ca490822cf`
+  is deliberately outside the already-built artifact and records this final
+  authority reconciliation without claiming artifact membership.
