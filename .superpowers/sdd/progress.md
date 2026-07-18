@@ -424,7 +424,15 @@ aesthetic approval on the exact served artifact on 2026-07-17.
   generated `activities-[activityId]--ready` scenario ID. Independent review
   found no Critical, Important, or Minor issue and confirmed the stacked-only
   selector cannot affect overlay scenes.
-- Hardening Task 3: pending — remove Console Workspace nested viewport height and enforce one-viewport mobile empty composition.
+- Hardening Task 3: complete — `7c01a23` removes Console Workspace's nested
+  viewport/background/padding ownership, keeps all three truthful panes, and
+  registers the authenticated responsive contract. Controller-observed TDD
+  ordering showed only the new spec before the expected missing-geometry RED.
+  GREEN evidence is 1/1 mobile Playwright, 8/8 focused component assertions,
+  web Playwright typecheck, runner syntax, and diff checks. Independent review
+  approved the local `min-h-[24rem] lg:min-h-0` pane minimum as a contained
+  implementation of the 78%-viewport contract, with no Critical or Important
+  issue. Its Minor warning-noise note remains open for raw final-gate evidence.
 - Hardening Task 4: pending — build one candidate, run pre-approval, inspect exact Home/Planner/Console evidence, and obtain six owner decisions.
 - Hardening Task 5: pending — update only the approved six PNGs and run the complete exact-artifact final gate.
 - Hardening Task 6: pending — reconcile authority/evidence and record release-ready but not-deployed status.
