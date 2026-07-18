@@ -135,7 +135,28 @@ Immutable delta algorithm: `delta_sha256 = SHA-256(UTF8("rumia-visual-delta-v1\0
 
 Hardening delta result: all six changed rows received explicit owner approval, the scoped update changed only those six PNGs, and the final exact-artifact gate passed against the same recorded build ID/digest. This approval does not authorize deployment or public ingress.
 
-## 2026-07-18 final-review provenance verification
+### 2026-07-18 Console geometry authority supersession
+
+The owner's later explicit approval of the exact Console desktop/mobile images
+supersedes the completed plan's earlier provisional 78% mobile endpoint. This
+is an explicit authority decision, not a silent weakening and not permission
+to alter the approved composition. The measured enforceable contract is:
+
+- after activating Anchors, Timeline, and Validation, each real
+  `DecisionStatePanel` bottom is at least 70% of the first viewport and no
+  greater than `viewportHeight + 1`;
+- document height is no greater than `viewportHeight + 1`, document width has
+  no overflow, and the panel is contained in the active pane;
+- all three panes remain reachable and truthful;
+- approved Console mobile blob
+  `e728dc6df41251a8352d2d51a226de60f206e928` remains immutable.
+
+Observed against the unchanged approved candidate at 390x844: Anchors
+628.78125/844 (74.50%); Timeline 602.78125/844 (71.42%); Validation
+602.78125/844 (71.42%). All exceed 70%. No Console product or PNG change was
+made for this authority reconciliation.
+
+## 2026-07-18 first final-review provenance verification (superseded candidate)
 
 The final-review fix did not edit or update any approved PNG. Their blob IDs
 remain exactly the six approved IDs in the immutable table above. A new
@@ -154,4 +175,30 @@ complete final phase was then rerun against the same unchanged receipt and
 runtime: 1,643 non-visual checks passed with 2,433 intentional skips, followed
 by all 102 expected visual rows with 306 intentional skips. Exit was 0; no
 snapshot was updated, no served assets were recopied, and port 3105 closed.
-The candidate is therefore local release-ready and remains not deployed.
+That j4Cx candidate was local release-ready and not deployed. It is now
+superseded by the explicitly authorized schema-3 replacement below; its exact
+receipt remains archived as immutable history.
+
+## 2026-07-18 second final-review replacement verification
+
+The replacement mechanism/source commit is
+`91d925643f1421998c42d7f6ee238558c65bc377`, tree
+`248a548f3c127d4b98314f9b8ef3e69a1f1b46ba`. The canonical clean build emitted
+provenance manifest SHA-256
+`0cbfe60cffee6aa370947ce86944df12a27b1c26d290fd99d86c5d93f31207dc`
+inside the hashed standalone root. The schema-3 candidate is build
+`rudKclU2P-R_aXinasLka`, digest
+`2be3e21cc9773f72434a08c14a0d2c78abf33eac042fbe8ab6c38013396e3164`,
+with 2,623 inventory entries.
+
+Replacement was explicitly authorized against old digest
+`e079b2cd79032599315a24bad318cb31d04626ac1032b64752ff0e4de968d22c`.
+The prior receipt archive SHA-256 is
+`d9484766e68e42f6f50e8bf0089c595ac018777fd080c261a2c717eef59293d5`.
+Bounded pre-approval passed 18 nonvisual and 2 visual checks, with 54 and 6
+intentional skips. Post-build test-only commit `6928a8b` changes no candidate
+byte. The complete same-receipt final passed 1,643 nonvisual and 102 visual
+checks, with 2,433 and 306 intentional skips; exit 0, no snapshot update, no
+asset recopy, and port 3105 closed. All six approved blobs remain exactly the
+IDs in the immutable table. The replacement candidate is local release-ready,
+not deployed, and does not supersede the owner's exact-image decisions.

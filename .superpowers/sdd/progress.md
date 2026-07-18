@@ -8,10 +8,11 @@ Audit: `docs/reviews/2026-07-14-rumia-frontend-visual-audit.md`
 
 Status: July 15 finish plan remains the accepted 53-route baseline; the bounded
 July 18 visual-hardening implementation is complete on
-`codex/rumia-visual-hardening` and remains **not deployed**. The final-review
-fix candidate has immutable provenance and is local release-ready after the
-test-only accessibility stabilization and complete green final gate. It is not
-deployed.
+`codex/rumia-visual-hardening` and remains **not deployed**. The schema-3
+second-final-review replacement has immutable provenance and is local
+release-ready after the complete green same-receipt final gate. Post-build
+test-only commit `6928a8b` is outside candidate bytes and is the documented
+ordering concern. The candidate is not deployed.
 
 ## Current checkpoint
 
@@ -31,16 +32,18 @@ deployed.
   `/Users/cheng/rota/.worktrees/rumia-visual-hardening`. Existing jsdom
   media-play notices and the dated first-attempt listener/timeout evidence are
   preserved below as historical runner evidence, not current blockers.
-- Final-review fixes are committed at `1e4786d3a4cdcb6570f98ee4548e4bcaa1ecf6d9`
-  (tree `3533320ea135cfb0d8131b6da8e653e5b5680646`). The exactly-once candidate
-  is build `j4CxzJH3lYqvjoIzeD9o-`, digest
-  `e079b2cd79032599315a24bad318cb31d04626ac1032b64752ff0e4de968d22c`,
-  with 2,622 immutable inventory entries. Bounded Console pre-approval passed
-  6 non-visual and 2 visual checks. Test-only commit `de9b01a` stabilizes Axe
-  before the state-changing interaction and is outside candidate bytes. The
-  complete final phase against the unchanged receipt passed 1,643 non-visual
-  checks with 2,433 intentional skips and 102 visual checks with 306
-  intentional skips. No snapshot was updated and port 3105 is closed.
+- The current replacement source is
+  `91d925643f1421998c42d7f6ee238558c65bc377` (tree
+  `248a548f3c127d4b98314f9b8ef3e69a1f1b46ba`). The schema-3 candidate is
+  build `rudKclU2P-R_aXinasLka`, digest
+  `2be3e21cc9773f72434a08c14a0d2c78abf33eac042fbe8ab6c38013396e3164`,
+  with 2,623 immutable inventory entries. Bounded replacement pre-approval
+  passed 18 nonvisual and 2 visual checks. Post-build test-only commit
+  `6928a8b` is outside candidate bytes. The complete final phase against the
+  same receipt passed 1,643 nonvisual checks with 2,433 intentional skips and
+  102 visual checks with 306 intentional skips. No snapshot was updated and
+  port 3105 is closed. The j4Cx/e079 candidate is superseded and its receipt is
+  archived byte-for-byte.
 
 ### Completed July 15 execution chronology
 
@@ -444,8 +447,9 @@ deployment or public ingress.
   GREEN evidence is 1/1 mobile Playwright, 8/8 focused component assertions,
   web Playwright typecheck, runner syntax, and diff checks. Independent review
   approved the local `min-h-[24rem] lg:min-h-0` pane minimum as a contained
-  implementation of the 78%-viewport contract, with no Critical or Important
-  issue. Its Minor warning-noise note remains open for raw final-gate evidence.
+  implementation of the then-provisional 78%-viewport heuristic, with no
+  Critical or Important issue. The later exact-image owner approval supersedes
+  that percentage with the measured 70% per-pane contract recorded below.
 - Hardening Task 4: complete — the single exact candidate is
   build `yOnVK7qbn55IFxrzqRCkV` with digest
   `001ad401de23721cde98ef35643bd9abc38c16f63fd8de34ad13c70a30248867`.
@@ -471,7 +475,7 @@ deployment or public ingress.
   deployed. Documentation commit `bf50728af48c9d1ea412baac6f8ea9ca490822cf`
   is deliberately outside the already-built artifact and records this final
   authority reconciliation without claiming artifact membership.
-- Final-review fix: complete — `1e4786d` hardens the exact-artifact
+- First final-review fix (superseded candidate): complete — `1e4786d` hardens the exact-artifact
   receipt, source/tree provenance, all-served-file inventory, mutation/dirty
   rejection, Console behavioral coverage, authority wording, and immutable
   six-row audit. Build `j4CxzJH3lYqvjoIzeD9o-` / digest
@@ -485,3 +489,24 @@ deployment or public ingress.
   is 1,643 passed / 2,433 skipped / 0 failed non-visual and 102 passed / 306
   skipped / 0 failed visual. This candidate is local release-ready and was not
   deployed.
+- Second final-review fix: complete with one documented ordering concern —
+  `91d9256` requires explicit phase and candidate authority, archives authorized
+  replacements, binds a clean commit/tree manifest into the hashed standalone,
+  rejects stale provenance and unsafe symlinks, and wires 16/16 focused unit
+  contracts into root/CI. The owner-approved exact Console image explicitly
+  supersedes the provisional 78% heuristic with the measured 70% per-pane
+  floor: Anchors 628.78125/844 (74.50%), Timeline and Validation 602.78125/844
+  (71.42%), with viewport/overflow/containment/truthfulness checks after every
+  activation and no product/snapshot edit. Exactly one canonical replacement
+  build produced `rudKclU2P-R_aXinasLka` / digest
+  `2be3e21cc9773f72434a08c14a0d2c78abf33eac042fbe8ab6c38013396e3164`,
+  source `91d925643f1421998c42d7f6ee238558c65bc377`, tree
+  `248a548f3c127d4b98314f9b8ef3e69a1f1b46ba`, and 2,623 entries. The old
+  e079 receipt was archived byte-for-byte. Bounded pre-approval passed 18/54
+  nonvisual and 2/6 visual. Post-build test-only commit `6928a8b` replaces an
+  invalid persistent-animation wait with a bounded two-render-frame settle;
+  it is outside candidate bytes, an explicit exception to the requested
+  pre-build test ordering. The same immutable receipt then passed the complete
+  final: 1,643/2,433 nonvisual and 102/306 visual, zero failures, no snapshot
+  update or asset recopy, port 3105 closed. Candidate is local release-ready,
+  not deployed; no push/merge/VPS/Caddy/DNS/ingress action occurred.

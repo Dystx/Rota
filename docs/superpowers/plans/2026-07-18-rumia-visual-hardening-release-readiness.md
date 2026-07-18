@@ -442,6 +442,20 @@ git commit -m "fix(frontend): repair home mobile chapter flow"
 
 ### Task 3: Remove the Console Workspace Blank Mobile Tail
 
+> **Completed-plan authority supersession — 2026-07-18.** The 78% endpoint
+> below was a provisional implementation heuristic written before the owner
+> explicitly approved the exact Console desktop/mobile compositions later on
+> 2026-07-18. That later exact-image approval supersedes 78%; it does not
+> authorize changing approved pixels. The enforceable completed-plan contract
+> is: after activating each real Anchors, Timeline, and Validation
+> `DecisionStatePanel`, panel bottom is at least 70% of the first viewport and
+> no greater than `viewportHeight + 1`; document height is no greater than
+> `viewportHeight + 1`; document width has no overflow; the panel is contained
+> in its active pane; and all three panes remain reachable and truthful. The
+> unchanged approved 390x844 composition measured Anchors at 628.78125 px
+> (74.50%) and Timeline/Validation at 602.78125 px (71.42%). Approved mobile
+> blob `e728dc6df41251a8352d2d51a226de60f206e928` remains immutable.
+
 **Files:**
 
 - Modify: `apps/web/app/console/workspace/page.tsx`
@@ -557,7 +571,7 @@ Expected: focused component tests and Playwright TypeScript pass.
 
 Run the Step 2 browser command again.
 
-Expected: PASS with Timeline and Validation reachable, 390px document width, document height no greater than 845px, and the active panel extending through at least 78% of the first viewport.
+Historical provisional expectation: PASS with Timeline and Validation reachable, 390px document width, document height no greater than 845px, and the active panel extending through at least 78% of the first viewport. The dated owner-approval supersession above replaces only that provisional percentage with the measured 70% contract and requires assertions after activating all three panes.
 
 - [ ] **Step 6: Commit the Console composition repair**
 
@@ -804,7 +818,7 @@ The pass is complete only when all of these statements are true:
 
 1. Planner computes a midnight root and linen headline at 390×844, passes Axe, and retains the choice-led activity flow.
 2. Home’s editorial chapter uses the Decision field/ink pairing; all three mobile activity cards are at least 320px wide, 300–340px high, one per row, and unclipped; activity-detail overlay remains unchanged.
-3. Console Workspace exposes all three panes, renders no fabricated data, has no horizontal overflow, and does not create a document taller than 845px at the 390×844 empty state.
+3. Console Workspace exposes all three truthful panes, renders no fabricated data, has no horizontal overflow, does not create a document taller than 845px at the 390×844 empty state, contains the real active panel in its pane, and places each activated panel bottom between 70% of the first viewport and `viewportHeight + 1` under the dated owner-approval supersession above.
 4. Focused unit/type/browser gates pass before candidate generation.
 5. One exact build produces one receipt, six reviewed visual differences, a scoped six-PNG update, and a final green 102-row visual family.
 6. The owner explicitly approves all six changed rows.

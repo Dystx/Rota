@@ -67,7 +67,7 @@ must not be read as evidence that Rumia is publicly deployed.
   ingress remains deferred. No VPS service, Caddy, DNS, or ingress mutation was
   made for this local candidate.
 
-### Local final-review fix candidate — 2026-07-18
+### Superseded local first final-review candidate — 2026-07-18
 
 - Source fix: `1e4786d3a4cdcb6570f98ee4548e4bcaa1ecf6d9`, tree
   `3533320ea135cfb0d8131b6da8e653e5b5680646`, on
@@ -86,10 +86,38 @@ must not be read as evidence that Rumia is publicly deployed.
   phase against the same receipt passed 1,643 non-visual checks with 2,433
   intentional skips, then 102 visual checks with 306 intentional skips; exit
   0, no snapshot updates, no asset recopy, and port 3105 closed.
-- This final-review candidate is **local release-ready and not deployed**. The
+- This j4Cx candidate was **local release-ready and not deployed**. It is now
+  superseded locally by the explicitly authorized schema-3 replacement below.
+  Its archived receipt remains immutable history.
+
+### Local second final-review replacement candidate — 2026-07-18
+
+- Mechanism/source commit
+  `91d925643f1421998c42d7f6ee238558c65bc377`, tree
+  `248a548f3c127d4b98314f9b8ef3e69a1f1b46ba`, was clean before and after the
+  canonical `build:acceptance` build. Post-build test-only commit `6928a8b` is
+  deliberately outside candidate runtime bytes.
+- Exact local schema-3 receipt: build `rudKclU2P-R_aXinasLka`, digest
+  `2be3e21cc9773f72434a08c14a0d2c78abf33eac042fbe8ab6c38013396e3164`,
+  created `2026-07-18T08:19:09.136Z`, with 2,623 standalone inventory entries.
+  Embedded provenance manifest SHA-256 is
+  `0cbfe60cffee6aa370947ce86944df12a27b1c26d290fd99d86c5d93f31207dc`.
+- Replacement was explicitly authorized against old j4Cx digest
+  `e079b2cd79032599315a24bad318cb31d04626ac1032b64752ff0e4de968d22c`.
+  The archived prior receipt SHA-256 is
+  `d9484766e68e42f6f50e8bf0089c595ac018777fd080c261a2c717eef59293d5`.
+- Bounded pre-approval passed 18 nonvisual / 2 visual checks with 54 / 6
+  intentional skips. The same-receipt final passed 1,643 nonvisual / 102
+  visual checks with 2,433 / 306 intentional skips; exit 0, no snapshot update,
+  no asset recopy, and port 3105 closed.
+- The later 2026-07-18 owner approval of exact Console pixels supersedes only
+  the plan's provisional 78% endpoint with the measured 70% per-pane geometry
+  contract. No Console product or snapshot changed; approved mobile blob
+  `e728dc6df41251a8352d2d51a226de60f206e928` remains immutable.
+- This replacement candidate is **local release-ready and not deployed**. The
   active private VPS release remains `20260713T204125Z-cinematic-fix`; no VPS
-  service, Caddy, DNS, ingress, schema, environment, dependency, or product
-  behavior mutation was made. Port 3105 is closed.
+  service, Caddy, DNS, ingress, schema, environment, dependency, product
+  behavior, merge, push, or deployment mutation was made.
 
 ### Cinematic frontend refresh — 2026-07-13
 
