@@ -42,9 +42,9 @@ async function stabilizeA11yMotion(page: Page): Promise<void> {
   await page.addStyleTag({
     content: "*,*::before,*::after{animation:none!important;transition:none!important}"
   });
-  await page.waitForFunction(() =>
-    document.getAnimations().every((animation) => animation.playState !== "running")
-  );
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  }));
 }
 
 test.afterAll(() => {

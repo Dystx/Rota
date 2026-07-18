@@ -6,6 +6,15 @@ type RouteOptions = {
   storageState?: string;
 };
 
+async function stabilizeVisualGeometry(page: Page): Promise<void> {
+  await page.addStyleTag({
+    content: "*,*::before,*::after{animation:none!important;transition:none!important}"
+  });
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  }));
+}
+
 export async function withMobilePage(
   browser: Browser,
   path: string,
@@ -55,6 +64,7 @@ test.describe("@smoke @visual-quality bounded visual hardening", () => {
     test.skip(testInfo.project.name !== "desktop-1440", "one canonical mobile composition run");
 
     await withMobilePage(browser, "/", {}, async (page) => {
+      await stabilizeVisualGeometry(page);
       await expect(page.getByTestId("home-editorial-chapter")).toHaveAttribute("data-tone", "decision");
       const geometry = await page.getByTestId("destination-bento-grid").evaluate((grid) => {
         const gridRect = grid.getBoundingClientRect();
