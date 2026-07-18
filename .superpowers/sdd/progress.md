@@ -7,7 +7,8 @@ Active follow-up plan: `docs/superpowers/plans/2026-07-18-rumia-visual-hardening
 Audit: `docs/reviews/2026-07-14-rumia-frontend-visual-audit.md`
 
 Status: July 15 finish plan complete and pushed at `dfbc31c`; bounded July 18
-visual-hardening pass in progress on `codex/rumia-visual-hardening`
+visual-hardening pass is paused at explicit owner approval on
+`codex/rumia-visual-hardening`
 
 ## Current checkpoint
 
@@ -433,6 +434,16 @@ aesthetic approval on the exact served artifact on 2026-07-17.
   approved the local `min-h-[24rem] lg:min-h-0` pane minimum as a contained
   implementation of the 78%-viewport contract, with no Critical or Important
   issue. Its Minor warning-noise note remains open for raw final-gate evidence.
-- Hardening Task 4: pending — build one candidate, run pre-approval, inspect exact Home/Planner/Console evidence, and obtain six owner decisions.
+- Hardening Task 4: awaiting owner approval — the single exact candidate is
+  build `yOnVK7qbn55IFxrzqRCkV` with digest
+  `001ad401de23721cde98ef35643bd9abc38c16f63fd8de34ad13c70a30248867`.
+  Static gates passed; the clean same-build retry passed 1,643 non-visual checks
+  with 2,433 intentional skips and 96 unchanged visual checks with 306 skips,
+  leaving exactly the six planned Home/Planner/Console deltas and no seventh.
+  In-app browser review covered Home and Planner at 390×844, 768×1024, and
+  1440×1000; the authenticated Console actuals were inspected at desktop and
+  mobile. Commit `c198895` records six `PENDING OWNER APPROVAL` ledger rows.
+  Independent Task 4 review is approved with no remaining findings; snapshots
+  remain unchanged and port 3105 is closed.
 - Hardening Task 5: pending — update only the approved six PNGs and run the complete exact-artifact final gate.
 - Hardening Task 6: pending — reconcile authority/evidence and record release-ready but not-deployed status.
