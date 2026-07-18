@@ -166,3 +166,53 @@ Manifest files: 21; missing in worktree: 0.
 ```
 
 The clean UI index retains `NavigationSheet` for `TopNav` and no longer exports SideSheet. No DB/Auth/schema or PNG changes were made.
+
+## Task 2 — Repair Home Chapter Flow and One-Up Mobile Activity Cards (2026-07-18)
+
+### Status and commit
+
+Complete. Code committed as `13c354c` (`fix(frontend): repair home mobile chapter flow`) on `codex/rumia-visual-hardening`, based on `02a3e40a10b768fca33d25cfe639981ed4dcf745`.
+
+### Implementation
+
+- Scoped `RouteScene` grid-area reset to `.rumia-route-scene--stacked` slots only; overlay composition, including the activity-detail hero, keeps its existing named placement and absolute media/actions.
+- Home now progresses cover → linen decision chapter → cover field note → atlas; the field note has a stable test marker.
+- The activity atlas is one 20rem, full-width card per mobile row, returning to the authored 12-column desktop bento at `md`; its content wrapper clips safely and CTA spans cannot overflow.
+- Added Home semantic/unit, bento responsive-contract, and mobile browser-geometry regression coverage. The bento test imports the repository-standard `@testing-library/jest-dom/vitest` matcher setup required by the brief's `toHaveClass` assertions.
+
+### Strict TDD evidence
+
+RED before production edits:
+
+```sh
+pnpm exec vitest run apps/web/app/'(marketing)'/page.test.tsx apps/web/app/_components/destination-bento.test.tsx
+```
+
+Result: failed as expected: Home received `data-tone="utility"` instead of `decision`; the bento lacked `data-testid="destination-bento-grid"`. Existing JSDOM `HTMLMediaElement.prototype.play` messages were non-failing environment noise.
+
+The required Home Playwright guard was then run with only `E2E_TEST_USER_PASSWORD` read process-locally from `/Users/cheng/rota/apps/web/.env.local`, plus fixture-only `RUMIA_OWNER_DATABASE_URL='postgresql:///rumia?user=rumia_owner'` and the brief's explicit runtime values. It failed as expected with `home-editorial-chapter` receiving `utility` rather than `decision`.
+
+GREEN:
+
+```sh
+pnpm exec vitest run apps/web/app/'(marketing)'/page.test.tsx apps/web/app/_components/destination-bento.test.tsx apps/web/app/_components/route-scene.test.tsx
+pnpm --dir apps/web test:typecheck
+```
+
+Result: 15/15 focused Vitest tests passed; Playwright typecheck passed. The Home mobile visual-quality guard passed (1/1) with the required decision tone, three cards, 300–340px card heights, no horizontal overflow, and fitting content.
+
+### Shared-overlay guard
+
+The brief's literal activity-detail grep (`activities--activityId---ready`) found no tests because this checkout's generated baseline ID is `activities-[activityId]--ready`. `playwright --list` confirmed the current ID; the unchanged existing baseline was run with that ID, no snapshot refresh, and passed: desktop activity detail 1/1 passed (the mobile counterpart was intentionally skipped by the desktop project).
+
+### Self-review
+
+- Scope: only the six prescribed code/test files were committed; no dependencies, schemas, APIs, flags, DB policy/role/migration, env files, content/URLs, map/3D work, or snapshot files changed.
+- Correctness: the normal-flow override cannot select overlay scenes; Home semantics, responsive class contract, browser geometry, and the activity-detail snapshot all cover the changed behavior.
+- Security/performance: diff contains no secrets, user-data handling, auth changes, or new network/runtime work; no `any`, ignore directives, or disabled lint were introduced.
+- Hygiene: `git diff --check` passed before commit. No additional refactor or cleanup was made.
+
+### Warnings and concerns
+
+- Non-failing baseline noise: JSDOM does not implement `HTMLMediaElement.play()`; Playwright emitted repeated `NO_COLOR`/`FORCE_COLOR` notices.
+- The literal activity-detail grep in the brief is stale for this checkout; the current named baseline passed with its generated ID. No product or implementation concern remains.
