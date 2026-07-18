@@ -1,6 +1,6 @@
 # Rumia plan index
 
-**Reconciled:** 2026-07-18 after the Task 17 closeout and completed bounded visual-hardening pass
+**Reconciled:** 2026-07-18 after the Task 17 closeout, bounded visual-hardening pass, and final-review fix evidence
 
 This is the authority map for Rumia planning. Only documents marked **ACTIVE**
 may supply implementation tasks. Supporting contracts constrain those tasks;
@@ -35,9 +35,13 @@ deferred packets require a new approval gate; archived plans are evidence only.
   `yOnVK7qbn55IFxrzqRCkV`, digest
   `001ad401de23721cde98ef35643bd9abc38c16f63fd8de34ad13c70a30248867`,
   with verified port closure. A development server is not release evidence.
-- The local candidate is release-ready but not deployed. The private VPS
-  evidence remains the July 13 release, and public DNS/Caddy ingress remains
-  deferred.
+- The earlier approved hardening candidate remains historical evidence. The
+  current final-review candidate hardens provenance without changing product
+  behavior, but is not release-ready: its complete final phase exposed three
+  intermittent Axe failures while sampling Itineraries filter color
+  transitions. Its unchanged-candidate 102-row visual family is green. Neither
+  candidate was deployed; the private VPS evidence remains the July 13 release,
+  and public DNS/Caddy ingress remains deferred.
 - Public ingress, deployment, Map Phase 2/3, richer 3D, saved-account launch,
   payments, workers, email, uploads, reviewer operations, and B2B enablement
   remain separate gates.
@@ -83,6 +87,7 @@ and the frontend polish plan are visually stable.
 | [`../reviews/2026-07-15-rumia-frontend-finish-verification.md`](../reviews/2026-07-15-rumia-frontend-finish-verification.md) | Completed frontend technical and exact-artifact evidence |
 | [`../reviews/2026-07-16-rumia-cleanup-allowlist.md`](../reviews/2026-07-16-rumia-cleanup-allowlist.md) | Task 17 exact-file cleanup decision and migrated acceptance-file deletion |
 | [`../reviews/2026-07-16-rumia-snapshot-approval.md`](../reviews/2026-07-16-rumia-snapshot-approval.md) | Approved 102-row baseline plus the approved July 18 six-row hardening delta and final-gate result |
+| [`../../.superpowers/sdd/final-review-fix-report.md`](../../.superpowers/sdd/final-review-fix-report.md) | Final-review source fix, immutable candidate provenance, focused checks, exact final-phase failure, and unchanged-candidate visual evidence |
 | [`../reviews/2026-07-14-rumia-frontend-convergence-baseline.md`](../reviews/2026-07-14-rumia-frontend-convergence-baseline.md) | Exact implementation checkpoint and route ownership |
 | [`../reviews/2026-07-13-rumia-ui-ux-visual-review.md`](../reviews/2026-07-13-rumia-ui-ux-visual-review.md) | Earlier functional and cinematic closeout; superseded for aesthetic acceptance |
 | [`../reviews/2026-07-13-rumia-full-bleed-media-research.md`](../reviews/2026-07-13-rumia-full-bleed-media-research.md) | Media/licensing direction and bounded cinematic rationale |

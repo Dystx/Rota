@@ -67,6 +67,30 @@ must not be read as evidence that Rumia is publicly deployed.
   ingress remains deferred. No VPS service, Caddy, DNS, or ingress mutation was
   made for this local candidate.
 
+### Local final-review fix candidate — 2026-07-18
+
+- Source fix: `1e4786d3a4cdcb6570f98ee4548e4bcaa1ecf6d9`, tree
+  `3533320ea135cfb0d8131b6da8e653e5b5680646`, on
+  `codex/rumia-visual-hardening`. Candidate creation recorded tracked-clean
+  source and rejected changes outside the intentionally untracked `output/`
+  evidence root.
+- Exact local receipt: schema 2, build `j4CxzJH3lYqvjoIzeD9o-`, digest
+  `e079b2cd79032599315a24bad318cb31d04626ac1032b64752ff0e4de968d22c`,
+  created `2026-07-18T06:06:02.144Z`, with 2,622 regular-file/symlink
+  inventory entries across the complete standalone tree. Pre-approval and
+  final verification retained the same identity and did not recopy served
+  assets.
+- Bounded Console pre-approval passed 6 non-visual and 2 visual checks, with 18
+  and 6 intentional skips. The complete final phase passed 1,640 non-visual
+  checks, skipped 2,433, and failed 3 intermittent Itineraries transition-state
+  Axe checks. The harness did not run visual after that failure; a supplemental
+  complete visual run against the unchanged receipt-bound candidate passed 102
+  with 306 intentional skips and no snapshot updates.
+- This final-review candidate is **not release-ready and not deployed**. The
+  active private VPS release remains `20260713T204125Z-cinematic-fix`; no VPS
+  service, Caddy, DNS, ingress, schema, environment, dependency, or product
+  behavior mutation was made. Port 3105 is closed.
+
 ### Cinematic frontend refresh — 2026-07-13
 
 - Local full unit suite passed at **177 files / 897 tests**; web typecheck and

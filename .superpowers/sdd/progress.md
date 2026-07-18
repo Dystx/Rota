@@ -7,8 +7,11 @@ Completed follow-up plan: `docs/superpowers/plans/2026-07-18-rumia-visual-harden
 Audit: `docs/reviews/2026-07-14-rumia-frontend-visual-audit.md`
 
 Status: July 15 finish plan remains the accepted 53-route baseline; the bounded
-July 18 visual-hardening pass is complete on `codex/rumia-visual-hardening` and
-its local candidate is release-ready but **not deployed**.
+July 18 visual-hardening implementation is complete on
+`codex/rumia-visual-hardening` and remains **not deployed**. The final-review
+fix candidate has immutable provenance and a green 102-row visual family, but
+is not release-ready because the complete final phase exposed an intermittent
+existing Itineraries transition-state contrast failure.
 
 ## Current checkpoint
 
@@ -28,6 +31,16 @@ its local candidate is release-ready but **not deployed**.
   `/Users/cheng/rota/.worktrees/rumia-visual-hardening`. Existing jsdom
   media-play notices and the dated first-attempt listener/timeout evidence are
   preserved below as historical runner evidence, not current blockers.
+- Final-review fixes are committed at `1e4786d3a4cdcb6570f98ee4548e4bcaa1ecf6d9`
+  (tree `3533320ea135cfb0d8131b6da8e653e5b5680646`). The exactly-once candidate
+  is build `j4CxzJH3lYqvjoIzeD9o-`, digest
+  `e079b2cd79032599315a24bad318cb31d04626ac1032b64752ff0e4de968d22c`,
+  with 2,622 immutable inventory entries. Bounded Console pre-approval passed
+  6 non-visual and 2 visual checks. The complete final phase passed 1,640
+  non-visual checks with 2,433 intentional skips and failed 3 intermittent Axe
+  checks on the Itineraries filter transition; a separate unchanged-candidate
+  visual run passed 102 checks with 306 intentional skips. No snapshot was
+  updated and port 3105 is closed.
 
 ### Completed July 15 execution chronology
 
@@ -458,3 +471,15 @@ deployment or public ingress.
   deployed. Documentation commit `bf50728af48c9d1ea412baac6f8ea9ca490822cf`
   is deliberately outside the already-built artifact and records this final
   authority reconciliation without claiming artifact membership.
+- Final-review fix: complete with concern — `1e4786d` hardens the exact-artifact
+  receipt, source/tree provenance, all-served-file inventory, mutation/dirty
+  rejection, Console behavioral coverage, authority wording, and immutable
+  six-row audit. Build `j4CxzJH3lYqvjoIzeD9o-` / digest
+  `e079b2cd79032599315a24bad318cb31d04626ac1032b64752ff0e4de968d22c`
+  binds source commit `1e4786d3a4cdcb6570f98ee4548e4bcaa1ecf6d9`, tree
+  `3533320ea135cfb0d8131b6da8e653e5b5680646`, and 2,622 entries. Focused
+  verification is green (6/6 runner, 1/1 Console mobile, 8/8 components).
+  Complete final evidence is 1,640 passed / 2,433 skipped / 3 failed due to an
+  intermittent existing Itineraries transition-state Axe race; supplemental
+  unchanged-artifact visual evidence is 102 passed / 306 skipped / 0 failed.
+  This candidate is not release-ready and was not deployed.

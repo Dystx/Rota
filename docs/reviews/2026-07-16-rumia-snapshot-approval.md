@@ -134,3 +134,25 @@ Immutable delta algorithm: `delta_sha256 = SHA-256(UTF8("rumia-visual-delta-v1\0
 | `console-workspace--empty` | `/console/workspace` | admin / empty | mobile-390 | `5e45bc52e64dc0d20162e6369d1c863b4a8edaf6` / `d76b55059ab5f8dc03257f1caacc3d3c6fde8494` / `95dc938937242ae99587b6ee08131993b19834b03885a9a5bea6e7868e2c77f3` | `41c12654eafa854b7cc613149957c53a04cd3f88` / `e728dc6df41251a8352d2d51a226de60f206e928` / `6761948f4ce4f39c9778099c7a43c7aaf8a8291d09638c67845ae970bac7090a` | `8eb08a6d42aba45a047b4c0af08927c01d4e1a03ccc058b313aa693cc1627bb5` | APPROVED 2026-07-18 — tabs plus one pane; capture ends intentionally with no inherited nested viewport or empty tail. |
 
 Hardening delta result: all six changed rows received explicit owner approval, the scoped update changed only those six PNGs, and the final exact-artifact gate passed against the same recorded build ID/digest. This approval does not authorize deployment or public ingress.
+
+## 2026-07-18 final-review provenance verification
+
+The final-review fix did not edit or update any approved PNG. Their blob IDs
+remain exactly the six approved IDs in the immutable table above. A new
+exactly-once candidate was built from tracked-clean source commit
+`1e4786d3a4cdcb6570f98ee4548e4bcaa1ecf6d9`, tree
+`3533320ea135cfb0d8131b6da8e653e5b5680646`: build
+`j4CxzJH3lYqvjoIzeD9o-`, digest
+`e079b2cd79032599315a24bad318cb31d04626ac1032b64752ff0e4de968d22c`,
+2,622 inventory entries.
+
+The bounded Console pre-approval passed 6 non-visual and 2 visual checks. The
+complete final phase verified the same receipt and bytes, then passed 1,640
+non-visual checks with 2,433 intentional skips and failed 3 intermittent Axe
+checks that sampled the existing Itineraries filter buttons during
+`transition-colors`. The harness consequently did not invoke its visual
+command. A supplemental complete visual run against the same unchanged
+candidate passed all 102 expected rows with 306 intentional skips and no
+snapshot updates. This preserves the six-row approval and visual-family
+evidence, but it does not make the new candidate release-ready or turn its
+complete final phase green.
