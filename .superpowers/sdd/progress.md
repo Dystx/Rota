@@ -405,7 +405,15 @@ aesthetic approval on the exact served artifact on 2026-07-17.
 
 ## 2026-07-18 visual-hardening ledger
 
-- Hardening Task 1: in progress — restore Planner midnight field and add computed-style/Axe contrast guards.
+- Hardening Task 1: complete — `a18433e` restores the Planner midnight field,
+  adds the 390×844 computed-style contract and Planner Axe coverage, and
+  registers the focused spec in the exact runner. TDD evidence recorded the
+  expected transparent RED before production edits, then 1/1 Playwright,
+  15/15 Planner unit tests, web Playwright typecheck, and diff check green.
+  Independent task review found no Critical or Important issue; its only Minor
+  note was to retain full `NO_COLOR`/`FORCE_COLOR` warning output in later gate
+  evidence. Fixture setup used the documented process-only owner connection;
+  production RLS roles and policies were unchanged.
 - Hardening Task 2: pending — repair Home stacked scene flow and one-up mobile activity-card geometry; prove activity-detail overlay unchanged.
 - Hardening Task 3: pending — remove Console Workspace nested viewport height and enforce one-viewport mobile empty composition.
 - Hardening Task 4: pending — build one candidate, run pre-approval, inspect exact Home/Planner/Console evidence, and obtain six owner decisions.
