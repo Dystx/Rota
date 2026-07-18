@@ -21,8 +21,9 @@ Post-build test-only stabilization commit:
 
 The second whole-branch review wave closes all three Important and both Minor
 review findings. Candidate creation is now explicit and one-shot; replacement
-requires the expected old digest and archives the prior receipt before any
-served asset mutation. The canonical acceptance builder binds a clean source
+requires the expected old digest, captures the prior receipt bytes before any
+served asset mutation, and archives them before replacing the receipt. The
+canonical acceptance builder binds a clean source
 commit and tree into a deterministic manifest inside the hashed standalone
 runtime. Pre-approval rejects stale or malformed provenance and missing or
 out-of-root symlink targets before receipt creation or asset copying.
