@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
 import { createAdminStorageState } from "../fixtures/admin-auth";
@@ -38,6 +38,16 @@ const tripPath = () => travelerTripPath();
 const tripExportPath = () => travelerTripPath("/export");
 const tripMapPath = () => travelerTripPath("/map");
 
+async function stabilizeA11yMotion(page: Page): Promise<void> {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addStyleTag({
+    content: "*,*::before,*::after{animation:none!important;transition:none!important}"
+  });
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => animation.playState !== "running")
+  );
+}
+
 test.afterAll(() => {
   const dir = path.join(process.cwd(), "../../.sisyphus/evidence/future-roadmap");
   if (!fs.existsSync(dir)) {
@@ -62,7 +72,7 @@ test.afterAll(() => {
 
 async function runAxe(page: any, routePath: string) {
   await page.waitForLoadState("networkidle");
-  await page.addStyleTag({ content: "*, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }" });
+  await stabilizeA11yMotion(page);
   const results = await new AxeBuilder({ page }).analyze();
   
   axeResults.push({
@@ -295,8 +305,19 @@ test.describe("Accessibility Audit - Traveler", () => {
     const route = "/itineraries#filtered-empty";
     await page.goto("/itineraries");
     await expect(page).not.toHaveURL(/\/sign-in/);
+    await stabilizeA11yMotion(page);
+    const draftsFilter = page.getByRole("button", { name: "Drafts" });
+    const filterMotion = await draftsFilter.evaluate((element: HTMLElement) => {
+      const style = window.getComputedStyle(element);
+      return { animationName: style.animationName, transitionDuration: style.transitionDuration };
+    });
+    expect(filterMotion, "Axe interactions must disable motion before changing state").toEqual({
+      animationName: "none",
+      transitionDuration: "0s"
+    });
     await page.getByRole("searchbox", { name: "Search itineraries" }).fill("Madeira");
-    await page.getByRole("button", { name: "Drafts" }).click();
+    await draftsFilter.click();
+    await expect(draftsFilter).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("itinerary-filtered-empty")).toBeVisible();
     await expect(page.getByRole("button", { name: "Clear filters" })).toBeVisible();
     await verifyLandmarksAndFocus(page, route);
