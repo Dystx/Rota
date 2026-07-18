@@ -37,11 +37,12 @@ deferred packets require a new approval gate; archived plans are evidence only.
   with verified port closure. A development server is not release evidence.
 - The earlier approved hardening candidate remains historical evidence. The
   current final-review candidate hardens provenance without changing product
-  behavior, but is not release-ready: its complete final phase exposed three
-  intermittent Axe failures while sampling Itineraries filter color
-  transitions. Its unchanged-candidate 102-row visual family is green. Neither
-  candidate was deployed; the private VPS evidence remains the July 13 release,
-  and public DNS/Caddy ingress remains deferred.
+  behavior. Test-only commit `de9b01a` stabilizes accessibility audits before
+  interaction and is outside candidate bytes; the unchanged-receipt final gate
+  passed 1,643 non-visual and 102 visual checks, with 2,433 and 306 intentional
+  project skips. The candidate is local release-ready. Neither candidate was
+  deployed; the private VPS evidence remains the July 13 release, and public
+  DNS/Caddy ingress remains deferred.
 - Public ingress, deployment, Map Phase 2/3, richer 3D, saved-account launch,
   payments, workers, email, uploads, reviewer operations, and B2B enablement
   remain separate gates.
@@ -87,7 +88,7 @@ and the frontend polish plan are visually stable.
 | [`../reviews/2026-07-15-rumia-frontend-finish-verification.md`](../reviews/2026-07-15-rumia-frontend-finish-verification.md) | Completed frontend technical and exact-artifact evidence |
 | [`../reviews/2026-07-16-rumia-cleanup-allowlist.md`](../reviews/2026-07-16-rumia-cleanup-allowlist.md) | Task 17 exact-file cleanup decision and migrated acceptance-file deletion |
 | [`../reviews/2026-07-16-rumia-snapshot-approval.md`](../reviews/2026-07-16-rumia-snapshot-approval.md) | Approved 102-row baseline plus the approved July 18 six-row hardening delta and final-gate result |
-| [`../../.superpowers/sdd/final-review-fix-report.md`](../../.superpowers/sdd/final-review-fix-report.md) | Final-review source fix, immutable candidate provenance, focused checks, exact final-phase failure, and unchanged-candidate visual evidence |
+| [`../../.superpowers/sdd/final-review-fix-report.md`](../../.superpowers/sdd/final-review-fix-report.md) | Final-review source fix, immutable candidate provenance, test-only accessibility stabilization, and complete green unchanged-receipt final gate |
 | [`../reviews/2026-07-14-rumia-frontend-convergence-baseline.md`](../reviews/2026-07-14-rumia-frontend-convergence-baseline.md) | Exact implementation checkpoint and route ownership |
 | [`../reviews/2026-07-13-rumia-ui-ux-visual-review.md`](../reviews/2026-07-13-rumia-ui-ux-visual-review.md) | Earlier functional and cinematic closeout; superseded for aesthetic acceptance |
 | [`../reviews/2026-07-13-rumia-full-bleed-media-research.md`](../reviews/2026-07-13-rumia-full-bleed-media-research.md) | Media/licensing direction and bounded cinematic rationale |

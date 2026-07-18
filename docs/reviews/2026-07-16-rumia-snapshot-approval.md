@@ -147,12 +147,11 @@ exactly-once candidate was built from tracked-clean source commit
 2,622 inventory entries.
 
 The bounded Console pre-approval passed 6 non-visual and 2 visual checks. The
-complete final phase verified the same receipt and bytes, then passed 1,640
-non-visual checks with 2,433 intentional skips and failed 3 intermittent Axe
-checks that sampled the existing Itineraries filter buttons during
-`transition-colors`. The harness consequently did not invoke its visual
-command. A supplemental complete visual run against the same unchanged
-candidate passed all 102 expected rows with 306 intentional skips and no
-snapshot updates. This preserves the six-row approval and visual-family
-evidence, but it does not make the new candidate release-ready or turn its
-complete final phase green.
+initial complete final phase exposed an Axe timing race while sampling the
+existing Itineraries filter `transition-colors`. Test-only commit `de9b01a`
+stabilizes motion before interaction and is outside candidate bytes. The
+complete final phase was then rerun against the same unchanged receipt and
+runtime: 1,643 non-visual checks passed with 2,433 intentional skips, followed
+by all 102 expected visual rows with 306 intentional skips. Exit was 0; no
+snapshot was updated, no served assets were recopied, and port 3105 closed.
+The candidate is therefore local release-ready and remains not deployed.

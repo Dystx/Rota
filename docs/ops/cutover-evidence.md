@@ -81,12 +81,12 @@ must not be read as evidence that Rumia is publicly deployed.
   final verification retained the same identity and did not recopy served
   assets.
 - Bounded Console pre-approval passed 6 non-visual and 2 visual checks, with 18
-  and 6 intentional skips. The complete final phase passed 1,640 non-visual
-  checks, skipped 2,433, and failed 3 intermittent Itineraries transition-state
-  Axe checks. The harness did not run visual after that failure; a supplemental
-  complete visual run against the unchanged receipt-bound candidate passed 102
-  with 306 intentional skips and no snapshot updates.
-- This final-review candidate is **not release-ready and not deployed**. The
+  and 6 intentional skips. Test-only commit `de9b01a` stabilizes accessibility
+  motion before interaction and is outside candidate bytes. The complete final
+  phase against the same receipt passed 1,643 non-visual checks with 2,433
+  intentional skips, then 102 visual checks with 306 intentional skips; exit
+  0, no snapshot updates, no asset recopy, and port 3105 closed.
+- This final-review candidate is **local release-ready and not deployed**. The
   active private VPS release remains `20260713T204125Z-cinematic-fix`; no VPS
   service, Caddy, DNS, ingress, schema, environment, dependency, or product
   behavior mutation was made. Port 3105 is closed.
