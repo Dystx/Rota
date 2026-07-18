@@ -50,4 +50,49 @@ test.describe("@smoke @visual-quality bounded visual hardening", () => {
       expect(styles.headingColor).toBe("rgb(239, 236, 230)");
     });
   });
+
+  test("home--ready keeps readable chapters and one-up mobile activity cards", async ({ browser }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "one canonical mobile composition run");
+
+    await withMobilePage(browser, "/", {}, async (page) => {
+      await expect(page.getByTestId("home-editorial-chapter")).toHaveAttribute("data-tone", "decision");
+      const geometry = await page.getByTestId("destination-bento-grid").evaluate((grid) => {
+        const gridRect = grid.getBoundingClientRect();
+        const cards = Array.from(grid.querySelectorAll<HTMLElement>("[data-testid^='bento-card-']"));
+        return {
+          gridHeight: gridRect.height,
+          cards: cards.map((card) => {
+            const rect = card.getBoundingClientRect();
+            const content = card.querySelector<HTMLElement>("[data-bento-content]");
+            const contentRect = content?.getBoundingClientRect();
+            return {
+              width: rect.width,
+              height: rect.height,
+              leftOffset: rect.left - gridRect.left,
+              rightOverflow: rect.right - gridRect.right,
+              contentFits: Boolean(
+                contentRect &&
+                contentRect.left >= rect.left &&
+                contentRect.right <= rect.right &&
+                content &&
+                content.scrollWidth <= content.clientWidth + 1 &&
+                content.scrollHeight <= content.clientHeight + 1
+              )
+            };
+          })
+        };
+      });
+
+      expect(geometry.cards).toHaveLength(3);
+      expect(geometry.gridHeight).toBeLessThanOrEqual(1_040);
+      for (const card of geometry.cards) {
+        expect(card.width).toBeGreaterThanOrEqual(320);
+        expect(card.height).toBeGreaterThanOrEqual(300);
+        expect(card.height).toBeLessThanOrEqual(340);
+        expect(Math.abs(card.leftOffset)).toBeLessThanOrEqual(1);
+        expect(card.rightOverflow).toBeLessThanOrEqual(1);
+        expect(card.contentFits).toBe(true);
+      }
+    });
+  });
 });

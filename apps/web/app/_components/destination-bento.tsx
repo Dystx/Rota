@@ -76,7 +76,7 @@ const BENTO_CARDS: BentoCardData[] = [
     activityRegion: "Lisbon · walking + culture",
     mediaSrc: "/trip-covers/lisbon-tagus.svg",
     mediaAlt: "Layered editorial illustration of Lisbon and the Tagus light.",
-    gridClass: "md:col-span-8 row-span-2",
+    gridClass: "row-span-1 md:col-span-8 md:row-span-2",
     contentClass: "text-on-primary"
   },
   {
@@ -89,7 +89,7 @@ const BENTO_CARDS: BentoCardData[] = [
     activityRegion: "Douro · landscape + food",
     mediaSrc: "/media/unsplash/douro-terraces-card.webp",
     mediaAlt: "Terraced vineyards descending toward the Douro River",
-    gridClass: "md:col-span-4 row-span-2",
+    gridClass: "row-span-1 md:col-span-4 md:row-span-2",
     contentClass: "text-on-primary"
   },
   {
@@ -103,7 +103,7 @@ const BENTO_CARDS: BentoCardData[] = [
     activityRegion: "Azores · nature + weather",
     mediaSrc: "/media/unsplash/portugal-coast-card.webp",
     mediaAlt: "Atlantic coast at golden hour in Portugal",
-    gridClass: "md:col-span-12 row-span-1",
+    gridClass: "row-span-1 md:col-span-12",
     contentClass: "text-on-primary w-full md:w-1/2"
   }
 ];
@@ -166,11 +166,14 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
 
   return (
     <section
-      className="rumia-destination-bento w-full max-w-7xl mx-auto px-container-padding-sm md:px-container-padding-lg py-section-gap relative -mt-16 z-20"
+      className="rumia-destination-bento relative z-20 mx-auto mt-0 w-full max-w-7xl px-container-padding-sm py-12 md:-mt-16 md:px-container-padding-lg md:py-section-gap"
       data-testid="destination-bento"
       data-mode={mode}
     >
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[250px]">
+      <div
+        data-testid="destination-bento-grid"
+        className="grid grid-cols-1 auto-rows-[20rem] gap-gutter md:grid-cols-12 md:auto-rows-[250px]"
+      >
         {BENTO_CARDS.map((card) => {
           const planHref = PLANNER_HREF_FOR(card.slug);
           const exploreHref = EXPLORE_HREF_FOR(card.slug);
@@ -189,7 +192,8 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-olive-dark/80 via-olive-dark/20 to-transparent" />
               <div
-                className={`absolute inset-0 p-card-padding flex flex-col justify-end ${card.contentClass} z-20`}
+                data-bento-content
+                className={`absolute inset-0 z-20 flex min-w-0 flex-col justify-end overflow-hidden p-card-padding ${card.contentClass}`}
               >
                 <span className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-light mb-2 bg-olive-dark/50 inline-block w-max px-2 py-1 rounded backdrop-blur-sm">
                   {region}
@@ -201,12 +205,12 @@ export function DestinationBento({ mode = "explore" }: DestinationBentoProps = {
                   {caption}
                 </p>
                 {mode === "plan" ? (
-                  <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-ochre-light px-3 py-1.5 font-label-ui text-label-ui text-primary shadow-sm">
+                  <span className="mt-3 inline-flex max-w-full items-center gap-1.5 rounded-full bg-ochre-light px-3 py-1.5 font-label-ui text-label-ui text-primary shadow-sm">
                     {BENTO_CTA_COPY[card.slug]}
                     <Icon name="arrow_forward" className="text-[16px]" />
                   </span>
                 ) : (
-                  <span className="mt-3 inline-flex min-h-11 w-max items-center gap-2 rounded-full bg-linen-dark/95 px-4 py-2 font-label-ui text-label-ui text-primary shadow-sm motion-safe:transition-colors motion-safe:hover:bg-white">
+                  <span className="mt-3 inline-flex min-h-11 w-max max-w-full items-center gap-2 rounded-full bg-linen-dark/95 px-4 py-2 font-label-ui text-label-ui text-primary shadow-sm motion-safe:transition-colors motion-safe:hover:bg-white">
                     <Icon name="map" className="text-base" />
                     See worthwhile activities
                     <Icon name="arrow_forward" className="text-base" />

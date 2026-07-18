@@ -356,6 +356,14 @@
   grid-area: actions;
 }
 
+.rumia-route-scene--stacked > .rumia-route-scene__media,
+.rumia-route-scene--stacked > .rumia-route-scene__foreground,
+.rumia-route-scene--stacked > .rumia-route-scene__aside,
+.rumia-route-scene--stacked > .rumia-route-scene__actions {
+  grid-area: auto;
+  min-width: 0;
+}
+
 /* Semantic role hooks for route-level composition. These remain opt-in so
  * existing class-heavy pages can converge incrementally without a rewrite. */
 .rumia-type-display,

@@ -43,14 +43,14 @@ describe("HomePage hero layout", () => {
     expect(cover.querySelector("[data-testid='route-scene-actions']")?.className).toContain("bottom-0");
   });
 
-  it("alternates cover, editorial, and atlas chapters", async () => {
+  it("alternates cover, decision, field-note, and atlas chapters", async () => {
     const page = await HomePage();
     render(page);
 
     expect(screen.getByTestId("home-cover").getAttribute("data-tone")).toBe("cover");
-    expect(screen.getByTestId("home-editorial-chapter").getAttribute("data-focal-layer")).toBe(
-      "typography"
-    );
+    expect(screen.getByTestId("home-editorial-chapter").getAttribute("data-tone")).toBe("decision");
+    expect(screen.getByTestId("home-editorial-chapter").getAttribute("data-focal-layer")).toBe("typography");
+    expect(screen.getByTestId("home-field-note-chapter").getAttribute("data-tone")).toBe("cover");
     expect(screen.getByTestId("home-atlas-chapter").getAttribute("data-tone")).toBe("atlas");
   });
 

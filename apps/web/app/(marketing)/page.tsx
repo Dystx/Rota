@@ -158,7 +158,7 @@ export default function HomePage() {
         />
 
         <RouteScene
-          tone="utility"
+          tone="decision"
           bleed="contained"
           focalLayer="typography"
           data-testid="home-editorial-chapter"
@@ -169,6 +169,7 @@ export default function HomePage() {
           tone="cover"
           bleed="contained"
           focalLayer="media"
+          data-testid="home-field-note-chapter"
           media={<PortugalEditorialChapter />}
           foreground={<HomeFieldNoteCopy />}
         />

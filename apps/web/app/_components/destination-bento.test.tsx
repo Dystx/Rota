@@ -1,4 +1,5 @@
 import * as React from "react";
+import "@testing-library/jest-dom/vitest";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { useMapStore } from "@/store/useMapStore";
@@ -112,5 +113,19 @@ describe("DestinationBento activity mode", () => {
       expect(card.getAttribute("style") ?? "").not.toMatch(/background-image/i);
       expect(card.querySelector("img")?.getAttribute("src")).toBeTruthy();
     }
+  });
+
+  it("uses one full-width activity card per row before the desktop bento breakpoint", () => {
+    render(<DestinationBento mode="explore" />);
+
+    expect(screen.getByTestId("destination-bento-grid")).toHaveClass(
+      "grid-cols-1",
+      "auto-rows-[20rem]",
+      "md:grid-cols-12",
+      "md:auto-rows-[250px]"
+    );
+    expect(screen.getByTestId("bento-card-lisbon")).toHaveClass("row-span-1", "md:row-span-2");
+    expect(screen.getByTestId("bento-card-douro")).toHaveClass("row-span-1", "md:row-span-2");
+    expect(screen.getByTestId("bento-card-azores")).toHaveClass("row-span-1", "md:col-span-12");
   });
 });
