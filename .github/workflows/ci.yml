@@ -36,6 +36,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Exact-artifact unit contracts
+        run: pnpm test:exact-artifact-unit
+
       - name: Build
         run: pnpm build
 

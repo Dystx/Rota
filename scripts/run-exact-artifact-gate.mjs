@@ -1,10 +1,17 @@
-import { execFile as execFileCallback, spawn } from "node:child_process";
+import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { isDeepStrictEqual, promisify } from "node:util";
+import { isDeepStrictEqual } from "node:util";
+
+import {
+  BUILD_PROVENANCE_FILE_NAME,
+  BUILD_PROVENANCE_SCHEMA_VERSION,
+  requireBuildProvenance,
+  requireCleanSourceProvenance
+} from "./exact-artifact-provenance.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const WEB_ROOT = path.join(ROOT, "apps", "web");
@@ -12,12 +19,13 @@ const NEXT_ROOT = path.join(WEB_ROOT, ".next");
 const STANDALONE_RUNTIME_ROOT = path.join(NEXT_ROOT, "standalone");
 const STANDALONE_ROOT = path.join(STANDALONE_RUNTIME_ROOT, "apps", "web");
 const STANDALONE_BUILD_ID_PATH = path.join(STANDALONE_ROOT, ".next", "BUILD_ID");
+const BUILD_PROVENANCE_PATH = path.join(STANDALONE_RUNTIME_ROOT, BUILD_PROVENANCE_FILE_NAME);
 const SERVER_PATH = path.join(STANDALONE_ROOT, "server.js");
 const RECEIPT_PATH = path.join(ROOT, "output", "playwright", "exact-artifact", "build-receipt.json");
-const RECEIPT_SCHEMA_VERSION = 2;
+const RECEIPT_ARCHIVE_ROOT = path.join(path.dirname(RECEIPT_PATH), "archive");
+const RECEIPT_SCHEMA_VERSION = 3;
 const PORT = 3105;
 const HOST = "127.0.0.1";
-const execFile = promisify(execFileCallback);
 
 const NON_VISUAL_SPECS = [
   "playwright/tests/route-scenes.spec.ts",
@@ -33,15 +41,55 @@ const NON_VISUAL_SPECS = [
 ];
 const VISUAL_SPECS = ["playwright/tests/visual.spec.ts"];
 
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const phaseIndex = args.indexOf("--phase");
-  const phase = phaseIndex === -1 ? "pre-approval" : args[phaseIndex + 1];
-  const grepIndex = args.indexOf("--grep");
-  const grep = grepIndex === -1 ? undefined : args[grepIndex + 1];
-  const updateSnapshots = args.includes("--update-snapshots");
+function parseArgs(args = process.argv.slice(2)) {
+  let phase;
+  let grep;
+  let updateSnapshots = false;
+  let newCandidate = false;
+  let replaceCandidate;
+  const valueFor = (flag, index) => {
+    const value = args[index + 1];
+    if (!value || value.startsWith("--")) throw new Error(`[exact-artifact] ${flag} requires a value`);
+    return value;
+  };
+
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index];
+    if (argument === "--phase") {
+      if (phase !== undefined) throw new Error("[exact-artifact] --phase may only be supplied once");
+      phase = valueFor(argument, index);
+      index += 1;
+    } else if (argument === "--grep") {
+      if (grep !== undefined) throw new Error("[exact-artifact] --grep may only be supplied once");
+      grep = valueFor(argument, index);
+      index += 1;
+    } else if (argument === "--update-snapshots") {
+      if (updateSnapshots) throw new Error("[exact-artifact] --update-snapshots may only be supplied once");
+      updateSnapshots = true;
+    } else if (argument === "--new-candidate") {
+      if (newCandidate) throw new Error("[exact-artifact] --new-candidate may only be supplied once");
+      newCandidate = true;
+    } else if (argument === "--replace-candidate") {
+      if (replaceCandidate !== undefined) throw new Error("[exact-artifact] --replace-candidate may only be supplied once");
+      replaceCandidate = valueFor(argument, index);
+      index += 1;
+    } else {
+      throw new Error(`[exact-artifact] unknown argument: ${argument}`);
+    }
+  }
+
+  if (phase === undefined) throw new Error("[exact-artifact] --phase is required");
   if (!["pre-approval", "update-family", "final"].includes(phase)) {
     throw new Error("[exact-artifact] --phase must be pre-approval, update-family, or final");
+  }
+  if (replaceCandidate !== undefined && !/^[0-9a-f]{64}$/u.test(replaceCandidate)) {
+    throw new Error("[exact-artifact] --replace-candidate must be a 64-character lowercase SHA-256 digest");
+  }
+  if (phase === "pre-approval" && Number(newCandidate) + Number(replaceCandidate !== undefined) !== 1) {
+    throw new Error("[exact-artifact] pre-approval requires exactly one of --new-candidate or --replace-candidate <expected-old-digest>");
+  }
+  if (phase !== "pre-approval" && (newCandidate || replaceCandidate !== undefined)) {
+    throw new Error("[exact-artifact] candidate creation authorization is only valid with --phase pre-approval");
   }
   if (phase === "update-family" && (!grep || !updateSnapshots)) {
     throw new Error("[exact-artifact] update-family requires both --grep <scoped-family> and --update-snapshots");
@@ -49,7 +97,7 @@ function parseArgs() {
   if (phase !== "update-family" && updateSnapshots) {
     throw new Error("[exact-artifact] snapshot updates are only allowed in the explicitly scoped update-family phase");
   }
-  return { phase, grep, updateSnapshots };
+  return { phase, grep, updateSnapshots, newCandidate, replaceCandidate };
 }
 
 async function exists(filePath) {
@@ -125,6 +173,39 @@ async function walk(directory) {
   return files;
 }
 
+function isInsideDirectory(directory, candidate) {
+  const relative = path.relative(directory, candidate);
+  return relative === "" || (!relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative));
+}
+
+async function validateSymlinkTarget(filePath) {
+  let resolved;
+  let resolvedRoot;
+  try {
+    [resolved, resolvedRoot] = await Promise.all([
+      fs.realpath(filePath),
+      fs.realpath(STANDALONE_RUNTIME_ROOT)
+    ]);
+  } catch (error) {
+    if (error && error.code === "ENOENT") {
+      throw new Error(`[exact-artifact] symlink target is missing: ${relativeToRoot(filePath)}`);
+    }
+    throw new Error(`[exact-artifact] symlink target cannot be resolved: ${relativeToRoot(filePath)} (${error instanceof Error ? error.message : String(error)})`);
+  }
+  if (!isInsideDirectory(resolvedRoot, resolved)) {
+    throw new Error(`[exact-artifact] symlink target resolves outside standalone root: ${relativeToRoot(filePath)}`);
+  }
+}
+
+async function validateRuntimeSymlinks() {
+  if (!(await exists(STANDALONE_RUNTIME_ROOT))) {
+    throw new Error("[exact-artifact] refusing to run: apps/web/.next/standalone is missing");
+  }
+  for (const filePath of await walk(STANDALONE_RUNTIME_ROOT)) {
+    if ((await fs.lstat(filePath)).isSymbolicLink()) await validateSymlinkTarget(filePath);
+  }
+}
+
 async function artifactDigest(_buildIdPath) {
   if (!(await exists(STANDALONE_RUNTIME_ROOT))) {
     throw new Error("[exact-artifact] refusing to run: apps/web/.next/standalone is missing");
@@ -138,6 +219,7 @@ async function artifactDigest(_buildIdPath) {
     const stats = await fs.lstat(filePath);
     const relativePath = relativeToRoot(filePath);
     if (stats.isSymbolicLink()) {
+      await validateSymlinkTarget(filePath);
       const entry = {
         path: relativePath,
         type: "symlink",
@@ -170,29 +252,10 @@ async function artifactDigest(_buildIdPath) {
   };
 }
 
-async function gitOutput(args) {
-  const { stdout } = await execFile("git", args, { cwd: ROOT, maxBuffer: 16 * 1024 * 1024 });
-  return stdout.trim();
-}
-
 async function sourceProvenance() {
-  const trackedStatus = await gitOutput(["status", "--porcelain=v1", "--untracked-files=no"]);
-  const untracked = (await gitOutput(["ls-files", "--others", "--exclude-standard"]))
-    .split("\n")
-    .filter(Boolean);
-  const disallowedUntracked = untracked.filter((filePath) => filePath !== "output" && !filePath.startsWith("output/"));
-  if (trackedStatus || disallowedUntracked.length > 0) {
-    const details = [
-      trackedStatus ? "tracked changes are present" : null,
-      disallowedUntracked.length > 0 ? `untracked files outside output/: ${disallowedUntracked.join(", ")}` : null
-    ].filter(Boolean).join("; ");
-    throw new Error(`[exact-artifact] pre-approval requires a clean source tree (${details})`);
-  }
-  return {
-    sourceCommit: await gitOutput(["rev-parse", "HEAD"]),
-    sourceTree: await gitOutput(["rev-parse", "HEAD^{tree}"]),
-    trackedClean: true
-  };
+  return requireCleanSourceProvenance(ROOT, {
+    errorPrefix: "[exact-artifact] pre-approval requires a clean source tree"
+  });
 }
 
 function receiptInvalid(reason) {
@@ -222,9 +285,10 @@ function validateInventory(inventory) {
   }
 }
 
-function validateReceipt(receipt) {
-  if (!receipt || typeof receipt !== "object" || receipt.schemaVersion !== RECEIPT_SCHEMA_VERSION) {
-    receiptInvalid(`expected schemaVersion ${RECEIPT_SCHEMA_VERSION}`);
+function validateReceipt(receipt, { allowLegacy = false } = {}) {
+  const acceptedSchemas = allowLegacy ? [2, RECEIPT_SCHEMA_VERSION] : [RECEIPT_SCHEMA_VERSION];
+  if (!receipt || typeof receipt !== "object" || !acceptedSchemas.includes(receipt.schemaVersion)) {
+    receiptInvalid(`expected schemaVersion ${acceptedSchemas.join(" or ")}`);
   }
   const candidate = receipt.candidate;
   if (!candidate || typeof candidate !== "object") receiptInvalid("candidate identity is missing");
@@ -240,6 +304,39 @@ function validateReceipt(receipt) {
   if (Number.isNaN(Date.parse(candidate.candidateCreatedAt))) receiptInvalid("candidate timestamp is malformed");
   validateInventory(candidate.inventory);
   if (candidate.inventoryCount !== candidate.inventory.length) receiptInvalid("candidate inventoryCount does not match inventory");
+  if (receipt.schemaVersion === RECEIPT_SCHEMA_VERSION) {
+    const buildProvenance = candidate.buildProvenance;
+    if (!buildProvenance || typeof buildProvenance !== "object") {
+      receiptInvalid("candidate buildProvenance is missing");
+    }
+    if (buildProvenance.schemaVersion !== BUILD_PROVENANCE_SCHEMA_VERSION) {
+      receiptInvalid("candidate buildProvenance schemaVersion is unexpected");
+    }
+    if (buildProvenance.manifest !== relativeToRoot(BUILD_PROVENANCE_PATH)) {
+      receiptInvalid("candidate buildProvenance manifest path is unexpected");
+    }
+    if (!/^[0-9a-f]{64}$/u.test(buildProvenance.manifestSha256)) {
+      receiptInvalid("candidate buildProvenance manifestSha256 is malformed");
+    }
+    const creation = receipt.creation;
+    if (!creation || typeof creation !== "object" || !["new", "replacement"].includes(creation.mode)) {
+      receiptInvalid("candidate creation audit is missing");
+    }
+    if (creation.mode === "replacement") {
+      if (!/^[0-9a-f]{64}$/u.test(creation.expectedPriorDigest)) {
+        receiptInvalid("replacement expectedPriorDigest is malformed");
+      }
+      if (typeof creation.priorBuildId !== "string" || !creation.priorBuildId) {
+        receiptInvalid("replacement priorBuildId is missing");
+      }
+      if (
+        typeof creation.priorReceiptArchive !== "string" ||
+        !creation.priorReceiptArchive.startsWith(`${relativeToRoot(RECEIPT_ARCHIVE_ROOT)}/`)
+      ) {
+        receiptInvalid("replacement priorReceiptArchive is unexpected");
+      }
+    }
+  }
   if (!Array.isArray(receipt.verifications) || receipt.verifications.length === 0) {
     receiptInvalid("phase verifications are missing");
   }
@@ -257,7 +354,7 @@ function validateReceipt(receipt) {
   return receipt;
 }
 
-async function readReceipt() {
+async function readReceipt({ allowLegacy = false, includeContents = false } = {}) {
   let contents;
   try {
     contents = await fs.readFile(RECEIPT_PATH, "utf8");
@@ -273,7 +370,8 @@ async function readReceipt() {
   } catch {
     throw new Error("[exact-artifact] candidate receipt is malformed JSON");
   }
-  return validateReceipt(receipt);
+  const validated = validateReceipt(receipt, { allowLegacy });
+  return includeContents ? { receipt: validated, contents } : validated;
 }
 
 async function writeReceipt(receipt) {
@@ -297,10 +395,64 @@ function phaseVerification(phase, candidate, now) {
   };
 }
 
-async function prepareArtifactPhase({ phase, now = () => new Date() }) {
+async function authorizeCandidateCreation({ newCandidate = false, replaceCandidate }) {
+  if (!newCandidate && replaceCandidate === undefined) {
+    throw new Error("[exact-artifact] pre-approval requires explicit candidate creation authorization");
+  }
+  if (newCandidate && replaceCandidate !== undefined) {
+    throw new Error("[exact-artifact] pre-approval accepts only one candidate creation authorization");
+  }
+  const receiptExists = await exists(RECEIPT_PATH);
+  if (newCandidate) {
+    if (receiptExists) {
+      throw new Error("[exact-artifact] --new-candidate requires that no candidate receipt exists");
+    }
+    return { creation: { mode: "new" } };
+  }
+  if (!receiptExists) {
+    throw new Error("[exact-artifact] --replace-candidate requires an existing candidate receipt");
+  }
+  const { receipt, contents } = await readReceipt({ allowLegacy: true, includeContents: true });
+  if (receipt.candidate.digest !== replaceCandidate) {
+    throw new Error(`[exact-artifact] replacement digest mismatch: expected existing ${receipt.candidate.digest}, received ${replaceCandidate}`);
+  }
+  const archivePath = path.join(RECEIPT_ARCHIVE_ROOT, `build-receipt.${receipt.candidate.digest}.json`);
+  return {
+    archivePath,
+    archivedContents: contents,
+    creation: {
+      mode: "replacement",
+      expectedPriorDigest: receipt.candidate.digest,
+      priorBuildId: receipt.candidate.buildId,
+      priorReceiptArchive: relativeToRoot(archivePath)
+    }
+  };
+}
+
+async function archivePriorReceipt(archivePath, contents) {
+  await fs.mkdir(path.dirname(archivePath), { recursive: true });
+  try {
+    await fs.writeFile(archivePath, contents, { flag: "wx" });
+  } catch (error) {
+    if (!error || error.code !== "EEXIST") throw error;
+    const existing = await fs.readFile(archivePath, "utf8");
+    if (existing !== contents) {
+      throw new Error(`[exact-artifact] refusing to overwrite a different receipt archive: ${relativeToRoot(archivePath)}`);
+    }
+  }
+}
+
+async function prepareArtifactPhase({ phase, newCandidate = false, replaceCandidate, now = () => new Date() }) {
   if (phase === "pre-approval") {
+    const authorization = await authorizeCandidateCreation({ newCandidate, replaceCandidate });
     const provenance = await sourceProvenance();
     const built = await requiredBuildArtifact();
+    const buildProvenance = await requireBuildProvenance(BUILD_PROVENANCE_PATH, {
+      buildId: built.buildId,
+      sourceCommit: provenance.sourceCommit,
+      sourceTree: provenance.sourceTree
+    });
+    await validateRuntimeSymlinks();
     await copyReleaseAssets();
     const served = await requiredServedArtifact();
     if (served.buildId !== built.buildId) {
@@ -316,22 +468,39 @@ async function prepareArtifactPhase({ phase, now = () => new Date() }) {
       server: relativeToRoot(SERVER_PATH),
       port: PORT,
       candidateCreatedAt: now().toISOString(),
+      buildProvenance: {
+        schemaVersion: BUILD_PROVENANCE_SCHEMA_VERSION,
+        manifest: relativeToRoot(BUILD_PROVENANCE_PATH),
+        manifestSha256: buildProvenance.manifestSha256
+      },
       inventoryCount: artifact.inventory.length,
       inventory: artifact.inventory
     };
     const receipt = {
       schemaVersion: RECEIPT_SCHEMA_VERSION,
       candidate,
+      creation: authorization.creation,
       verifications: [phaseVerification(phase, candidate, now)]
     };
+    if (authorization.archivePath) {
+      await archivePriorReceipt(authorization.archivePath, authorization.archivedContents);
+    }
     await writeReceipt(receipt);
-    return { artifact, receipt };
+    return { artifact, receipt, receiptArchivePath: authorization.archivePath };
   }
 
   const receipt = await readReceipt();
   const served = await requiredServedArtifact();
   if (served.buildId !== receipt.candidate.buildId) {
     throw new Error("[exact-artifact] served BUILD_ID mismatch before server start");
+  }
+  const buildProvenance = await requireBuildProvenance(BUILD_PROVENANCE_PATH, {
+    buildId: receipt.candidate.buildId,
+    sourceCommit: receipt.candidate.sourceCommit,
+    sourceTree: receipt.candidate.sourceTree
+  });
+  if (buildProvenance.manifestSha256 !== receipt.candidate.buildProvenance.manifestSha256) {
+    throw new Error("[exact-artifact] build provenance manifest digest mismatch before server start");
   }
   const artifact = await artifactDigest();
   if (artifact.digest !== receipt.candidate.digest) {
@@ -426,8 +595,8 @@ async function runCommand(args, env) {
 }
 
 async function main() {
-  const { phase, grep, updateSnapshots } = parseArgs();
-  const { receipt } = await prepareArtifactPhase({ phase });
+  const { phase, grep, updateSnapshots, newCandidate, replaceCandidate } = parseArgs();
+  const { receipt } = await prepareArtifactPhase({ phase, newCandidate, replaceCandidate });
   const { buildId, digest } = receipt.candidate;
 
   const server = await startServer(buildId, digest);
@@ -450,7 +619,12 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  process.stderr.write(`${error instanceof Error ? error.stack ?? error.message : String(error)}\n`);
-  process.exitCode = 1;
-});
+export const testApi = { artifactDigest, parseArgs, prepareArtifactPhase };
+
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+  main().catch((error) => {
+    process.stderr.write(`${error instanceof Error ? error.stack ?? error.message : String(error)}\n`);
+    process.exitCode = 1;
+  });
+}

@@ -41,41 +41,36 @@ test.describe("@console-workspace-responsive console mobile panes", () => {
       await expect(activePane).toBeVisible();
       await expect(activePane.getByRole("heading", { name: pane.heading })).toBeVisible();
       await expect(activePane.getByText(pane.description, { exact: true })).toBeVisible();
+      const geometry = await activePane.evaluate((element) => {
+        const renderedPanel = element.querySelector<HTMLElement>("[data-testid='decision-state-panel']");
+        if (!renderedPanel) throw new Error("Console workspace DecisionStatePanel is unavailable");
+        const activeRect = element.getBoundingClientRect();
+        const panelRect = renderedPanel.getBoundingClientRect();
+        return {
+          documentWidth: document.documentElement.scrollWidth,
+          documentHeight: document.documentElement.scrollHeight,
+          viewportWidth: window.innerWidth,
+          viewportHeight: window.innerHeight,
+          activeTop: activeRect.top,
+          activeBottom: activeRect.bottom,
+          panelTop: panelRect.top,
+          panelBottom: panelRect.bottom,
+          panelHeight: panelRect.height
+        };
+      });
+
+      expect(geometry.documentWidth, `${pane.tab} must not overflow horizontally`).toBeLessThanOrEqual(geometry.viewportWidth + 1);
+      expect(geometry.documentHeight, `${pane.tab} must not create a blank-page tail`).toBeLessThanOrEqual(geometry.viewportHeight + 1);
+      expect(geometry.panelTop, `${pane.tab} panel must stay inside its active pane`).toBeGreaterThanOrEqual(geometry.activeTop - 1);
+      expect(geometry.panelBottom, `${pane.tab} panel must stay inside its active pane`).toBeLessThanOrEqual(geometry.activeBottom + 1);
+      expect(geometry.panelBottom, `${pane.tab} panel must reach 70% of the first viewport`).toBeGreaterThanOrEqual(geometry.viewportHeight * 0.7);
+      expect(geometry.panelBottom, `${pane.tab} panel must end inside the first viewport`).toBeLessThanOrEqual(geometry.viewportHeight + 1);
+      expect(geometry.panelHeight).toBeGreaterThanOrEqual(220);
     };
 
-    await assertActivePane(panes[0]);
-    for (const pane of panes.slice(1)) {
+    for (const pane of panes) {
       await page.getByRole("tab", { name: pane.tab }).click();
       await assertActivePane(pane);
     }
-    await page.getByRole("tab", { name: panes[0].tab }).click();
-    await assertActivePane(panes[0]);
-
-    const geometry = await page.evaluate(() => {
-      const activePane = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-testid^='workspace-']")
-      ).find((element) => window.getComputedStyle(element).display !== "none");
-      const renderedPanel = activePane?.querySelector<HTMLElement>("[data-testid='decision-state-panel']");
-      if (!activePane || !renderedPanel) throw new Error("Console workspace geometry is unavailable");
-      const activeRect = activePane.getBoundingClientRect();
-      const panelRect = renderedPanel.getBoundingClientRect();
-      return {
-        documentWidth: document.documentElement.scrollWidth,
-        documentHeight: document.documentElement.scrollHeight,
-        viewportWidth: window.innerWidth,
-        viewportHeight: window.innerHeight,
-        activeTop: activeRect.top,
-        activeBottom: activeRect.bottom,
-        panelTop: panelRect.top,
-        panelBottom: panelRect.bottom,
-        panelHeight: panelRect.height
-      };
-    });
-
-    expect(geometry.documentWidth).toBeLessThanOrEqual(geometry.viewportWidth + 1);
-    expect(geometry.documentHeight).toBeLessThanOrEqual(geometry.viewportHeight + 1);
-    expect(geometry.panelTop).toBeGreaterThanOrEqual(geometry.activeTop - 1);
-    expect(geometry.panelBottom).toBeLessThanOrEqual(geometry.activeBottom + 1);
-    expect(geometry.panelHeight).toBeGreaterThanOrEqual(220);
   });
 });

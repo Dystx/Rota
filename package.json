@@ -8,11 +8,13 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "build:acceptance": "node scripts/build-exact-artifact.mjs",
     "typecheck": "turbo run typecheck",
     "lint": "pnpm -r --if-present lint && eslint .",
     "lint:eslint": "eslint .",
-    "test": "pnpm -r --if-present test",
+    "test": "pnpm test:exact-artifact-unit && pnpm -r --if-present test",
     "test:unit": "pnpm exec vitest run",
+    "test:exact-artifact-unit": "node --test scripts/build-exact-artifact.test.mjs scripts/run-exact-artifact-gate.test.mjs",
     "test:rls": "node scripts/run-postgres-policy-tests.mjs",
     "test:e2e": "pnpm --dir apps/web test:e2e",
     "test:visual": "pnpm --dir apps/web test:visual",
@@ -27,7 +29,7 @@
     "db:migrate": "node scripts/db-migrate.mjs",
     "db:reset": "node scripts/db-reset.mjs",
     "test:db-policy": "node scripts/run-postgres-policy-tests.mjs",
-    "test:acceptance": "node scripts/run-exact-artifact-gate.mjs"
+    "test:acceptance": "node scripts/run-exact-artifact-gate.mjs --phase final"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

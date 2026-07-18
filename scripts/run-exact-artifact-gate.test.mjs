@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile as execFileCallback } from "node:child_process";
+import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -9,6 +10,7 @@ import { promisify } from "node:util";
 const HARNESS_PATH = new URL("./run-exact-artifact-gate.mjs", import.meta.url);
 const execFile = promisify(execFileCallback);
 const FIXED_TIME = "2026-07-18T12:00:00.000Z";
+const PROVENANCE_FILE_NAME = "rumia-exact-artifact-provenance.json";
 
 async function writeFile(filePath, contents) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
@@ -41,21 +43,27 @@ async function createRuntimeFixture() {
 
 async function loadCurrentGate(root) {
   const source = await fs.readFile(HARNESS_PATH, "utf8");
-  const isolatedSource = source
-    .replace(
+  let isolatedSource = source.replace(
       'const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");',
       `const ROOT = ${JSON.stringify(root)};`
-    )
-    .replace(
+    );
+  if (!isolatedSource.includes("export const testApi")) {
+    isolatedSource = isolatedSource.replace(
       /main\(\)\.catch\(\(error\) => \{[\s\S]*?\n\}\);\s*$/,
       `export const testApi = {
         artifactDigest,
+        parseArgs,
         prepareArtifactPhase: typeof prepareArtifactPhase === "function" ? prepareArtifactPhase : undefined
       };\n`
     );
+  }
   const modulePath = path.join(root, "output", "test-harness", "isolated-gate.mjs");
   await fs.mkdir(path.dirname(modulePath), { recursive: true });
   await fs.writeFile(modulePath, isolatedSource);
+  const provenanceModule = new URL("./exact-artifact-provenance.mjs", HARNESS_PATH);
+  if (await fs.access(provenanceModule).then(() => true, () => false)) {
+    await fs.copyFile(provenanceModule, path.join(path.dirname(modulePath), "exact-artifact-provenance.mjs"));
+  }
   return (await import(`${new URL(`file://${modulePath}`).href}?test=${Date.now()}`)).testApi;
 }
 
@@ -72,6 +80,26 @@ async function initializeGitFixture(fixture) {
   await execFile("git", ["add", ".gitignore", "tracked-source.txt", "apps/web/public/guide.txt"], { cwd: fixture.root });
   await execFile("git", ["commit", "-m", "fixture"], { cwd: fixture.root });
   await writeFile(path.join(fixture.root, "output", "existing.txt"), "allowed\n");
+}
+
+async function writeBuildProvenance(fixture, overrides = {}) {
+  const sourceCommit = (await execFile("git", ["rev-parse", "HEAD"], { cwd: fixture.root })).stdout.trim();
+  const sourceTree = (await execFile("git", ["rev-parse", "HEAD^{tree}"], { cwd: fixture.root })).stdout.trim();
+  const manifest = {
+    schemaVersion: 1,
+    buildId: "red-build",
+    sourceCommit,
+    sourceTree,
+    ...overrides
+  };
+  const contents = `${JSON.stringify(manifest, null, 2)}\n`;
+  const manifestPath = path.join(fixture.standaloneRoot, PROVENANCE_FILE_NAME);
+  await writeFile(manifestPath, contents);
+  return {
+    manifest,
+    manifestPath,
+    manifestSha256: createHash("sha256").update(contents).digest("hex")
+  };
 }
 
 test("artifact digest inventory covers every served payload class", async (t) => {
@@ -122,6 +150,10 @@ test("artifact digest changes for public, static, server, dependency, and symlin
   }
 
   const symlinkPath = path.join(fixture.standaloneRoot, "node_modules", "runtime-link");
+  await writeFile(
+    path.join(fixture.standaloneRoot, "node_modules", "alternate-package", "index.js"),
+    "alternate-dependency"
+  );
   const beforeSymlink = await artifactDigest(fixture.buildIdPath);
   await fs.unlink(symlinkPath);
   await fs.symlink("alternate-package", symlinkPath);
@@ -133,6 +165,7 @@ test("pre-approval materializes once and records immutable candidate provenance"
   const fixture = await createRuntimeFixture();
   t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
   await initializeGitFixture(fixture);
+  const provenance = await writeBuildProvenance(fixture);
   await fs.rm(path.join(fixture.standaloneApp, "public"), { recursive: true, force: true });
   await fs.rm(path.join(fixture.standaloneApp, ".next", "static"), { recursive: true, force: true });
   const { prepareArtifactPhase } = await loadCurrentGate(fixture.root);
@@ -140,12 +173,13 @@ test("pre-approval materializes once and records immutable candidate provenance"
 
   const result = await prepareArtifactPhase({
     phase: "pre-approval",
+    newCandidate: true,
     now: () => new Date(FIXED_TIME)
   });
   const sourceCommit = (await execFile("git", ["rev-parse", "HEAD"], { cwd: fixture.root })).stdout.trim();
   const sourceTree = (await execFile("git", ["rev-parse", "HEAD^{tree}"], { cwd: fixture.root })).stdout.trim();
 
-  assert.equal(result.receipt.schemaVersion, 2);
+  assert.equal(result.receipt.schemaVersion, 3);
   assert.deepEqual(
     {
       buildId: result.receipt.candidate.buildId,
@@ -155,7 +189,8 @@ test("pre-approval materializes once and records immutable candidate provenance"
       trackedClean: result.receipt.candidate.trackedClean,
       server: result.receipt.candidate.server,
       candidateCreatedAt: result.receipt.candidate.candidateCreatedAt,
-      inventoryCount: result.receipt.candidate.inventoryCount
+      inventoryCount: result.receipt.candidate.inventoryCount,
+      buildProvenance: result.receipt.candidate.buildProvenance
     },
     {
       buildId: "red-build",
@@ -165,9 +200,15 @@ test("pre-approval materializes once and records immutable candidate provenance"
       trackedClean: true,
       server: "apps/web/.next/standalone/apps/web/server.js",
       candidateCreatedAt: FIXED_TIME,
-      inventoryCount: result.artifact.inventory.length
+      inventoryCount: result.artifact.inventory.length,
+      buildProvenance: {
+        schemaVersion: 1,
+        manifest: `apps/web/.next/standalone/${PROVENANCE_FILE_NAME}`,
+        manifestSha256: provenance.manifestSha256
+      }
     }
   );
+  assert.deepEqual(result.receipt.creation, { mode: "new" });
   assert.equal(result.receipt.candidate.inventory.length, result.artifact.inventory.length);
   assert.deepEqual(result.receipt.verifications.map(({ phase }) => phase), ["pre-approval"]);
   assert.equal(
@@ -180,10 +221,11 @@ test("later phases never recopy assets and reject a changed served byte before s
   const fixture = await createRuntimeFixture();
   t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
   await initializeGitFixture(fixture);
+  await writeBuildProvenance(fixture);
   const { prepareArtifactPhase } = await loadCurrentGate(fixture.root);
   assert.equal(typeof prepareArtifactPhase, "function", "candidate phase API is missing");
 
-  const created = await prepareArtifactPhase({ phase: "pre-approval", now: () => new Date(FIXED_TIME) });
+  const created = await prepareArtifactPhase({ phase: "pre-approval", newCandidate: true, now: () => new Date(FIXED_TIME) });
   const candidateIdentity = structuredClone(created.receipt.candidate);
   await fs.writeFile(path.join(fixture.root, "apps", "web", "public", "guide.txt"), "source-v2");
 
@@ -208,18 +250,19 @@ test("pre-approval rejects tracked changes and untracked files outside output", 
   const fixture = await createRuntimeFixture();
   t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
   await initializeGitFixture(fixture);
+  await writeBuildProvenance(fixture);
   const { prepareArtifactPhase } = await loadCurrentGate(fixture.root);
   assert.equal(typeof prepareArtifactPhase, "function", "candidate phase API is missing");
 
   await fs.writeFile(path.join(fixture.root, "tracked-source.txt"), "dirty\n");
   await assert.rejects(
-    prepareArtifactPhase({ phase: "pre-approval" }),
+    prepareArtifactPhase({ phase: "pre-approval", newCandidate: true }),
     /clean source tree.*tracked changes are present/i
   );
   await fs.writeFile(path.join(fixture.root, "tracked-source.txt"), "tracked\n");
   await fs.writeFile(path.join(fixture.root, "stray.txt"), "stray\n");
   await assert.rejects(
-    prepareArtifactPhase({ phase: "pre-approval" }),
+    prepareArtifactPhase({ phase: "pre-approval", newCandidate: true }),
     /clean source tree.*untracked files outside output/i
   );
 });
@@ -246,4 +289,190 @@ test("later phases reject missing and malformed receipts", async (t) => {
     prepareArtifactPhase({ phase: "final" }),
     /candidate receipt is invalid/i
   );
+});
+
+test("argument parsing requires an explicit phase and valid candidate authorization", async (t) => {
+  const fixture = await createRuntimeFixture();
+  t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
+  const { parseArgs } = await loadCurrentGate(fixture.root);
+  assert.equal(typeof parseArgs, "function", "argument parser API is missing");
+
+  assert.throws(() => parseArgs([]), /--phase is required/i);
+  assert.deepEqual(parseArgs(["--phase", "final"]), {
+    phase: "final",
+    grep: undefined,
+    updateSnapshots: false,
+    newCandidate: false,
+    replaceCandidate: undefined
+  });
+  assert.deepEqual(parseArgs(["--phase", "pre-approval", "--new-candidate", "--grep", "console-workspace"]), {
+    phase: "pre-approval",
+    grep: "console-workspace",
+    updateSnapshots: false,
+    newCandidate: true,
+    replaceCandidate: undefined
+  });
+  assert.throws(
+    () => parseArgs(["--phase", "pre-approval"]),
+    /requires exactly one of --new-candidate or --replace-candidate/i
+  );
+  assert.throws(
+    () => parseArgs(["--phase", "pre-approval", "--new-candidate", "--replace-candidate", "a".repeat(64)]),
+    /exactly one/i
+  );
+  assert.throws(
+    () => parseArgs(["--phase", "final", "--new-candidate"]),
+    /only valid with --phase pre-approval/i
+  );
+  assert.throws(
+    () => parseArgs(["--phase", "pre-approval", "--replace-candidate", "not-a-digest"]),
+    /64-character lowercase sha-256/i
+  );
+  assert.throws(() => parseArgs(["--phase", "final", "--unknown"]), /unknown argument/i);
+});
+
+test("repeated pre-approval without replacement authorization preserves receipt and served bytes", async (t) => {
+  const fixture = await createRuntimeFixture();
+  t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
+  await initializeGitFixture(fixture);
+  await writeBuildProvenance(fixture);
+  const { prepareArtifactPhase } = await loadCurrentGate(fixture.root);
+  const receiptPath = path.join(fixture.root, "output", "playwright", "exact-artifact", "build-receipt.json");
+  const servedStatic = path.join(fixture.standaloneApp, ".next", "static", "chunks", "app.js");
+
+  await prepareArtifactPhase({ phase: "pre-approval", newCandidate: true, now: () => new Date(FIXED_TIME) });
+  const receiptBefore = await fs.readFile(receiptPath);
+  const servedBefore = await fs.readFile(servedStatic);
+  await fs.writeFile(path.join(fixture.nextRoot, "static", "chunks", "app.js"), "static-v2");
+
+  await assert.rejects(
+    prepareArtifactPhase({ phase: "pre-approval" }),
+    /requires explicit candidate creation authorization/i
+  );
+  assert.deepEqual(await fs.readFile(receiptPath), receiptBefore);
+  assert.deepEqual(await fs.readFile(servedStatic), servedBefore);
+});
+
+test("replacement requires the exact old digest and archives the prior receipt bytes", async (t) => {
+  const fixture = await createRuntimeFixture();
+  t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
+  await initializeGitFixture(fixture);
+  await writeBuildProvenance(fixture);
+  const { prepareArtifactPhase } = await loadCurrentGate(fixture.root);
+  const receiptPath = path.join(fixture.root, "output", "playwright", "exact-artifact", "build-receipt.json");
+  const servedStatic = path.join(fixture.standaloneApp, ".next", "static", "chunks", "app.js");
+
+  const first = await prepareArtifactPhase({ phase: "pre-approval", newCandidate: true, now: () => new Date(FIXED_TIME) });
+  const legacyReceipt = structuredClone(first.receipt);
+  legacyReceipt.schemaVersion = 2;
+  delete legacyReceipt.creation;
+  delete legacyReceipt.candidate.buildProvenance;
+  await fs.writeFile(receiptPath, `${JSON.stringify(legacyReceipt, null, 2)}\n`);
+  const oldReceiptBytes = await fs.readFile(receiptPath);
+  const oldServedBytes = await fs.readFile(servedStatic);
+  await fs.writeFile(path.join(fixture.nextRoot, "static", "chunks", "app.js"), "static-v2");
+
+  await assert.rejects(
+    prepareArtifactPhase({ phase: "pre-approval", replaceCandidate: "0".repeat(64) }),
+    /replacement digest mismatch/i
+  );
+  assert.deepEqual(await fs.readFile(receiptPath), oldReceiptBytes);
+  assert.deepEqual(await fs.readFile(servedStatic), oldServedBytes);
+
+  const replacement = await prepareArtifactPhase({
+    phase: "pre-approval",
+    replaceCandidate: first.receipt.candidate.digest,
+    now: () => new Date("2026-07-18T13:00:00.000Z")
+  });
+  const expectedArchive = path.join(
+    fixture.root,
+    "output",
+    "playwright",
+    "exact-artifact",
+    "archive",
+    `build-receipt.${first.receipt.candidate.digest}.json`
+  );
+  assert.deepEqual(await fs.readFile(expectedArchive), oldReceiptBytes);
+  assert.notEqual(replacement.receipt.candidate.digest, first.receipt.candidate.digest);
+  assert.deepEqual(replacement.receipt.creation, {
+    mode: "replacement",
+    expectedPriorDigest: first.receipt.candidate.digest,
+    priorBuildId: first.receipt.candidate.buildId,
+    priorReceiptArchive: path.relative(fixture.root, expectedArchive).split(path.sep).join("/")
+  });
+});
+
+test("pre-approval rejects stale build provenance before receipt creation or asset mutation", async (t) => {
+  const fixture = await createRuntimeFixture();
+  t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
+  await initializeGitFixture(fixture);
+  await writeBuildProvenance(fixture);
+  const { prepareArtifactPhase } = await loadCurrentGate(fixture.root);
+  const receiptPath = path.join(fixture.root, "output", "playwright", "exact-artifact", "build-receipt.json");
+  const servedStatic = path.join(fixture.standaloneApp, ".next", "static", "chunks", "app.js");
+  const servedBefore = await fs.readFile(servedStatic);
+
+  await fs.writeFile(path.join(fixture.root, "tracked-source.txt"), "advanced\n");
+  await execFile("git", ["add", "tracked-source.txt"], { cwd: fixture.root });
+  await execFile("git", ["commit", "-m", "advance source"], { cwd: fixture.root });
+  await fs.writeFile(path.join(fixture.nextRoot, "static", "chunks", "app.js"), "stale-copy-attempt");
+
+  await assert.rejects(
+    prepareArtifactPhase({ phase: "pre-approval", newCandidate: true }),
+    /build provenance sourceCommit does not match clean HEAD/i
+  );
+  await assert.rejects(fs.access(receiptPath), /ENOENT/);
+  assert.deepEqual(await fs.readFile(servedStatic), servedBefore);
+});
+
+test("pre-approval rejects missing and malformed build provenance before asset mutation", async (t) => {
+  const fixture = await createRuntimeFixture();
+  t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
+  await initializeGitFixture(fixture);
+  const { prepareArtifactPhase } = await loadCurrentGate(fixture.root);
+  const servedStatic = path.join(fixture.standaloneApp, ".next", "static", "chunks", "app.js");
+  const servedBefore = await fs.readFile(servedStatic);
+
+  await assert.rejects(
+    prepareArtifactPhase({ phase: "pre-approval", newCandidate: true }),
+    /build provenance manifest is missing/i
+  );
+  assert.deepEqual(await fs.readFile(servedStatic), servedBefore);
+  await writeFile(path.join(fixture.standaloneRoot, PROVENANCE_FILE_NAME), "not-json\n");
+  await assert.rejects(
+    prepareArtifactPhase({ phase: "pre-approval", newCandidate: true }),
+    /build provenance manifest is malformed JSON/i
+  );
+  assert.deepEqual(await fs.readFile(servedStatic), servedBefore);
+
+  await writeBuildProvenance(fixture, { buildId: "different-build" });
+  await assert.rejects(
+    prepareArtifactPhase({ phase: "pre-approval", newCandidate: true }),
+    /build provenance buildId does not match candidate build/i
+  );
+  assert.deepEqual(await fs.readFile(servedStatic), servedBefore);
+
+  await writeBuildProvenance(fixture, { sourceTree: "0".repeat(40) });
+  await assert.rejects(
+    prepareArtifactPhase({ phase: "pre-approval", newCandidate: true }),
+    /build provenance sourceTree does not match clean HEAD/i
+  );
+  assert.deepEqual(await fs.readFile(servedStatic), servedBefore);
+});
+
+test("artifact digest rejects missing and out-of-root symlink targets", async (t) => {
+  const fixture = await createRuntimeFixture();
+  t.after(() => fs.rm(fixture.root, { recursive: true, force: true }));
+  const { artifactDigest } = await loadCurrentGate(fixture.root);
+  const symlinkPath = path.join(fixture.standaloneRoot, "node_modules", "runtime-link");
+
+  await fs.unlink(symlinkPath);
+  await fs.symlink("missing-package", symlinkPath);
+  await assert.rejects(artifactDigest(fixture.buildIdPath), /symlink target is missing/i);
+
+  await fs.unlink(symlinkPath);
+  const outsideTarget = path.join(fixture.root, "outside-runtime.js");
+  await fs.writeFile(outsideTarget, "outside");
+  await fs.symlink(path.relative(path.dirname(symlinkPath), outsideTarget), symlinkPath);
+  await assert.rejects(artifactDigest(fixture.buildIdPath), /symlink target resolves outside standalone root/i);
 });

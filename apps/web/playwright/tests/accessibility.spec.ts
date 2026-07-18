@@ -39,7 +39,6 @@ const tripExportPath = () => travelerTripPath("/export");
 const tripMapPath = () => travelerTripPath("/map");
 
 async function stabilizeA11yMotion(page: Page): Promise<void> {
-  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.addStyleTag({
     content: "*,*::before,*::after{animation:none!important;transition:none!important}"
   });
@@ -306,6 +305,10 @@ test.describe("Accessibility Audit - Traveler", () => {
     await page.goto("/itineraries");
     await expect(page).not.toHaveURL(/\/sign-in/);
     await stabilizeA11yMotion(page);
+    expect(
+      await page.evaluate(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches),
+      "The generic Axe sweep must retain the default motion preference"
+    ).toBe(false);
     const draftsFilter = page.getByRole("button", { name: "Drafts" });
     const filterMotion = await draftsFilter.evaluate((element: HTMLElement) => {
       const style = window.getComputedStyle(element);
