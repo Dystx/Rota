@@ -18,6 +18,7 @@ const NON_VISUAL_SPECS = [
   "playwright/tests/loading-recovery.spec.ts",
   "playwright/tests/preference-accessibility.spec.ts",
   "playwright/tests/visual-quality.spec.ts",
+  "playwright/tests/console-workspace-responsive.spec.ts",
   "playwright/tests/protected-routes.spec.ts",
   "playwright/tests/accessibility.spec.ts",
   "playwright/tests/mobile-overflow.spec.ts",

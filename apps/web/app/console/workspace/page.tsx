@@ -13,14 +13,17 @@ const WORKSPACE_VIEWS = [
 ] as const;
 
 function paneClass(pane: WorkspacePane, activePane: WorkspacePane) {
-  return `${pane === activePane ? "block" : "hidden"} min-w-0 lg:block`;
+  return `${pane === activePane ? "block" : "hidden"} min-w-0 min-h-[24rem] lg:min-h-0 lg:block`;
 }
 
 export default function ConsoleWorkspacePage() {
   const [activePane, setActivePane] = React.useState<WorkspacePane>("anchors");
 
   return (
-    <div className="min-w-0 min-h-screen overflow-x-hidden bg-background p-container-padding-sm lg:p-container-padding-lg">
+    <div
+      data-testid="console-workspace-content"
+      className="min-w-0 overflow-x-hidden"
+    >
       <header className="mb-5 flex min-w-0 flex-col gap-3 border-b border-olive-light/15 pb-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="font-mono-micro text-mono-micro uppercase tracking-widest text-ochre-dark">
@@ -54,6 +57,7 @@ export default function ConsoleWorkspacePage() {
             headingLevel={2}
             title="Client anchors unavailable"
             description="No persisted trip is selected for this workspace, so client constraints are not shown as if they were real."
+            className="min-h-[20rem] lg:min-h-[22rem]"
           />
         </aside>
 
@@ -63,6 +67,7 @@ export default function ConsoleWorkspacePage() {
             headingLevel={2}
             title="Timeline unavailable"
             description="Select a persisted trip before timeline events or editorial actions can be loaded."
+            className="min-h-[20rem] lg:min-h-[22rem]"
           />
         </section>
 
@@ -72,6 +77,7 @@ export default function ConsoleWorkspacePage() {
             headingLevel={2}
             title="Validation unavailable"
             description="Validation checks require persisted itinerary evidence and are not fabricated here."
+            className="min-h-[20rem] lg:min-h-[22rem]"
           />
         </aside>
       </div>
